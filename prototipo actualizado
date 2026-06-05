@@ -1,0 +1,2769 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SGROAS — Sistema de Gestión de Recursos Operativos, Administrativos y de Seguridad</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  :root {
+    --blue: #57B9FF;
+    --blue-dark: #1A8FE3;
+    --blue-deeper: #0A6AB8;
+    --blue-light: #C2E4FF;
+    --blue-ultra-light: #EEF7FF;
+    --white: #FFFFFF;
+    --gray-50: #F8FBFF;
+    --gray-100: #EFF5FB;
+    --gray-200: #D9E8F5;
+    --gray-400: #94B4CC;
+    --gray-600: #5A7A94;
+    --gray-800: #1E3347;
+    --sidebar-w: 260px;
+    --topbar-h: 64px;
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(87,185,255,0.10);
+    --shadow-lg: 0 8px 32px rgba(87,185,255,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-800);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── LOGIN ─── */
+  #login-screen {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0A6AB8 0%, #57B9FF 60%, #C2E4FF 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #login-screen::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    top: -200px; right: -150px;
+  }
+
+  #login-screen::after {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    bottom: -150px; left: -100px;
+  }
+
+  .login-card {
+    background: rgba(255,255,255,0.97);
+    border-radius: 20px;
+    padding: 48px 44px;
+    width: 440px;
+    box-shadow: 0 24px 80px rgba(10,106,184,0.25);
+    position: relative;
+    z-index: 2;
+    animation: slideUp 0.6s ease;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .login-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .login-logo-icon {
+    width: 48px; height: 48px;
+    background: linear-gradient(135deg, var(--blue-dark), var(--blue));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 22px;
+  }
+
+  .login-logo-text h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--blue-deeper);
+    letter-spacing: -0.5px;
+  }
+
+  .login-logo-text span {
+    font-size: 11px;
+    color: var(--gray-600);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .login-subtitle {
+    font-size: 13.5px;
+    color: var(--gray-600);
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--gray-100);
+    padding-bottom: 24px;
+  }
+
+  .form-group {
+    margin-bottom: 18px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-800);
+    margin-bottom: 7px;
+  }
+
+  .form-group .input-wrap {
+    position: relative;
+  }
+
+  .form-group .input-wrap i {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-400);
+    font-size: 15px;
+  }
+
+  .form-group input, .form-group select {
+    width: 100%;
+    padding: 11px 14px 11px 40px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--gray-800);
+    background: var(--gray-50);
+    transition: all 0.2s;
+    outline: none;
+  }
+
+  .form-group input:focus {
+    border-color: var(--blue);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(87,185,255,0.15);
+  }
+
+  .login-role-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .role-tab {
+    flex: 1;
+    padding: 8px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 8px;
+    text-align: center;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+  }
+
+  .role-tab.active, .role-tab:hover {
+    border-color: var(--blue);
+    background: var(--blue-ultra-light);
+    color: var(--blue-dark);
+  }
+
+  .btn-login {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, var(--blue-dark), var(--blue));
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+    letter-spacing: 0.2px;
+  }
+
+  .btn-login:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(87,185,255,0.4);
+  }
+
+  .login-footer {
+    text-align: center;
+    font-size: 12px;
+    color: var(--gray-400);
+    margin-top: 20px;
+  }
+
+  /* ─── MAIN APP ─── */
+  #app {
+    display: none;
+    min-height: 100vh;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: linear-gradient(180deg, #0A5A9C 0%, #0D6DB5 40%, #1A8FE3 100%);
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    box-shadow: 4px 0 20px rgba(10,90,156,0.3);
+  }
+
+  .sidebar-brand {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .sidebar-brand-icon {
+    width: 40px; height: 40px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .sidebar-brand-text h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+  }
+
+  .sidebar-brand-text span {
+    font-size: 10px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  .sidebar-section {
+    padding: 12px 12px 4px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+  }
+
+  .sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 12px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.18s;
+    margin-bottom: 2px;
+    color: rgba(255,255,255,0.75);
+    font-size: 14px;
+    font-weight: 400;
+    position: relative;
+  }
+
+  .nav-item i {
+    width: 20px;
+    text-align: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .nav-item:hover {
+    background: rgba(255,255,255,0.12);
+    color: white;
+  }
+
+  .nav-item.active {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  }
+
+  .nav-badge {
+    margin-left: auto;
+    background: #FF5B5B;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 20px;
+  }
+
+  .nav-badge.blue {
+    background: rgba(255,255,255,0.25);
+    color: white;
+  }
+
+  .sidebar-footer {
+    padding: 16px 12px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+  }
+
+  .sidebar-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.1);
+    cursor: pointer;
+  }
+
+  .user-avatar {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .user-info h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+  }
+
+  .user-info span {
+    font-size: 11px;
+    color: rgba(255,255,255,0.6);
+  }
+
+  /* MAIN CONTENT */
+  .main-content {
+    margin-left: var(--sidebar-w);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* TOPBAR */
+  .topbar {
+    height: var(--topbar-h);
+    background: white;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    padding: 0 28px;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 1px 8px rgba(87,185,255,0.08);
+  }
+
+  .topbar-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gray-800);
+    flex: 1;
+  }
+
+  .topbar-title span {
+    font-size: 13px;
+    color: var(--gray-600);
+    font-weight: 400;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .topbar-btn {
+    width: 36px; height: 36px;
+    border-radius: 9px;
+    border: 1.5px solid var(--gray-200);
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--gray-600);
+    font-size: 15px;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .topbar-btn:hover {
+    border-color: var(--blue);
+    color: var(--blue-dark);
+    background: var(--blue-ultra-light);
+  }
+
+  .topbar-btn .notif-dot {
+    position: absolute;
+    top: 6px; right: 6px;
+    width: 7px; height: 7px;
+    background: #FF5B5B;
+    border-radius: 50%;
+    border: 1.5px solid white;
+  }
+
+  .topbar-date {
+    font-size: 12px;
+    color: var(--gray-400);
+    padding: 6px 12px;
+    background: var(--gray-100);
+    border-radius: 8px;
+  }
+
+  /* PAGES */
+  .page {
+    display: none;
+    padding: 28px;
+    flex: 1;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .page.active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* CARDS */
+  .card {
+    background: white;
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+    padding: 24px;
+    box-shadow: var(--shadow);
+  }
+
+  .card-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title i {
+    color: var(--blue);
+  }
+
+  /* STAT CARDS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--blue-dark), var(--blue));
+  }
+
+  .stat-card.green::before { background: linear-gradient(90deg, #0a8a5c, #1DBBAA); }
+  .stat-card.orange::before { background: linear-gradient(90deg, #d4620a, #F5A623); }
+  .stat-card.red::before { background: linear-gradient(90deg, #a32222, #E24B4A); }
+
+  .stat-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--blue-ultra-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--blue-dark);
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+
+  .stat-card.green .stat-icon { background: #e1f5ee; color: #0a8a5c; }
+  .stat-card.orange .stat-icon { background: #fff3e0; color: #d4620a; }
+  .stat-card.red .stat-icon { background: #fff0f0; color: #a32222; }
+
+  .stat-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--gray-800);
+    line-height: 1;
+    margin-bottom: 5px;
+  }
+
+  .stat-label {
+    font-size: 12.5px;
+    color: var(--gray-600);
+  }
+
+  .stat-trend {
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .stat-trend.up { color: #0a8a5c; }
+  .stat-trend.down { color: #E24B4A; }
+
+  /* TABLES */
+  .table-wrap { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+
+  thead th {
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--gray-600);
+    border-bottom: 1.5px solid var(--gray-200);
+    background: var(--gray-50);
+  }
+
+  tbody td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--gray-100);
+    color: var(--gray-800);
+  }
+
+  tbody tr:hover td {
+    background: var(--blue-ultra-light);
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+
+  /* BADGES */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 600;
+  }
+
+  .badge.active { background: #e1f5ee; color: #0a6b45; }
+  .badge.inactive { background: #fff0f0; color: #a32222; }
+  .badge.warning { background: #fff3e0; color: #b35d00; }
+  .badge.blue { background: var(--blue-ultra-light); color: var(--blue-deeper); }
+  .badge.gray { background: var(--gray-100); color: var(--gray-600); }
+  .badge.critical { background: #ff2d2d22; color: #c0000a; }
+  .badge.high { background: #ff850022; color: #cc5500; }
+  .badge.medium { background: #ffcc0022; color: #9a7800; }
+  .badge.low { background: #00c47822; color: #006b42; }
+
+  /* GRID LAYOUTS */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  .col-span-2 { grid-column: span 2; }
+
+  /* FILTERS BAR */
+  .filters-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+
+  .filter-input {
+    padding: 8px 14px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--gray-800);
+    background: white;
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  .filter-input:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(87,185,255,0.15);
+  }
+
+  .btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--blue-dark), var(--blue));
+    color: white;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(87,185,255,0.35);
+  }
+
+  .btn-outline {
+    background: white;
+    color: var(--blue-dark);
+    border: 1.5px solid var(--blue);
+  }
+
+  .btn-outline:hover {
+    background: var(--blue-ultra-light);
+  }
+
+  .btn-ghost {
+    background: var(--gray-100);
+    color: var(--gray-800);
+    border: 1px solid var(--gray-200);
+  }
+
+  .btn-ghost:hover {
+    background: var(--gray-200);
+  }
+
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+
+  .btn-danger {
+    background: #fff0f0;
+    color: #a32222;
+    border: 1px solid #ffd4d4;
+  }
+
+  /* FORM ELEMENTS */
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .form-field label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--gray-600);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .form-field input,
+  .form-field select,
+  .form-field textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--gray-800);
+    background: var(--gray-50);
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  .form-field input:focus,
+  .form-field select:focus,
+  .form-field textarea:focus {
+    border-color: var(--blue);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(87,185,255,0.15);
+  }
+
+  .form-field textarea { resize: vertical; min-height: 90px; }
+
+  /* PAGE HEADER */
+  .page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .page-header h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--gray-800);
+    margin-bottom: 4px;
+  }
+
+  .page-header p {
+    font-size: 13.5px;
+    color: var(--gray-600);
+  }
+
+  /* TABS */
+  .tab-bar {
+    display: flex;
+    gap: 4px;
+    border-bottom: 2px solid var(--gray-200);
+    margin-bottom: 24px;
+  }
+
+  .tab-item {
+    padding: 10px 18px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--gray-600);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s;
+  }
+
+  .tab-item.active {
+    color: var(--blue-dark);
+    border-bottom-color: var(--blue);
+  }
+
+  .tab-item:hover:not(.active) {
+    color: var(--gray-800);
+    background: var(--gray-100);
+    border-radius: 8px 8px 0 0;
+  }
+
+  /* PROGRESS BARS */
+  .progress-bar {
+    height: 6px;
+    background: var(--gray-200);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--blue-dark), var(--blue));
+    border-radius: 3px;
+    transition: width 0.5s ease;
+  }
+
+  .progress-fill.green { background: linear-gradient(90deg, #0a8a5c, #1DBBAA); }
+  .progress-fill.orange { background: linear-gradient(90deg, #d4620a, #F5A623); }
+  .progress-fill.red { background: linear-gradient(90deg, #a32222, #E24B4A); }
+
+  /* IMAGE UPLOAD */
+  .upload-zone {
+    border: 2px dashed var(--gray-200);
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--gray-50);
+  }
+
+  .upload-zone:hover {
+    border-color: var(--blue);
+    background: var(--blue-ultra-light);
+  }
+
+  .upload-zone i {
+    font-size: 36px;
+    color: var(--gray-400);
+    margin-bottom: 10px;
+  }
+
+  .upload-zone p { font-size: 13.5px; color: var(--gray-600); }
+  .upload-zone small { font-size: 11.5px; color: var(--gray-400); }
+
+  /* AI BADGE */
+  .ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: linear-gradient(135deg, #6a35d4, #9B59B6);
+    color: white;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  /* INCIDENTS */
+  .incident-card {
+    background: white;
+    border-radius: 10px;
+    border: 1px solid var(--gray-200);
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.2s;
+  }
+
+  .incident-card:hover {
+    border-color: var(--blue-light);
+    box-shadow: var(--shadow);
+  }
+
+  .incident-severity {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .incident-severity.critical { background: #ff2d2d22; color: #c0000a; }
+  .incident-severity.high { background: #ff850022; color: #cc5500; }
+  .incident-severity.medium { background: #ffcc0022; color: #9a7800; }
+  .incident-severity.low { background: #00c47822; color: #006b42; }
+
+  /* ROUTE PLANNER */
+  .route-card {
+    background: white;
+    border-radius: 10px;
+    border: 1px solid var(--gray-200);
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .route-card:hover, .route-card.selected {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(87,185,255,0.1);
+  }
+
+  .route-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 12.5px;
+    color: var(--gray-600);
+  }
+
+  .route-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--blue);
+    flex-shrink: 0;
+  }
+
+  .route-dot.end {
+    background: var(--blue-deeper);
+  }
+
+  .route-dash {
+    flex: 1;
+    height: 1.5px;
+    background: repeating-linear-gradient(90deg, var(--blue-light) 0, var(--blue-light) 4px, transparent 4px, transparent 8px);
+  }
+
+  /* CHART PLACEHOLDER */
+  .chart-area {
+    width: 100%;
+    height: 180px;
+    background: var(--gray-50);
+    border-radius: 10px;
+    border: 1px solid var(--gray-100);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    padding: 16px 16px 0;
+    gap: 6px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .chart-bar {
+    flex: 1;
+    border-radius: 4px 4px 0 0;
+    background: linear-gradient(180deg, var(--blue) 0%, var(--blue-dark) 100%);
+    opacity: 0.85;
+    transition: opacity 0.2s;
+    position: relative;
+  }
+
+  .chart-bar:hover { opacity: 1; }
+
+  .chart-bar.alt {
+    background: linear-gradient(180deg, #57D9A3 0%, #0a8a5c 100%);
+  }
+
+  .chart-labels {
+    display: flex;
+    justify-content: space-around;
+    padding: 6px 16px 0;
+    font-size: 11px;
+    color: var(--gray-400);
+  }
+
+  /* AUDIT LOG */
+  .audit-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--gray-100);
+    font-size: 13px;
+  }
+
+  .audit-item:last-child { border-bottom: none; }
+
+  .audit-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--blue);
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+
+  .audit-dot.warning { background: #F5A623; }
+  .audit-dot.danger { background: #E24B4A; }
+
+  /* SCROLL */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 3px; }
+
+  /* NOTIFICATION TOAST */
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    background: var(--gray-800);
+    color: white;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 13.5px;
+    font-weight: 500;
+    box-shadow: 0 8px 28px rgba(30,51,71,0.3);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 9999;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+
+  .toast.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .toast i { color: var(--blue); }
+
+  /* MINI MAP PLACEHOLDER */
+  .map-placeholder {
+    width: 100%;
+    height: 220px;
+    background: linear-gradient(135deg, #e6f4ff 0%, #d0eaff 100%);
+    border-radius: 10px;
+    border: 1px solid var(--blue-light);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--blue-dark);
+  }
+
+  .map-placeholder::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(87,185,255,0.15) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(87,185,255,0.15) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+
+  .map-pin {
+    position: absolute;
+    width: 12px; height: 12px;
+    background: var(--blue-dark);
+    border-radius: 50%;
+    border: 2.5px solid white;
+    box-shadow: 0 2px 8px rgba(10,106,184,0.4);
+  }
+
+  .map-route {
+    position: absolute;
+    background: transparent;
+    border: 2px dashed var(--blue-dark);
+    border-radius: 30px;
+    opacity: 0.6;
+  }
+
+  /* SECTION DIVIDER */
+  .section-divider {
+    height: 1px;
+    background: var(--gray-200);
+    margin: 20px 0;
+  }
+
+  /* AI ANALYSIS PANEL */
+  .ai-panel {
+    background: linear-gradient(135deg, #f8f4ff, #ede8ff);
+    border: 1px solid #d4c8f7;
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .ai-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .ai-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, #6a35d4, #9B59B6);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+  }
+
+  .ai-panel-header h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #3c236b;
+  }
+
+  .ai-panel-header span {
+    font-size: 12px;
+    color: #7a5ca8;
+  }
+
+  .ai-result {
+    background: white;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: var(--gray-800);
+    border: 1px solid #e0d8f7;
+  }
+
+  .ai-result strong { color: #6a35d4; }
+
+  .severity-meter {
+    display: flex;
+    gap: 4px;
+    margin-top: 10px;
+  }
+
+  .severity-seg {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--gray-200);
+  }
+
+  .severity-seg.filled-critical { background: #E24B4A; }
+  .severity-seg.filled-high { background: #F5A623; }
+  .severity-seg.filled-medium { background: #F5E623; }
+  .severity-seg.filled-low { background: #1DBBAA; }
+
+  /* DRIVER CARD */
+  .driver-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: white;
+    border-radius: 10px;
+    border: 1px solid var(--gray-200);
+    margin-bottom: 10px;
+    transition: all 0.2s;
+  }
+
+  .driver-card:hover {
+    border-color: var(--blue-light);
+    box-shadow: var(--shadow);
+  }
+
+  .driver-avatar {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    background: var(--blue-ultra-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--blue-dark);
+    flex-shrink: 0;
+  }
+
+  .driver-info { flex: 1; }
+  .driver-info h4 { font-size: 14px; font-weight: 500; color: var(--gray-800); }
+  .driver-info p { font-size: 12.5px; color: var(--gray-600); margin-top: 2px; }
+
+  /* MODAL OVERLAY */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10,30,60,0.45);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.open {
+    display: flex;
+  }
+
+  .modal {
+    background: white;
+    border-radius: 16px;
+    padding: 28px;
+    width: 560px;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 64px rgba(10,30,60,0.3);
+    animation: slideUp 0.3s ease;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .modal-header h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gray-800);
+  }
+
+  .modal-close {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--gray-200);
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--gray-600);
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+
+  .modal-close:hover { background: var(--gray-100); }
+
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid var(--gray-100);
+  }
+
+  /* RESPONSIVE TWEAKS */
+  @media (max-width: 900px) {
+    .stats-grid { grid-template-columns: repeat(2,1fr); }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     LOGIN SCREEN
+════════════════════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon"><i class="fas fa-bus-alt"></i></div>
+      <div class="login-logo-text">
+        <h1>SGROAS</h1>
+        <span>Plataforma de Gestión Cooperativa</span>
+      </div>
+    </div>
+    <p class="login-subtitle">Sistema de Recursos Operativos, Administrativos y de Seguridad para Cooperativas de Transporte Nacional</p>
+
+    <div class="login-role-tabs">
+      <div class="role-tab active" onclick="selectRole(this,'Administrador')"><i class="fas fa-user-shield"></i> Administrador</div>
+      <div class="role-tab" onclick="selectRole(this,'Supervisor')"><i class="fas fa-user-check"></i> Supervisor</div>
+      <div class="role-tab" onclick="selectRole(this,'Operador')"><i class="fas fa-user"></i> Operador</div>
+    </div>
+
+    <div class="form-group">
+      <label>Correo electrónico</label>
+      <div class="input-wrap">
+        <i class="fas fa-envelope"></i>
+        <input type="email" value="admin@cooperativa.ec" placeholder="usuario@dominio.ec">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Contraseña</label>
+      <div class="input-wrap">
+        <i class="fas fa-lock"></i>
+        <input type="password" value="••••••••" placeholder="Ingrese su contraseña">
+      </div>
+    </div>
+
+    <button class="btn-login" onclick="doLogin()">
+      <i class="fas fa-sign-in-alt"></i> &nbsp; Ingresar al sistema
+    </button>
+
+    <p class="login-footer">Cooperativa Nacional de Transporte &nbsp;·&nbsp; v2.4.1 &nbsp;·&nbsp; © 2025 SGROAS</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     MAIN APP
+════════════════════════════════════════════════ -->
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon"><i class="fas fa-bus-alt"></i></div>
+      <div class="sidebar-brand-text">
+        <h2>SGROAS</h2>
+        <span>Cooperativa Nacional</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">Principal</div>
+
+      <div class="nav-item active" onclick="showPage('dashboard', this)">
+        <i class="fas fa-th-large"></i> Dashboard
+      </div>
+
+      <div class="sidebar-section">Operaciones</div>
+
+      <div class="nav-item" onclick="showPage('unidades', this)">
+        <i class="fas fa-bus"></i> Unidades
+        <span class="nav-badge blue">42</span>
+      </div>
+
+      <div class="nav-item" onclick="showPage('conductores', this)">
+        <i class="fas fa-id-card"></i> Conductores
+        <span class="nav-badge blue">87</span>
+      </div>
+
+      <div class="nav-item" onclick="showPage('rutas', this)">
+        <i class="fas fa-route"></i> Rutas
+      </div>
+
+      <div class="sidebar-section">Planificación</div>
+
+      <div class="nav-item" onclick="showPage('planificacion', this)">
+        <i class="fas fa-calendar-alt"></i> Asignaciones
+      </div>
+
+      <div class="sidebar-section">Seguridad</div>
+
+      <div class="nav-item" onclick="showPage('incidentes', this)">
+        <i class="fas fa-exclamation-triangle"></i> Incidentes
+        <span class="nav-badge">3</span>
+      </div>
+
+      <div class="sidebar-section">Inteligencia</div>
+
+      <div class="nav-item" onclick="showPage('analisis', this)">
+        <i class="fas fa-brain"></i> IA & Análisis
+      </div>
+
+      <div class="nav-item" onclick="showPage('reportes', this)">
+        <i class="fas fa-file-chart-line"></i> Reportes
+      </div>
+
+      <div class="sidebar-section">Sistema</div>
+
+      <div class="nav-item" onclick="showPage('usuarios', this)">
+        <i class="fas fa-users-cog"></i> Usuarios & Roles
+      </div>
+
+      <div class="nav-item" onclick="showPage('auditoria', this)">
+        <i class="fas fa-shield-alt"></i> Auditoría
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar">AD</div>
+        <div class="user-info">
+          <h4>Álvaro Díaz</h4>
+          <span>Administrador</span>
+        </div>
+        <i class="fas fa-chevron-right" style="color:rgba(255,255,255,0.4);font-size:11px;margin-left:auto;"></i>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-title">
+        <span id="page-breadcrumb">Dashboard</span>
+      </div>
+      <div class="topbar-actions">
+        <div class="topbar-date"><i class="far fa-calendar"></i> &nbsp;Junio 2025</div>
+        <div class="topbar-btn" title="Buscar"><i class="fas fa-search"></i></div>
+        <div class="topbar-btn" title="Notificaciones">
+          <i class="fas fa-bell"></i>
+          <span class="notif-dot"></span>
+        </div>
+        <div class="topbar-btn" title="Configuración"><i class="fas fa-cog"></i></div>
+        <div class="topbar-btn" title="Cerrar sesión" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i></div>
+      </div>
+    </div>
+
+    <!-- ── DASHBOARD ────────────────────────── -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div>
+          <h2>Dashboard General</h2>
+          <p>Resumen operativo en tiempo real · Cooperativa Nacional de Transporte</p>
+        </div>
+        <button class="btn btn-primary" onclick="showToast('Datos actualizados correctamente')">
+          <i class="fas fa-sync-alt"></i> Actualizar
+        </button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-bus"></i></div>
+          <div class="stat-value">42</div>
+          <div class="stat-label">Unidades activas</div>
+          <div class="stat-trend up"><i class="fas fa-arrow-up"></i> +3 este mes</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon"><i class="fas fa-id-card"></i></div>
+          <div class="stat-value">87</div>
+          <div class="stat-label">Conductores habilitados</div>
+          <div class="stat-trend up"><i class="fas fa-arrow-up"></i> +5 este mes</div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon"><i class="fas fa-route"></i></div>
+          <div class="stat-value">18</div>
+          <div class="stat-label">Rutas en operación</div>
+          <div class="stat-trend down"><i class="fas fa-minus"></i> Sin cambios</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+          <div class="stat-value">3</div>
+          <div class="stat-label">Incidentes pendientes</div>
+          <div class="stat-trend down"><i class="fas fa-arrow-down"></i> -2 esta semana</div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:20px;">
+        <div class="card">
+          <div class="card-title"><i class="fas fa-chart-bar"></i> Incidentes por mes</div>
+          <div class="chart-area">
+            <div class="chart-bar" style="height:55%;" title="Enero: 11"></div>
+            <div class="chart-bar" style="height:40%;" title="Feb: 8"></div>
+            <div class="chart-bar" style="height:70%;" title="Mar: 14"></div>
+            <div class="chart-bar" style="height:50%;" title="Abr: 10"></div>
+            <div class="chart-bar" style="height:35%;" title="May: 7"></div>
+            <div class="chart-bar" style="height:20%;" title="Jun: 3" class="alt"></div>
+          </div>
+          <div class="chart-labels">
+            <span>Ene</span><span>Feb</span><span>Mar</span><span>Abr</span><span>May</span><span>Jun</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><i class="fas fa-chart-line"></i> Eficiencia por ruta</div>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px;">
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+                <span>Quito – Guayaquil</span><strong style="color:var(--blue-dark)">94%</strong>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" style="width:94%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+                <span>Quito – Cuenca</span><strong style="color:var(--blue-dark)">88%</strong>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" style="width:88%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+                <span>Ambato – Manta</span><strong style="color:#d4620a">72%</strong>
+              </div>
+              <div class="progress-bar"><div class="progress-fill orange" style="width:72%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+                <span>Loja – Esmeraldas</span><strong style="color:#a32222">58%</strong>
+              </div>
+              <div class="progress-bar"><div class="progress-fill red" style="width:58%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+                <span>Ibarra – Machala</span><strong style="color:var(--blue-dark)">81%</strong>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" style="width:81%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><i class="fas fa-exclamation-circle"></i> Últimos incidentes</div>
+          <div class="incident-card" style="padding:12px 14px;">
+            <div class="incident-severity critical"><i class="fas fa-car-crash"></i></div>
+            <div style="flex:1">
+              <strong style="font-size:13.5px;">Colisión menor en Av. Patria</strong>
+              <p style="font-size:12px;color:var(--gray-600);margin-top:2px;">Unidad #B-14 · Hace 2 horas</p>
+            </div>
+            <span class="badge critical">Crítico</span>
+          </div>
+          <div class="incident-card" style="padding:12px 14px;">
+            <div class="incident-severity high"><i class="fas fa-tools"></i></div>
+            <div style="flex:1">
+              <strong style="font-size:13.5px;">Falla mecánica en ruta Quito-GYE</strong>
+              <p style="font-size:12px;color:var(--gray-600);margin-top:2px;">Unidad #A-07 · Hace 5 horas</p>
+            </div>
+            <span class="badge high">Alto</span>
+          </div>
+          <div class="incident-card" style="padding:12px 14px;">
+            <div class="incident-severity medium"><i class="fas fa-user-injured"></i></div>
+            <div style="flex:1">
+              <strong style="font-size:13.5px;">Queja de pasajero — conducción</strong>
+              <p style="font-size:12px;color:var(--gray-600);margin-top:2px;">Conductor C-032 · Ayer 14:30</p>
+            </div>
+            <span class="badge medium">Medio</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><i class="fas fa-bus-alt"></i> Estado de flota</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div style="text-align:center;padding:16px;background:var(--blue-ultra-light);border-radius:10px;">
+              <div style="font-size:28px;font-weight:700;color:var(--blue-dark)">34</div>
+              <div style="font-size:12px;color:var(--blue-dark);margin-top:4px;"><i class="fas fa-circle" style="color:#1DBBAA;font-size:8px;"></i> En ruta</div>
+            </div>
+            <div style="text-align:center;padding:16px;background:#e1f5ee;border-radius:10px;">
+              <div style="font-size:28px;font-weight:700;color:#0a6b45">6</div>
+              <div style="font-size:12px;color:#0a6b45;margin-top:4px;"><i class="fas fa-circle" style="font-size:8px;"></i> Disponibles</div>
+            </div>
+            <div style="text-align:center;padding:16px;background:#fff3e0;border-radius:10px;">
+              <div style="font-size:28px;font-weight:700;color:#b35d00">2</div>
+              <div style="font-size:12px;color:#b35d00;margin-top:4px;"><i class="fas fa-wrench" style="font-size:8px;"></i> Mantenimiento</div>
+            </div>
+            <div style="text-align:center;padding:16px;background:#fff0f0;border-radius:10px;">
+              <div style="font-size:28px;font-weight:700;color:#a32222">0</div>
+              <div style="font-size:12px;color:#a32222;margin-top:4px;"><i class="fas fa-times-circle" style="font-size:8px;"></i> Inhabilitadas</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── UNIDADES ────────────────────────── -->
+    <div class="page" id="page-unidades">
+      <div class="page-header">
+        <div>
+          <h2>Gestión de Unidades</h2>
+          <p>Flota completa · 42 unidades registradas</p>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('modal-unidad')">
+          <i class="fas fa-plus"></i> Nueva unidad
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="filters-bar">
+          <input class="filter-input" placeholder="🔍  Buscar por placa o modelo..." style="flex:1;max-width:300px;">
+          <select class="filter-input">
+            <option>Todos los estados</option>
+            <option>En ruta</option>
+            <option>Disponible</option>
+            <option>Mantenimiento</option>
+          </select>
+          <select class="filter-input">
+            <option>Todas las rutas</option>
+            <option>Quito - Guayaquil</option>
+            <option>Quito - Cuenca</option>
+            <option>Ambato - Manta</option>
+          </select>
+          <button class="btn btn-ghost"><i class="fas fa-filter"></i> Filtrar</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Placa</th>
+                <th>Modelo / Marca</th>
+                <th>Año</th>
+                <th>Capacidad</th>
+                <th>Ruta asignada</th>
+                <th>Estado</th>
+                <th>Último mantenimiento</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>PBH-1234</strong></td>
+                <td>Mercedes-Benz O500</td>
+                <td>2020</td>
+                <td>45 pax</td>
+                <td>Quito – Guayaquil</td>
+                <td><span class="badge active"><i class="fas fa-circle" style="font-size:7px;"></i> En ruta</span></td>
+                <td>15/05/2025</td>
+                <td><button class="btn btn-sm btn-outline">Editar</button></td>
+              </tr>
+              <tr>
+                <td><strong>PCA-5678</strong></td>
+                <td>Scania K410</td>
+                <td>2021</td>
+                <td>48 pax</td>
+                <td>Quito – Cuenca</td>
+                <td><span class="badge active"><i class="fas fa-circle" style="font-size:7px;"></i> En ruta</span></td>
+                <td>02/06/2025</td>
+                <td><button class="btn btn-sm btn-outline">Editar</button></td>
+              </tr>
+              <tr>
+                <td><strong>PBM-9102</strong></td>
+                <td>Volvo B9R</td>
+                <td>2019</td>
+                <td>42 pax</td>
+                <td>—</td>
+                <td><span class="badge gray"><i class="fas fa-circle" style="font-size:7px;"></i> Disponible</span></td>
+                <td>28/05/2025</td>
+                <td><button class="btn btn-sm btn-outline">Editar</button></td>
+              </tr>
+              <tr>
+                <td><strong>PCC-3344</strong></td>
+                <td>King Long XMQ6127</td>
+                <td>2018</td>
+                <td>50 pax</td>
+                <td>—</td>
+                <td><span class="badge warning"><i class="fas fa-wrench" style="font-size:9px;"></i> Mantenimiento</span></td>
+                <td>En proceso</td>
+                <td><button class="btn btn-sm btn-outline">Editar</button></td>
+              </tr>
+              <tr>
+                <td><strong>PHT-7756</strong></td>
+                <td>Irizar i6S</td>
+                <td>2022</td>
+                <td>46 pax</td>
+                <td>Ibarra – Machala</td>
+                <td><span class="badge active"><i class="fas fa-circle" style="font-size:7px;"></i> En ruta</span></td>
+                <td>10/06/2025</td>
+                <td><button class="btn btn-sm btn-outline">Editar</button></td>
+              </tr>
+              <tr>
+                <td><strong>PLJ-2281</strong></td>
+                <td>Hino AK8JRSA</td>
+                <td>2017</td>
+                <td>40 pax</td>
+                <td>Loja – Esmeraldas</td>
+                <td><span class="badge active"><i class="fas fa-circle" style="font-size:7px;"></i> En ruta</span></td>
+                <td>01/05/2025</td>
+                <td><button class="btn btn-sm btn-outline">Editar</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;font-size:13px;color:var(--gray-600);">
+          <span>Mostrando 6 de 42 unidades</span>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-sm btn-ghost">← Anterior</button>
+            <button class="btn btn-sm btn-primary">1</button>
+            <button class="btn btn-sm btn-ghost">2</button>
+            <button class="btn btn-sm btn-ghost">3</button>
+            <button class="btn btn-sm btn-ghost">Siguiente →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CONDUCTORES ────────────────────── -->
+    <div class="page" id="page-conductores">
+      <div class="page-header">
+        <div>
+          <h2>Gestión de Conductores</h2>
+          <p>87 conductores habilitados · 3 en proceso de renovación</p>
+        </div>
+        <button class="btn btn-primary" onclick="showToast('Módulo de registro abierto')">
+          <i class="fas fa-user-plus"></i> Nuevo conductor
+        </button>
+      </div>
+
+      <div class="tab-bar">
+        <div class="tab-item active">Todos (87)</div>
+        <div class="tab-item">En turno (34)</div>
+        <div class="tab-item">Disponibles (48)</div>
+        <div class="tab-item">Licencia vencida (3)</div>
+        <div class="tab-item">Inhabilitados (2)</div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="filters-bar">
+            <input class="filter-input" placeholder="🔍  Buscar conductor..." style="flex:1;">
+          </div>
+          <div class="driver-card">
+            <div class="driver-avatar">JM</div>
+            <div class="driver-info">
+              <h4>Jorge Medina Suárez</h4>
+              <p>Licencia Tipo E · Vence: 14/12/2026</p>
+            </div>
+            <span class="badge active">Activo</span>
+          </div>
+          <div class="driver-card">
+            <div class="driver-avatar">CP</div>
+            <div class="driver-info">
+              <h4>Carlos Pérez Rodas</h4>
+              <p>Licencia Tipo E · Vence: 03/08/2025</p>
+            </div>
+            <span class="badge warning">Por vencer</span>
+          </div>
+          <div class="driver-card">
+            <div class="driver-avatar">LV</div>
+            <div class="driver-info">
+              <h4>Luis Vera Alvarado</h4>
+              <p>Licencia Tipo E · Vence: 20/02/2027</p>
+            </div>
+            <span class="badge active">Activo</span>
+          </div>
+          <div class="driver-card">
+            <div class="driver-avatar">MQ</div>
+            <div class="driver-info">
+              <h4>Manuel Quispe Tapia</h4>
+              <p>Licencia Tipo E · Vence: 11/01/2025</p>
+            </div>
+            <span class="badge inactive">Vencida</span>
+          </div>
+          <div class="driver-card">
+            <div class="driver-avatar">AN</div>
+            <div class="driver-info">
+              <h4>Ana Noriega Castro</h4>
+              <p>Licencia Tipo C · Vence: 07/09/2026</p>
+            </div>
+            <span class="badge active">Activo</span>
+          </div>
+        </div>
+
+        <div class="card" style="height:fit-content;">
+          <div class="card-title"><i class="fas fa-user-circle"></i> Perfil del conductor</div>
+          <div style="text-align:center;margin-bottom:20px;">
+            <div style="width:64px;height:64px;border-radius:16px;background:var(--blue-ultra-light);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:var(--blue-dark);margin:0 auto 10px;">JM</div>
+            <h3 style="font-size:16px;font-weight:600;">Jorge Medina Suárez</h3>
+            <p style="font-size:13px;color:var(--gray-600);">Código: C-012</p>
+          </div>
+          <div class="section-divider"></div>
+          <div style="display:flex;flex-direction:column;gap:10px;font-size:13.5px;">
+            <div style="display:flex;justify-content:space-between;"><span style="color:var(--gray-600)">Cédula</span><strong>1712345678</strong></div>
+            <div style="display:flex;justify-content:space-between;"><span style="color:var(--gray-600)">Licencia</span><strong>Tipo E</strong></div>
+            <div style="display:flex;justify-content:space-between;"><span style="color:var(--gray-600)">Vencimiento</span><strong>14/12/2026</strong></div>
+            <div style="display:flex;justify-content:space-between;"><span style="color:var(--gray-600)">Ruta actual</span><strong>Quito – Guayaquil</strong></div>
+            <div style="display:flex;justify-content:space-between;"><span style="color:var(--gray-600)">Teléfono</span><strong>0991234567</strong></div>
+            <div style="display:flex;justify-content:space-between;"><span style="color:var(--gray-600)">Incidentes</span><strong>2 (12 meses)</strong></div>
+          </div>
+          <div class="section-divider"></div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-outline" style="flex:1;font-size:12.5px;"><i class="fas fa-edit"></i> Editar</button>
+            <button class="btn btn-danger" style="flex:1;font-size:12.5px;"><i class="fas fa-ban"></i> Inhabilitar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RUTAS ────────────────────────────── -->
+    <div class="page" id="page-rutas">
+      <div class="page-header">
+        <div>
+          <h2>Rutas de Operación</h2>
+          <p>18 rutas activas · Cobertura nacional</p>
+        </div>
+        <button class="btn btn-primary" onclick="showToast('Módulo de nueva ruta abierto')">
+          <i class="fas fa-plus"></i> Nueva ruta
+        </button>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-title"><i class="fas fa-route"></i> Lista de rutas</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div class="route-card selected">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <strong style="font-size:14px;">RT-001 · Quito – Guayaquil</strong>
+                  <span class="badge active">Activa</span>
+                </div>
+                <div class="route-line">
+                  <span class="route-dot"></span>
+                  <div class="route-dash"></div>
+                  <span class="route-dot end"></span>
+                  <span style="margin-left:4px;">450 km · ~6h</span>
+                </div>
+                <div style="font-size:12px;color:var(--gray-400);margin-top:6px;">8 unidades · 3 frecuencias diarias</div>
+              </div>
+              <div class="route-card">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <strong style="font-size:14px;">RT-002 · Quito – Cuenca</strong>
+                  <span class="badge active">Activa</span>
+                </div>
+                <div class="route-line">
+                  <span class="route-dot"></span><div class="route-dash"></div><span class="route-dot end"></span>
+                  <span style="margin-left:4px;">480 km · ~8h</span>
+                </div>
+                <div style="font-size:12px;color:var(--gray-400);margin-top:6px;">6 unidades · 2 frecuencias diarias</div>
+              </div>
+              <div class="route-card">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <strong style="font-size:14px;">RT-005 · Ambato – Manta</strong>
+                  <span class="badge warning">Parcial</span>
+                </div>
+                <div class="route-line">
+                  <span class="route-dot"></span><div class="route-dash"></div><span class="route-dot end"></span>
+                  <span style="margin-left:4px;">310 km · ~5h</span>
+                </div>
+                <div style="font-size:12px;color:var(--gray-400);margin-top:6px;">4 unidades · 1 frecuencia diaria</div>
+              </div>
+              <div class="route-card">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <strong style="font-size:14px;">RT-011 · Loja – Esmeraldas</strong>
+                  <span class="badge active">Activa</span>
+                </div>
+                <div class="route-line">
+                  <span class="route-dot"></span><div class="route-dash"></div><span class="route-dot end"></span>
+                  <span style="margin-left:4px;">720 km · ~12h</span>
+                </div>
+                <div style="font-size:12px;color:var(--gray-400);margin-top:6px;">5 unidades · 2 frecuencias diarias</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-title"><i class="fas fa-map-marked-alt"></i> Mapa de ruta — RT-001</div>
+            <div class="map-placeholder">
+              <div class="map-pin" style="top:30%;left:35%;"></div>
+              <div class="map-pin" style="bottom:25%;right:30%;"></div>
+              <div class="map-route" style="top:28%;left:33%;width:160px;height:100px;transform:rotate(-10deg);"></div>
+              <div style="position:relative;z-index:2;text-align:center;">
+                <i class="fas fa-map" style="font-size:28px;margin-bottom:6px;"></i>
+                <p style="font-size:13px;font-weight:500;">Quito → Guayaquil</p>
+                <p style="font-size:11.5px;opacity:0.7;">450 km · 4 paradas intermedias</p>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title"><i class="fas fa-info-circle"></i> Paradas intermedias</div>
+            <div style="display:flex;flex-direction:column;gap:8px;font-size:13.5px;">
+              <div style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--blue-ultra-light);border-radius:8px;">
+                <span style="font-weight:700;color:var(--blue-dark);min-width:24px;">1</span>
+                <span>Quito (origen) &nbsp;·&nbsp; Salida 06:00</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:8px;border:1px solid var(--gray-100);border-radius:8px;">
+                <span style="font-weight:700;color:var(--gray-400);min-width:24px;">2</span>
+                <span>Latacunga &nbsp;·&nbsp; ~07:15</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:8px;border:1px solid var(--gray-100);border-radius:8px;">
+                <span style="font-weight:700;color:var(--gray-400);min-width:24px;">3</span>
+                <span>Ambato &nbsp;·&nbsp; ~08:00</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:8px;border:1px solid var(--gray-100);border-radius:8px;">
+                <span style="font-weight:700;color:var(--gray-400);min-width:24px;">4</span>
+                <span>Santo Domingo &nbsp;·&nbsp; ~10:30</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:8px;background:#e1f5ee;border-radius:8px;">
+                <span style="font-weight:700;color:#0a6b45;min-width:24px;">5</span>
+                <span>Guayaquil (destino) &nbsp;·&nbsp; ~12:00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PLANIFICACIÓN ───────────────────── -->
+    <div class="page" id="page-planificacion">
+      <div class="page-header">
+        <div>
+          <h2>Planificación — Asignaciones</h2>
+          <p>Asigne unidades y conductores a rutas · Semana del 02 al 08 de junio 2025</p>
+        </div>
+        <button class="btn btn-primary" onclick="showToast('Asignación guardada exitosamente')">
+          <i class="fas fa-save"></i> Guardar cambios
+        </button>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-title"><i class="fas fa-plus-circle"></i> Nueva asignación</div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Ruta</label>
+            <select>
+              <option>RT-001 · Quito – Guayaquil</option>
+              <option>RT-002 · Quito – Cuenca</option>
+              <option>RT-005 · Ambato – Manta</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Unidad</label>
+            <select>
+              <option>PBH-1234 · Mercedes-Benz O500</option>
+              <option>PBM-9102 · Volvo B9R (disponible)</option>
+              <option>PCX-4412 · Scania K410</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Conductor principal</label>
+            <select>
+              <option>Jorge Medina Suárez (C-012)</option>
+              <option>Luis Vera Alvarado (C-028)</option>
+              <option>Ana Noriega Castro (C-045)</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Conductor auxiliar</label>
+            <select>
+              <option>— Sin auxiliar —</option>
+              <option>Carlos Pérez Rodas (C-019)</option>
+              <option>Manuel Quispe Tapia (C-033)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Fecha de inicio</label>
+            <input type="date" value="2025-06-04">
+          </div>
+          <div class="form-field">
+            <label>Frecuencia</label>
+            <select>
+              <option>Diaria</option>
+              <option>Lunes a Sábado</option>
+              <option>Solo fin de semana</option>
+              <option>Personalizada</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary"><i class="fas fa-plus"></i> Agregar asignación</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="fas fa-calendar-week"></i> Asignaciones activas</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Ruta</th>
+                <th>Unidad</th>
+                <th>Conductor</th>
+                <th>Auxiliar</th>
+                <th>Frecuencia</th>
+                <th>Turno</th>
+                <th>Estado</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>RT-001</strong> Quito–GYE</td>
+                <td>PBH-1234</td>
+                <td>J. Medina (C-012)</td>
+                <td>—</td>
+                <td>Diaria</td>
+                <td>06:00 AM</td>
+                <td><span class="badge active">Activa</span></td>
+                <td><button class="btn btn-sm btn-ghost"><i class="fas fa-ellipsis-h"></i></button></td>
+              </tr>
+              <tr>
+                <td><strong>RT-002</strong> Quito–Cuenca</td>
+                <td>PCA-5678</td>
+                <td>L. Vera (C-028)</td>
+                <td>C. Pérez (C-019)</td>
+                <td>Diaria</td>
+                <td>07:30 AM</td>
+                <td><span class="badge active">Activa</span></td>
+                <td><button class="btn btn-sm btn-ghost"><i class="fas fa-ellipsis-h"></i></button></td>
+              </tr>
+              <tr>
+                <td><strong>RT-005</strong> Ambato–Manta</td>
+                <td>PCC-3344</td>
+                <td>A. Noriega (C-045)</td>
+                <td>—</td>
+                <td>L–S</td>
+                <td>08:00 AM</td>
+                <td><span class="badge warning">Suspendida</span></td>
+                <td><button class="btn btn-sm btn-ghost"><i class="fas fa-ellipsis-h"></i></button></td>
+              </tr>
+              <tr>
+                <td><strong>RT-011</strong> Loja–Esmer.</td>
+                <td>PLJ-2281</td>
+                <td>M. Quispe (C-033)</td>
+                <td>—</td>
+                <td>Diaria</td>
+                <td>05:00 AM</td>
+                <td><span class="badge active">Activa</span></td>
+                <td><button class="btn btn-sm btn-ghost"><i class="fas fa-ellipsis-h"></i></button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── INCIDENTES ─────────────────────── -->
+    <div class="page" id="page-incidentes">
+      <div class="page-header">
+        <div>
+          <h2>Registro de Incidentes</h2>
+          <p>3 incidentes abiertos · 47 cerrados en 2025</p>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('modal-incidente')">
+          <i class="fas fa-plus"></i> Registrar incidente
+        </button>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:20px;">
+        <div class="card">
+          <div class="card-title"><i class="fas fa-list"></i> Incidentes recientes</div>
+          <div class="incident-card">
+            <div class="incident-severity critical"><i class="fas fa-car-crash"></i></div>
+            <div style="flex:1">
+              <strong style="font-size:13.5px;">Colisión menor — Av. Patria</strong>
+              <p style="font-size:12px;color:var(--gray-600);margin-top:2px;">Unidad PBH-1234 · Jorge Medina · 04/06/2025 09:22</p>
+              <p style="font-size:12px;color:var(--gray-600);">Sin heridos. Daño frontal leve.</p>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+              <span class="badge critical">Crítico</span>
+              <span class="badge inactive" style="font-size:10px;">Abierto</span>
+            </div>
+          </div>
+          <div class="incident-card">
+            <div class="incident-severity high"><i class="fas fa-tools"></i></div>
+            <div style="flex:1">
+              <strong style="font-size:13.5px;">Falla mecánica en ruta</strong>
+              <p style="font-size:12px;color:var(--gray-600);margin-top:2px;">Unidad PCA-5678 · Luis Vera · 04/06/2025 06:45</p>
+              <p style="font-size:12px;color:var(--gray-600);">Avería de caja de cambios. Pasajeros trasladados.</p>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+              <span class="badge high">Alto</span>
+              <span class="badge inactive" style="font-size:10px;">Abierto</span>
+            </div>
+          </div>
+          <div class="incident-card">
+            <div class="incident-severity medium"><i class="fas fa-user-injured"></i></div>
+            <div style="flex:1">
+              <strong style="font-size:13.5px;">Queja por conducción agresiva</strong>
+              <p style="font-size:12px;color:var(--gray-600);margin-top:2px;">Unidad PHT-7756 · A. Noriega · 03/06/2025 14:30</p>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+              <span class="badge medium">Medio</span>
+              <span class="badge blue" style="font-size:10px;">En revisión</span>
+            </div>
+          </div>
+          <div class="incident-card">
+            <div class="incident-severity low"><i class="fas fa-map-marker-alt"></i></div>
+            <div style="flex:1">
+              <strong style="font-size:13.5px;">Retraso por condiciones viales</strong>
+              <p style="font-size:12px;color:var(--gray-600);margin-top:2px;">Unidad PLJ-2281 · M. Quispe · 02/06/2025 08:00</p>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+              <span class="badge low">Bajo</span>
+              <span class="badge active" style="font-size:10px;">Cerrado</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="ai-panel" style="margin-bottom:16px;">
+            <div class="ai-panel-header">
+              <div class="ai-icon"><i class="fas fa-brain"></i></div>
+              <div>
+                <h4>Análisis IA — Incidente #INC-047</h4>
+                <span>Clasificación automática de gravedad</span>
+              </div>
+              <span class="ai-badge" style="margin-left:auto;"><i class="fas fa-sparkles"></i> IA</span>
+            </div>
+            <div class="ai-result">
+              <strong>Tipo detectado:</strong> Colisión de tránsito (frontal leve)<br>
+              <strong>Gravedad estimada:</strong> Crítica (nivel 4/4)<br>
+              <strong>Factores clave:</strong> Hora pico, zona urbana concurrida, unidad de carga pasajeros
+            </div>
+            <div class="ai-result">
+              <strong>Recomendación:</strong> Notificar inmediatamente a supervisión, retener unidad para inspección técnica y reportar al SIAT en un plazo máximo de 24 horas.
+            </div>
+            <div style="font-size:12px;color:#7a5ca8;margin-top:8px;margin-bottom:4px;font-weight:500;">Indicador de severidad</div>
+            <div class="severity-meter">
+              <div class="severity-seg filled-low"></div>
+              <div class="severity-seg filled-medium"></div>
+              <div class="severity-seg filled-high"></div>
+              <div class="severity-seg filled-critical"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:10.5px;color:#7a5ca8;margin-top:4px;">
+              <span>Bajo</span><span>Medio</span><span>Alto</span><span>Crítico ▲</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title"><i class="fas fa-image"></i> Evidencia fotográfica</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div style="height:100px;background:var(--gray-100);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--gray-400);font-size:26px;border:1px dashed var(--gray-200);"><i class="fas fa-image"></i></div>
+              <div style="height:100px;background:var(--gray-100);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--gray-400);font-size:26px;border:1px dashed var(--gray-200);"><i class="fas fa-image"></i></div>
+            </div>
+            <div style="font-size:12px;color:var(--gray-400);text-align:center;margin-top:8px;">2 imágenes adjuntas · INC-047</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ANÁLISIS IA ─────────────────────── -->
+    <div class="page" id="page-analisis">
+      <div class="page-header">
+        <div>
+          <h2>Inteligencia y Análisis con IA</h2>
+          <p>Clasificación automática, predicciones y tendencias operativas</p>
+        </div>
+        <span class="ai-badge" style="font-size:12px;padding:6px 14px;"><i class="fas fa-robot"></i> &nbsp;Motor IA activo</span>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-brain"></i></div>
+          <div class="stat-value">97%</div>
+          <div class="stat-label">Precisión clasificación</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+          <div class="stat-value">234</div>
+          <div class="stat-label">Incidentes clasificados</div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon"><i class="fas fa-exclamation"></i></div>
+          <div class="stat-value">12</div>
+          <div class="stat-label">Alertas tempranas</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-icon"><i class="fas fa-fire"></i></div>
+          <div class="stat-value">3</div>
+          <div class="stat-label">Riesgo crítico activo</div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:20px;">
+        <div class="card">
+          <div class="card-title"><i class="fas fa-chart-pie"></i> Distribución de incidentes por gravedad</div>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px;">
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+                <span style="color:#a32222;font-weight:500;">Crítico</span><strong>8 (17%)</strong>
+              </div>
+              <div class="progress-bar"><div class="progress-fill red" style="width:17%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+                <span style="color:#cc5500;font-weight:500;">Alto</span><strong>14 (30%)</strong>
+              </div>
+              <div class="progress-bar"><div class="progress-fill orange" style="width:30%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+                <span style="color:#9a7800;font-weight:500;">Medio</span><strong>18 (38%)</strong>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" style="width:38%;background:linear-gradient(90deg,#b38900,#F5E623);"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+                <span style="color:#006b42;font-weight:500;">Bajo</span><strong>7 (15%)</strong>
+              </div>
+              <div class="progress-bar"><div class="progress-fill green" style="width:15%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><i class="fas fa-map-marker-alt"></i> Zonas de mayor riesgo</div>
+          <div class="map-placeholder" style="height:180px;">
+            <div class="map-pin" style="top:20%;left:30%;background:#E24B4A;"></div>
+            <div class="map-pin" style="top:55%;left:60%;background:#F5A623;"></div>
+            <div class="map-pin" style="bottom:20%;right:25%;background:#F5A623;"></div>
+            <div class="map-pin" style="top:40%;left:45%;background:var(--blue-dark);"></div>
+            <div style="position:relative;z-index:2;text-align:center;">
+              <i class="fas fa-map-marked-alt" style="font-size:24px;margin-bottom:4px;"></i>
+              <p style="font-size:12px;font-weight:500;">Mapa de calor de incidentes</p>
+              <p style="font-size:11px;opacity:0.7;">4 zonas críticas identificadas</p>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;margin-top:10px;font-size:12px;">
+            <div style="display:flex;align-items:center;gap:4px;"><div style="width:10px;height:10px;border-radius:50%;background:#E24B4A;"></div> Alta incidencia</div>
+            <div style="display:flex;align-items:center;gap:4px;"><div style="width:10px;height:10px;border-radius:50%;background:#F5A623;"></div> Incidencia media</div>
+            <div style="display:flex;align-items:center;gap:4px;"><div style="width:10px;height:10px;border-radius:50%;background:var(--blue-dark);"></div> Baja incidencia</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="fas fa-lightbulb"></i> Alertas predictivas generadas por IA</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;gap:14px;padding:14px;border:1px solid #ffd4d4;border-radius:10px;background:#fff8f8;">
+            <div style="width:40px;height:40px;border-radius:10px;background:#fff0f0;display:flex;align-items:center;justify-content:center;color:#a32222;font-size:18px;flex-shrink:0;"><i class="fas fa-exclamation-circle"></i></div>
+            <div>
+              <strong style="font-size:13.5px;color:#a32222;">Conductor C-019 — Patrón de conducción de riesgo</strong>
+              <p style="font-size:12.5px;color:var(--gray-600);margin-top:3px;">3 eventos de frenado brusco en últimas 72 horas. Se recomienda revisión de conducta y capacitación preventiva.</p>
+              <div style="margin-top:6px;display:flex;gap:6px;"><span class="ai-badge" style="font-size:10px;"><i class="fas fa-robot"></i> IA</span><span class="badge critical">Riesgo alto</span></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:14px;padding:14px;border:1px solid #ffe0b0;border-radius:10px;background:#fffbf5;">
+            <div style="width:40px;height:40px;border-radius:10px;background:#fff3e0;display:flex;align-items:center;justify-content:center;color:#b35d00;font-size:18px;flex-shrink:0;"><i class="fas fa-bus"></i></div>
+            <div>
+              <strong style="font-size:13.5px;color:#b35d00;">Unidad PBM-9102 — Mantenimiento preventivo urgente</strong>
+              <p style="font-size:12.5px;color:var(--gray-600);margin-top:3px;">Kilómetros acumulados superan el umbral de servicio (85,000 km). Riesgo de falla mecánica en próximas 2 semanas.</p>
+              <div style="margin-top:6px;display:flex;gap:6px;"><span class="ai-badge" style="font-size:10px;"><i class="fas fa-robot"></i> IA</span><span class="badge high">Medio-alto</span></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:14px;padding:14px;border:1px solid var(--blue-light);border-radius:10px;background:var(--blue-ultra-light);">
+            <div style="width:40px;height:40px;border-radius:10px;background:var(--blue-light);display:flex;align-items:center;justify-content:center;color:var(--blue-deeper);font-size:18px;flex-shrink:0;"><i class="fas fa-cloud-rain"></i></div>
+            <div>
+              <strong style="font-size:13.5px;color:var(--blue-deeper);">Condiciones climáticas — Ruta RT-011 (Loja–Esmeraldas)</strong>
+              <p style="font-size:12.5px;color:var(--gray-600);margin-top:3px;">Pronóstico de lluvia intensa para este fin de semana. Se recomienda activar protocolo de velocidad reducida y notificar a conductores asignados.</p>
+              <div style="margin-top:6px;display:flex;gap:6px;"><span class="ai-badge" style="font-size:10px;"><i class="fas fa-robot"></i> IA</span><span class="badge blue">Preventivo</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── REPORTES ────────────────────────── -->
+    <div class="page" id="page-reportes">
+      <div class="page-header">
+        <div>
+          <h2>Reportes y Exportación</h2>
+          <p>Genera reportes filtrables con exportación en PDF y Excel</p>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-outline" onclick="showToast('Exportando a Excel...')">
+            <i class="fas fa-file-excel" style="color:#1D6F42;"></i> Excel
+          </button>
+          <button class="btn btn-outline" onclick="showToast('Generando PDF...')">
+            <i class="fas fa-file-pdf" style="color:#c0392b;"></i> PDF
+          </button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-title"><i class="fas fa-filter"></i> Filtros del reporte</div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Tipo de reporte</label>
+            <select>
+              <option>Incidentes por período</option>
+              <option>Operatividad de flota</option>
+              <option>Rendimiento de conductores</option>
+              <option>Rutas — estadísticas</option>
+              <option>Auditoría de usuarios</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Período</label>
+            <select>
+              <option>Junio 2025</option>
+              <option>Mayo 2025</option>
+              <option>Q1 2025 (Ene–Mar)</option>
+              <option>Semestral 2025</option>
+              <option>Anual 2024</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Ruta (opcional)</label>
+            <select>
+              <option>Todas las rutas</option>
+              <option>RT-001 · Quito–Guayaquil</option>
+              <option>RT-002 · Quito–Cuenca</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Gravedad (incidentes)</label>
+            <select>
+              <option>Todos los niveles</option>
+              <option>Crítico</option>
+              <option>Alto</option>
+              <option>Medio</option>
+              <option>Bajo</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="showToast('Reporte generado exitosamente')"><i class="fas fa-play"></i> Generar reporte</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="fas fa-table"></i> Reporte: Incidentes — Junio 2025</div>
+        <div class="filters-bar">
+          <input class="filter-input" placeholder="🔍 Buscar en reporte..." style="flex:1;max-width:280px;">
+          <select class="filter-input">
+            <option>Todos</option>
+            <option>Crítico</option>
+            <option>Alto</option>
+            <option>Medio</option>
+            <option>Bajo</option>
+          </select>
+          <button class="btn btn-ghost btn-sm"><i class="fas fa-sort-amount-down"></i> Ordenar</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Unidad</th>
+                <th>Conductor</th>
+                <th>Ruta</th>
+                <th>Gravedad</th>
+                <th>Estado</th>
+                <th>Clasificado por</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>#INC-047</strong></td>
+                <td>04/06/2025</td>
+                <td>Colisión</td>
+                <td>PBH-1234</td>
+                <td>J. Medina</td>
+                <td>RT-001</td>
+                <td><span class="badge critical">Crítico</span></td>
+                <td><span class="badge inactive">Abierto</span></td>
+                <td><span class="ai-badge" style="font-size:10px;"><i class="fas fa-robot"></i> IA</span></td>
+              </tr>
+              <tr>
+                <td><strong>#INC-046</strong></td>
+                <td>04/06/2025</td>
+                <td>Falla mecánica</td>
+                <td>PCA-5678</td>
+                <td>L. Vera</td>
+                <td>RT-001</td>
+                <td><span class="badge high">Alto</span></td>
+                <td><span class="badge inactive">Abierto</span></td>
+                <td><span class="ai-badge" style="font-size:10px;"><i class="fas fa-robot"></i> IA</span></td>
+              </tr>
+              <tr>
+                <td><strong>#INC-045</strong></td>
+                <td>03/06/2025</td>
+                <td>Queja pasajero</td>
+                <td>PHT-7756</td>
+                <td>A. Noriega</td>
+                <td>RT-002</td>
+                <td><span class="badge medium">Medio</span></td>
+                <td><span class="badge blue">En revisión</span></td>
+                <td>Manual</td>
+              </tr>
+              <tr>
+                <td><strong>#INC-044</strong></td>
+                <td>02/06/2025</td>
+                <td>Retraso vial</td>
+                <td>PLJ-2281</td>
+                <td>M. Quispe</td>
+                <td>RT-011</td>
+                <td><span class="badge low">Bajo</span></td>
+                <td><span class="badge active">Cerrado</span></td>
+                <td><span class="ai-badge" style="font-size:10px;"><i class="fas fa-robot"></i> IA</span></td>
+              </tr>
+              <tr>
+                <td><strong>#INC-043</strong></td>
+                <td>01/06/2025</td>
+                <td>Exceso velocidad</td>
+                <td>PCC-3344</td>
+                <td>C. Pérez</td>
+                <td>RT-005</td>
+                <td><span class="badge high">Alto</span></td>
+                <td><span class="badge active">Cerrado</span></td>
+                <td><span class="ai-badge" style="font-size:10px;"><i class="fas fa-robot"></i> IA</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;">
+          <span style="font-size:13px;color:var(--gray-600);">5 registros · Junio 2025</span>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-outline btn-sm" onclick="showToast('Exportando Excel...')"><i class="fas fa-file-excel" style="color:#1D6F42;"></i> Excel</button>
+            <button class="btn btn-outline btn-sm" onclick="showToast('Generando PDF...')"><i class="fas fa-file-pdf" style="color:#c0392b;"></i> PDF</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── USUARIOS ────────────────────────── -->
+    <div class="page" id="page-usuarios">
+      <div class="page-header">
+        <div>
+          <h2>Usuarios y Roles</h2>
+          <p>Gestione el acceso y permisos del sistema</p>
+        </div>
+        <button class="btn btn-primary" onclick="showToast('Formulario de nuevo usuario abierto')">
+          <i class="fas fa-user-plus"></i> Nuevo usuario
+        </button>
+      </div>
+
+      <div class="grid-3" style="margin-bottom:20px;">
+        <div class="card" style="text-align:center;padding:20px;">
+          <div style="width:48px;height:48px;border-radius:12px;background:var(--blue-ultra-light);display:flex;align-items:center;justify-content:center;color:var(--blue-dark);font-size:22px;margin:0 auto 10px;"><i class="fas fa-user-shield"></i></div>
+          <div style="font-size:26px;font-weight:700;color:var(--gray-800)">3</div>
+          <div style="font-size:13px;color:var(--gray-600)">Administradores</div>
+        </div>
+        <div class="card" style="text-align:center;padding:20px;">
+          <div style="width:48px;height:48px;border-radius:12px;background:#e1f5ee;display:flex;align-items:center;justify-content:center;color:#0a6b45;font-size:22px;margin:0 auto 10px;"><i class="fas fa-user-check"></i></div>
+          <div style="font-size:26px;font-weight:700;color:var(--gray-800)">8</div>
+          <div style="font-size:13px;color:var(--gray-600)">Supervisores</div>
+        </div>
+        <div class="card" style="text-align:center;padding:20px;">
+          <div style="width:48px;height:48px;border-radius:12px;background:#fff3e0;display:flex;align-items:center;justify-content:center;color:#b35d00;font-size:22px;margin:0 auto 10px;"><i class="fas fa-user"></i></div>
+          <div style="font-size:26px;font-weight:700;color:var(--gray-800)">14</div>
+          <div style="font-size:13px;color:var(--gray-600)">Operadores</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="fas fa-users"></i> Usuarios del sistema</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Correo</th>
+                <th>Rol</th>
+                <th>Último acceso</th>
+                <th>Estado</th>
+                <th>2FA</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:30px;height:30px;border-radius:7px;background:var(--blue-ultra-light);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--blue-dark);">AD</div><strong>Álvaro Díaz</strong></div></td>
+                <td>a.diaz@cooperativa.ec</td>
+                <td><span class="badge blue">Administrador</span></td>
+                <td>Hoy 08:45</td>
+                <td><span class="badge active">Activo</span></td>
+                <td><i class="fas fa-check-circle" style="color:#0a8a5c;"></i></td>
+                <td><button class="btn btn-sm btn-ghost"><i class="fas fa-edit"></i></button></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:30px;height:30px;border-radius:7px;background:#e1f5ee;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#0a6b45;">MR</div><strong>María Rosero</strong></div></td>
+                <td>m.rosero@cooperativa.ec</td>
+                <td><span class="badge" style="background:#e1f5ee;color:#0a6b45;">Supervisor</span></td>
+                <td>Hoy 09:12</td>
+                <td><span class="badge active">Activo</span></td>
+                <td><i class="fas fa-check-circle" style="color:#0a8a5c;"></i></td>
+                <td><button class="btn btn-sm btn-ghost"><i class="fas fa-edit"></i></button></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:30px;height:30px;border-radius:7px;background:#fff3e0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#b35d00;">PC</div><strong>Pedro Cañar</strong></div></td>
+                <td>p.canar@cooperativa.ec</td>
+                <td><span class="badge warning">Operador</span></td>
+                <td>Ayer 16:30</td>
+                <td><span class="badge active">Activo</span></td>
+                <td><i class="fas fa-times-circle" style="color:#c0392b;"></i></td>
+                <td><button class="btn btn-sm btn-ghost"><i class="fas fa-edit"></i></button></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:30px;height:30px;border-radius:7px;background:var(--gray-100);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--gray-600);">LT</div><strong>Laura Torres</strong></div></td>
+                <td>l.torres@cooperativa.ec</td>
+                <td><span class="badge" style="background:#e1f5ee;color:#0a6b45;">Supervisor</span></td>
+                <td>01/06/2025</td>
+                <td><span class="badge inactive">Inactivo</span></td>
+                <td><i class="fas fa-times-circle" style="color:#c0392b;"></i></td>
+                <td><button class="btn btn-sm btn-ghost"><i class="fas fa-edit"></i></button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── AUDITORÍA ──────────────────────── -->
+    <div class="page" id="page-auditoria">
+      <div class="page-header">
+        <div>
+          <h2>Auditoría del Sistema</h2>
+          <p>Registro completo de actividad · Cumplimiento normativo</p>
+        </div>
+        <button class="btn btn-outline" onclick="showToast('Exportando log de auditoría...')">
+          <i class="fas fa-download"></i> Exportar log
+        </button>
+      </div>
+
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-history"></i></div>
+          <div class="stat-value">1,284</div>
+          <div class="stat-label">Eventos registrados (mes)</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon"><i class="fas fa-sign-in-alt"></i></div>
+          <div class="stat-value">342</div>
+          <div class="stat-label">Inicios de sesión</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-icon"><i class="fas fa-ban"></i></div>
+          <div class="stat-value">7</div>
+          <div class="stat-label">Accesos denegados</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="fas fa-list-alt"></i> Log de auditoría reciente</div>
+        <div class="filters-bar">
+          <input class="filter-input" placeholder="🔍 Buscar evento..." style="flex:1;max-width:280px;">
+          <select class="filter-input">
+            <option>Todos los eventos</option>
+            <option>Login / Logout</option>
+            <option>Modificaciones</option>
+            <option>Errores</option>
+            <option>Accesos denegados</option>
+          </select>
+          <select class="filter-input">
+            <option>Todos los usuarios</option>
+            <option>Álvaro Díaz</option>
+            <option>María Rosero</option>
+          </select>
+        </div>
+        <div style="max-height:380px;overflow-y:auto;">
+          <div class="audit-item">
+            <div class="audit-dot"></div>
+            <div style="flex:1">
+              <strong style="font-size:13px;">Álvaro Díaz</strong>
+              <span style="font-size:12.5px;color:var(--gray-600);"> — Inicio de sesión exitoso desde 190.95.xx.xx</span>
+            </div>
+            <span style="font-size:12px;color:var(--gray-400);white-space:nowrap;">Hoy 08:45</span>
+          </div>
+          <div class="audit-item">
+            <div class="audit-dot"></div>
+            <div style="flex:1">
+              <strong style="font-size:13px;">Álvaro Díaz</strong>
+              <span style="font-size:12.5px;color:var(--gray-600);"> — Registró incidente #INC-047 (Colisión RT-001)</span>
+            </div>
+            <span style="font-size:12px;color:var(--gray-400);white-space:nowrap;">Hoy 09:15</span>
+          </div>
+          <div class="audit-item">
+            <div class="audit-dot"></div>
+            <div style="flex:1">
+              <strong style="font-size:13px;">María Rosero</strong>
+              <span style="font-size:12.5px;color:var(--gray-600);"> — Modificó asignación RT-001 · Unidad PBH-1234</span>
+            </div>
+            <span style="font-size:12px;color:var(--gray-400);white-space:nowrap;">Hoy 09:12</span>
+          </div>
+          <div class="audit-item">
+            <div class="audit-dot warning"></div>
+            <div style="flex:1">
+              <strong style="font-size:13px;">Pedro Cañar</strong>
+              <span style="font-size:12.5px;color:var(--gray-600);"> — Intentó acceder a módulo de Usuarios (sin permisos)</span>
+            </div>
+            <span style="font-size:12px;color:var(--gray-400);white-space:nowrap;">Ayer 16:48</span>
+          </div>
+          <div class="audit-item">
+            <div class="audit-dot danger"></div>
+            <div style="flex:1">
+              <strong style="font-size:13px;">Sistema</strong>
+              <span style="font-size:12.5px;color:var(--gray-600);"> — Acceso denegado (contraseña incorrecta x3) IP: 181.78.xx.xx</span>
+            </div>
+            <span style="font-size:12px;color:var(--gray-400);white-space:nowrap;">Ayer 14:20</span>
+          </div>
+          <div class="audit-item">
+            <div class="audit-dot"></div>
+            <div style="flex:1">
+              <strong style="font-size:13px;">Álvaro Díaz</strong>
+              <span style="font-size:12.5px;color:var(--gray-600);"> — Creó nuevo conductor: Ana Noriega Castro (C-045)</span>
+            </div>
+            <span style="font-size:12px;color:var(--gray-400);white-space:nowrap;">02/06/2025</span>
+          </div>
+          <div class="audit-item">
+            <div class="audit-dot"></div>
+            <div style="flex:1">
+              <strong style="font-size:13px;">María Rosero</strong>
+              <span style="font-size:12.5px;color:var(--gray-600);"> — Exportó reporte de incidentes Mayo 2025 en PDF</span>
+            </div>
+            <span style="font-size:12px;color:var(--gray-400);white-space:nowrap;">01/06/2025</span>
+          </div>
+          <div class="audit-item">
+            <div class="audit-dot"></div>
+            <div style="flex:1">
+              <strong style="font-size:13px;">Álvaro Díaz</strong>
+              <span style="font-size:12.5px;color:var(--gray-600);"> — Actualizó estado unidad PBM-9102 → Disponible</span>
+            </div>
+            <span style="font-size:12px;color:var(--gray-400);white-space:nowrap;">01/06/2025</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main-content -->
+</div><!-- /app -->
+
+<!-- ═══════════════════════════════════════════════
+     MODALES
+════════════════════════════════════════════════ -->
+
+<!-- Modal Nueva Unidad -->
+<div class="modal-overlay" id="modal-unidad">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-bus" style="color:var(--blue);margin-right:8px;"></i>Registrar nueva unidad</h3>
+      <div class="modal-close" onclick="closeModal('modal-unidad')"><i class="fas fa-times"></i></div>
+    </div>
+    <div class="form-row">
+      <div class="form-field"><label>Placa</label><input type="text" placeholder="PBH-1234"></div>
+      <div class="form-field"><label>Marca</label><input type="text" placeholder="Mercedes-Benz"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-field"><label>Modelo</label><input type="text" placeholder="O500 RSD"></div>
+      <div class="form-field"><label>Año de fabricación</label><input type="number" placeholder="2022"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-field"><label>Capacidad (pasajeros)</label><input type="number" placeholder="45"></div>
+      <div class="form-field"><label>Estado inicial</label>
+        <select><option>Disponible</option><option>En ruta</option><option>Mantenimiento</option></select>
+      </div>
+    </div>
+    <div class="form-field" style="margin-bottom:16px;">
+      <label>Ruta asignada</label>
+      <select><option>— Sin asignar —</option><option>RT-001 · Quito–Guayaquil</option><option>RT-002 · Quito–Cuenca</option></select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-unidad')">Cancelar</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-unidad');showToast('Unidad registrada exitosamente')"><i class="fas fa-save"></i> Guardar unidad</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Registro de Incidente -->
+<div class="modal-overlay" id="modal-incidente">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-exclamation-triangle" style="color:#E24B4A;margin-right:8px;"></i>Registrar incidente</h3>
+      <div class="modal-close" onclick="closeModal('modal-incidente')"><i class="fas fa-times"></i></div>
+    </div>
+    <div class="form-row">
+      <div class="form-field"><label>Tipo de incidente</label>
+        <select><option>Colisión</option><option>Falla mecánica</option><option>Queja de pasajero</option><option>Exceso de velocidad</option><option>Retraso</option><option>Otro</option></select>
+      </div>
+      <div class="form-field"><label>Fecha y hora</label><input type="datetime-local" value="2025-06-04T10:00"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-field"><label>Unidad involucrada</label>
+        <select><option>PBH-1234</option><option>PCA-5678</option><option>PHT-7756</option><option>PLJ-2281</option></select>
+      </div>
+      <div class="form-field"><label>Conductor</label>
+        <select><option>J. Medina (C-012)</option><option>L. Vera (C-028)</option><option>A. Noriega (C-045)</option></select>
+      </div>
+    </div>
+    <div class="form-field" style="margin-bottom:16px;">
+      <label>Descripción del incidente</label>
+      <textarea placeholder="Describa lo ocurrido con el mayor detalle posible..."></textarea>
+    </div>
+    <div class="form-field" style="margin-bottom:16px;">
+      <label>Evidencia fotográfica</label>
+      <div class="upload-zone" onclick="showToast('Seleccione imágenes del incidente')">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <p>Arrastra imágenes aquí o haz clic para seleccionar</p>
+        <small>JPG, PNG · Máx. 10MB por imagen · Hasta 5 fotos</small>
+      </div>
+    </div>
+    <div class="ai-panel" style="padding:14px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span class="ai-badge"><i class="fas fa-robot"></i> IA</span>
+        <span style="font-size:12.5px;color:#6a35d4;font-weight:500;">La gravedad será clasificada automáticamente al guardar</span>
+      </div>
+      <p style="font-size:12px;color:#7a5ca8;">El sistema analiza el tipo, hora, zona y contexto para determinar el nivel de gravedad y enviar las alertas correspondientes.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-incidente')">Cancelar</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-incidente');showToast('Incidente registrado · IA clasificando...')"><i class="fas fa-save"></i> Registrar y clasificar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <i class="fas fa-check-circle"></i>
+  <span id="toast-msg">Operación exitosa</span>
+</div>
+
+<script>
+  let selectedRole = 'Administrador';
+
+  function selectRole(el, role) {
+    document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    selectedRole = role;
+  }
+
+  function doLogin() {
+    const btn = document.querySelector('.btn-login');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> &nbsp; Verificando...';
+    btn.disabled = true;
+    setTimeout(() => {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app').style.display = 'flex';
+      showToast('Bienvenido, Álvaro Díaz — ' + selectedRole);
+    }, 1200);
+  }
+
+  function doLogout() {
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+    document.querySelector('.btn-login').innerHTML = '<i class="fas fa-sign-in-alt"></i> &nbsp; Ingresar al sistema';
+    document.querySelector('.btn-login').disabled = false;
+  }
+
+  function showPage(pageId, navEl) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const target = document.getElementById('page-' + pageId);
+    if (target) target.classList.add('active');
+    if (navEl) navEl.classList.add('active');
+    const titles = {
+      'dashboard': 'Dashboard',
+      'unidades': 'Gestión de Unidades',
+      'conductores': 'Gestión de Conductores',
+      'rutas': 'Rutas de Operación',
+      'planificacion': 'Planificación',
+      'incidentes': 'Registro de Incidentes',
+      'analisis': 'Inteligencia y Análisis',
+      'reportes': 'Reportes',
+      'usuarios': 'Usuarios y Roles',
+      'auditoria': 'Auditoría'
+    };
+    document.getElementById('page-breadcrumb').textContent = titles[pageId] || pageId;
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toast-msg').textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function openModal(id) {
+    document.getElementById(id).classList.add('open');
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+  }
+
+  // Cerrar modal al click fuera
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) {
+      if (e.target === this) this.classList.remove('open');
+    });
+  });
+
+  // Tab bar clicks (conductores)
+  document.querySelectorAll('.tab-item').forEach(tab => {
+    tab.addEventListener('click', function() {
+      this.closest('.tab-bar').querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
