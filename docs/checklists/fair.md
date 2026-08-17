@@ -38,9 +38,9 @@ data management and stewardship*. Scientific Data, 3, 160018.
 
 | Principio | Evidencia en el repositorio |
 |---|---|
-| F1 | DOI dataset Zenodo (ver CITATION.cff / README) |
+| F1 | DOI dataset Zenodo **10.5281/zenodo.21973297** (ver CITATION.cff / README) |
 | F2–F3 | docs/mediciones/DATA-DICTIONARY.md, DATA-PROVENANCE.md |
-| A1 | Enlace de depósito Zenodo público |
+| A1 | Enlace de depósito Zenodo público (https://doi.org/10.5281/zenodo.21973297) |
 | I1 | Formatos JSON/CSV/PNG/HTML |
 | R1.1 | docs/etica/ETHICS.md y metadatos del depósito |
 | R1.2 | docs/mediciones/DATA-PROVENANCE.md |
