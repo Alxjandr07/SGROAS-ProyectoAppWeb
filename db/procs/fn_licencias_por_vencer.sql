@@ -16,7 +16,7 @@ BEGIN
     OPEN cur FOR
     SELECT
         c.id,
-        (c.nombres || ' ' || c.apellidos)::VARCHAR AS nombre_completo,
+        CONCAT(c.nombres, ' ', c.apellidos) AS nombre_completo,
         c.cedula::VARCHAR,
         c.numero_licencia::VARCHAR,
         c.tipo_licencia::VARCHAR,

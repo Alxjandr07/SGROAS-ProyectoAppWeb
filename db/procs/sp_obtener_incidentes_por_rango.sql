@@ -23,7 +23,7 @@ BEGIN
         i.descripcion,
         i.fecha_incidente,
         i.ubicacion,
-        (c.nombres || ' ' || c.apellidos)::VARCHAR AS conductor_nombre,
+        CONCAT(c.nombres, ' ', c.apellidos) AS conductor_nombre,
         v.placa::VARCHAR,
         r.codigo::VARCHAR
     FROM incidentes i

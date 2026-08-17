@@ -1,4 +1,4 @@
-﻿-- V5__stored_procedures.sql
+-- V5__stored_procedures.sql
 -- Migracion que instala los stored procedures y funciones de SGROAS
 -- Contenido sincronizado con db/procs/*.sql (CATALOGO-SP.md)
 -- Estrategia hibrida de acceso a datos: invocacion via @Procedure (JPA 2.1)
@@ -49,7 +49,7 @@ BEGIN
     OPEN cur FOR
     SELECT
         c.id,
-        (c.nombres || ' ' || c.apellidos)::VARCHAR AS nombre_completo,
+        CONCAT(c.nombres, ' ', c.apellidos) AS nombre_completo,
         c.cedula::VARCHAR,
         c.numero_licencia::VARCHAR,
         c.tipo_licencia::VARCHAR,
@@ -152,7 +152,7 @@ BEGIN
         i.descripcion,
         i.fecha_incidente,
         i.ubicacion,
-        (c.nombres || ' ' || c.apellidos)::VARCHAR AS conductor_nombre,
+        CONCAT(c.nombres, ' ', c.apellidos) AS conductor_nombre,
         v.placa::VARCHAR,
         r.codigo::VARCHAR
     FROM incidentes i
@@ -232,4 +232,3 @@ BEGIN
     ORDER BY v.placa;
 END;
 $$;
-
