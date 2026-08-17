@@ -25,10 +25,20 @@ services:
     healthCheckPath: /actuator/health
     autoDeploy: true
     envVars:
-      - key: SPRING_DATASOURCE_URL
+      - key: PGHOST
         fromDatabase:
           name: sgroas-db
-          property: connectionString
+          property: host
+      - key: PGPORT
+        fromDatabase:
+          name: sgroas-db
+          property: port
+      - key: PGDATABASE
+        fromDatabase:
+          name: sgroas-db
+          property: database
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:postgresql://$PGHOST:$PGPORT/$PGDATABASE
       - key: SPRING_DATASOURCE_USERNAME
         fromDatabase:
           name: sgroas-db
