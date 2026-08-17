@@ -9,25 +9,30 @@ authors:
   - given-names: Kevin Moisés
     family-names: Castro Espinoza
     email: kcastro@uteq.edu.ec
+    orcid: https://orcid.org/0009-0004-4935-0439
   - given-names: María del Rosario
     family-names: Escudero Plaza
     email: mescudero@uteq.edu.ec
+    orcid: https://orcid.org/0009-0007-3212-9924
   - given-names: Luis Alejandro
     family-names: Tejada Bajaña
     email: atejada@uteq.edu.ec
-    orcid: https://orcid.org/0000-0000-0000-0000
+    orcid: https://orcid.org/0009-0006-2080-1798
 affiliation: >-
   Universidad Técnica Estatal de Quevedo (UTEQ) — Facultad de
   Ciencias de la Ingeniería — Carrera de Ingeniería de Software
-version: 0.9.0-rc
-date-released: 2026-07-24
+version: 1.0.0
+date-released: 2026-08-17
 doi: 10.5281/zenodo.21698129
 license: MIT
 repository-code: >-
   https://github.com/Alxjandr07/SGROAS-ProyectoAppWeb
+# Dataset del estudio empírico: depósito SEPARADO en Zenodo.
+# DOI dataset (rellenar tras el depósito): 10.5281/zenodo.XXXXXXX
 keywords:
   - transportation
   - fleet management
   - spring boot
   - angular
+  - empirical study
   - ecuador
