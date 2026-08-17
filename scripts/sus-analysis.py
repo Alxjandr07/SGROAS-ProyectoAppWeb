@@ -60,7 +60,30 @@ def construir_por_participante(respuestas) -> List[Dict[str, Any]]:
     return filas
 
 
-def generar_markdown(filas, stats, puntuaciones) -> str:
+def stats_por_item(filas) -> List[Dict[str, Any]]:
+    """Media, DT y contribucion promedio de Brooke por ítem (q1..q10)."""
+    n_items = 10
+    items = []
+    for i in range(n_items):
+        valores = [f["respuestas"][i] for f in filas]
+        contribuciones = [
+            v - 1 if i % 2 == 0 else 5 - v for v in valores
+        ]
+        items.append(
+            {
+                "item": f"q{i + 1}",
+                "media_respuesta": round(sum(valores) / len(valores), 2),
+                "dt_respuesta": round(
+                    (sum((v - sum(valores) / len(valores)) ** 2 for v in valores)
+                     / (len(valores) - 1)) ** 0.5, 2
+                ),
+                "media_contribucion": round(sum(contribuciones) / len(contribuciones), 2),
+            }
+        )
+    return items
+
+
+def generar_markdown(filas, stats, puntuaciones, items) -> str:
     m, s, se, inf, sup = stats
     adjetivo, zona = interpretar_adjetiva(m)
     lineas = [
@@ -101,6 +124,27 @@ def generar_markdown(filas, stats, puntuaciones) -> str:
         "| Calificacion adjetiva (Bangor et al., 2009) | %s |" % adjetivo,
         "| Zona de aceptabilidad | %s |" % zona,
         "| Umbral de usabilidad (>= 70) | %s |" % ("CUMPLE" if m >= UMBRAL_ACEPTABLE else "NO CUMPLE"),
+        "",
+        "## Estadisticos por item",
+        "",
+        "Contribucion promedio de Brooke por item (mayor = mejor; items pares son "
+        "enunciados negativos).",
+        "",
+        "| Item | Media respuesta | DT respuesta | Contribucion /4 |",
+        "|---|---|---|---|",
+    ]
+    for it in items:
+        lineas.append(
+            "| %s | %.2f | %.2f | %.2f |"
+            % (it["item"], it["media_respuesta"], it["dt_respuesta"], it["media_contribucion"])
+        )
+    peores = sorted(items, key=lambda x: x["media_contribucion"])[:3]
+    mejores = sorted(items, key=lambda x: -x["media_contribucion"])[:3]
+    lineas += [
+        "",
+        "Items con peor contribucion promedio: %s." % ", ".join(p["item"] for p in peores),
+        "",
+        "Items con mejor contribucion promedio: %s." % ", ".join(m["item"] for m in mejores),
         "",
         "## Interpretacion",
         "",
@@ -148,6 +192,7 @@ def main() -> int:
     filas = construir_por_participante(respuestas)
     puntuaciones = [f["sus_score"] for f in filas]
     stats = ic95(puntuaciones)
+    items = stats_por_item(filas)
 
     SUS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -171,7 +216,17 @@ def main() -> int:
             fh, ensure_ascii=False, indent=2,
         )
 
-    md = generar_markdown(filas, stats, puntuaciones)
+    with open(SUS_DIR / "estadisticas-item.json", "w", encoding="utf-8") as fh:
+        json.dump(
+            {
+                "generado": date.today().isoformat(),
+                "n": len(filas),
+                "items": items,
+            },
+            fh, ensure_ascii=False, indent=2,
+        )
+
+    md = generar_markdown(filas, stats, puntuaciones, items)
     with open(SUS_DIR / "ANALISIS-SUS.md", "w", encoding="utf-8") as fh:
         fh.write(md)
 
@@ -202,6 +257,25 @@ def main() -> int:
         fig.tight_layout()
         fig.savefig(FIGURAS / "fig-sus-por-participante.png", dpi=150)
         plt.close(fig)
+
+        # Figura: media de respuesta por item (1-5) mostrando enunciados negativos.
+        fig2, ax2 = plt.subplots(figsize=(FIGW, FIGH))
+        nombres = [it["item"].upper() for it in items]
+        medias = [it["media_respuesta"] for it in items]
+        colores = [
+            OKABE_ITO["azul"] if i % 2 == 0 else OKABE_ITO["naranja"]
+            for i in range(len(items))
+        ]
+        ax2.bar(nombres, medias, color=colores, alpha=0.85)
+        ax2.axhline(3.0, color="black", linestyle="--", linewidth=1.2, label="punto medio 3")
+        ax2.set_ylabel("Media de respuesta Likert (1-5)")
+        ax2.set_title("Media de respuesta por item del SUS (n = %d)" % len(filas))
+        ax2.set_ylim(1, 5)
+        ax2.legend()
+        ax2.grid(True, axis="y", linestyle=":", alpha=0.5)
+        fig2.tight_layout()
+        fig2.savefig(FIGURAS / "fig-sus-item-respuestas.png", dpi=150)
+        plt.close(fig2)
     except ImportError:
         print("AVISO: matplotlib no disponible; no se genero la figura.")
 

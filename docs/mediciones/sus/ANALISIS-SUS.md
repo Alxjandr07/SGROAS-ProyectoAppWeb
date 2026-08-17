@@ -1,6 +1,6 @@
 # Analisis de usabilidad (SUS) - Bloque C.3
 
-**Tarea K2** | Fecha de generacion: 2026-08-16
+**Tarea K2** | Fecha de generacion: 2026-08-17
 
 ## Instrumento
 
@@ -34,6 +34,27 @@ System Usability Scale (Brooke, 1996): 10 items Likert 1-5. Puntuacion por parti
 | Calificacion adjetiva (Bangor et al., 2009) | Bueno |
 | Zona de aceptabilidad | Marginal (50-70) |
 | Umbral de usabilidad (>= 70) | NO CUMPLE |
+
+## Estadisticos por item
+
+Contribucion promedio de Brooke por item (mayor = mejor; items pares son enunciados negativos).
+
+| Item | Media respuesta | DT respuesta | Contribucion /4 |
+|---|---|---|---|
+| q1 | 3.60 | 0.70 | 2.60 |
+| q2 | 2.70 | 1.16 | 2.30 |
+| q3 | 3.40 | 0.52 | 2.40 |
+| q4 | 2.40 | 1.17 | 2.60 |
+| q5 | 3.70 | 0.67 | 2.70 |
+| q6 | 2.70 | 0.67 | 2.30 |
+| q7 | 3.50 | 1.18 | 2.50 |
+| q8 | 2.00 | 0.82 | 3.00 |
+| q9 | 3.40 | 1.17 | 2.40 |
+| q10 | 2.60 | 1.07 | 2.40 |
+
+Items con peor contribucion promedio: q2, q6, q3.
+
+Items con mejor contribucion promedio: q8, q5, q1.
 
 ## Interpretacion
 
