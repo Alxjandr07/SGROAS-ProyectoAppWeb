@@ -1,5 +1,7 @@
 .PHONY: up down test bench audit jacoco versions docs all clean
 
+PYTHON ?= $(shell command -v python3 2>/dev/null || command -v python 2>/dev/null)
+
 # =============================================================================
 # SGROAS — Makefile
 # =============================================================================
@@ -47,7 +49,8 @@ jacoco:
 	@echo "Reporte JaCoCo regenerado en docs/mediciones/jacoco/"
 
 versions:
-	python scripts/gen-versions.py > docs/entorno/versions.txt
+	mkdir -p docs/entorno
+	$(PYTHON) scripts/gen-versions.py > docs/entorno/versions.txt
 	@echo "Versiones registradas en docs/entorno/versions.txt"
 
 docs: versions
