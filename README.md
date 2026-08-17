@@ -81,7 +81,24 @@ Distribuido bajo licencia MIT. Ver [LICENSE](LICENSE).
   month = jul,
   year = 2026,
   publisher = {Zenodo},
-  doi = {10.5281/zenodo.XXXXXXX},
+  doi = {10.5281/zenodo.21698129},
   url = {https://github.com/Alxjandr07/SGROAS-ProyectoAppWeb}
 }
 ```
+
+## Dataset del estudio empírico
+
+Los datos de mediciones (rendimiento k6, susabilidad SUS, calidad web
+Lighthouse, seguridad OWASP ZAP y cobertura JaCoCo) están publicados como
+dataset de acceso abierto en Zenodo:
+
+- **Dataset:** [10.5281/zenodo.21973297](https://doi.org/10.5281/zenodo.21973297)
+  ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/))
+- Empaquetado reproducible: `scripts/zenodo/package-dataset.py`
+- Descripción y checksums: [`dataset/`](dataset/)
+
+## Video
+
+Video de reproducibilidad (`make all`) y recorrido por los reportes:
+**enlace pendiente** (YouTube no listado) — guion en
+[`docs/video/GUION-video.md`](docs/video/GUION-video.md).

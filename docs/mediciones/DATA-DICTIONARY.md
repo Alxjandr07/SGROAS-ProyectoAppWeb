@@ -333,3 +333,46 @@
 | PUT | `/api/incidentes/{id}` | ADMIN, COORDINADOR, SEGURIDAD | Actualizar incidente |
 | DELETE | `/api/incidentes/{id}` | ADMIN, COORDINADOR, SEGURIDAD | Eliminar incidente (logico) |
 | GET | `/api/docs/swagger-ui.html` | No | Documentacion OpenAPI 3.0 |
+
+## 8. Estadi­sticos del analisis (k6 / SUS)
+
+| Metrica | Tipo | Unidad | Descripcion |
+|---|---|---|---|
+| `media` | float | ms / puntos SUS | Media aritmetica |
+| `desviacion_tipica` | float | ms / puntos SUS | DT muestral (n-1) |
+| `error_estandar` | float | ms / puntos SUS | SE = s / sqrt(n) |
+| `ic95_inf` / `ic95_sup` | float | ms / puntos SUS | Limites del IC 95% (t de Student) |
+| `p95` | float | ms | Percentil 95 de http_req_duration |
+| `error_rate` | ratio | 0-1 | http_req_failed (0 = sin errores) |
+| `t_critico` | float | — | Valor critico t para gl y alfa=0.05 |
+| `d_cliff` | float | [-1, 1] | Tamano del efecto (d de Cliff) |
+
+## 9. Metricas de usabilidad (SUS)
+
+| Variable | Tipo | Rango | Descripcion |
+|---|---|---|---|
+| `codigo` | string | P01..P10 | Identificador anonimizado del participante |
+| `q1..q10` | int | 1-5 | Respuestas Likert del SUS (Brooke, 1996) |
+| `sus_score` | float | 0-100 | Puntuacion SUS = (suma contribuciones) * 2.5 |
+| `sexo` / `edad` | string / int | — | Demografia (sin datos identificables) |
+| `experiencia_web` | string | Baja/Media/Alta | Autopercepcion de experiencia |
+| `consentimiento` | string | Si | Confirmacion de consentimiento informado |
+
+## 10. Metricas de calidad web (Lighthouse)
+
+| Categoria | Significado | Umbral |
+|---|---|---|
+| `performance` | Rendimiento de carga | >= 80 |
+| `accessibility` | Accesibilidad (axe) | >= 90 |
+| `best-practices` | Practicas recomendadas | >= 90 |
+| `seo` | Optimizacion para buscadores | >= 90 |
+
+## 11. Seguridad (ZAP)
+
+| Variable | Descripcion |
+|---|---|
+| `alert_count` | Numero de alertas por nivel (info, low, medium, high) |
+| `fail_count` | Numero de reglas fallidas en el baseline |
+| `pass_count` | Numero de reglas superadas |
+| `warn_count` | Numero de advertencias |
+| `scan_date` | Fecha del escaneo (ISO 8601) |

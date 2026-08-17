@@ -1,0 +1,21 @@
+{
+  "codigo": "P03",
+  "edad": 25,
+  "sexo": "Masculino",
+  "experiencia_web": "Alta",
+  "dispositivo": "Computadora",
+  "consentimiento": "Sí",
+  "respuestas": [
+    3,
+    3,
+    3,
+    3,
+    3,
+    2,
+    1,
+    2,
+    4,
+    4
+  ],
+  "sus_score": 50.0
+}

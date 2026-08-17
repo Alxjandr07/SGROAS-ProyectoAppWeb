@@ -1,0 +1,14 @@
+{
+  "generado": "2026-08-17",
+  "semilla": 20260817,
+  "remuestras": 10000,
+  "n_corridas": 3,
+  "medias_corrida_ms": [
+    14.817675483011305,
+    16.89737488341106,
+    37.32428212824015
+  ],
+  "media_observada_ms": 23.013,
+  "ic95_bootstrap_inf_ms": 14.818,
+  "ic95_bootstrap_sup_ms": 37.324
+}

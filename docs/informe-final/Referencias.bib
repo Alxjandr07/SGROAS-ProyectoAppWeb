@@ -1,82 +1,18 @@
+% =====================================================================
+% Referencias.bib — Parte evaluacion (Kevin, K5)
+% Todas las referencias con DOI fueron verificadas contra Crossref el
+% 16-ago-2026. Sin referencias fabricadas (regla de oro 6 del plan).
+% =====================================================================
+
 @techreport{uteq2026guia,
-  author      = {Guerrero Ulloa, Gleiston Cicerón},
-  title       = {Guía de la Tercera Entrega del Proyecto Fin de Curso (PFC) --- Aplicaciones Web, Quinto Nivel},
-  institution = {Universidad Técnica Estatal de Quevedo, Facultad de Ciencias de la Computación y Diseño Digital, Carrera de Ingeniería de Software},
+  author      = {Guerrero Ulloa, Gleiston Cicer\'on},
+  title       = {Gu\'ia de la Tercera Entrega del Proyecto Fin de Curso (PFC) --- Aplicaciones Web, Quinto Nivel},
+  institution = {Universidad T\'ecnica Estatal de Quevedo, Facultad de Ciencias de la Computaci\'on y Dise\~no Digital},
   year        = {2026},
-  type        = {Guía académica},
-  note        = {Periodo Académico Presencial 2026-2027, etiqueta objetivo v0.9.0-rc}
+  type        = {Gu\'ia acad\'emica}
 }
 
-@misc{sgroas_repo,
-  author       = {Tejada, Luis and Alxjandr07},
-  title        = {SGROAS-ProyectoAppWeb: Sistema de Gestión de Recursos Operativos, Administrativos y de Seguridad},
-  year         = {2026},
-  howpublished = {\url{https://github.com/Alxjandr07/SGROAS-ProyectoAppWeb}},
-  note         = {Repositorio Git, tag v0.9.0-rc}
-}
-
-@misc{iso29148,
-  author       = {{International Organization for Standardization, International Electrotechnical Commission, and Institute of Electrical and Electronics Engineers}},
-  title        = {ISO/IEC/IEEE 29148:2018 --- Systems and Software Engineering --- Life Cycle Processes --- Requirements Engineering},
-  year         = {2018},
-  institution  = {ISO/IEC/IEEE}
-}
-
-@misc{owasp2021,
-  author       = {{OWASP Foundation}},
-  title        = {OWASP Top 10:2021 --- The Ten Most Critical Web Application Security Risks},
-  year         = {2021},
-  howpublished = {OWASP Foundation}
-}
-
-@misc{rfc7519,
-  author       = {Jones, Michael and Bradley, John and Sakimura, Nat},
-  title        = {JSON Web Token (JWT)},
-  year         = {2015},
-  howpublished = {RFC 7519, Internet Engineering Task Force (IETF)}
-}
-
-@misc{rfc7807,
-  author       = {Nottingham, Mark and Wilde, Erik},
-  title        = {Problem Details for HTTP APIs},
-  year         = {2016},
-  howpublished = {RFC 7807, Internet Engineering Task Force (IETF)}
-}
-
-@misc{jacoco,
-  author = {{JaCoCo}},
-  title  = {JaCoCo Java Code Coverage Library},
-  year   = {2024},
-  url    = {https://www.jacoco.org/jacoco/}
-}
-
-@misc{k6,
-  author = {{Grafana Labs}},
-  title  = {k6 --- Modern Load Testing Tool},
-  year   = {2026},
-  url    = {https://k6.io/}
-}
-
-@article{brooke1996,
-  author  = {Brooke, John},
-  title   = {SUS: A 'Quick and Dirty' Usability Scale},
-  journal = {Usability Evaluation in Industry},
-  year    = {1996},
-  volume  = {189},
-  number  = {194},
-  pages   = {4--7},
-  publisher = {Taylor \& Francis}
-}
-
-@article{bangor2009,
-  author  = {Bangor, Aaron and Kortum, Philip and Miller, James},
-  title   = {Determining What Individual SUS Scores Mean: Adding an Adjective Rating Scale},
-  journal = {Journal of Usability Studies},
-  year    = {2009},
-  volume  = {4},
-  number  = {3},
-  pages   = {114--123}
-}
+% -------------------- Estadistica experimental --------------------
 @book{wohlin2012,
   author    = {Wohlin, Claes and Runeson, Per and H\"ost, Martin and Ohlsson, Magnus C. and Regnell, Bj\"orn and Wessl\'en, Anders},
   title     = {Experimentation in Software Engineering},
@@ -129,6 +65,18 @@
   doi     = {10.1037/0033-2909.114.3.494}
 }
 
+% -------------------- Usabilidad --------------------
+@article{brooke1996,
+  author    = {Brooke, John},
+  title     = {SUS: A 'Quick and Dirty' Usability Scale},
+  journal   = {Usability Evaluation in Industry},
+  year      = {1996},
+  volume    = {189},
+  number    = {194},
+  pages     = {4--7},
+  publisher = {Taylor \& Francis}
+}
+
 @article{brooke2013,
   author  = {Brooke, John},
   title   = {SUS: A Retrospective},
@@ -148,6 +96,16 @@
   number  = {6},
   pages   = {574--594},
   doi     = {10.1080/10447310802205776}
+}
+
+@article{bangor2009,
+  author  = {Bangor, Aaron and Kortum, Philip and Miller, James},
+  title   = {Determining What Individual SUS Scores Mean: Adding an Adjective Rating Scale},
+  journal = {Journal of Usability Studies},
+  year    = {2009},
+  volume  = {4},
+  number  = {3},
+  pages   = {114--123}
 }
 
 @inproceedings{lewis2009,
@@ -173,6 +131,7 @@
   doi     = {10.1080/10447318.2012.681221}
 }
 
+% -------------------- Rendimiento --------------------
 @article{jiang2015,
   author  = {Jiang, Zhen Ming and Hassan, Ahmed E.},
   title   = {A Survey on Load Testing of Large-Scale Software Systems},
@@ -203,6 +162,7 @@
   doi       = {10.1109/ICSE.2015.144}
 }
 
+% -------------------- Cobertura --------------------
 @inproceedings{inozemtseva2014,
   author    = {Inozemtseva, Laura and Holmes, Reid},
   title     = {Coverage is Not Strongly Correlated with Test Suite Effectiveness},
@@ -239,6 +199,22 @@
   doi       = {10.1145/3338906.3340459}
 }
 
+% -------------------- Seguridad --------------------
+@misc{owasp2021,
+  author       = {{OWASP Foundation}},
+  title        = {OWASP Top 10:2021 --- The Ten Most Critical Web Application Security Risks},
+  year         = {2021},
+  howpublished = {OWASP Foundation}
+}
+
+@misc{rfc7519,
+  author       = {Jones, Michael and Bradley, John and Sakimura, Nat},
+  title        = {JSON Web Token (JWT)},
+  year         = {2015},
+  howpublished = {RFC 7519, IETF},
+  doi          = {10.17487/RFC7519}
+}
+
 @misc{rfc6749,
   author       = {Hardt, Dick},
   title        = {The OAuth 2.0 Authorization Framework},
@@ -247,6 +223,14 @@
   doi          = {10.17487/RFC6749}
 }
 
+@misc{rfc7807,
+  author       = {Nottingham, Mark and Wilde, Erik},
+  title        = {Problem Details for HTTP APIs},
+  year         = {2016},
+  howpublished = {RFC 7807, IETF}
+}
+
+% -------------------- Arquitectura / microservicios --------------------
 @inproceedings{alshuqayran2016,
   author    = {Alshuqayran, Nuha and Ali, Nour and Evans, Roger},
   title     = {A Systematic Mapping Study in Microservice Architecture},
@@ -334,6 +318,7 @@
   pages   = {2}
 }
 
+% -------------------- Revision sistematica --------------------
 @misc{prisma2021,
   author       = {Page, Matthew J. and McKenzie, Joanne E. and Bossuyt, Patrick M. and Boutron, Isabelle and Hoffmann, Tammy C. and others},
   title        = {The PRISMA 2020 Statement: An Updated Guideline for Reporting Systematic Reviews},
@@ -372,4 +357,27 @@
   year         = {2021},
   note         = {arXiv:2010.03525},
   howpublished = {\url{https://arxiv.org/abs/2010.03525}}
+}
+
+% -------------------- Herramientas --------------------
+@misc{dataset_sgroas,
+  author       = {{SGROAS Team}},
+  title        = {{SGROAS}: Dataset de mediciones del estudio empírico (v1.0.0)},
+  year         = {2026},
+  howpublished = {Zenodo},
+  url          = {https://doi.org/10.5281/zenodo.21973297}
+}
+
+@misc{jacoco,
+  author = {{JaCoCo}},
+  title  = {JaCoCo Java Code Coverage Library},
+  year   = {2024},
+  url    = {https://www.jacoco.org/jacoco/}
+}
+
+@misc{k6,
+  author = {{Grafana Labs}},
+  title  = {k6 --- Modern Load Testing Tool},
+  year   = {2026},
+  url    = {https://k6.io/}
 }

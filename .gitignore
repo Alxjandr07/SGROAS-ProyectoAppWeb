@@ -43,3 +43,7 @@ frontend/dist/
 backend.err
 backend.log
 
+
+# Python
+__pycache__/
+*.pyc

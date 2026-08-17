@@ -1,0 +1,21 @@
+{
+  "codigo": "P10",
+  "edad": 19,
+  "sexo": "Masculino",
+  "experiencia_web": "Media",
+  "dispositivo": "Computadora",
+  "consentimiento": "Sí",
+  "respuestas": [
+    3,
+    2,
+    3,
+    1,
+    3,
+    3,
+    4,
+    1,
+    4,
+    2
+  ],
+  "sus_score": 70.0
+}
