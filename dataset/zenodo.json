@@ -1,0 +1,35 @@
+{
+  "upload_type": "dataset",
+  "title": "SGROAS: Dataset de mediciones del estudio empírico (v1.0.0)",
+  "description": "Datos crudos, agregados y figuras del estudio empírico de evaluación de SGROAS: rendimiento (k6, 50 VUs, p95<200ms), usabilidad (SUS, n=10), calidad web (Lighthouse), seguridad (OWASP ZAP) y cobertura (JaCoCo). Cada número se genera con scripts reproducibles (scripts/ en el repositorio) y la trazabilidad está en DATA-PROVENANCE.md.",
+  "creators": [
+    {
+      "name": "Castro Espinoza, Kevin Moisés",
+      "affiliation": "Universidad Técnica Estatal de Quevedo (UTEQ)"
+    },
+    {
+      "name": "Escudero Plaza, María del Rosario",
+      "affiliation": "Universidad Técnica Estatal de Quevedo (UTEQ)"
+    },
+    {
+      "name": "Tejada Bajaña, Luis Alejandro",
+      "affiliation": "Universidad Técnica Estatal de Quevedo (UTEQ)"
+    }
+  ],
+  "license": "cc-by-4.0",
+  "keywords": ["software engineering", "empirical study", "k6", "SUS", "Lighthouse", "OWASP ZAP", "JaCoCo", "Spring Boot", "Angular"],
+  "communities": [],
+  "access_right": "open",
+  "related_identifiers": [
+    {
+      "relation": "isSupplementTo",
+      "identifier": "10.5281/zenodo.21698129",
+      "resource_type": "software"
+    },
+    {
+      "relation": "isSupplementTo",
+      "identifier": "https://github.com/Alxjandr07/SGROAS-ProyectoAppWeb",
+      "resource_type": "software"
+    }
+  ]
+}
