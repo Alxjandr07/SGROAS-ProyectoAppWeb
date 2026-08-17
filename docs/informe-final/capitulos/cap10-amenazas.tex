@@ -1,0 +1,89 @@
+\chapter{Amenazas a la validez}
+\label{cap:amenazas}
+
+Siguiendo el marco clásico de experimentación aplicado a ingeniería de software
+\cite{wohlin2012}, este capítulo declara las amenazas a la validez del estudio
+empírico y las mitigaciones adoptadas. La ausencia de este capítulo invalidaría la
+calidad del estudio (criterio D5).
+
+\section{Amenazas a la validez de constructo}
+
+\textbf{Descripción:} las métricas pueden no medir exactamente el constructo
+pretendido (por ejemplo, la usabilidad percibida o el rendimiento).
+
+\textbf{Mitigaciones:}
+\begin{itemize}
+  \item El rendimiento se mide con la métrica estándar \texttt{http\_req\_duration}
+        y sus percentiles p95/p99, con umbrales declarados a priori en
+        \texttt{k6/opts.js}.
+  \item La usabilidad se mide con el cuestionario SUS validado por Brooke
+        \cite{brooke1996} y se interpreta con la escala adjetiva de Bangor
+        \cite{bangor2009,bangor2008}.
+  \item La cobertura utiliza los contadores estandarizados de JaCoCo (instrucciones,
+        ramas, líneas).
+  \item La seguridad se evalúa con controles explícitos del OWASP Top 10
+        \cite{owasp2021} y auditoría estática de SQL dinámico.
+\end{itemize}
+
+\section{Amenazas a la validez interna}
+
+\textbf{Descripción:} factores no controlados pueden explicar los resultados
+(variación entre corridas, orden de ejecución, estado del cache, entorno de
+máquina).
+
+\textbf{Mitigaciones:}
+\begin{itemize}
+  \item Tres corridas independientes; la media y el IC\,95\,\% se calculan con
+        t de Student sobre las corridas (n = 3), no sobre una sola.
+  \item Se documenta el efecto del arranque en frío (k01) frente al estado
+        estable (k02--k03).
+  \item El entorno se fija (k6 0.57, 50 VUs, 30\,s) y se archiva con su commit.
+  \item Para el SUS, los procedimientos y el orden de tareas son idénticos en los
+        10 participantes.
+\end{itemize}
+
+\section{Amenazas a la validez externa}
+
+\textbf{Descripción:} los resultados pueden no generalizarse a otros entornos,
+cargas o poblaciones.
+
+\textbf{Mitigaciones:}
+\begin{itemize}
+  \item La medición está ligada al endpoint representativo \texttt{GET /api/conductores}
+        protegido con JWT; se documenta el protocolo completo.
+  \item El SUS usa 10 participantes heterogéneos (P01--P10) con distinto nivel de
+        experiencia web, acorde al tamaño mínimo recomendado
+        \cite{kortum2013,lewis2009}.
+  \item Las conclusiones de rendimiento se restringen a la condición de cache
+        caliente; el contraste con cache frío queda definido a priori para la
+        medición remota (K3).
+  \item El sistema es una aplicación de cooperativa de transporte nacional; los
+        resultados son transferibles a sistemas web similares de gestión de
+        recursos, no a dominios sin relación.
+\end{itemize}
+
+\section{Amenazas a la validez de conclusión}
+
+\textbf{Descripción:} decisiones estadísticas incorrectas pueden llevar a
+conclusiones erróneas.
+
+\textbf{Mitigaciones:}
+\begin{itemize}
+  \item Se utilizan métodos no paramétricos (U de Mann-Whitney \cite{mann_whitney1947},
+        Wilcoxon \cite{wilcoxon1945}) y el d de Cliff \cite{cliff1993} para el
+        contraste planeado, sin asumir normalidad.
+  \item El n reducido de corridas (3) se declara explícitamente y el IC\,95\,\%
+        resultante es ancho; se evita afirmar significancia donde no la hay.
+  \item La puntuación SUS se recalcula con la regla de Brooke desde los datos
+        crudos y se contrasta con la referencia.
+  \item El IC\,95\,\% usa la distribución t de Student de la referencia clásica
+        de Gosset \cite{student1908}.
+\end{itemize}
+
+\section{Conclusión}
+
+El diseño minimiza las amenazas mediante protocolo declarado, datos crudos
+versionados, scripts reproducibles y contraste no paramétrico planeado. Las
+limitaciones restantes (n pequeño, dominio específico, una condición de cache)
+se declaran en el capítulo de discusión y no comprometen las conclusiones de
+cumplimiento de umbrales, que se sostienen en los valores observados.
