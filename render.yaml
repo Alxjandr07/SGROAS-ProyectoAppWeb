@@ -37,13 +37,11 @@ services:
         fromDatabase:
           name: sgroas-db
           property: database
-      - key: SPRING_DATASOURCE_URL
-        value: jdbc:postgresql://$PGHOST:$PGPORT/$PGDATABASE
-      - key: SPRING_DATASOURCE_USERNAME
+      - key: PGUSER
         fromDatabase:
           name: sgroas-db
           property: user
-      - key: SPRING_DATASOURCE_PASSWORD
+      - key: PGPASSWORD
         fromDatabase:
           name: sgroas-db
           property: password
