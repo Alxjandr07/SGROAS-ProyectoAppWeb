@@ -96,3 +96,9 @@ dataset de acceso abierto en Zenodo:
   ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/))
 - Empaquetado reproducible: `scripts/zenodo/package-dataset.py`
 - Descripción y checksums: [`dataset/`](dataset/)
+
+## Video
+
+Video de reproducibilidad (`make all`) y recorrido por los reportes:
+**enlace pendiente** (YouTube no listado) — guion en
+[`docs/video/GUION-video.md`](docs/video/GUION-video.md).
