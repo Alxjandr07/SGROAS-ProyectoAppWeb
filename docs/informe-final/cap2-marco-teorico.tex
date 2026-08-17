@@ -1,0 +1,199 @@
+\chapter{Marco Teórico}
+\label{cap:marco-teorico}
+
+Este capítulo presenta los fundamentos teóricos y tecnológicos que sustentan el diseño e implementación del sistema SGROAS. Se organizan en cuatro áreas principales: ingeniería de requisitos, arquitectura de software, seguridad y tecnologías de implementación.
+
+\section{Ingeniería de requisitos}
+\label{sec:req-theory}
+
+\subsection{ISO/IEC/IEEE 29148:2018}
+\label{sec:iso29148}
+
+La norma ISO/IEC/IEEE 29148:2018 \cite{iso29148} establece los procesos y productos asociados con la ingeniería de requisitos de software. Define un SRS (Software Requirements Specification) como el documento que captura los requisitos de software de un sistema, incluyendo sus requisitos funcionales, no funcionales y de interfaz.
+
+Las características clave de un SRS conforme a esta norma son:
+\begin{itemize}
+  \item \textbf{Unambiguous:} Cada requisito se expresa de manera que solo admite una interpretación.
+  \item \textbf{Complete:} El SRS incluye todos los requisitos significativos (funcionales, no funcionales y de diseño).
+  \item \textbf{Consistent:} Los requisitos no contradictorios entre sí.
+  \item \textbf{Verifiable:} Cada requisito puede verificarse mediante una técnica de verificación definida.
+  \item \textbf{Traceable:} Cada requisito es rastreable hacia su origen y hacia los elementos de diseño.
+\end{itemize}
+
+SGROAS adopta la estructura de SRS recomendada por ISO/IEC/IEEE 29148:2018, organizando los requisitos en tres categorías: funcionales (REQ-F), no funcionales (REQ-NF) y de interfaz externa (REQ-IF). Cada requisito incluye su identificador, tipo, prioridad MoSCoW, justificación (rationale), enunciado, criterio de aceptación, método de verificación y trazabilidad.
+
+\subsection{INCOSE Guide to Writing Requirements v4}
+\label{sec:incose}
+
+El INCOSE (International Council on Systems Engineering) publica la guía ``Guide to Writing Requirements'' \cite{incose}, que define 15 características de calidad para requisitos individuales y conjuntos de requisitos. Estas características se organizan en dos grupos:
+
+\textbf{Características individuales (C1--C9):}
+\begin{enumerate}
+  \item[C1.] \textbf{Necessary:} El requisito es necesario para cumplir el objetivo del sistema.
+  \item[C2.] \textbf{Appropriate:} El requisito es apropiado para el nivel de abstracción al que pertenece.
+  \item[C3.] \textbf{Unambiguous:} El requisito se expresa de manera clara y sin ambigüedad.
+  \item[C4.] \textbf{Complete:} El requisito contiene toda la información necesaria.
+  \item[C5.] \textbf{Singular:} El requisito expresa un solo concepto.
+  \item[C6.] \textbf{Feasible:} El requisito es factible de implementar.
+  \item[C7.] \textbf{Verifiable:} El requisito puede verificarse mediante una técnica definida.
+  \item[C8.] \textbf{Correct:} El requisito refleja la necesidad real del stakeholder.
+  \item[C9.] \textbf{Conforming:} El requisito sigue las convenciones de formato establecidas.
+\end{enumerate}
+
+\textbf{Características del conjunto (C10--C15):}
+\begin{enumerate}
+  \item[C10.] \textbf{Complete (set):} El conjunto contiene todos los requisitos necesarios.
+  \item[C11.] \textbf{Consistent (set):} Los requisitos no se contradicen entre sí.
+  \item[C12.] \textbf{Comprehensible:} El conjunto es comprensible para los stakeholders.
+  \item[C13.] \textbf{Able to be validated:} El conjunto puede validarse contra las necesidades del usuario.
+  \item[C14.] \textbf{Trazable:} Cada requisito es rastreable hacia su origen.
+  \item[C15.] \textbf{Unico (set):} Cada requisito es único dentro del conjunto.
+\end{enumerate}
+
+SGROAS verifica las 15 características C1--C15 para cada uno de sus 50 requisitos en el checklist \texttt{docs/checklists/incose2023-req.md}.
+
+\subsection{Historias de usuario y casos de uso}
+\label{sec:hu-cu}
+
+Las historias de usuario, introducidas por Cohn \cite{cohn2004}, son una técnica de captura de requisitos que se expresa en el formato: ``Como [rol], quiero [acción] para [valor]''. Cada historia se valida mediante criterios de aceptación en formato Gherkin (Given/When/Then). Las historias de usuario se evalúan con los criterios INVEST: Independent, Negotiable, Valuable, Estimable, Small y Testable.
+
+Los casos de uso, formalizados por Cockburn \cite{cockburn2001}, describen las interacciones entre actores y el sistema para lograr un objetivo. Se organizan en niveles de detalle (Cockburn 1--4) que van desde el objetivo del usuario hasta el flujo paso a paso. Los casos de uso incluyen escenarios principales de éxito y extensiones (casos de excepción).
+
+SGROAS combina ambas técnicas: 8 historias de usuario con criterios Gherkin (formato Connextra) y 6 casos de uso en formato Cockburn niveles 1--4, garantizando cobertura completa de los requisitos funcionales.
+
+\subsection{Matriz MoSCoW}
+\label{sec:moscow}
+
+La técnica MoSCoW \cite{wiegers2013} prioriza los requisitos en cuatro categorías:
+\begin{itemize}
+  \item \textbf{Must:} Requisito obligatorio; el sistema no es útil sin él.
+  \item \textbf{Should:} Requisito importante; se incluye si hay recursos disponibles.
+  \item \textbf{Could:} Requisito deseable; se incluye si sobra tiempo.
+  \item \textbf{Won't:} Requisito pospuesto a futuras versiones.
+\end{itemize}
+
+SGROAS clasifica 44 requisitos como Must (88\%) y 6 como Should (12\%), reflejando un sistema con funcionalidad central consolidada y reportes como capacidades complementarias.
+
+\section{Arquitectura de software}
+\label{sec:architecture-theory}
+
+\subsection{Modelo C4}
+\label{sec:c4}
+
+El modelo C4 \cite{c4model} es una técnica de documentación arquitectónica que describe un sistema en cuatro niveles de abstracción:
+\begin{enumerate}
+  \item \textbf{Contexto (nivel 1):} Describe el sistema en su entorno, mostrando actores y sistemas externos.
+  \item \textbf{Contenedores (nivel 2):} Muestra las aplicaciones y bases de datos que componen el sistema.
+  \item \textbf{Componentes (nivel 3):} Detalla los componentes internos de cada contenedor.
+  \item \textbf{Código (nivel 4):} Describe la estructura de clases o módulos (opcional).
+\end{enumerate}
+
+SGROAS documenta su arquitectura en los niveles 1--3 mediante diagramas DSL (Domain Specific Language) generados con Structurizr, ubicados en \texttt{docs/arquitectura/}. Los diagramas C4 proporcionan una visión escalonada que facilita la comprensión de la arquitectura para diferentes audiencias.
+
+\subsection{Arquitectura de tres capas}
+\label{sec:three-tier}
+
+La arquitectura de tres capas separa la presentación (frontend), la lógica de negocio (backend) y el almacenamiento de datos (base de datos) en capas independientes \cite{martin2017}. SGROAS implementa esta arquitectura con:
+\begin{itemize}
+  \item \textbf{Capa de presentación:} Angular 20, que consume la API REST del backend.
+  \item \textbf{Capa de lógica de negocio:} Spring Boot 3.2.x con Java 21 LTS, que implementa los controladores, servicios y repositorios.
+  \item \textbf{Capa de datos:} PostgreSQL 16 para persistencia y Redis 7 como caché distribuida.
+\end{itemize}
+
+\section{Seguridad}
+\label{sec:security-theory}
+
+\subsection{OWASP Top 10:2021}
+\label{sec:owasp}
+
+El OWASP (Open Worldwide Application Security Project) publica periódicamente la lista de los 10 riesgos de seguridad más críticos en aplicaciones web \cite{owasp}. Los riesgos más relevantes para SGROAS son:
+
+\begin{description}
+  \item[A01 — Broken Access Control:] El mecanismo de autenticación JWT en cookie HttpOnly + Secure + SameSite=Strict, combinado con la autorización por rol, mitiga este riesgo.
+  \item[A02 — Cryptographic Failures:] TLS v1.3 en producción y cifrado de contraseñas con bcrypt mitigan este riesgo.
+  \item[A03 — Injection:] El uso de JPA con consultas parametrizadas y la prohibición de SQL dinámico en procedimientos almacenados mitigan este riesgo.
+  \item[A05 — Security Misconfiguration:] Las cabeceras HTTP de seguridad (HSTS, CSP, X-Frame-Options, X-Content-Type-Options) mitigan este riesgo.
+  \item[A07 — Identification and Authentication Failures:] El rate limiting en login (6 intentos, respuesta 429) mitiga este riesgo.
+\end{description}
+
+\subsection{JWT (RFC 7519)}
+\label{sec:jwt}
+
+JSON Web Token (JWT) \cite{rfc7519} es un estándar para la representación segura de afirmaciones entre dos partes. Un JWT se compone de tres partes: header (algoritmo y tipo), payload (claims) y signature (firma). SGROAS genera JWTs con 7 claims: \texttt{iss} (emisor), \texttt{sub} (sujeto), \texttt{aud} (audiencia), \texttt{exp} (expiración), \texttt{nbf} (no antes de), \texttt{iat} (emitido en) y \texttt{jti} (identificador único). El JWT se almacena en una cookie HttpOnly + Secure + SameSite=Strict, evitando el acceso desde JavaScript del navegador.
+
+\subsection{ProblemDetails (RFC 7807)}
+\label{sec:rfc7807}
+
+El estándar RFC 7807 \cite{rfc7807} define un formato uniforme para los errores en APIs HTTP. SGROAS implementa ProblemDetails en todas las respuestas de error, incluyendo los campos \texttt{type}, \texttt{title}, \texttt{status}, \texttt{detail} e \texttt{instance}. Esto garantiza que los clientes puedan manejar los errores de manera consistente y automatizada.
+
+\section{Tecnologías de implementación}
+\label{sec:tech}
+
+\subsection{Spring Boot 3.2.x con Java 21 LTS}
+\label{sec:spring}
+
+Spring Boot \cite{springboot} es un framework que simplifica la creación de aplicaciones basadas en Spring. SGROAS utiliza Spring Boot 3.2.x con Java 21 LTS (Long Term Support), aprovechando:
+\begin{itemize}
+  \item Spring Data JPA con Hibernate para el mapeo objeto-relacional (ORM).
+  \item Spring Security para la autenticación y autorización.
+  \item Spring Cache con Redis para la caché distribuida.
+  \item Flyway para las migraciones de base de datos.
+  \item SpringDoc OpenAPI para la documentación automática de la API.
+\end{itemize}
+
+\subsection{Angular 20}
+\label{sec:angular}
+
+Angular \cite{angular} es un framework de desarrollo frontend mantenido por Google. SGROAS utiliza Angular 20 con TypeScript, aprovechando:
+\begin{itemize}
+  \item Componentes y módulos para la organización del código.
+  \item Servicios e inyección de dependencias para la comunicación con la API.
+  \item Angular Router para la navegación entre vistas.
+  \item HttpClient para las peticiones HTTP al backend.
+\end{itemize}
+
+\subsection{PostgreSQL 16}
+\label{sec:postgresql}
+
+PostgreSQL \cite{postgresql} es un sistema de gestión de bases de datos relacional de código abierto. SGROAS utiliza PostgreSQL 16 aprovechando:
+\begin{itemize}
+  \item Procedimientos almacenados para reportes y agregaciones complejas.
+  \item Funciones SQL para estadísticas y métricas.
+  \item Triggers para auditoría y validación de datos.
+  \item Índices para optimización de consultas.
+  \item Tipos enumerados para estados y categorías.
+\end{itemize}
+
+\subsection{Redis 7}
+\label{sec:redis}
+
+Redis \cite{redis} es un almacén de datos en memoria utilizado como caché distribuida. SGROAS emplea Redis para:
+\begin{itemize}
+  \item Caché del listado paginado de conductores con TTL configurable.
+  \item Lista negra de tokens JWT revocados (JTI en logout).
+  \item Rate limiting para el control de intentos de login.
+\end{itemize}
+
+\section{Estándares de calidad}
+\label{sec:quality}
+
+\subsection{ISO/IEC 25010:2011}
+\label{sec:iso25010}
+
+La norma ISO/IEC 25010:2011 \cite{iso25010} define un modelo de calidad del producto software con ocho características: adecuación funcional, eficiencia de desempeño, compatibilidad, usabilidad, fiabilidad, seguridad, mantenibilidad y portabilidad. SGROAS verifica explícitamente las siguientes características:
+\begin{itemize}
+  \item \textbf{Adecuación funcional:} El sistema cumple con los 44 requisitos funcionales especificados.
+  \item \textbf{Eficiencia de desempeño:} El p95 del listado de conductores es de 81,43 ms (umbral: 200 ms).
+  \item \textbf{Seguridad:} Cabeceras HTTP de seguridad, JWT en cookie HttpOnly, rate limiting, parametrización de consultas.
+  \item \textbf{Usabilidad:} SUS de 63,0 (DT 13,88, n=10).
+\end{itemize}
+
+\subsection{Métricas de calidad de código}
+\label{sec:code-quality}
+
+La calidad de código se mide mediante:
+\begin{itemize}
+  \item \textbf{Cobertura de pruebas (JaCoCo):} 98,8\% instrucciones, 85,4\% ramas, 99,7\% líneas.
+  \item \textbf{Número de pruebas:} 150 pruebas JUnit 5 (unitarias e de integración).
+  \item \textbf{Deuda técnica:} Verificación mediante el plugin de SonarQube en CI.
+\end{itemize}

@@ -1,0 +1,103 @@
+\chapter{Introducción}
+\label{cap:introduccion}
+
+\section{Contexto y justificación}
+\label{sec:contexto}
+
+Las cooperativas de transporte urbano en Ecuador enfrentan desafíos significativos en la gestión de sus recursos operativos, administrativos y de seguridad. La planificación de rutas, la asignación de conductores y vehículos, el registro de incidentes y la generación de reportes se realizan frecuentemente mediante procesos manuales o semi-automatizados que dependen de hojas de cálculo, formatos en papel y sistemas de comunicación no estructurados \cite{sommerville2015}. Estas prácticas generan inconsistencias en los datos, demoras en la toma de decisiones y dificultades para el seguimiento del cumplimiento normativo.
+
+El sector del transporte público en Ecuador mueve a más de 3 millones de pasajeros diarios en las principales ciudades, según datos del Ministerio de Transporte y Obras Públicas \cite{mtop2024}. La gestión ineficiente de la flota, las asignaciones de rutas sin herramientas digitales y la falta de un registro estructurado de incidentes de seguridad representan riesgos operativos que afectan directamente la calidad del servicio y la seguridad de los usuarios.
+
+En este contexto, el desarrollo de un sistema de información web que centralice la gestión de los recursos de una cooperativa de transporte se convierte en una necesidad estratégica. SGROAS (Sistema de Gestión de Recursos Operativos, Administrativos y de Seguridad) fue concebido como una solución que integra las funcionalidades esenciales para la administración de conductores, usuarios, rutas, vehículos, asignaciones operativas e incidentes, proporcionando una plataforma unificada para el personal administrativo, operativo y de seguridad de la institución.
+
+La motivación del proyecto se sustenta en tres pilares: (1) la necesidad real expresada por el personal de la cooperativa durante las entrevistas iniciales, (2) la oportunidad de aplicar los conocimientos adquiridos durante la carrera de Ingeniería de Software en un caso de uso real, y (3) la contribución al cuerpo de conocimiento en ingeniería de requisitos aplicada a sistemas de gestión de transporte en el contexto ecuatoriano.
+
+\section{Descripción del problema}
+\label{sec:problema}
+
+La cooperativa de transporte objeto de estudio carece de un sistema integrado de información que soporte sus procesos operativos. Actualmente, la gestión de conductores se realiza mediante registros en hojas de cálculo que no garantizan la integridad de los datos. La asignación de rutas y vehículos se coordina por teléfono o mensajería instantánea, lo que dificulta el seguimiento y la auditoría. El registro de incidentes se realiza en formatos físicos que pueden extraviarse o ser incompletos. La generación de reportes operativos requiere la consolidación manual de datos de múltiples fuentes, proceso que consume tiempo y es propenso a errores.
+
+Estos problemas se traducen en:
+\begin{itemize}
+  \item \textbf{Pérdida de información:} Registros en papel y hojas de cálculo no respaldadas generan pérdida de datos históricos.
+  \item \textbf{Ineficiencia operativa:} La asignación manual de recursos consume tiempo valioso del personal coordinador.
+  \item \textbf{Falta de trazabilidad:} No existe un registro estructurado de las decisiones operativas y los incidentes.
+  \item \textbf{Limitaciones en reportes:} La ausencia de herramientas automatizadas dificulta la obtención de métricas para la toma de decisiones.
+  \item \textbf{Riesgos de seguridad:} La gestión descentralizada de la información aumenta la exposición a incidentes de seguridad de datos.
+\end{itemize}
+
+\section{Preguntas de investigación}
+\label{sec:preguntas}
+
+El desarrollo de SGROAS se orienta a responder las siguientes preguntas de investigación:
+
+\begin{enumerate}
+  \item \textbf{RQ1:} ¿Cómo se pueden especificar los requisitos de un sistema de gestión de recursos de transporte utilizando estándares internacionales (ISO/IEC/IEEE 29148:2018) y verificando las características de calidad del INCOSE Guide to Writing Requirements v4?
+
+  \item \textbf{RQ2:} ¿Es factible implementar una arquitectura de tres capas (Angular + Spring Boot + PostgreSQL) que cumpla con los requisitos funcionales y no funcionales definidos para el sistema SGROAS?
+
+  \item \textbf{RQ3:} ¿Qué nivel de calidad de código y rendimiento se puede alcanzar aplicando buenas prácticas de ingeniería de software en un proyecto de estas características?
+
+  \item \textbf{RQ4:} ¿Cómo afecta la usabilidad percibida (SUS) de una aplicación de gestión de transporte a la satisfacción de sus usuarios potenciales?
+\end{enumerate}
+
+\section{Objetivos}
+\label{sec:objetivos}
+
+\subsection{Objetivo general}
+
+Diseñar, implementar y validar el Sistema de Gestión de Recursos Operativos, Administrativos y de Seguridad (SGROAS), una aplicación web de tres capas que gestione los recursos de una cooperativa de transporte, verificando la calidad de sus requisitos conforme a ISO/IEC/IEEE 29148:2018 y las 15 características del INCOSE Guide to Writing Requirements v4.
+
+\subsection{Objetivos específicos}
+
+\begin{enumerate}
+  \item Especificar los requisitos funcionales y no funcionales del sistema SGROAS en un documento SRS conforme a ISO/IEC/IEEE 29148:2018, con trazabilidad completa hacia historias de usuario y casos de uso.
+
+  \item Verificar las 15 características de calidad de requisitos (C1--C15) del INCOSE Guide to Writing Requirements v4 para cada requisito especificado.
+
+  \item Implementar el backend del sistema utilizando Spring Boot 3.2.x con Java 21 LTS, PostgreSQL 16 y Redis 7, aplicando principios de arquitectura limpia y seguridad OWASP.
+
+  \item Implementar el frontend del sistema utilizando Angular 20, con autenticación JWT en cookie HttpOnly y diseño responsivo.
+
+  \item Ejecutar un conjunto de pruebas automatizadas que incluya pruebas unitarias, de integración y de carga, verificando cobertura mínima del 70\% y p95 menor a 200 ms.
+
+  \item Realizar un escaneo de seguridad con OWASP ZAP y verificar el cumplimiento de las cabeceras HTTP de seguridad.
+
+  \item Aplicar la prueba de System Usability Scale (SUS) con un mínimo de 15 participantes para evaluar la usabilidad percibida del sistema.
+\end{enumerate}
+
+\section{Contribuciones}
+\label{sec:contribuciones}
+
+Las contribuciones esperadas del proyecto SGROAS son:
+
+\begin{enumerate}
+  \item \textbf{Documento SRS v1.0.0:} Especificación completa de requisitos conforme a ISO/IEC/IEEE 29148:2018, con verificación INCOSE C1--C15, 50 requisitos (44 funcionales + 6 no funcionales) y trazabilidad completa.
+
+  \item \textbf{Sistema funcional:} Aplicación web desplegable con Docker Compose, que integra autenticación JWT, CRUD completo para 6 entidades, 7 procedimientos almacenados y 2 funciones SQL.
+
+  \item \textbf{Evidencia de calidad:} 150 pruebas automatizadas con 98,8\% de cobertura JaCoCo, escaneo OWASP ZAP sin vulnerabilidades críticas y pruebas de carga con p95 de 81,43 ms.
+
+  \item \textbf{Validación de requisitos:} Checklist INCOSE verificando las 15 características de calidad para cada requisito del SRS, con evidencia de elicitación documentada.
+
+  \item \textbf{Dataset reproducible:} Repositorio público en GitHub con código fuente, documentación, scripts de medición y datos semilla, archivado en Zenodo con DOI asignado.
+\end{enumerate}
+
+\section{Estructura del documento}
+\label{sec:estructura}
+
+El presente informe se organiza en los siguientes capítulos:
+
+\begin{description}
+  \item[Capítulo 1 — Introducción:] Contexto, justificación, descripción del problema, preguntas de investigación, objetivos y contribuciones (el presente capítulo).
+
+  \item[Capítulo 2 — Marco Teórico:] Fundamentos teóricos y tecnológicos que sustentan el desarrollo del sistema: ISO/IEC/IEEE 29148:2018, INCOSE Guide, modelo C4, JWT, OWASP Top 10, Spring Boot, Angular, PostgreSQL y Redis.
+
+  \item[Capítulo 3 — Diseño y Arquitectura:] Arquitectura de tres capas, diagramas C4 (niveles 1--3), decisiones de diseño (ADR), diseño de base de datos y diseño de la API REST.
+
+  \item[Capítulo 4 — Ingeniería de Requisitos:] Proceso de elicitación, stakeholders, historias de usuario, casos de uso, matriz MoSCoW, matriz de trazabilidad y conformidad INCOSE.
+
+  \item[Capítulo 5 — Verificación y Validación:] Pruebas unitarias e de integración (JaCoCo), pruebas de carga (k6), escaneo de seguridad (OWASP ZAP), prueba de usabilidad (SUS) y observaciones de auditoría.
+
+  \item[Capítulo 6 — Conclusiones:] Resumen de resultados, respuesta a las preguntas de investigación, limitaciones y trabajo futuro.
+\end{description}
