@@ -1,0 +1,19 @@
+# SGROAS - Versiones del entorno de ejecucion
+# Generado: 2026-08-17T00:25:28
+
+Sistema operativo: Windows 11 (10.0.26200)
+Arquitectura: AMD64
+
+Docker: Docker version 29.6.1, build 8900f1d
+Docker Compose: 5.3.0
+Java (JDK): N/A
+Maven (mvnw): N/A
+Node.js: v24.16.0
+npm: 11.13.0
+Angular CLI: N/A
+Python: N/A
+k6: N/A
+Git: git version 2.52.0.windows.1
+
+# Nota: en CI (ubuntu-latest) make versions regenera este archivo con las
+# versiones del runner (java 21, node, maven del proyecto).
