@@ -1,0 +1,21 @@
+{
+  "codigo": "P05",
+  "edad": 20,
+  "sexo": "Femenino",
+  "experiencia_web": "Media",
+  "dispositivo": "Computadora",
+  "consentimiento": "Sí",
+  "respuestas": [
+    3,
+    4,
+    3,
+    2,
+    4,
+    2,
+    3,
+    2,
+    3,
+    4
+  ],
+  "sus_score": 55.0
+}

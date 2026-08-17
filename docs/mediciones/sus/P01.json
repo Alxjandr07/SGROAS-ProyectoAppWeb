@@ -1,0 +1,21 @@
+{
+  "codigo": "P01",
+  "edad": 23,
+  "sexo": "Masculino",
+  "experiencia_web": "Baja",
+  "dispositivo": "Computadora",
+  "consentimiento": "Sí",
+  "respuestas": [
+    3,
+    3,
+    4,
+    4,
+    4,
+    3,
+    4,
+    4,
+    1,
+    3
+  ],
+  "sus_score": 47.5
+}
