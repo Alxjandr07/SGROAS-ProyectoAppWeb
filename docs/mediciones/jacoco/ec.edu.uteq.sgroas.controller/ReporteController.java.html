@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReporteController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">ec.edu.uteq.sgroas.controller</a> &gt; <span class="el_source">ReporteController.java</span></div><h1>ReporteController.java</h1><pre class="source lang-java linenums">package ec.edu.uteq.sgroas.controller;
+
+import ec.edu.uteq.sgroas.service.ReporteService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping(&quot;/api/reportes&quot;)
+@RequiredArgsConstructor
+public class ReporteController {
+
+    private final ReporteService reporteService;
+
+    @GetMapping(&quot;/estadisticas-generales&quot;)
+    @PreAuthorize(&quot;hasAnyRole('ADMIN', 'COORDINADOR', 'SEGURIDAD')&quot;)
+    public ResponseEntity&lt;List&lt;Map&lt;String, Object&gt;&gt;&gt; estadisticasGenerales() {
+<span class="fc" id="L24">        return ResponseEntity.ok(reporteService.estadisticasGenerales());</span>
+    }
+
+    @GetMapping(&quot;/incidentes-por-gravedad&quot;)
+    @PreAuthorize(&quot;hasAnyRole('ADMIN', 'SEGURIDAD')&quot;)
+    public ResponseEntity&lt;List&lt;Map&lt;String, Object&gt;&gt;&gt; incidentesPorGravedad(
+            @RequestParam(required = false) String tipo
+    ) {
+<span class="fc" id="L32">        return ResponseEntity.ok(reporteService.incidentesPorGravedad(tipo));</span>
+    }
+
+    @GetMapping(&quot;/incidentes-por-rango&quot;)
+    @PreAuthorize(&quot;hasAnyRole('ADMIN', 'SEGURIDAD')&quot;)
+    public ResponseEntity&lt;List&lt;Map&lt;String, Object&gt;&gt;&gt; incidentesPorRango(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant desde,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant hasta
+    ) {
+<span class="fc" id="L41">        return ResponseEntity.ok(reporteService.incidentesPorRango(desde, hasta));</span>
+    }
+
+    @GetMapping(&quot;/licencias-por-vencer&quot;)
+    @PreAuthorize(&quot;hasAnyRole('ADMIN', 'COORDINADOR')&quot;)
+    public ResponseEntity&lt;List&lt;Map&lt;String, Object&gt;&gt;&gt; licenciasPorVencer(
+            @RequestParam(defaultValue = &quot;30&quot;) Integer dias
+    ) {
+<span class="fc" id="L49">        return ResponseEntity.ok(reporteService.licenciasPorVencer(dias));</span>
+    }
+
+    @GetMapping(&quot;/vehiculos-en-mantenimiento&quot;)
+    @PreAuthorize(&quot;hasAnyRole('ADMIN', 'COORDINADOR')&quot;)
+    public ResponseEntity&lt;List&lt;Map&lt;String, Object&gt;&gt;&gt; vehiculosEnMantenimiento() {
+<span class="fc" id="L55">        return ResponseEntity.ok(reporteService.vehiculosEnMantenimiento());</span>
+    }
+
+    @GetMapping(&quot;/rendimiento-rutas&quot;)
+    @PreAuthorize(&quot;hasAnyRole('ADMIN', 'COORDINADOR')&quot;)
+    public ResponseEntity&lt;List&lt;Map&lt;String, Object&gt;&gt;&gt; rendimientoRutas() {
+<span class="fc" id="L61">        return ResponseEntity.ok(reporteService.reporteRendimientoRutas());</span>
+    }
+
+    @GetMapping(&quot;/asignaciones-activas/{conductorId}&quot;)
+    @PreAuthorize(&quot;hasAnyRole('ADMIN', 'COORDINADOR')&quot;)
+    public ResponseEntity&lt;List&lt;Map&lt;String, Object&gt;&gt;&gt; asignacionesActivas(
+            @PathVariable Long conductorId
+    ) {
+<span class="fc" id="L69">        return ResponseEntity.ok(reporteService.asignacionesActivasPorConductor(conductorId));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

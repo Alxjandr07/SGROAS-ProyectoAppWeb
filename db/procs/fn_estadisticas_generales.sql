@@ -1,28 +1,19 @@
 -- =============================================================================
 -- fn_estadisticas_generales
--- Descripcion: Funcion que retorna estadisticas resumidas de todo el sistema:
+-- Descripcion: Retorna estadisticas resumidas de todo el sistema:
 --              totales de conductores, vehiculos, rutas, asignaciones e
 --              incidentes. Util para dashboards.
--- Uso: Funcion sin parametros, multiples agregaciones
+-- Uso: Procedimiento sin parametros, multiples agregaciones
+-- Invocacion JPA: @Procedure(name = "Incidente.estadisticasGenerales")
 -- =============================================================================
 
-CREATE OR REPLACE FUNCTION fn_estadisticas_generales()
-    RETURNS TABLE(
-        total_conductores BIGINT,
-        conductores_activos BIGINT,
-        total_vehiculos BIGINT,
-        vehiculos_activos BIGINT,
-        total_rutas BIGINT,
-        rutas_activas BIGINT,
-        total_asignaciones BIGINT,
-        asignaciones_activas BIGINT,
-        total_incidentes BIGINT,
-        incidentes_abiertos BIGINT
-    )
+CREATE OR REPLACE PROCEDURE fn_estadisticas_generales(
+    INOUT cur refcursor
+)
     LANGUAGE plpgsql
 AS $$
 BEGIN
-    RETURN QUERY
+    OPEN cur FOR
     SELECT
         (SELECT COUNT(*) FROM conductores)::BIGINT,
         (SELECT COUNT(*) FROM conductores WHERE activo = true)::BIGINT,

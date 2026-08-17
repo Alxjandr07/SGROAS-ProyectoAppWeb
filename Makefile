@@ -1,4 +1,4 @@
-.PHONY: up down test bench audit clean
+.PHONY: up down test bench audit jacoco versions docs all clean
 
 # =============================================================================
 # SGROAS — Makefile
@@ -7,7 +7,11 @@
 #      make down  -> detener contenedores
 #      make test  -> ejecutar pruebas
 #      make bench -> ejecutar benchmarks k6
-#      make audit -> auditoría OWASP
+#      make audit -> auditoria SQL estatico + trazabilidad
+#      make jacoco-> regenerar reporte de cobertura
+#      make versions -> generar docs/entorno/versions.txt
+#      make docs  -> generar artefactos de documentacion
+#      make all   -> pipeline completo (R1: reproduccion end-to-end)
 #      make clean -> limpieza total
 # =============================================================================
 
@@ -32,9 +36,27 @@ bench:
 	@echo "Benchmarks completos. Resultados en docs/mediciones/perf/"
 
 audit:
-	@echo "Ejecutando auditoría OWASP..."
+	@echo "Auditoria: SQL dinamico prohibido..."
 	scripts/audit-sql-dynamic.sh
-	@echo "Verificar resultados en docs/mediciones/sec/"
+	@echo "Auditoria: trazabilidad end-to-end..."
+	scripts/validate-traceability.sh
+	@echo "Auditorias completas (exit 0 = OK)."
+
+jacoco:
+	./mvnw clean verify
+	@echo "Reporte JaCoCo regenerado en docs/mediciones/jacoco/"
+
+versions:
+	python scripts/gen-versions.py > docs/entorno/versions.txt
+	@echo "Versiones registradas en docs/entorno/versions.txt"
+
+docs: versions
+	@echo "Artefactos de documentacion generados."
+
+all: up test bench audit jacoco versions
+	@echo "=========================================="
+	@echo "PIPELINE COMPLETO (make all) FINALIZADO OK"
+	@echo "=========================================="
 
 clean:
 	docker compose down -v --rmi all

@@ -3,22 +3,16 @@
 -- Descripcion: Lista los vehiculos en estado EN_MANTENIMIENTO con
 --              el conteo de incidentes asociados a sus asignaciones.
 -- Uso: LEFT JOIN + agregacion
+-- Invocacion JPA: @Procedure(name = "Vehiculo.vehiculosEnMantenimiento")
 -- =============================================================================
 
-CREATE OR REPLACE FUNCTION sp_vehiculos_en_mantenimiento()
-    RETURNS TABLE(
-        vehiculo_id BIGINT,
-        placa VARCHAR,
-        marca VARCHAR,
-        modelo VARCHAR,
-        anio INTEGER,
-        total_asignaciones BIGINT,
-        total_incidentes BIGINT
-    )
+CREATE OR REPLACE PROCEDURE sp_vehiculos_en_mantenimiento(
+    INOUT cur refcursor
+)
     LANGUAGE plpgsql
 AS $$
 BEGIN
-    RETURN QUERY
+    OPEN cur FOR
     SELECT
         v.id,
         v.placa::VARCHAR,

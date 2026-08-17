@@ -38,10 +38,12 @@ GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_
 ,ec.edu.uteq.sgroas.controller,VehiculoController,0,36,0,0,0,7,0,5,0,5
 ,ec.edu.uteq.sgroas.controller,UsuarioController,0,36,0,0,0,7,0,5,0,5
 ,ec.edu.uteq.sgroas.controller,AuthController,0,141,0,4,0,44,0,8,0,6
+,ec.edu.uteq.sgroas.controller,ReporteController,0,40,0,0,0,7,0,7,0,7
 ,ec.edu.uteq.sgroas.controller,ConductorController,0,36,0,0,0,7,0,5,0,5
 ,ec.edu.uteq.sgroas.controller,AsignacionRutaController,0,36,0,0,0,7,0,5,0,5
 ,ec.edu.uteq.sgroas.controller,RutaController,0,36,0,0,0,7,0,5,0,5
 ,ec.edu.uteq.sgroas.service,RutaService,0,220,1,5,0,61,1,12,0,10
+,ec.edu.uteq.sgroas.service,ReporteService,683,0,2,0,25,0,16,0,15,0
 ,ec.edu.uteq.sgroas.service,ConductorService,0,297,2,14,0,80,2,19,0,13
 ,ec.edu.uteq.sgroas.service,VehiculoService,0,238,1,5,0,67,1,12,0,10
 ,ec.edu.uteq.sgroas.service,IncidenteService,5,257,0,0,0,71,1,13,1,13

@@ -1,26 +1,19 @@
 -- =============================================================================
 -- fn_licencias_por_vencer
--- Descripcion: Funcion que retorna los conductores cuya licencia vence
+-- Descripcion: Retorna los conductores cuya licencia vence
 --              dentro de los proximos N dias.
--- Uso: Funcion con parametro, filtro por fecha
+-- Uso: Procedimiento con parametro, filtro por fecha
+-- Invocacion JPA: @Procedure(name = "Conductor.licenciasPorVencer")
 -- =============================================================================
 
-CREATE OR REPLACE FUNCTION fn_licencias_por_vencer(
-    p_dias_umbral INTEGER DEFAULT 30
+CREATE OR REPLACE PROCEDURE fn_licencias_por_vencer(
+    p_dias_umbral INTEGER,
+    INOUT cur refcursor
 )
-    RETURNS TABLE(
-        conductor_id BIGINT,
-        nombre_completo VARCHAR,
-        cedula VARCHAR,
-        numero_licencia VARCHAR,
-        tipo_licencia VARCHAR,
-        fecha_vencimiento DATE,
-        asignacion_activa BOOLEAN
-    )
     LANGUAGE plpgsql
 AS $$
 BEGIN
-    RETURN QUERY
+    OPEN cur FOR
     SELECT
         c.id,
         (c.nombres || ' ' || c.apellidos)::VARCHAR AS nombre_completo,

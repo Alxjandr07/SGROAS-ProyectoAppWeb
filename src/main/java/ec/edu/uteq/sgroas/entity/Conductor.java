@@ -13,6 +13,13 @@ import java.time.LocalDate;
 @Builder
 @Entity
 @Table(name = "conductores")
+@NamedStoredProcedureQuery(
+        name = "Conductor.licenciasPorVencer",
+        procedureName = "fn_licencias_por_vencer",
+        parameters = {
+                @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_dias_umbral", type = Integer.class),
+                @StoredProcedureParameter(mode = ParameterMode.REF_CURSOR, name = "cur", type = Class.class)
+        })
 public class Conductor {
 
     @Id

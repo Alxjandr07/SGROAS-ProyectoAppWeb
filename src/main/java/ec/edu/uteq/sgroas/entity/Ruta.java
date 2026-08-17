@@ -12,6 +12,12 @@ import java.time.Instant;
 @Builder
 @Entity
 @Table(name = "rutas")
+@NamedStoredProcedureQuery(
+        name = "Ruta.reporteRendimientoRutas",
+        procedureName = "sp_reporte_rendimiento_rutas",
+        parameters = {
+                @StoredProcedureParameter(mode = ParameterMode.REF_CURSOR, name = "cur", type = Class.class)
+        })
 public class Ruta {
 
     @Id
@@ -49,3 +55,4 @@ public class Ruta {
     @Column(name = "actualizado_en", nullable = false)
     private Instant actualizadoEn;
 }
+

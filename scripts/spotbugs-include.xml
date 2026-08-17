@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Include filter para SpotBugs + FindSecBugs (Bloque A.2.3).
+  Rechaza exclusivamente la categoria de SQL no constante:
+  SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE
+-->
+<FindBugsFilter>
+    <Match>
+        <Bug category="SECURITY" />
+        <Bug code="SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE" />
+    </Match>
+</FindBugsFilter>
