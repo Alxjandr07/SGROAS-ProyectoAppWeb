@@ -2,6 +2,41 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [v1.0.0] — 2026-08-17
+
+### Added
+
+- REQ-F-015 a REQ-F-019: CRUD de rutas de transporte (listado, consulta, alta, actualizacion, eliminacion logica)
+- REQ-F-020 a REQ-F-024: CRUD de vehiculos (listado, consulta, alta, actualizacion, desactivacion)
+- REQ-F-025 a REQ-F-029: CRUD de asignaciones ruta-conductor-vehiculo (listado, consulta, alta, actualizacion, eliminacion)
+- REQ-F-030 a REQ-F-034: CRUD de incidentes (listado, consulta, alta, actualizacion, eliminacion logica)
+- REQ-F-035: Reporte de rendimiento de rutas (sp_reporte_rendimiento_rutas)
+- REQ-F-036: Estadisticas generales del sistema (fn_estadisticas_generales)
+- REQ-F-037: Alerta de licencias por vencer (fn_licencias_por_vencer)
+- REQ-F-038: Reporte de incidentes por gravedad (sp_incidentes_por_gravedad)
+- REQ-F-039: Reporte de incidentes por rango de fechas (sp_obtener_incidentes_por_rango)
+- REQ-F-040: Consulta de asignaciones activas por conductor (sp_asignaciones_activas_por_conductor)
+- REQ-NF-007: Documentacion OpenAPI 3.0 en /api/docs
+- REQ-NF-008: Error handling con ProblemDetails (RFC 7807)
+- REQ-NF-009: CORS configurado por origen
+- REQ-NF-010: CORS configurado por rol
+- 8 historias de usuario (HU-001 a HU-008) con criterios Gherkin
+- 6 casos de uso (CU-001 a CU-006) en formato Cockburn niveles 1-4
+- Checklist INCOSE C1-C15 para los 20 requisitos del SRS
+- Evidencia de elicitation: entrevistas, observaciones, cuestionario, taller JAD
+- Matriz de priorizacion MoSCoW para 50 requisitos
+
+### Modified
+
+- REQ-NF-002: Aclarado que TLS aplica exclusivamente a produccion (entorno local opera en HTTP plano)
+- REQ-NF-006: Umbral de cobertura actualizado de >= 60% a >= 70% para Entrega Final
+- Matriz de trazabilidad: REQ-F-002 a REQ-F-014 actualizados de "implementado" a "verificado"
+- SRS consolidado a v1.0.0 con 44 requisitos funcionales + 6 no funcionales
+
+### Removed
+
+- Ninguno
+
 ## [v0.9.0-rc] — 2026-07-24
 
 ### Added
