@@ -124,4 +124,6 @@ jobs:
             ghcr.io/alxjandr07/sgroas:latest
 
       - name: Print image digest
-        run: echo "image pushed: ghcr.io/alxjandr07/sgroas:${{ github.ref_name }} digest=${{ steps.build.outputs.digest }}"
+        run: |
+          echo "image pushed: ghcr.io/alxjandr07/sgroas:${{ github.ref_name }}"
+          echo "digest: ${{ steps.build.outputs.digest }}"
