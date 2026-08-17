@@ -1,0 +1,54 @@
+% =====================================================================
+% Anexo A — Resumen de resultados por bloque de la evaluación empírica
+% =====================================================================
+\clearpage
+\chapter*{Anexo A: Matriz de resultados por bloque}
+\addcontentsline{toc}{chapter}{Anexo A: Matriz de resultados por bloque}
+
+La siguiente matriz consolida los números reportados en el capítulo~8 con su
+trazabilidad a datos crudos y scripts. Todos los valores se generan desde
+\texttt{scripts/} y se archivan en \texttt{docs/mediciones/} (dataset Zenodo
+\cite{dataset_sgroas}).
+
+\begin{table}[H]
+\centering
+\small
+\caption{Resumen de mediciones por bloque.}
+\begin{tabular}{@{}llrrl@{}}
+\toprule
+\textbf{Bloque} & \textbf{Métrica} & \textbf{Valor} & \textbf{Umbral} & \textbf{Cumple} \\
+\midrule
+Rendimiento (RQ1) & p95 respuesta & 173.13\,ms & \textless 200\,ms & Sí \\
+Rendimiento (RQ1) & Error rate & 0.00\,\% & \textless 1\,\% & Sí \\
+Usabilidad (RQ2) & SUS media & 63.0 & $\geq$ 70 & No \\
+Calidad web (RQ3) & Lighthouse perf & 100 & $\geq$ 80 & Sí \\
+Calidad web (RQ3) & Lighthouse acc & 95 & $\geq$ 90 & Sí \\
+Calidad web (RQ3) & Lighthouse PAI & 100 & $\geq$ 90 & Sí \\
+Calidad web (RQ3) & Lighthouse SEO & 90 & $\geq$ 90 & Sí \\
+Seguridad (RQ4) & OWASP ZAP & pendiente URL & -- & -- \\
+Cobertura (RQ4) & JaCoCo líneas & 99.7\,\% & $\geq$ 90 & Sí \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Decisiones de umbral}: tomadas \emph{a priori} en la definición del
+estudio (ver GQM en el capítulo 8) a partir de recomendaciones de literatura:
+SUS $\geq$ 70 \cite{bangor2009}, rendimiento p95 \textless 200\,ms acorde a
+guías web \cite{foo2015}, y umbrales Lighthouse por defecto de la propia
+herramienta \cite{jacoco}.
+
+\textbf{Trazabilidad script $\rightarrow$ dato}:
+
+\begin{center}
+\begin{tabular}{@{}lp{.55\textwidth}@{}}
+\toprule
+\textbf{Script} & \textbf{Salida} \\
+\midrule
+\texttt{scripts/perf-analysis.py} & \texttt{docs/mediciones/perf/ANALISIS-k6.md} y \texttt{estadisticas.json} \\
+\texttt{scripts/gen-figuras.py} & \texttt{docs/mediciones/perf/figuras/*.png} \\
+\texttt{scripts/sus-analysis.py} & \texttt{docs/mediciones/sus/ANALISIS-SUS.md} y \texttt{estadisticas-sus.json} \\
+\texttt{scripts/lighthouse/run-lighthouse.sh} & \texttt{docs/mediciones/lighthouse/lhci-*.json} \\
+\texttt{scripts/zap/run-zap.sh} & \texttt{docs/mediciones/sec/zap/RESUMEN.md} \\
+\bottomrule
+\end{tabular}
+\end{center}
