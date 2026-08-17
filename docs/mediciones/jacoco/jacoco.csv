@@ -28,6 +28,7 @@ GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_
 ,ec.edu.uteq.sgroas.config,SecurityConfig,0,193,0,0,0,36,0,14,0,14
 ,ec.edu.uteq.sgroas.config,CacheConfig,0,35,0,0,0,14,0,2,0,2
 ,ec.edu.uteq.sgroas.config,RedisConfig,0,25,0,0,0,6,0,3,0,3
+,ec.edu.uteq.sgroas.config,RenderDataSourceConfig,24,24,0,0,6,7,1,2,1,2
 ,ec.edu.uteq.sgroas.exception,GlobalExceptionHandler,0,113,0,0,0,30,0,6,0,6
 ,ec.edu.uteq.sgroas,SgroasApplication,5,3,0,0,2,1,1,1,1,1
 ,ec.edu.uteq.sgroas.security,JwtAuthenticationFilter,2,130,4,18,0,32,4,9,0,2
