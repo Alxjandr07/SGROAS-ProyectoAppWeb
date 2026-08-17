@@ -12,6 +12,7 @@ services:
   - type: redis
     name: sgroas-redis
     plan: free
+    ipAllowList: []
     maxmemoryPolicy: allkeys-lru
 
   - type: web
@@ -46,11 +47,6 @@ services:
           type: redis
           name: sgroas-redis
           property: port
-      - key: SPRING_DATA_REDIS_PASSWORD
-        fromService:
-          type: redis
-          name: sgroas-redis
-          property: password
       - key: APP_JWT_SECRET
         generateValue: true
       - key: APP_JWT_EXPIRATION_MS
