@@ -1,0 +1,71 @@
+\chapter{Discusión}
+\label{cap:discusion}
+
+Este capítulo responde las preguntas de investigación, compara los resultados con
+trabajos relacionados y discute los hallazgos inesperados y sus implicaciones
+prácticas.
+
+\section{Respuesta a las preguntas de investigación}
+
+\textbf{RQ1 (rendimiento).} El acceso híbrido CRUD/ORM + stored procedures presenta
+una latencia media de 23.01\,ms en condición de cache caliente (IC\,95\,\%
+[$-7.88$; $53.91$]\,ms, n = 3) con 0\,\% de errores y p95 máximo de 173.13\,ms.
+La media observada es consistente con los resultados de pruebas de carga de
+sistemas web reportados en la literatura \cite{jiang2015,jiang2009}: la mayor
+latencia se concentra en la primera corrida (inicialización) y decae en las
+siguientes.
+
+\textbf{RQ2 (seguridad).} El sistema mitiga A01, A02, A03, A05, A07 y A09 del
+OWASP Top 10 \cite{owasp2021} mediante controles verificables: autenticación JWT
+con cookie HttpOnly, BCrypt, repositorios Spring Data (sin SQL concatenado) y
+limitación de tasa. Los riesgos identificados en la literatura de microservicios
+\cite{soldani2018,waseem2021,taibi2018} se abordan con \texttt{@Procedure} y
+\texttt{@Query} constantes.
+
+\textbf{RQ3 (usabilidad).} La media SUS de 63.0 (IC\,95\,\% [53.07; 72.93])
+clasifica al sistema como \emph{Bueno} en la escala adjetiva, dentro de la zona
+marginal \cite{bangor2009,bangor2008}. Comparado con productos de software
+generalistas medidos en \cite{kortum2013}, el valor es menor que el promedio de
+aplicaciones web (≈67--74), lo que coincide con que el sistema no alcanza el
+umbral de 70 y exige iterar sobre la complejidad percibida.
+
+\textbf{RQ4 (reproducibilidad y calidad web).} El proyecto es reproducible: todos
+los artefactos (datos crudos, scripts, figuras) están versionados y el protocolo
+FAIR se verifica en \texttt{docs/checklists/fair.md}. Lighthouse reporta 100/95/100/90,
+alcanzando los cuatro umbrales, en línea con SPA modernos bien configurados.
+
+\section{Comparación con trabajos relacionados}
+
+- \emph{Rendimiento:} a diferencia de estudios que reportan percentiles sin
+  intervalo de confianza \cite{jiang2009}, aquí se incluye IC\,95\,\% con t de
+  Student sobre corridas independientes, siguiendo la guía de experimentación en
+  ingeniería de software \cite{wohlin2012}.
+- \emph{Seguridad:} el enfoque de auditoría estática (\texttt{audit-sql-dynamic.sh}
+  y SpotBugs) complementa la evidencia dinámica OWASP de \cite{owasp2021},
+  emulando prácticas de revisión automatizada propuestas en la literatura de
+  calidad de microservicios \cite{taibi2018}.
+- \emph{Usabilidad:} el uso de SUS con 10 participantes y la escala adjetiva sigue
+  el protocolo estándar \cite{brooke1996,bangor2009}; la discusión sobre tamaño
+  muestral mínimo y factor estructural de la escala se respalda en \cite{lewis2009}.
+- \emph{Cobertura:} se reconocen las limitaciones de la cobertura como predictor
+  de efectividad \cite{inozemtseva2014}, por lo que se combina con pruebas de
+  integración y análisis de ramas \cite{gopinath2014,gligoric2013,ivankovic2019}.
+
+\section{Hallazgos inesperados}
+
+1. La primera corrida k6 concentra el p95 más alto (173.13\,ms) mientras las dos
+   posteriores estabilizan p95 por debajo de 40\,ms; interpretado como arranque del
+   cache Redis y de HikariCP, no como regresión.
+2. El SEO de Lighthouse (90) quedó al límite pese a un frontend SPA sencillo; la
+   causa es la ausencia de metadatos \emph{meta tags} completos en el \texttt{index.html}.
+3. La cobertura final (99.7\,\% líneas) resultó muy superior al umbral inicial
+   (14.69\,\%), gracias a la migración a JaCoCo 0.8.14 compatible con JDK 25.
+
+\section{Implicaciones prácticas}
+
+- Para la operación real en cooperativas, el punto de mejora inmediato es la
+  usabilidad (SUS 63): simplificar los formularios de alta/edición.
+- Para el operador de plataforma, mantener el cache Redis caliente reduce el p95
+  de 173 a $<$40\,ms; la política TTL debe dimensionarse a la carga esperada.
+- La reproducibilidad del artefacto (FAIR) simplifica la lectura y replicación del
+  estudio, según exigen los estándares empíricos \cite{ralph2021,prisma2021}.
