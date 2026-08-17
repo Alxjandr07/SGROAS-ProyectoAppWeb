@@ -3,25 +3,16 @@
 -- Descripcion: Reporte de rendimiento por ruta: total de asignaciones,
 --              incidentes reportados, y distribucion por gravedad.
 -- Uso: Agregaciones multiples, subqueries
+-- Invocacion JPA: @Procedure(name = "Ruta.reporteRendimientoRutas")
 -- =============================================================================
 
-CREATE OR REPLACE FUNCTION sp_reporte_rendimiento_rutas()
-    RETURNS TABLE(
-        ruta_id BIGINT,
-        ruta_codigo VARCHAR,
-        ruta_nombre VARCHAR,
-        total_asignaciones BIGINT,
-        total_incidentes BIGINT,
-        incidentes_criticos BIGINT,
-        incidentes_altos BIGINT,
-        incidentes_medios BIGINT,
-        incidentes_bajos BIGINT,
-        promedio_distancia_km NUMERIC
-    )
+CREATE OR REPLACE PROCEDURE sp_reporte_rendimiento_rutas(
+    INOUT cur refcursor
+)
     LANGUAGE plpgsql
 AS $$
 BEGIN
-    RETURN QUERY
+    OPEN cur FOR
     SELECT
         r.id,
         r.codigo::VARCHAR,

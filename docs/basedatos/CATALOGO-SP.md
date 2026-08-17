@@ -2,15 +2,22 @@
 
 ## Resumen
 
-| # | Nombre | Tipo | Descripcion |
-|---|--------|------|-------------|
-| 1 | `sp_obtener_incidentes_por_rango` | FUNCTION | Incidentes en rango de fechas con JOIN a 5 tablas |
-| 2 | `sp_incidentes_por_gravedad` | FUNCTION | Conteo de incidentes agrupados por gravedad |
-| 3 | `sp_asignaciones_activas_por_conductor` | FUNCTION | Asignaciones activas de un conductor especifico |
-| 4 | `sp_vehiculos_en_mantenimiento` | FUNCTION | Vehiculos en mantenimiento con total de incidentes |
-| 5 | `sp_reporte_rendimiento_rutas` | FUNCTION | Reporte de rendimiento por ruta con metricas |
-| 6 | `fn_licencias_por_vencer` | FUNCTION | Conductores con licencias por vencer |
-| 7 | `fn_estadisticas_generales` | FUNCTION | Estadisticas generales del sistema |
+| # | Nombre | Tipo | Descripcion | Invocacion JPA |
+|---|--------|------|-------------|----------------|
+| 1 | `sp_obtener_incidentes_por_rango` | PROCEDURE | Incidentes en rango de fechas con JOIN a 5 tablas | `@Procedure` en `IncidenteRepository` |
+| 2 | `sp_incidentes_por_gravedad` | PROCEDURE | Conteo de incidentes agrupados por gravedad | `@Procedure` en `IncidenteRepository` |
+| 3 | `sp_asignaciones_activas_por_conductor` | PROCEDURE | Asignaciones activas de un conductor especifico | `@Procedure` en `AsignacionRutaRepository` |
+| 4 | `sp_vehiculos_en_mantenimiento` | PROCEDURE | Vehiculos en mantenimiento con total de incidentes | `@Procedure` en `VehiculoRepository` |
+| 5 | `sp_reporte_rendimiento_rutas` | PROCEDURE | Reporte de rendimiento por ruta con metricas | `@Procedure` en `RutaRepository` |
+| 6 | `fn_licencias_por_vencer` | PROCEDURE | Conductores con licencias por vencer | `@Procedure` en `ConductorRepository` |
+| 7 | `fn_estadisticas_generales` | PROCEDURE | Estadisticas generales del sistema | `@Procedure` en `IncidenteRepository` |
+
+> **Firma de invocacion (JPA 2.1):** todos los procedimientos usan un parametro
+> `INOUT cur refcursor` que transporta el result set. Se invocan EXCLUSIVAMENTE
+> via `@Procedure(procedureName=..., outputParameterName="cur")` (prohibido SQL
+> dinamico o `createNativeQuery` con concatenacion, ver ADR-006 y
+> `scripts/audit-sql-dynamic.sh`). Instalados en BD por la migracion Flyway
+> `V5__stored_procedures.sql` (sincronizada con `db/procs/*.sql`).
 
 ---
 

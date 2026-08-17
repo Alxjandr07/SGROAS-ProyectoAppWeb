@@ -3,20 +3,17 @@
 -- Descripcion: Agrupa y cuenta incidentes por nivel de gravedad,
 --              filtrados opcionalmente por tipo.
 -- Uso: Agregacion con COUNT, GROUP BY
+-- Invocacion JPA: @Procedure(name = "Incidente.incidentesPorGravedad")
 -- =============================================================================
 
-CREATE OR REPLACE FUNCTION sp_incidentes_por_gravedad(
-    p_tipo VARCHAR DEFAULT NULL
+CREATE OR REPLACE PROCEDURE sp_incidentes_por_gravedad(
+    p_tipo VARCHAR DEFAULT NULL,
+    INOUT cur refcursor
 )
-    RETURNS TABLE(
-        gravedad VARCHAR,
-        total_incidentes BIGINT,
-        ultimo_incidente TIMESTAMPTZ
-    )
     LANGUAGE plpgsql
 AS $$
 BEGIN
-    RETURN QUERY
+    OPEN cur FOR
     SELECT
         i.gravedad::VARCHAR,
         COUNT(*)::BIGINT AS total_incidentes,

@@ -3,28 +3,18 @@
 -- Descripcion: Obtiene todos los incidentes en un rango de fechas con
 --              informacion del conductor, vehiculo y ruta asociados.
 -- JOINs: incidentes + asignacion_rutas + conductores + vehiculos + rutas
+-- Invocacion JPA: @Procedure(name = "Incidente.obtenerIncidentesPorRango")
 -- =============================================================================
 
-CREATE OR REPLACE FUNCTION sp_obtener_incidentes_por_rango(
+CREATE OR REPLACE PROCEDURE sp_obtener_incidentes_por_rango(
     p_fecha_desde TIMESTAMPTZ,
-    p_fecha_hasta TIMESTAMPTZ
+    p_fecha_hasta TIMESTAMPTZ,
+    INOUT cur refcursor
 )
-    RETURNS TABLE(
-        incidente_id BIGINT,
-        tipo VARCHAR,
-        gravedad VARCHAR,
-        estado VARCHAR,
-        descripcion TEXT,
-        fecha_incidente TIMESTAMPTZ,
-        ubicacion VARCHAR,
-        conductor_nombre VARCHAR,
-        vehiculo_placa VARCHAR,
-        ruta_codigo VARCHAR
-    )
     LANGUAGE plpgsql
 AS $$
 BEGIN
-    RETURN QUERY
+    OPEN cur FOR
     SELECT
         i.id,
         i.tipo::VARCHAR,

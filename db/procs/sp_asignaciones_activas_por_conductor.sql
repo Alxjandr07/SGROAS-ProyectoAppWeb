@@ -3,24 +3,17 @@
 -- Descripcion: Devuelve las asignaciones activas para un conductor,
 --              incluyendo datos del vehiculo y la ruta.
 -- JOINs: asignacion_rutas + conductores + vehiculos + rutas
+-- Invocacion JPA: @Procedure(name = "AsignacionRuta.asignacionesActivasPorConductor")
 -- =============================================================================
 
-CREATE OR REPLACE FUNCTION sp_asignaciones_activas_por_conductor(
-    p_conductor_id BIGINT
+CREATE OR REPLACE PROCEDURE sp_asignaciones_activas_por_conductor(
+    p_conductor_id BIGINT,
+    INOUT cur refcursor
 )
-    RETURNS TABLE(
-        asignacion_id BIGINT,
-        vehiculo_placa VARCHAR,
-        vehiculo_marca VARCHAR,
-        ruta_codigo VARCHAR,
-        ruta_nombre VARCHAR,
-        fecha_inicio DATE,
-        fecha_fin DATE
-    )
     LANGUAGE plpgsql
 AS $$
 BEGIN
-    RETURN QUERY
+    OPEN cur FOR
     SELECT
         ar.id,
         v.placa::VARCHAR,
