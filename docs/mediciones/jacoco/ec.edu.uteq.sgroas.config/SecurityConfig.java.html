@@ -54,47 +54,51 @@ public class SecurityConfig {
 <span class="fc" id="L54">                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)</span>
                 )
 <span class="fc" id="L56">                .authorizeHttpRequests(auth -&gt; auth</span>
-<span class="fc" id="L57">                        .requestMatchers(&quot;/api/auth/**&quot;).permitAll()</span>
-<span class="fc" id="L58">                        .requestMatchers(&quot;/api/docs/**&quot;, &quot;/v3/api-docs/**&quot;, &quot;/swagger-ui/**&quot;).permitAll()</span>
-<span class="fc" id="L59">                        .requestMatchers(&quot;/actuator/health&quot;).permitAll()</span>
-<span class="fc" id="L60">                        .requestMatchers(&quot;/api/conductores/**&quot;).hasAnyAuthority(</span>
+<span class="fc" id="L57">                        .requestMatchers(&quot;/&quot;, &quot;/index.html&quot;, &quot;/favicon.ico&quot;,</span>
+                                &quot;/assets/**&quot;,
+                                &quot;/*.js&quot;, &quot;/*.css&quot;, &quot;/*.png&quot;, &quot;/*.svg&quot;, &quot;/*.ico&quot;,
+<span class="fc" id="L60">                                &quot;/*.woff&quot;, &quot;/*.woff2&quot;, &quot;/*.ttf&quot;, &quot;/*.txt&quot;).permitAll()</span>
+<span class="fc" id="L61">                        .requestMatchers(&quot;/api/auth/**&quot;).permitAll()</span>
+<span class="fc" id="L62">                        .requestMatchers(&quot;/api/docs/**&quot;, &quot;/v3/api-docs/**&quot;, &quot;/swagger-ui/**&quot;).permitAll()</span>
+<span class="fc" id="L63">                        .requestMatchers(&quot;/actuator/health&quot;).permitAll()</span>
+<span class="fc" id="L64">                        .requestMatchers(&quot;/api/conductores/**&quot;).hasAnyAuthority(</span>
                                 &quot;ROLE_ADMIN&quot;,
                                 &quot;ROLE_COORDINADOR&quot;
                         )
-<span class="fc" id="L64">                        .anyRequest().authenticated()</span>
+<span class="fc" id="L68">                        .anyRequest().authenticated()</span>
                 )
-<span class="fc" id="L66">                .addFilterBefore(</span>
+<span class="fc" id="L70">                .addFilterBefore(</span>
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
                 )
-<span class="fc" id="L70">                .headers(headers -&gt; headers</span>
-<span class="fc" id="L71">                        .httpStrictTransportSecurity(hsts -&gt; hsts</span>
-<span class="fc" id="L72">                                .includeSubDomains(true)</span>
-<span class="fc" id="L73">                                .maxAgeInSeconds(31536000)</span>
+<span class="fc" id="L74">                .headers(headers -&gt; headers</span>
+<span class="fc" id="L75">                        .httpStrictTransportSecurity(hsts -&gt; hsts</span>
+<span class="fc" id="L76">                                .includeSubDomains(true)</span>
+<span class="fc" id="L77">                                .maxAgeInSeconds(31536000)</span>
                         )
-<span class="fc" id="L75">                        .frameOptions(frame -&gt; frame.deny())</span>
-<span class="fc" id="L76">                        .contentTypeOptions(content -&gt; { })</span>
-<span class="fc" id="L77">                        .xssProtection(xss -&gt; { })</span>
-<span class="fc" id="L78">                        .addHeaderWriter(new StaticHeadersWriter(</span>
+<span class="fc" id="L79">                        .frameOptions(frame -&gt; frame.deny())</span>
+<span class="fc" id="L80">                        .contentTypeOptions(content -&gt; { })</span>
+<span class="fc" id="L81">                        .xssProtection(xss -&gt; { })</span>
+<span class="fc" id="L82">                        .addHeaderWriter(new StaticHeadersWriter(</span>
                                 &quot;Content-Security-Policy&quot;,
                                 &quot;default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'&quot;
                         ))
                 );
 
-<span class="fc" id="L84">        return http.build();</span>
+<span class="fc" id="L88">        return http.build();</span>
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-<span class="fc" id="L89">        CorsConfiguration config = new CorsConfiguration();</span>
-<span class="fc" id="L90">        config.setAllowedOrigins(List.of(&quot;http://localhost:4200&quot;));</span>
-<span class="fc" id="L91">        config.setAllowedMethods(List.of(&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;, &quot;DELETE&quot;, &quot;OPTIONS&quot;));</span>
-<span class="fc" id="L92">        config.setAllowedHeaders(List.of(&quot;*&quot;));</span>
-<span class="fc" id="L93">        config.setAllowCredentials(true);</span>
+<span class="fc" id="L93">        CorsConfiguration config = new CorsConfiguration();</span>
+<span class="fc" id="L94">        config.setAllowedOrigins(List.of(&quot;http://localhost:4200&quot;));</span>
+<span class="fc" id="L95">        config.setAllowedMethods(List.of(&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;, &quot;DELETE&quot;, &quot;OPTIONS&quot;));</span>
+<span class="fc" id="L96">        config.setAllowedHeaders(List.of(&quot;*&quot;));</span>
+<span class="fc" id="L97">        config.setAllowCredentials(true);</span>
 
-<span class="fc" id="L95">        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();</span>
-<span class="fc" id="L96">        source.registerCorsConfiguration(&quot;/**&quot;, config);</span>
-<span class="fc" id="L97">        return source;</span>
+<span class="fc" id="L99">        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();</span>
+<span class="fc" id="L100">        source.registerCorsConfiguration(&quot;/**&quot;, config);</span>
+<span class="fc" id="L101">        return source;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>
