@@ -1,0 +1,65 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=3cm]{geometry}
+\usepackage{setspace}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{amsmath}
+\usepackage[colorlinks=true, linkcolor=blue, urlcolor=blue, citecolor=blue]{hyperref}
+\usepackage[backend=biber, style=ieee, doi=true, url=true]{biblatex}
+\addbibresource{Referencias.bib}
+\setstretch{1.5}
+\setlength{\parindent}{1.5cm}
+\setlength{\parskip}{6pt}
+
+\begin{document}
+
+% --- Portada ---
+\input{portada}
+
+% --- Resumen ---
+\setcounter{page}{2}
+\input{resumen}
+
+% --- Índice ---
+\tableofcontents
+\clearpage
+
+% --- Capítulo 1: Introducción ---
+\input{cap1-introduccion}
+
+% --- Capítulo 2: Marco Teórico ---
+\input{cap2-marco-teorico}
+
+% --- Capítulo 3: Diseño y Arquitectura (Luis) ---
+%\input{cap3-diseno-arquitectura}
+
+% --- Capítulo 4: Ingeniería de Requisitos ---
+\input{cap4-ingenieria-requisitos}
+
+% --- Capítulo 5: Verificación y Validación (Kevin) ---
+%\input{cap5-verificacion-validacion}
+
+% --- Capítulo 6: Conclusiones (compartido) ---
+%\input{cap6-conclusiones}
+
+% --- Referencias ---
+\clearpage
+\printbibliography[title={Referencias}]
+
+% --- Declaraciones ---
+\clearpage
+\input{declaraciones}
+
+% --- Anexos ---
+\appendix
+\input{anexos}
+
+\end{document}
