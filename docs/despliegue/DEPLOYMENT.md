@@ -67,9 +67,9 @@ Internet → Render TLS (HTTPS)
 
 | Item | Valor |
 |---|---|
-| URL base | `https://<url>` (rellenar tras despliegue real) |
-| Health | `https://<url>/actuator/health` → `{"status":"UP"}` (db, redis UP) |
-| OpenAPI | `https://<url>/api/docs` |
+| URL base | `https://sgroas-backend.onrender.com` |
+| Health | `https://sgroas-backend.onrender.com/actuator/health` → `{"status":"UP"}` (db, redis UP) |
+| OpenAPI | `https://sgroas-backend.onrender.com/api/docs` |
 | Capturas CI | `.github/workflows/ci.yml` (corridas verdes en Actions) |
 
 ## 5. Frontend
