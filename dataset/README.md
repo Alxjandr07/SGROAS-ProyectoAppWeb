@@ -3,7 +3,7 @@
 **Repositorio:** https://github.com/Alxjandr07/SGROAS-ProyectoAppWeb
 **Fecha del estudio:** julio-agosto 2026 · **Versionado:** v1.0.0 (2026-08-17)
 **Licencia del dataset:** [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
-**DOI dataset:** 10.5281/zenodo.XXXXXXXX (depósito SEPARADO en Zenodo)
+**DOI dataset:** [10.5281/zenodo.21973297](https://doi.org/10.5281/zenodo.21973297) (depósito SEPARADO en Zenodo)
 
 Este paquete archiva los **datos crudos, agregados y figuras** generados por el
 estudio empírico de evaluación de SGROAS (Sistema de Gestión de Recursos
@@ -40,7 +40,7 @@ dataset-sgroas/
 
 - Cite este depósito: **Castro Espinoza, K. M., Escudero Plaza, M. R., &
   Tejada Bajaña, L. A. (2026). SGROAS: Dataset de mediciones del estudio
-  empírico (v1.0.0) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.XXXXXXXX**
+  empírico (v1.0.0) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.21973297**
 - Los datos SUS corresponden a 10 participantes voluntarios con
   consentimiento informado (ver `docs/etica/` en el repositorio). No contiene
   datos personales identificables.

@@ -28,7 +28,7 @@ license: MIT
 repository-code: >-
   https://github.com/Alxjandr07/SGROAS-ProyectoAppWeb
 # Dataset del estudio empírico: depósito SEPARADO en Zenodo.
-# DOI dataset (rellenar tras el depósito): 10.5281/zenodo.XXXXXXX
+# DOI dataset: 10.5281/zenodo.21973297
 keywords:
   - transportation
   - fleet management
