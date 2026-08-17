@@ -1,0 +1,170 @@
+\chapter{Ingeniería de Requisitos}
+\label{cap:req-engineering}
+
+Este capítulo describe el proceso completo de ingeniería de requisitos aplicado al sistema SGROAS, desde la identificación de stakeholders hasta la verificación de conformidad con las características INCOSE. El proceso se ejecutó de manera iterativa entre mayo y agosto de 2026, siguiendo las recomendaciones de ISO/IEC/IEEE 29148:2018 \cite{iso29148} y el INCOSE Guide to Writing Requirements v4 \cite{incose}.
+
+\section{Stakeholders}
+\label{sec:stakeholders}
+
+La identificación de stakeholders se realizó mediante revisión documental del organigrama de la cooperativa y entrevistas iniciales con el personal directivo. Se clasificaron en seis categorías:
+
+\begin{longtable}{@{}p{3.5cm}p{3cm}p{8cm}@{}}
+\toprule
+\textbf{Stakeholder} & \textbf{Rol en el proyecto} & \textbf{Necesidades principales} \\
+\midrule
+\endhead
+Administrador del sistema & Usuario final, decisor & Gestión de usuarios, control de acceso, reportes ejecutivos \\
+Coordinador de operaciones & Usuario final & Gestión de conductores, rutas, vehículos, asignaciones \\
+Personal de seguridad & Usuario final & Registro y consulta de incidentes \\
+Conductores & Usuarios indirectos & Información de rutas asignadas \\
+Director de la cooperativa & Patrocinador & Reportes ejecutivos, estadísticas \\
+Equipo de desarrollo (PFC) & Desarrolladores & Requisitos claros, trazabilidad, calidad \\
+\bottomrule
+\end{longtable}
+
+Los stakeholders se priorizaron según su nivel de influencia e interés, identificando al administrador y al coordinador como los usuarios primarios con mayor impacto en la definición de requisitos.
+
+\section{Proceso de elicitación}
+\label{sec:elicitation}
+
+Se aplicaron cinco técnicas de elicitación de requisitos, documentadas en \texttt{docs/requisitos/elicitacion/elicitation-evidence.md}:
+
+\begin{enumerate}
+  \item \textbf{Entrevista semiestructurada (10 mayo 2026):} Se entrevistó al coordinador de operaciones y al administrador del sistema. Se identificaron los requisitos iniciales: autenticación, CRUD de conductores y reportes básicos. Las entrevistas duraron aproximadamente 90 minutos cada una y se grabaron con consentimiento del participante.
+
+  \item \textbf{Observación directa (15 mayo 2026):} Se observaron los flujos operativos del personal de seguridad y los conductores durante una jornada laboral. Se documentaron los procesos de asignación de rutas y registro de incidentes en formato físico, identificando puntos de mejora y requisitos no expresados.
+
+  \item \textbf{Cuestionario online (20 mayo 2026):} Se distribuyó un cuestionario Google Forms a 12 empleados de la cooperativa. El cuestionario incluyó preguntas de priorización MoSCoW para funcionalidades candidatas y una escala de satisfacción percibida. Se obtuvieron 10 respuestas completas.
+
+  \item \textbf{Revisión de documentación existente (25 mayo 2026):} Se analizaron las políticas de seguridad informática, los formatos de incidentes en papel, el organigrama institucional y los flujos operativos documentados. Esta técnica proporcionó contexto para la definición de restricciones y supuestos.
+
+  \item \textbf{Taller JAD (1 junio 2026):} Se realizó un taller conjunto (Joint Application Design) con el coordinador, el personal de seguridad y el administrador. Se validaron las historias de usuario, los casos de uso y las prioridades MoSCoW. El taller duró 3 horas y se documentó en acta.
+\end{enumerate}
+
+\section{Historias de usuario}
+\label{sec:hu}
+
+Se definieron 8 historias de usuario en formato Connextra (``Como [rol], quiero [acción] para [valor]''), cada una con criterios de aceptación en formato Gherkin (Given/When/Then). Las historias se evaluaron con los criterios INVEST de Cohn \cite{cohn2004}.
+
+\begin{longtable}{@{}p{2cm}p{3cm}p{4cm}p{4cm}@{}}
+\toprule
+\textbf{ID} & \textbf{Rol} & \textbf{Historia} & \textbf{Criterios Gherkin} \\
+\midrule
+\endhead
+HU-001 & Admin/Coord/Seg & Iniciar sesión en el sistema & 3 escenarios (éxito, credenciales inválidas, sin autenticación) \\
+HU-002 & Coord/Admin & Gestionar conductores (CRUD) & 4 escenarios (crear, consultar, actualizar, eliminar) \\
+HU-003 & Admin & Gestionar usuarios del sistema (CRUD) & 4 escenarios (crear, consultar, actualizar, eliminar) \\
+HU-004 & Coord/Admin & Gestionar rutas de transporte (CRUD) & 6 escenarios (crear, consultar, actualizar, eliminar, no encontrado, validación) \\
+HU-005 & Coord/Admin & Gestionar vehículos (CRUD) & 5 escenarios (registrar, listar, mantener, actualizar, desactivar) \\
+HU-006 & Coordinador & Asignar conductores y vehículos a rutas & 4 escenarios (crear, consultar activas, conflicto, listar) \\
+HU-007 & Seguridad & Registrar y consultar incidentes & 5 escenarios (registrar, por rango, por gravedad, listar, no encontrado) \\
+HU-008 & Admin/Coord & Generar reportes y estadísticas & 4 escenarios (rendimiento, generales, licencias, acceso no autorizado) \\
+\bottomrule
+\end{longtable}
+
+Las historias HU-001 a HU-003 se heredaron de la Entrega 1B y se mantuvieron sin cambios. Las historias HU-004 a HU-008 se definieron para la Entrega Final, cubriendo las funcionalidades nuevas del sistema.
+
+\section{Casos de uso}
+\label{sec:cu}
+
+Se definieron 6 casos de uso en formato Cockburn \cite{cockburn2001} con cuatro niveles de detalle (Cockburn 1--4). Cada caso incluye actor principal, actor secundario, precondiciones, postcondiciones, escenario principal de éxito y extensiones:
+
+\begin{longtable}{@{}p{1.5cm}p{3cm}p{3cm}p{6cm}@{}}
+\toprule
+\textbf{ID} & \textbf{Nombre} & \textbf{Actor principal} & \textbf{Descripción} \\
+\midrule
+\endhead
+CU-001 & Inicio de sesión & Usuario & Autenticación con JWT en cookie HttpOnly \\
+CU-002 & Gestión de conductores & Coordinador & CRUD completo de conductores con paginación \\
+CU-003 & Gestión de usuarios & Administrador & CRUD completo de usuarios con control de roles \\
+CU-004 & Gestión de rutas & Coordinador & CRUD de rutas con validación de distancia \\
+CU-005 & Gestión de vehículos & Coordinador & CRUD de vehículos con control de placa única \\
+CU-006 & Asignaciones e incidentes & Coord/Seguridad & Asignación de recursos y registro de incidentes \\
+\bottomrule
+\end{longtable}
+
+Los casos de uso CU-001 a CU-003 se heredaron de entregas anteriores. Los casos CU-004 a CU-006 se definieron para la Entrega Final. Cada caso de uso se documentó en un archivo Markdown individual en \texttt{docs/requisitos/casos-de-uso/}.
+
+\section{Priorización MoSCoW}
+\label{sec:moscow-application}
+
+Los 50 requisitos identificados se priorizaron mediante la técnica MoSCoW \cite{wiegers2013}, resultando en la distribución mostrada en la Tabla \ref{tab:moscow}:
+
+\begin{table}[H]
+\centering
+\caption{Distribución de requisitos por prioridad MoSCoW}
+\label{tab:moscow}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Prioridad} & \textbf{Cantidad} & \textbf{Porcentaje} \\
+\midrule
+Must & 44 & 88\% \\
+Should & 6 & 12\% \\
+Could & 0 & 0\% \\
+Won't & 0 & 0\% \\
+\midrule
+\textbf{Total} & \textbf{50} & \textbf{100\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La alta proporción de requisitos Must (88\%) refleja la naturaleza del sistema: SGROAS es una aplicación de gestión donde la funcionalidad central (CRUD, autenticación, seguridad) es indispensable. Los 6 requisitos Should corresponden a reportes y funciones SQL que complementan la funcionalidad principal.
+
+\section{Matriz de trazabilidad}
+\label{sec:traceability}
+
+La matriz de trazabilidad (\texttt{docs/trazabilidad/matriz.csv}) conecta cada requisito con su historia de usuario, caso de uso, módulo de código, endpoint API, prueba automatizada, evidencia empírica y estado de verificación. La matriz cubre el 100\% de los requisitos y se valida automáticamente mediante \texttt{scripts/validate-traceability.sh} en el pipeline de CI.
+
+La matriz incluye la columna \texttt{tipo\_acceso} que clasifica cada requisito según su mecanismo de acceso a datos:
+\begin{itemize}
+  \item \textbf{CRUD-ORM:} Operaciones CRUD mapeadas mediante JPA/Hibernate.
+  \item \textbf{SP:} Procedimientos almacenados en PostgreSQL.
+  \item \textbf{FN:} Funciones SQL en PostgreSQL.
+\end{itemize}
+
+\section{Conformidad INCOSE}
+\label{sec:incose-compliance}
+
+Cada uno de los 50 requisitos del SRS v1.0.0 se verificó contra las 15 características de calidad del INCOSE Guide to Writing Requirements v4 \cite{incose}. El checklist completo se encuentra en \texttt{docs/checklists/incose2023-req.md}.
+
+Los resultados de la verificación se resumen en la Tabla \ref{tab:incose}:
+
+\begin{table}[H]
+\centering
+\caption{Resumen de conformidad INCOSE C1--C15}
+\label{tab:incose}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Resultado} & \textbf{Requisitos} & \textbf{Porcentaje} \\
+\midrule
+Sí en las 15 características & 18 de 20 & 90\% \\
+Parcial en alguna característica & 2 de 20 & 10\% \\
+\midrule
+\textbf{Total} & \textbf{20} & \textbf{100\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Los dos requisitos con verificación parcial son:
+\begin{itemize}
+  \item \textbf{REQ-NF-002 (Cifrado TLS):} Parcial en C3, C4, C7, C8 y C12. El enunciado declara TLS v1.3 pero el entorno de desarrollo opera en HTTP plano. Se aclaró que TLS aplica exclusivamente a producción.
+  \item \textbf{REQ-NF-006 (Cobertura):} Parcial en C4. El umbral declarado (60\%) es obsoleto; se actualizó a 70\% para la Entrega Final.
+\end{itemize}
+
+\section{Gestión del cambio}
+\label{sec:change-management}
+
+Las modificaciones a los requisitos se registran en \texttt{docs/requisitos/CHANGELOG-REQ.md} siguiendo el formato Keep a Changelog. Las decisiones de diseño que afectan requisitos Must se documentan como ADR (Architecture Decision Records) en \texttt{docs/adr/} siguiendo la plantilla de Nygard \cite{nygard2017}. El repositorio contiene 6 ADRs que cubren las decisiones más significativas del sistema.
+
+\section{Resumen de requisitos}
+\label{sec:req-summary}
+
+El SRS v1.0.0 de SGROAS contiene:
+\begin{itemize}
+  \item \textbf{44 requisitos funcionales} (REQ-F-001 a REQ-F-040, con agrupaciones): 14 de autenticación y CRUD de conductores/usuarios (heredados de entregas anteriores) + 30 nuevos para rutas, vehículos, asignaciones, incidentes y reportes.
+  \item \textbf{6 requisitos no funcionales} (REQ-NF-001 a REQ-NF-010): seguridad HTTP, TLS, rendimiento, inyección, rate limiting, cobertura, OpenAPI, ProblemDetails, CORS por origen y CORS por rol.
+  \item \textbf{8 historias de usuario} con criterios Gherkin (formato Connextra).
+  \item \textbf{6 casos de uso} en formato Cockburn niveles 1--4.
+  \item \textbf{100\% de trazabilidad} verificada mediante script automatizado.
+  \item \textbf{Conformidad INCOSE} C1--C15 verificada para cada requisito.
+\end{itemize}
