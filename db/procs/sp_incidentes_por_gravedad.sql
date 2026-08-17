@@ -1,13 +1,13 @@
 -- =============================================================================
 -- sp_incidentes_por_gravedad
 -- Descripcion: Agrupa y cuenta incidentes por nivel de gravedad,
---              filtrados opcionalmente por tipo.
+--              filtrados opcionalmente por tipo (NULL = sin filtro).
 -- Uso: Agregacion con COUNT, GROUP BY
 -- Invocacion JPA: @Procedure(name = "Incidente.incidentesPorGravedad")
 -- =============================================================================
 
 CREATE OR REPLACE PROCEDURE sp_incidentes_por_gravedad(
-    p_tipo VARCHAR DEFAULT NULL,
+    p_tipo VARCHAR,
     INOUT cur refcursor
 )
     LANGUAGE plpgsql

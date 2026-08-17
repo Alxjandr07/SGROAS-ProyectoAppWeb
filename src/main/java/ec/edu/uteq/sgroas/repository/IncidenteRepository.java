@@ -16,13 +16,13 @@ public interface IncidenteRepository extends JpaRepository<Incidente, Long> {
 
     List<Incidente> findByAsignacionIdAndActivoTrue(Long asignacionId);
 
-    @Procedure(procedureName = "sp_incidentes_por_gravedad", outputParameterName = "cur")
+    @Procedure(name = "Incidente.incidentesPorGravedad")
     List<Object[]> incidentesPorGravedad(@Param("p_tipo") String tipo);
 
-    @Procedure(procedureName = "sp_obtener_incidentes_por_rango", outputParameterName = "cur")
+    @Procedure(name = "Incidente.obtenerIncidentesPorRango")
     List<Object[]> obtenerIncidentesPorRango(@Param("p_fecha_desde") Instant fechaDesde,
                                              @Param("p_fecha_hasta") Instant fechaHasta);
 
-    @Procedure(procedureName = "fn_estadisticas_generales", outputParameterName = "cur")
+    @Procedure(name = "Incidente.estadisticasGenerales")
     List<Object[]> estadisticasGenerales();
 }

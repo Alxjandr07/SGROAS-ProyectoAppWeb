@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -17,9 +18,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * Prueba de integracion que ejecuta los stored procedures reales
  * (estrategia hibrida CRUD-ORM + SP, ADR-006) contra PostgreSQL.
  * Requiere BD levantada (docker compose up -d postgres redis).
+ * Transaccional: los cursores REFCURSOR solo sobreviven dentro de la
+ * misma transaccion JDBC (requisito de pgjdbc/PostgreSQL).
  */
 @SpringBootTest(classes = SgroasApplication.class)
 @ActiveProfiles("test")
+@Transactional
 class StoredProcedureIntegrationTest {
 
     @Autowired

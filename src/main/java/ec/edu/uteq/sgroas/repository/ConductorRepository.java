@@ -17,6 +17,6 @@ public interface ConductorRepository extends JpaRepository<Conductor, Long> {
 
     boolean existsByNumeroLicencia(String numeroLicencia);
 
-    @Procedure(procedureName = "fn_licencias_por_vencer", outputParameterName = "cur")
+    @Procedure(name = "Conductor.licenciasPorVencer")
     List<Object[]> licenciasPorVencer(@Param("p_dias_umbral") Integer diasUmbral);
 }

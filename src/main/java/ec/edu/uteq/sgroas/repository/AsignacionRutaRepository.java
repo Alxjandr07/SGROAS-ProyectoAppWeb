@@ -19,6 +19,6 @@ public interface AsignacionRutaRepository extends JpaRepository<AsignacionRuta, 
 
     List<AsignacionRuta> findByRutaIdAndActivoTrue(Long rutaId);
 
-    @Procedure(procedureName = "sp_asignaciones_activas_por_conductor", outputParameterName = "cur")
+    @Procedure(name = "AsignacionRuta.asignacionesActivasPorConductor")
     List<Object[]> asignacionesActivasPorConductor(@Param("p_conductor_id") Long conductorId);
 }

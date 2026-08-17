@@ -7,6 +7,7 @@ import ec.edu.uteq.sgroas.repository.RutaRepository;
 import ec.edu.uteq.sgroas.repository.VehiculoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.LinkedHashMap;
@@ -17,9 +18,12 @@ import java.util.stream.Collectors;
 /**
  * Servicio de reportes que invoca los stored procedures a traves de
  * @Procedure (estrategia hibrida CRUD-ORM + SP, ver ADR-006).
+ * Transaccional: los cursores REFCURSOR de PostgreSQL solo pueden leerse
+ * dentro de la misma transaccion JDBC (ver CATALOGO-SP.md).
  */
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ReporteService {
 
     private final IncidenteRepository incidenteRepository;

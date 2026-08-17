@@ -12,12 +12,17 @@
 | 6 | `fn_licencias_por_vencer` | PROCEDURE | Conductores con licencias por vencer | `@Procedure` en `ConductorRepository` |
 | 7 | `fn_estadisticas_generales` | PROCEDURE | Estadisticas generales del sistema | `@Procedure` en `IncidenteRepository` |
 
-> **Firma de invocacion (JPA 2.1):** todos los procedimientos usan un parametro
+> **Firma de invocacion (JPA 2.1+):** todos los procedimientos usan un parametro
 > `INOUT cur refcursor` que transporta el result set. Se invocan EXCLUSIVAMENTE
-> via `@Procedure(procedureName=..., outputParameterName="cur")` (prohibido SQL
-> dinamico o `createNativeQuery` con concatenacion, ver ADR-006 y
-> `scripts/audit-sql-dynamic.sh`). Instalados en BD por la migracion Flyway
-> `V5__stored_procedures.sql` (sincronizada con `db/procs/*.sql`).
+> via `@NamedStoredProcedureQuery` (declarada en la entidad) + `@Procedure(name=...)`
+> en el repositorio, con el cursor declarado como
+> `@StoredProcedureParameter(mode = ParameterMode.REF_CURSOR, type = Class.class)`
+> (prohibido SQL dinamico o `createNativeQuery` con concatenacion, ver ADR-006 y
+> `scripts/audit-sql-dynamic.sh`). Requisito PostgreSQL/pgjdbc: la lectura del
+> REFCURSOR debe ocurrir dentro de la misma transaccion JDBC, por lo que la capa
+> de invocacion (`ReporteService`, tests) esta anotada con `@Transactional`.
+> Instalados en BD por la migracion Flyway `V5__stored_procedures.sql`
+> (sincronizada con `db/procs/*.sql`).
 
 ---
 
@@ -120,7 +125,7 @@ Retorna conductores cuya licencia vence dentro de un umbral de dias.
 
 | Parametro | Tipo | Descripcion |
 |-----------|------|-------------|
-| `p_dias_umbral` | INTEGER (default: 30) | Dias para considerar "por vencer" |
+| `p_dias_umbral` | INTEGER | Dias para considerar "por vencer" (default 30 gestionado en la capa JPA: `@RequestParam(defaultValue="30")`) |
 
 **Columnas retornadas:** `conductor_id`, `nombre_completo`, `cedula`, `numero_licencia`, `tipo_licencia`, `fecha_vencimiento`, `asignacion_activa`
 

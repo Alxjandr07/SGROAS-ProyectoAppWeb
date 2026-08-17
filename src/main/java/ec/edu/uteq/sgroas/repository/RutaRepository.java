@@ -14,6 +14,6 @@ public interface RutaRepository extends JpaRepository<Ruta, Long> {
 
     boolean existsByCodigo(String codigo);
 
-    @Procedure(procedureName = "sp_reporte_rendimiento_rutas", outputParameterName = "cur")
+    @Procedure(name = "Ruta.reporteRendimientoRutas")
     List<Object[]> reporteRendimientoRutas();
 }

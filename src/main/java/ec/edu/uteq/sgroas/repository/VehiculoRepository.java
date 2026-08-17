@@ -14,6 +14,6 @@ public interface VehiculoRepository extends JpaRepository<Vehiculo, Long> {
 
     boolean existsByPlaca(String placa);
 
-    @Procedure(procedureName = "sp_vehiculos_en_mantenimiento", outputParameterName = "cur")
+    @Procedure(name = "Vehiculo.vehiculosEnMantenimiento")
     List<Object[]> vehiculosEnMantenimiento();
 }

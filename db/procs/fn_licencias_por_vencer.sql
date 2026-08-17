@@ -7,7 +7,7 @@
 -- =============================================================================
 
 CREATE OR REPLACE PROCEDURE fn_licencias_por_vencer(
-    p_dias_umbral INTEGER DEFAULT 30,
+    p_dias_umbral INTEGER,
     INOUT cur refcursor
 )
     LANGUAGE plpgsql
