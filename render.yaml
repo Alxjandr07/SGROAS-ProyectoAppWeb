@@ -1,0 +1,63 @@
+# Render Blueprint — SGROAS v1.0.0
+# Uso: New + Blueprint + seleccionar el repositorio (rama main).
+# Recrea: PostgreSQL managed, Redis y Web Service con health check.
+databases:
+  - name: sgroas-db
+    databaseName: sgroas_db
+    user: sgroas
+    plan: free
+    ipAllowList: []
+
+services:
+  - type: redis
+    name: sgroas-redis
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+
+  - type: web
+    name: sgroas-backend
+    runtime: docker
+    repo: https://github.com/Alxjandr07/SGROAS-ProyectoAppWeb
+    branch: main
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /actuator/health
+    autoDeploy: true
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: sgroas-db
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: sgroas-db
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: sgroas-db
+          property: password
+      - key: SPRING_DATA_REDIS_HOST
+        fromService:
+          type: redis
+          name: sgroas-redis
+          property: host
+      - key: SPRING_DATA_REDIS_PORT
+        fromService:
+          type: redis
+          name: sgroas-redis
+          property: port
+      - key: SPRING_DATA_REDIS_PASSWORD
+        fromService:
+          type: redis
+          name: sgroas-redis
+          property: password
+      - key: APP_JWT_SECRET
+        generateValue: true
+      - key: APP_JWT_EXPIRATION_MS
+        value: "3600000"
+      - key: APP_JWT_REFRESH_EXPIRATION_MS
+        value: "604800000"
+      - key: APP_JWT_ISSUER
+        value: "https://sgroas.onrender.com"
+      - key: APP_JWT_AUDIENCE
+        value: "sgroas-frontend"

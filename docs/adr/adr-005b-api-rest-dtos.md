@@ -1,4 +1,4 @@
-# ADR-006: API REST con DTOs y Validacion por Records
+# ADR-005b: API REST con DTOs y Validacion por Records
 
 **Estado:** Aceptado
 
@@ -14,7 +14,7 @@
 
 **Consecuencias:**
 - **Positivas:** Contratos claros y desacoplados de la entidad JPA. Validacion declarativa y centralizada. Documentacion automatica de la API. Records Java reducen boilerplate.
-- **Negativas:** Mapeo request → entidad → response requiere codigo manual en servicios. Los endpoints nuevos duplican el patron DTO.
+- **Negativas:** Mapeo request â†’ entidad â†’ response requiere codigo manual en servicios. Los endpoints nuevos duplican el patron DTO.
 - **Riesgos:** Cambios en la entidad requieren actualizar DTOs y mapeos manualmente.
 
 **Opciones consideradas:**
