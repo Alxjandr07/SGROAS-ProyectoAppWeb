@@ -1,0 +1,149 @@
+\chapter{Evaluación}
+\label{cap:evaluacion}
+
+Este capítulo presenta los resultados empíricos del sistema SGROAS organizados por
+bloque de evaluación (Bloque C de la guía \cite{uteq2026guia}). Cada bloque declara:
+la pregunta de investigación que responde, la métrica empleada, los datos crudos que
+la soportan, la estadística descriptiva con intervalo de confianza al 95\,\% y la
+interpretación. Todos los números son generados con scripts versionados y pueden
+reproducirse siguiendo \texttt{docs/mediciones/DATA-PROVENANCE.md}.
+
+\section{Rendimiento (Bloque C.1) — RQ1}
+\label{sec:perf}
+
+\textbf{Pregunta:} \emph{¿El acceso híbrido a datos CRUD/ORM + stored procedures
+mantiene un tiempo de respuesta aceptable bajo carga?}
+
+\textbf{Métricas:} latencia de \texttt{http\_req\_duration} (media, mediana,
+percentil 95) y tasa de error \texttt{http\_req\_failed} sobre
+\texttt{GET /api/conductores}, con 50 VUs durante 30\,s (\texttt{k6/opts.js}).
+El umbral declarado es p95~<~200\,ms y error~<~1\,\%.
+
+\textbf{Datos crudos:} tres corridas independientes en
+\texttt{docs/mediciones/perf/k01-run1.json}, \texttt{k02-run2.json} y
+\texttt{k03-run3.json} (commit \texttt{62bf8fa}).
+
+\textbf{Descriptiva e IC 95\,\%:} la media de las medias por corrida es
+\textbf{23.01\,ms} (DT 12.44\,ms, EE 7.18\,ms), con IC\,95\,\%
+\textbf{[$-7.88$; $53.91$]\,ms} (t de Student, gl = 2, n = 3 corridas). El p95
+máximo es 173.13\,ms (corrida k01), por debajo del umbral de 200\,ms, y la tasa de
+error es 0\,\% con 8930 verificaciones correctas. La primera corrida (37.3\,ms de
+media; p95 173.13\,ms) refleja el arranque en frío de conexiones y del cache
+Redis; las corridas k02 y k03 estabilizan la media por debajo de 17\,ms
+(\texttt{docs/mediciones/perf/ANALISIS-k6.md}).
+
+\textbf{Interpretación:} el sistema cumple los umbrales de rendimiento en la
+condición de cache caliente. Dado que las tres corridas corresponden a la misma
+condición, el contraste formal cache caliente-frío queda definido a priori en
+\texttt{scripts/perf/nonparametric.py} (U de Mann-Whitney, Wilcoxon y d de Cliff
+\cite{mann_whitney1947,wilcoxon1945,cliff1993}) y se ejecutará con la condición de
+cache fría cuando la URL pública esté disponible (K3). La medición sigue los
+lineamientos de pruebas de carga de sistemas de gran escala de \cite{jiang2015}.
+
+\section{Seguridad (Bloque C.2) — RQ2}
+\label{sec:sec}
+
+\textbf{Pregunta:} \emph{¿El sistema mitiga los riesgos más críticos del OWASP Top
+10 \cite{owasp2021} con controles verificables?}
+
+\textbf{Evidencia (datos crudos):} se documentan seis controles en
+\texttt{docs/mediciones/sec/}: control de acceso (A01), criptografía de contraseñas
+y sesión (A02), prevención de inyección con repositorios Spring Data y
+\texttt{@Procedure} sin SQL concatenado (A03), cabeceras de seguridad y error
+\emph{Problem Details} RFC\,7807 \cite{rfc7807} (A05), limitación de tasa de login
+(A07) y registros de auditoría (A09).
+
+\textbf{Medidas mecánicas:} la regla de oro del proyecto prohíbe SQL dinámico
+concatenado; se audita con \texttt{scripts/audit-sql-dynamic.sh} (commit
+\texttt{1a07dc7}) y con SpotBugs/Find-Sec-Bugs en CI. El esquema de autenticación
+usa JWT según RFC\,7519 \cite{rfc7519} sobre OAuth\,2.0 \cite{rfc6749}, con cookie
+HttpOnly y BCrypt (factor 10+).
+
+\textbf{ZAP (pendiente de URL):} el escaneo baseline de OWASP ZAP
+(\texttt{scripts/zap/run-zap.sh}) se ejecutará contra la URL pública y su resultado
+se reportará en \texttt{docs/mediciones/sec/zap/RESUMEN.md} (dependencia K3).
+
+\textbf{Interpretación:} los controles estáticos y dinámicos ejecutados no detectan
+SQL dinámico ni credenciales en texto plano; la evidencia A01 (accessible via
+token) confirma el cierre del acceso no autenticado.
+
+\section{Usabilidad (Bloque C.3) — RQ3}
+\label{sec:sus}
+
+\textbf{Pregunta:} \emph{¿Qué nivel de usabilidad perciben los usuarios del
+sistema?}
+
+\textbf{Instrumento:} System Usability Scale de Brooke \cite{brooke1996}, 10 ítems
+Likert 1--5. Puntuación = (suma de contribuciones) $\times$ 2.5.
+
+\textbf{Datos crudos:} 10 participantes (P01--P10) anonimizados en
+\texttt{docs/mediciones/sus/sus-raw.csv} y por participante en
+\texttt{P01.json..P10.json}; consentimientos custodiados fuera del repositorio.
+
+\textbf{Descriptiva e IC 95\,\%:} media \textbf{63.0/100}, DT 13.88, EE 4.39, IC\,95\,\%
+\textbf{[53.07; 72.93]} (t = 2.262, gl = 9), mínimo 47.5 y máximo 90.0
+(\texttt{docs/mediciones/sus/ANALISIS-SUS.md}). En la escala adjetiva de Bangor et
+al. \cite{bangor2009,bangor2008} la media corresponde a \emph{Bueno}, dentro de la
+zona de aceptabilidad \emph{marginal} (50--70) \cite{lewis2009}.
+
+\textbf{Interpretación:} la media no alcanza el umbral de 70 que Bangor asocia a
+sistemas aceptables; se documenta como área de mejora prioritaria (ítems pares de
+complejidad percibida). El tamaño muestral (n = 10) cumple la recomendación mínima
+para SUS \cite{kortum2013}.
+
+\section{Cobertura de pruebas (Bloque C.4)}
+\label{sec:cobertura}
+
+\textbf{Métrica:} contadores de JaCoCo (instrucciones, ramas y líneas) sobre la
+ejecución de \texttt{./mvnw verify} con 150 pruebas JUnit 5.
+
+\textbf{Datos crudos:} \texttt{docs/mediciones/jacoco/jacoco.csv} y reporte HTML
+(commit \texttt{5f3b472}).
+
+\textbf{Resultado:} instrucciones 98.8\,\%, ramas 85.4\,\% y líneas 99.7\,\%, con
+0 fallos. Se supera el umbral del proyecto (líneas $\ge$ 0.70 para la entrega
+final). La discusión sobre la relación entre cobertura y detección de fallos se
+fundamenta en \cite{inozemtseva2014,gopinath2014,gligoric2013,ivankovic2019}.
+
+\section{Calidad web (Bloque C.5) — RQ4}
+\label{sec:lighthouse}
+
+\textbf{Pregunta:} \emph{¿La interfaz web cumple estándares de rendimiento,
+accesibilidad, mejores prácticas y SEO?}
+
+\textbf{Métrica:} categorías de Lighthouse \cite{jacoco} (móvil, throttling Slow 4G)
+sobre el login del frontend Angular.
+
+\textbf{Datos crudos:} \texttt{docs/mediciones/lighthouse/lhci-20260730-2115.json} y
+\texttt{...2117.json} (commit \texttt{1a07dc7}).
+
+\textbf{Resultado:} Performance 100, Accessibility 95, Best Practices 100, SEO 90;
+los cuatro umbrales (80/90/90/90, \texttt{lighthouserc.js}) se cumplen. Las
+corridas adicionales m1--m3 y d1--d3 se ejecutarán con la URL pública
+(\texttt{scripts/lighthouse/run-lighthouse.sh}).
+
+\textbf{Interpretación:} el SPA cumple los estándares; SEO (90) es el punto más
+cercano al umbral y se documenta como mejora menor (metadatos).
+
+\section{Síntesis}
+\label{sec:sintesis}
+
+La Tabla~\ref{tab:sintesis} resume el cumplimiento por bloque.
+
+\begin{table}[H]
+\centering
+\caption{Síntesis de resultados por bloque de evaluación.}
+\label{tab:sintesis}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Bloque & Indicador & Valor & Cumple \\
+\midrule
+C.1 Rendimiento & p95 $<$ 200\,ms (cache caliente) & 173.13\,ms & Sí \\
+C.1 Rendimiento & error rate $<$ 1\,\% & 0\,\% & Sí \\
+C.2 Seguridad & SQL dinámico / A01--A09 & 0 violaciones & Sí \\
+C.3 Usabilidad & SUS $\ge$ 70 & 63.0 & No (marginal) \\
+C.4 Cobertura & líneas $\ge$ 70\,\% & 99.7\,\% & Sí \\
+C.5 Calidad web & Perf/Acc/BP/SEO $\ge$ 80/90/90/90 & 100/95/100/90 & Sí \\
+\bottomrule
+\end{tabular}
+\end{table}
