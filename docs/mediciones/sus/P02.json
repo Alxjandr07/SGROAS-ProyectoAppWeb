@@ -1,0 +1,21 @@
+{
+  "codigo": "P02",
+  "edad": 21,
+  "sexo": "Femenino",
+  "experiencia_web": "Media",
+  "dispositivo": "Computadora",
+  "consentimiento": "Sí",
+  "respuestas": [
+    5,
+    5,
+    4,
+    4,
+    3,
+    3,
+    4,
+    2,
+    2,
+    3
+  ],
+  "sus_score": 52.5
+}

@@ -1,0 +1,62 @@
+% =====================================================================
+% main-evaluacion.tex
+% Esqueleto compilable de la parte de evaluacion (capitulos 8-12, Kevin).
+% Integra los capitulos de evidencia empirica de la entrega final.
+% Compilar en Overleaf con engine pdflatex + biber, o:
+%   pdflatex main-evaluacion && biber main-evaluacion && pdflatex main-evaluacion (x2)
+% =====================================================================
+\documentclass[11pt,a4paper]{report}
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage[
+  backend=biber,
+  style=ieee,
+  doi=true,
+  url=true
+]{biblatex}
+\addbibresource{Referencias.bib}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\begin{document}
+
+\tableofcontents
+\clearpage
+
+\input{capitulos/cap8-evaluacion}
+\clearpage
+\input{capitulos/cap9-discusion}
+\clearpage
+\input{capitulos/cap10-amenazas}
+\clearpage
+\input{capitulos/cap11-futuro}
+\clearpage
+\input{capitulos/cap12-conclusiones}
+\input{capitulos/capA-anexo-resultados}
+
+\clearpage
+\section*{Disponibilidad de datos}
+\addcontentsline{toc}{section}{Disponibilidad de datos}
+
+Los datos crudos, agregados y figuras de este estudio (k6, SUS, Lighthouse, ZAP,
+JaCoCo) están publicados como dataset de acceso abierto en Zenodo
+\cite{dataset_sgroas}, con licencia CC BY 4.0. El código fuente del software y
+su versión evaluada están disponibles en
+\href{https://github.com/Alxjandr07/SGROAS-ProyectoAppWeb}{GitHub}, con DOI de
+software \href{https://doi.org/10.5281/zenodo.21698129}{10.5281/zenodo.21698129}.
+Los scripts que generan cada análisis y figura se encuentran en
+\texttt{scripts/} del repositorio, de forma que todos los números del informe
+son regenerables.
+
+\clearpage
+\printbibliography[title={Referencias}]
+
+% Publica tambien las referencias de contexto verificadas aunque no citadas.
+\nocite{*}
+\end{document}

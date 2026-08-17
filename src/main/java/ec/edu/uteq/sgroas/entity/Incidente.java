@@ -13,6 +13,27 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "incidentes")
+@NamedStoredProcedureQuery(
+        name = "Incidente.incidentesPorGravedad",
+        procedureName = "sp_incidentes_por_gravedad",
+        parameters = {
+                @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_tipo", type = String.class),
+                @StoredProcedureParameter(mode = ParameterMode.REF_CURSOR, name = "cur", type = Class.class)
+        })
+@NamedStoredProcedureQuery(
+        name = "Incidente.obtenerIncidentesPorRango",
+        procedureName = "sp_obtener_incidentes_por_rango",
+        parameters = {
+                @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_fecha_desde", type = Instant.class),
+                @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_fecha_hasta", type = Instant.class),
+                @StoredProcedureParameter(mode = ParameterMode.REF_CURSOR, name = "cur", type = Class.class)
+        })
+@NamedStoredProcedureQuery(
+        name = "Incidente.estadisticasGenerales",
+        procedureName = "fn_estadisticas_generales",
+        parameters = {
+                @StoredProcedureParameter(mode = ParameterMode.REF_CURSOR, name = "cur", type = Class.class)
+        })
 public class Incidente {
 
     @Id
@@ -56,3 +77,4 @@ public class Incidente {
     @Column(name = "actualizado_en", nullable = false)
     private Instant actualizadoEn;
 }
+

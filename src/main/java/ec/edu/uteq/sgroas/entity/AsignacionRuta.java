@@ -13,6 +13,13 @@ import java.time.LocalDate;
 @Builder
 @Entity
 @Table(name = "asignacion_rutas")
+@NamedStoredProcedureQuery(
+        name = "AsignacionRuta.asignacionesActivasPorConductor",
+        procedureName = "sp_asignaciones_activas_por_conductor",
+        parameters = {
+                @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_conductor_id", type = Long.class),
+                @StoredProcedureParameter(mode = ParameterMode.REF_CURSOR, name = "cur", type = Class.class)
+        })
 public class AsignacionRuta {
 
     @Id
@@ -53,3 +60,4 @@ public class AsignacionRuta {
     @Column(name = "actualizado_en", nullable = false)
     private Instant actualizadoEn;
 }
+

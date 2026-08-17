@@ -5,6 +5,26 @@ Todas las cambios notables de SGROAS se documentan aquí.
 Formato basado en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 y el proyecto usa [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Añadido (ruta de entrega final — v1.0.0, 2026-08-17)
+
+- Análisis estadístico reproducible de k6 (`scripts/perf-analysis.py`,
+  `scripts/gen-figuras.py`) con media/DT/EE/IC95 y figuras Okabe-Ito.
+- Análisis SUS con estadísticos por ítem (`estadisticas-item.json`) y nueva
+  figura de medias de respuesta por ítem.
+- Epílogo documental: ANALISIS-k6.md, ANALISIS-SUS.md, RESUMEN Lighthouse/ZAP,
+  DATA-PROVENANCE.md, DATA-DICTIONARY.md ampliado, checklists (empirical,
+  PRISMA 2020, FAIR).
+- Capítulos 8-12 del informe final en `docs/informe-final/` con
+  `main-evaluacion.tex` compilable (biblatex + biber) y
+  `Referencias.bib` con 39 entradas (27 DOIs verificados vía Crossref).
+- Anexo A: matriz de resultados por bloque y trazabilidad script→dato.
+- Paquete de dataset para Zenodo (`dataset/`, `scripts/zenodo/package-dataset.py`)
+  y DOI de dataset 10.5281/zenodo.21973297.
+- CITATION.cff v1.0.0 con ORCID reales de los 3 integrantes.
+- Guion del video de reproducibilidad (`docs/video/GUION-video.md`).
+
 ## [0.9.0-rc] — 2026-07-24 — Tercera Entrega
 
 ### Añadido

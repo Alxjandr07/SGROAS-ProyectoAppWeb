@@ -1,0 +1,73 @@
+{
+  "generado": "2026-08-16",
+  "por_corrida": [
+    {
+      "corrida": "k01-run1",
+      "archivo": "C:\\Users\\USUARIO\\Documents\\Default Project\\docs\\mediciones\\perf\\k01-run1.json",
+      "iteraciones": 1465,
+      "vus": 50,
+      "media_ms": 37.324,
+      "mediana_ms": 17.885,
+      "min_ms": 7.326,
+      "max_ms": 286.028,
+      "p90_ms": 82.062,
+      "p95_ms": 173.13,
+      "p99_ms": 251.443,
+      "error_rate": 0.0,
+      "checks_ok": 2930,
+      "checks_fail": 0
+    },
+    {
+      "corrida": "k02-run2",
+      "archivo": "C:\\Users\\USUARIO\\Documents\\Default Project\\docs\\mediciones\\perf\\k02-run2.json",
+      "iteraciones": 1500,
+      "vus": 50,
+      "media_ms": 16.897,
+      "mediana_ms": 10.477,
+      "min_ms": 5.648,
+      "max_ms": 251.105,
+      "p90_ms": 23.64,
+      "p95_ms": 35.3,
+      "p99_ms": 155.98,
+      "error_rate": 0.0,
+      "checks_ok": 3000,
+      "checks_fail": 0
+    },
+    {
+      "corrida": "k03-run3",
+      "archivo": "C:\\Users\\USUARIO\\Documents\\Default Project\\docs\\mediciones\\perf\\k03-run3.json",
+      "iteraciones": 1500,
+      "vus": 50,
+      "media_ms": 14.818,
+      "mediana_ms": 9.126,
+      "min_ms": 4.916,
+      "max_ms": 187.762,
+      "p90_ms": 26.881,
+      "p95_ms": 37.843,
+      "p99_ms": 159.622,
+      "error_rate": 0.0,
+      "checks_ok": 3000,
+      "checks_fail": 0
+    }
+  ],
+  "global": {
+    "n_corridas": 3,
+    "metrica": "http_req_duration (ms)",
+    "media_medias_ms": 23.013,
+    "desviacion_tipica_ms": 12.437,
+    "error_estandar_ms": 7.181,
+    "t_critico": 4.3027,
+    "ic95_inf_ms": -7.883,
+    "ic95_sup_ms": 53.909,
+    "p95_por_corrida_ms": [
+      173.13,
+      35.3,
+      37.843
+    ],
+    "p95_max_ms": 173.13,
+    "umbral_p95_ms": 200,
+    "error_rate_max": 0.0,
+    "checks_totales": 8930,
+    "checks_fallos": 0
+  }
+}

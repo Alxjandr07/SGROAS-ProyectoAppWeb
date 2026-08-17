@@ -70,15 +70,60 @@ jobs:
           SPRING_DATA_REDIS_HOST: localhost
           SPRING_DATA_REDIS_PORT: 6379
 
+      - name: Generate versions artifact (make versions)
+        run: make versions
+
+      - name: Upload versions artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: versions-txt
+          path: docs/entorno/versions.txt
+
       - name: Upload JaCoCo report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-report
-          path: target/site/jacoco/
+          path: docs/mediciones/jacoco/
 
       - name: Upload JAR
         uses: actions/upload-artifact@v4
         with:
           name: sgroas-jar
           path: target/*.jar
+
+  docker-publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/alxjandr07/sgroas:${{ github.ref_name }}
+            ghcr.io/alxjandr07/sgroas:latest
+
+      - name: Print image digest
+        run: |
+          echo "image pushed: ghcr.io/alxjandr07/sgroas:${{ github.ref_name }}"
+          echo "digest: ${{ steps.build.outputs.digest }}"

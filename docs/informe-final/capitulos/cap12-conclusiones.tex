@@ -1,0 +1,35 @@
+\chapter{Conclusiones}
+\label{cap:conclusiones}
+
+La entrega final de SGROAS alcanza el objetivo de proporcionar evidencia empírica
+reproducible sobre un sistema de gestión de recursos para cooperativas de
+transporte nacional, en el marco del Bloque C de la rúbrica \cite{uteq2026guia}.
+
+Los resultados por bloque confirman el cumplimiento de los umbrales en la mayoría
+de los criterios:
+\begin{itemize}
+  \item \textbf{Rendimiento:} p95 máximo de 173.13\,ms (umbral 200\,ms) y 0\,\% de
+        errores en la condición de cache caliente; media de medias de 23.01\,ms
+        con IC\,95\,\% [$-$7.88; 53.91]\,ms.
+  \item \textbf{Seguridad:} seis controles OWASP con evidencia cruda (A01, A02,
+        A03, A05, A07, A09) y cero SQL dinámico en el análisis estático.
+  \item \textbf{Usabilidad:} SUS 63.0 (IC\,95\,\% [53.07; 72.93]), clasificado como
+        \emph{bueno} en zona marginal; por debajo del umbral de 70, por lo que se
+        declara como mejora prioritaria.
+  \item \textbf{Cobertura:} 99.7\,\% de líneas y 85.4\,\% de ramas con JaCoCo sobre
+        150 pruebas JUnit, superando el umbral del proyecto.
+  \item \textbf{Calidad web:} Lighthouse 100/95/100/90, cumpliendo los cuatro
+        umbrales (80/90/90/90).
+\end{itemize}
+
+El estudio fue conducido con las reglas de reproducibilidad del plan de trabajo:
+datos crudos versionados, scripts regenerables, procedencia declarada
+(\texttt{DATA-PROVENANCE.md}) y consentimientos éticos custodiados fuera del
+repositorio público. Las limitaciones (tamaño muestral, condición única de cache y
+dominio específico) se documentan en las amenazas a la validez y no alteran la
+conclusión de cumplimiento de umbrales.
+
+En conjunto, SGROAS está operativamente habilitado para la defensa: el artefacto
+es reproducible desde un clon limpio, la CI valida build, pruebas y cobertura, y la
+evidencia empírica de rendimiento, seguridad y calidad web respalda las respuestas
+a las preguntas de investigación planteadas.
