@@ -18,6 +18,7 @@ Todo número del informe es re-derivable desde estas fuentes (reglas de oro 6 y 
 | Fig. "Media e IC95" | ídem | `scripts/gen-figuras.py` → `fig-media-ic95.png` | `cba0e96` |
 | Contraste no paramétrico (a priori) | — (definido en script) | `scripts/perf/nonparametric.py` | `6e2c372` |
 | Informe de análisis k6 | `docs/mediciones/perf/ANALISIS-k6.md` | `scripts/perf-analysis.py` | `761e5e1` |
+| IC bootstrap (validación) | `docs/mediciones/perf/ANALISIS-BOOTSTRAP.md` | `scripts/perf-bootstrap.py` → `bootstrap.json` | `683cea3` |
 
 ## 2. Usabilidad (SUS) — Bloque C.3
 
@@ -29,6 +30,8 @@ Todo número del informe es re-derivable desde estas fuentes (reglas de oro 6 y 
 | Fig. "SUS por participante" | `sus-raw.csv` | `scripts/sus-analysis.py` → `fig-sus-por-participante.png` | `458f322` |
 | Puntuación (regla Brooke) | — | `scripts/sus/brooke.py` | `1a5c42c` |
 | Informe de análisis SUS | `docs/mediciones/sus/ANALISIS-SUS.md` | `scripts/sus-analysis.py` | `fe41053` |
+| Estadísticos por ítem (q1–q10) | `sus-raw.csv` | `scripts/sus-analysis.py` → `estadisticas-item.json` | `af9962d` |
+| Fig. "Media de respuesta por ítem" | `sus-raw.csv` | `scripts/sus-analysis.py` → `fig-sus-item-respuestas.png` | `af9962d` |
 
 ## 3. Cobertura (JaCoCo) — Bloque C.4
 
@@ -51,7 +54,15 @@ Todo número del informe es re-derivable desde estas fuentes (reglas de oro 6 y 
 | Evidencias OWASP A01–A09 | `docs/mediciones/sec/*` | scripts de evidencia (`A01-*.sh`, etc.) | `34f3a6a`, `56002f3`, `9f67bfc` |
 | ZAP baseline (pendiente URL pública) | `docs/mediciones/sec/zap/` | `scripts/zap/run-zap.sh` | por definir |
 
-## 6. Convención de nombres
+## 6. Dataset público (Zenodo) — Bloque G / K6
+
+| Artefacto | Datos crudos | Script | Commit |
+|---|---|---|---|
+| ZIP del dataset (173 archivos) | `docs/mediciones/{perf,sus,lighthouse,zap,jacoco}` | `scripts/zenodo/package-dataset.py` | `d30e980` |
+| Checksums SHA-256 | — | idem → `dataset/MANIFEST.csv` | `d30e980` |
+| DOI dataset | — | depósito Zenodo 10.5281/zenodo.21973297 | `b18444b` |
+
+## 7. Convención de nombres
 
 - Datos crudos: formato abierto (JSON / CSV), nunca editados a mano después de su captura.
 - Scripts: en `scripts/`; su salida se versiona para que el informe siempre sea reproducible.
