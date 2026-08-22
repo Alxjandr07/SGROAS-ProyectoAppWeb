@@ -23,7 +23,7 @@ public class Programacion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_programacion")
-    private Long idProgramacion;
+    private Integer idProgramacion;
 
     @Column(name = "fecha", nullable = false)
     private LocalDate fecha;

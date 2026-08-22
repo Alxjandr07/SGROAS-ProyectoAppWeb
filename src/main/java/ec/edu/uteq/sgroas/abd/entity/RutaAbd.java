@@ -21,7 +21,7 @@ public class RutaAbd {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_ruta")
-    private Long idRuta;
+    private Integer idRuta;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_terminal_origen", nullable = false)

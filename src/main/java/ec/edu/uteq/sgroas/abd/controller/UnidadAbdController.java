@@ -26,7 +26,7 @@ public class UnidadAbdController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AbdDtos.UnidadResponse> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<AbdDtos.UnidadResponse> buscarPorId(@PathVariable Integer id) {
         return ResponseEntity.ok(unidadAbdService.buscarPorId(id));
     }
 
@@ -36,13 +36,13 @@ public class UnidadAbdController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AbdDtos.UnidadResponse> actualizar(@PathVariable Long id,
+    public ResponseEntity<AbdDtos.UnidadResponse> actualizar(@PathVariable Integer id,
                                                              @Valid @RequestBody AbdDtos.UnidadRequest request) {
         return ResponseEntity.ok(unidadAbdService.actualizar(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
         unidadAbdService.eliminar(id);
         return ResponseEntity.noContent().build();
     }

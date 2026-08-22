@@ -54,7 +54,7 @@ public class IncidenteAbdService {
         return aResponse(incidente);
     }
 
-    public void eliminar(Long idIncidente) {
+    public void eliminar(Integer idIncidente) {
         if (!incidenteRepository.existsById(idIncidente)) {
             throw new IllegalArgumentException("Incidente no encontrado: " + idIncidente);
         }

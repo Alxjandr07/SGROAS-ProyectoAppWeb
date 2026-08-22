@@ -1,0 +1,149 @@
+<div class="page-header">
+  <div>
+    <h1>Programaciones</h1>
+    <p class="page-desc">Salidas programadas por ruta, unidad y conductor.</p>
+  </div>
+  <button class="btn-primary" (click)="abrirFormulario()">+ Nueva programación</button>
+</div>
+
+<div class="filtros">
+  <label>
+    Estado
+    <select [value]="filtroEstado()" (change)="aplicarFiltroEstado($event)">
+      <option value="">Todos</option>
+      <option value="Programado">Programado</option>
+      <option value="En Curso">En Curso</option>
+      <option value="Completado">Completado</option>
+      <option value="Cancelado">Cancelado</option>
+    </select>
+  </label>
+  <label>
+    Conductor
+    <select [value]="filtroConductor() ?? ''" (change)="aplicarFiltroConductor($event)">
+      <option value="">Todos</option>
+      @for (c of conductores(); track c.idConductor) {
+        <option [value]="c.idConductor">{{ c.nombres }} {{ c.apellidos }}</option>
+      }
+    </select>
+  </label>
+  <label>
+    Ruta
+    <select [value]="filtroRuta() ?? ''" (change)="aplicarFiltroRuta($event)">
+      <option value="">Todas</option>
+      @for (r of rutas(); track r.idRuta) {
+        <option [value]="r.idRuta">{{ r.terminalOrigen }} → {{ r.terminalDestino }}</option>
+      }
+    </select>
+  </label>
+</div>
+
+@if (mostrandoFormulario()) {
+  <div class="form-panel">
+    <h3>Nueva programación</h3>
+    @if (errorForm()) {
+      <div class="alert-error">{{ errorForm() }}</div>
+    }
+    <form [formGroup]="form" (ngSubmit)="guardar()">
+      <div class="form-grid">
+        <label>Fecha<input type="date" formControlName="fecha" /></label>
+        <label>Hora salida<input type="time" formControlName="horaSalida" /></label>
+        <label>Hora llegada estimada<input type="time" formControlName="horaEstimadaLlegada" /></label>
+        <label>Estado
+          <select formControlName="estado">
+            @for (e of estados; track e) {
+              <option [value]="e">{{ e }}</option>
+            }
+          </select>
+        </label>
+        <label>Ruta
+          <select formControlName="idRuta">
+            <option [ngValue]="null" disabled>Seleccione...</option>
+            @for (r of rutas(); track r.idRuta) {
+              <option [ngValue]="r.idRuta">{{ r.terminalOrigen }} → {{ r.terminalDestino }}</option>
+            }
+          </select>
+        </label>
+        <label>Unidad
+          <select formControlName="idUnidad">
+            <option [ngValue]="null" disabled>Seleccione...</option>
+            @for (u of unidades(); track u.idUnidad) {
+              <option [ngValue]="u.idUnidad">{{ u.placa }} — disco {{ u.numeroDisco }}</option>
+            }
+          </select>
+        </label>
+        <label>Conductor
+          <select formControlName="idConductor">
+            <option [ngValue]="null" disabled>Seleccione...</option>
+            @for (c of conductores(); track c.idConductor) {
+              <option [ngValue]="c.idConductor">{{ c.nombres }} {{ c.apellidos }}</option>
+            }
+          </select>
+        </label>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" [disabled]="form.invalid || guardando()">
+          {{ guardando() ? 'Guardando...' : 'Guardar' }}
+        </button>
+        <button type="button" class="btn-sm btn-sm--secundario" (click)="cancelar()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+}
+
+@if (loading()) {
+  <p class="loading-text">Cargando programaciones...</p>
+} @else if (errorMsg()) {
+  <div class="alert-error">{{ errorMsg() }}</div>
+} @else {
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Fecha</th>
+          <th>Salida</th>
+          <th>Llegada est.</th>
+          <th>Ruta</th>
+          <th>Unidad</th>
+          <th>Conductor</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of programaciones(); track p.idProgramacion) {
+          <tr>
+            <td>{{ p.idProgramacion }}</td>
+            <td>{{ p.fecha }}</td>
+            <td>{{ p.horaSalida }}</td>
+            <td>{{ p.horaEstimadaLlegada }}</td>
+            <td>{{ p.rutaDescripcion }}</td>
+            <td>{{ p.unidadPlaca }}</td>
+            <td>{{ p.conductorNombres }}</td>
+            <td>
+              <span class="badge"
+                    [class.badge--activo]="p.estado === 'Completado'"
+                    [class.badge--info]="p.estado === 'Programado'"
+                    [class.badge--warning]="p.estado === 'En Curso'"
+                    [class.badge--inactivo]="p.estado === 'Cancelado'">
+                {{ p.estado }}
+              </span>
+            </td>
+            <td class="actions-cell">
+              <button class="btn-sm btn-sm--danger" (click)="confirmarEliminar(p.idProgramacion)">Eliminar</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="9" class="empty-msg">No hay programaciones registradas.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <app-paginador
+    [currentPage]="currentPage()"
+    [totalPages]="totalPages()"
+    [totalElements]="totalElements()"
+    (pageChange)="cambiarPagina($event)"
+  />
+}

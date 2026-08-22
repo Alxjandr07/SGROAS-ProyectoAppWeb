@@ -21,8 +21,8 @@ public class ProgramacionAbdController {
     @GetMapping
     public ResponseEntity<Page<AbdDtos.ProgramacionResponse>> listar(
             @RequestParam(required = false) String estado,
-            @RequestParam(required = false) Long idConductor,
-            @RequestParam(required = false) Long idRuta,
+            @RequestParam(required = false) Integer idConductor,
+            @RequestParam(required = false) Integer idRuta,
             @PageableDefault(size = 50, sort = "idProgramacion") Pageable pageable) {
         return ResponseEntity.ok(programacionAbdService.listar(estado, idConductor, idRuta, pageable));
     }
@@ -33,7 +33,7 @@ public class ProgramacionAbdController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
         programacionAbdService.eliminar(id);
         return ResponseEntity.noContent().build();
     }

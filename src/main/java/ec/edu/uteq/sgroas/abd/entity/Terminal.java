@@ -15,7 +15,7 @@ public class Terminal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_terminal")
-    private Long idTerminal;
+    private Integer idTerminal;
 
     @Column(name = "nombre", nullable = false, length = 150)
     private String nombre;

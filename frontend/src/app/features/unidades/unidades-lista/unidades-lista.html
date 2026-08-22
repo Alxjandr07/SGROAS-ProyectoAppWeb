@@ -1,0 +1,106 @@
+<div class="page-header">
+  <div>
+    <h1>Unidades</h1>
+    <p class="page-desc">Flota vehicular registrada en el sistema.</p>
+  </div>
+  <button class="btn-primary" (click)="abrirFormulario()">+ Nueva unidad</button>
+</div>
+
+<div class="filtros">
+  <label>
+    Estado
+    <select [value]="filtroEstado()" (change)="aplicarFiltro($event)">
+      <option value="">Todos</option>
+      <option value="Activo">Activo</option>
+      <option value="Inactivo">Inactivo</option>
+      <option value="En Mantenimiento">En Mantenimiento</option>
+    </select>
+  </label>
+</div>
+
+@if (mostrandoFormulario()) {
+  <div class="form-panel">
+    <h3>{{ editId() ? 'Editar unidad' : 'Nueva unidad' }}</h3>
+    @if (errorForm()) {
+      <div class="alert-error">{{ errorForm() }}</div>
+    }
+    <form [formGroup]="form" (ngSubmit)="guardar()">
+      <div class="form-grid">
+        <label>Placa<input formControlName="placa" placeholder="ABC-1234" /></label>
+        <label>Número de disco<input formControlName="numeroDisco" /></label>
+        <label>Modelo<input formControlName="modelo" /></label>
+        <label>Capacidad<input type="number" min="1" max="200" formControlName="capacidad" /></label>
+        <label>Año fabricación<input type="number" min="1950" max="2100" formControlName="anioFabricacion" /></label>
+        <label>Estado
+          <select formControlName="estado">
+            @for (e of estados; track e) {
+              <option [value]="e">{{ e }}</option>
+            }
+          </select>
+        </label>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" [disabled]="form.invalid || guardando()">
+          {{ guardando() ? 'Guardando...' : 'Guardar' }}
+        </button>
+        <button type="button" class="btn-sm btn-sm--secundario" (click)="cancelar()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+}
+
+@if (loading()) {
+  <p class="loading-text">Cargando unidades...</p>
+} @else if (errorMsg()) {
+  <div class="alert-error">{{ errorMsg() }}</div>
+} @else {
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Placa</th>
+          <th>Disco</th>
+          <th>Modelo</th>
+          <th>Capacidad</th>
+          <th>Año</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (u of unidades(); track u.idUnidad) {
+          <tr>
+            <td>{{ u.idUnidad }}</td>
+            <td>{{ u.placa }}</td>
+            <td>{{ u.numeroDisco }}</td>
+            <td>{{ u.modelo }}</td>
+            <td>{{ u.capacidad }}</td>
+            <td>{{ u.anioFabricacion ?? '—' }}</td>
+            <td>
+              <span class="badge"
+                    [class.badge--activo]="u.estado === 'Activo'"
+                    [class.badge--warning]="u.estado === 'En Mantenimiento'"
+                    [class.badge--inactivo]="u.estado === 'Inactivo'">
+                {{ u.estado }}
+              </span>
+            </td>
+            <td class="actions-cell">
+              <button class="btn-sm" (click)="editar(u)">Editar</button>
+              <button class="btn-sm btn-sm--danger" (click)="confirmarEliminar(u.idUnidad)">Eliminar</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="8" class="empty-msg">No hay unidades registradas.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <app-paginador
+    [currentPage]="currentPage()"
+    [totalPages]="totalPages()"
+    [totalElements]="totalElements()"
+    (pageChange)="cambiarPagina($event)"
+  />
+}

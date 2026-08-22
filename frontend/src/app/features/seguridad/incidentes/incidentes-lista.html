@@ -1,0 +1,147 @@
+<div class="page-header">
+  <div>
+    <h1>Incidentes y Alertas</h1>
+    <p class="page-desc">Incidentes reportados por unidad y alertas generadas automaticamente.</p>
+  </div>
+  <button class="btn-primary" (click)="abrirFormulario()">+ Reportar incidente</button>
+</div>
+
+@if (mostrandoFormulario()) {
+  <div class="form-panel">
+    <h3>Reportar incidente</h3>
+    @if (errorForm()) {
+      <div class="alert-error">{{ errorForm() }}</div>
+    }
+    <form [formGroup]="form" (ngSubmit)="guardar()">
+      <div class="form-grid">
+        <label>Tipo
+          <select formControlName="tipo">
+            @for (t of tipos; track t) {
+              <option [value]="t">{{ t }}</option>
+            }
+          </select>
+        </label>
+        <label>Nivel sugerido
+          <select formControlName="nivelSugerido">
+            @for (n of niveles; track n) {
+              <option [value]="n">{{ n }}</option>
+            }
+          </select>
+        </label>
+        <label>Estado
+          <select formControlName="estado">
+            @for (e of estadosIncidente; track e) {
+              <option [value]="e">{{ e }}</option>
+            }
+          </select>
+        </label>
+        <label>Unidad
+          <select formControlName="idUnidad">
+            <option [ngValue]="null" disabled>Seleccione...</option>
+            @for (u of unidades(); track u.idUnidad) {
+              <option [ngValue]="u.idUnidad">{{ u.placa }} — disco {{ u.numeroDisco }}</option>
+            }
+          </select>
+        </label>
+        <label>Evidencia (opcional)<input formControlName="evidencia" placeholder="URL o referencia" /></label>
+      </div>
+      <label class="campo-ancho">Descripción<textarea formControlName="descripcion"></textarea></label>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" [disabled]="form.invalid || guardando()">
+          {{ guardando() ? 'Guardando...' : 'Reportar' }}
+        </button>
+        <button type="button" class="btn-sm btn-sm--secundario" (click)="cancelar()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+}
+
+<div class="filtros">
+  <label>
+    Estado
+    <select [value]="filtroEstado()" (change)="aplicarFiltroEstado($event)">
+      <option value="">Todos</option>
+      @for (e of estadosIncidente; track e) {
+        <option [value]="e">{{ e }}</option>
+      }
+    </select>
+  </label>
+  <label>
+    Nivel
+    <select [value]="filtroNivel()" (change)="aplicarFiltroNivel($event)">
+      <option value="">Todos</option>
+      @for (n of niveles; track n) {
+        <option [value]="n">{{ n }}</option>
+      }
+    </select>
+  </label>
+</div>
+
+@if (loading()) {
+  <p class="loading-text">Cargando incidentes...</p>
+} @else if (errorMsg()) {
+  <div class="alert-error">{{ errorMsg() }}</div>
+} @else {
+  @if (alertas().length > 0) {
+    <section class="alertas-seccion">
+      <h2>Alertas activas</h2>
+      <ul class="alertas-lista">
+        @for (a of alertas(); track a.idAlerta) {
+          <li>
+            <span class="badge badge--inactivo">ALERTA {{ a.nivelRiesgo }}</span>
+            {{ a.descripcion }}
+          </li>
+        }
+      </ul>
+    </section>
+  }
+
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Tipo</th>
+          <th>Descripción</th>
+          <th>Nivel</th>
+          <th>Fecha</th>
+          <th>Unidad</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (i of incidentes(); track i.idIncidente) {
+          <tr>
+            <td>{{ i.idIncidente }}</td>
+            <td>{{ i.tipo }}</td>
+            <td class="celda-descripcion">{{ i.descripcion }}</td>
+            <td>
+              <span class="badge"
+                    [class.badge--activo]="i.nivelSugerido === 'BAJO'"
+                    [class.badge--warning]="i.nivelSugerido === 'MEDIO'"
+                    [class.badge--inactivo]="i.nivelSugerido === 'ALTO'">
+                {{ i.nivelSugerido }}
+              </span>
+            </td>
+            <td>{{ i.fechaIncidente }}</td>
+            <td>{{ i.unidadPlaca }}</td>
+            <td>{{ i.estado }}</td>
+            <td class="actions-cell">
+              <button class="btn-sm btn-sm--danger" (click)="confirmarEliminar(i.idIncidente)">Eliminar</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="8" class="empty-msg">No hay incidentes registrados.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <app-paginador
+    [currentPage]="currentPage()"
+    [totalPages]="totalPages()"
+    [totalElements]="totalElements()"
+    (pageChange)="cambiarPagina($event)"
+  />
+}

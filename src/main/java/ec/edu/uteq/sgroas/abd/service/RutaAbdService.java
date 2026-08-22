@@ -24,7 +24,7 @@ public class RutaAbdService {
     }
 
     @Transactional(readOnly = true)
-    public AbdDtos.RutaAbdResponse buscarPorId(Long idRuta) {
+    public AbdDtos.RutaAbdResponse buscarPorId(Integer idRuta) {
         return rutaAbdRepository.findById(idRuta).map(this::aResponse)
                 .orElseThrow(() -> new IllegalArgumentException("Ruta no encontrada: " + idRuta));
     }
@@ -41,7 +41,7 @@ public class RutaAbdService {
         return aResponse(rutaAbdRepository.save(ruta));
     }
 
-    public AbdDtos.RutaAbdResponse actualizar(Long idRuta, AbdDtos.RutaAbdRequest request) {
+    public AbdDtos.RutaAbdResponse actualizar(Integer idRuta, AbdDtos.RutaAbdRequest request) {
         if (request.idTerminalOrigen().equals(request.idTerminalDestino())) {
             throw new IllegalArgumentException("El origen y el destino no pueden ser el mismo terminal");
         }
@@ -53,7 +53,7 @@ public class RutaAbdService {
         return aResponse(rutaAbdRepository.save(ruta));
     }
 
-    public void eliminar(Long idRuta) {
+    public void eliminar(Integer idRuta) {
         if (!rutaAbdRepository.existsById(idRuta)) {
             throw new IllegalArgumentException("Ruta no encontrada: " + idRuta);
         }

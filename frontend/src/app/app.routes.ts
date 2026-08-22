@@ -6,10 +6,12 @@ import { ConductorLista } from './features/conductores/lista/conductor-lista';
 import { ConductorFormulario } from './features/conductores/formulario/conductor-formulario';
 import { UsuarioLista } from './features/usuarios/lista/usuario-lista';
 import { UsuarioFormulario } from './features/usuarios/formulario/usuario-formulario';
-import { RutasPlaceholder } from './features/rutas/rutas-placeholder';
-import { SeguridadPlaceholder } from './features/seguridad/seguridad-placeholder';
+import { RutasLista } from './features/rutas/rutas-lista/rutas-lista';
+import { UnidadesLista } from './features/unidades/unidades-lista/unidades-lista';
+import { ProgramacionesLista } from './features/programaciones/programaciones-lista/programaciones-lista';
+import { IncidentesLista } from './features/seguridad/incidentes/incidentes-lista';
+import { ReportesAbd } from './features/reportes/reportes-abd/reportes-abd';
 import { AdminPlaceholder } from './features/administracion/admin-placeholder';
-import { ReportesPlaceholder } from './features/reportes/reportes-placeholder';
 import { authGuard } from './core/guards/auth-guard';
 
 export const routes: Routes = [
@@ -37,10 +39,12 @@ export const routes: Routes = [
           { path: 'editar/:id', component: ConductorFormulario },
         ],
       },
-      { path: 'rutas', component: RutasPlaceholder },
-      { path: 'seguridad', component: SeguridadPlaceholder },
+      { path: 'unidades', component: UnidadesLista },
+      { path: 'rutas', component: RutasLista },
+      { path: 'programaciones', component: ProgramacionesLista },
+      { path: 'seguridad', component: IncidentesLista },
+      { path: 'reportes', component: ReportesAbd },
       { path: 'administracion', component: AdminPlaceholder },
-      { path: 'reportes', component: ReportesPlaceholder },
     ],
   },
 ];

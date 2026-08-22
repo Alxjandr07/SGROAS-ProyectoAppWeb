@@ -5,10 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface RutaAbdRepository extends JpaRepository<RutaAbd, Long> {
+public interface RutaAbdRepository extends JpaRepository<RutaAbd, Integer> {
 
-    boolean existsByTerminalOrigenIdTerminalAndTerminalDestinoIdTerminal(Long idOrigen, Long idDestino);
+    boolean existsByTerminalOrigenIdTerminalAndTerminalDestinoIdTerminal(Integer idOrigen, Integer idDestino);
 
     @Query("select count(p) from Programacion p where p.ruta.idRuta = :idRuta")
-    long contarProgramaciones(@Param("idRuta") Long idRuta);
+    Integer contarProgramaciones(@Param("idRuta") Integer idRuta);
 }

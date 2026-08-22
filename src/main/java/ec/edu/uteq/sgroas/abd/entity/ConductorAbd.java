@@ -20,7 +20,7 @@ public class ConductorAbd {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_conductor")
-    private Long idConductor;
+    private Integer idConductor;
 
     @Column(name = "cedula", nullable = false, unique = true, length = 10)
     private String cedula;

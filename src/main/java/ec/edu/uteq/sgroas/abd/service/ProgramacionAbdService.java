@@ -26,10 +26,10 @@ public class ProgramacionAbdService {
     private final ConductorAbdRepository conductorAbdRepository;
 
     @Transactional(readOnly = true)
-    public Page<AbdDtos.ProgramacionResponse> listar(String estado, Long idConductor, Long idRuta, Pageable pageable) {
+    public Page<AbdDtos.ProgramacionResponse> listar(String estado, Integer idConductor, Integer idRuta, Pageable pageable) {
         String estadoFiltro = (estado == null || estado.isBlank()) ? null : estado;
-        Long conductorFiltro = idConductor != null && idConductor > 0 ? idConductor : null;
-        Long rutaFiltro = idRuta != null && idRuta > 0 ? idRuta : null;
+        Integer conductorFiltro = idConductor != null && idConductor > 0 ? idConductor : null;
+        Integer rutaFiltro = idRuta != null && idRuta > 0 ? idRuta : null;
         if (estadoFiltro == null && conductorFiltro == null && rutaFiltro == null) {
             return programacionRepository.findAll(pageable).map(this::aResponse);
         }
@@ -59,7 +59,7 @@ public class ProgramacionAbdService {
         return aResponse(programacionRepository.save(programacion));
     }
 
-    public void eliminar(Long idProgramacion) {
+    public void eliminar(Integer idProgramacion) {
         if (!programacionRepository.existsById(idProgramacion)) {
             throw new IllegalArgumentException("Programacion no encontrada: " + idProgramacion);
         }

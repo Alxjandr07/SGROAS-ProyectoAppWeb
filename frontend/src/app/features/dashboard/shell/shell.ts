@@ -22,9 +22,10 @@ export class Shell {
     { label: 'Inicio', path: '' },
     { label: 'Usuarios y Roles', path: 'usuarios' },
     { label: 'Flota Vehicular', path: 'flota' },
-    { label: 'Rutas y Frecuencias', path: 'rutas' },
+    { label: 'Unidades', path: 'unidades' },
+    { label: 'Rutas', path: 'rutas' },
+    { label: 'Programaciones', path: 'programaciones' },
     { label: 'Seguridad', path: 'seguridad' },
-    { label: 'Administración', path: 'administracion' },
     { label: 'Reportes', path: 'reportes' }
   ];
 

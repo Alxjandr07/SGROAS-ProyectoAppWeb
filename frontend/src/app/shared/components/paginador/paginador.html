@@ -1,0 +1,15 @@
+<div class="paginador">
+  <span class="paginador__info">
+    {{ totalElements() | number }} registros — Página {{ currentPage() + 1 }} de {{ totalPages() || 1 }}
+  </span>
+
+  <div class="paginador__controles">
+    <button (click)="irA(0)" [disabled]="currentPage() === 0" title="Primera">«</button>
+    <button (click)="irA(currentPage() - 1)" [disabled]="currentPage() === 0">Anterior</button>
+    @for (p of paginasVisibles(); track p) {
+      <button (click)="irA(p)" [class.paginador__activo]="p === currentPage()">{{ p + 1 }}</button>
+    }
+    <button (click)="irA(currentPage() + 1)" [disabled]="currentPage() >= totalPages() - 1">Siguiente</button>
+    <button (click)="irA(totalPages() - 1)" [disabled]="currentPage() >= totalPages() - 1" title="Última">»</button>
+  </div>
+</div>

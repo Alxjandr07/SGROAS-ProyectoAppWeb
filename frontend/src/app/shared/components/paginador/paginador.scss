@@ -1,0 +1,44 @@
+.paginador {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+
+  &__info {
+    font-size: 0.85rem;
+    color: var(--text-muted, #6b7280);
+  }
+
+  &__controles {
+    display: flex;
+    gap: 0.25rem;
+
+    button {
+      min-width: 2.25rem;
+      padding: 0.35rem 0.6rem;
+      border: 1px solid #d1d5db;
+      background: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+
+      &:hover:not(:disabled) {
+        background: #f3f4f6;
+      }
+
+      &:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+
+      &.paginador__activo {
+        background: var(--primary, #2563eb);
+        border-color: var(--primary, #2563eb);
+        color: #fff;
+        font-weight: 600;
+      }
+    }
+  }
+}

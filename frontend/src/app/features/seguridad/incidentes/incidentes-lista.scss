@@ -1,0 +1,55 @@
+@use '../../../shared/styles/crud-lista';
+
+.campo-ancho {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 1rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+
+  textarea {
+    padding: 0.5rem 0.65rem;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    min-height: 4.5rem;
+    resize: vertical;
+
+    &:focus { outline: 2px solid var(--color-teal); outline-offset: -1px; }
+  }
+}
+
+.alertas-seccion {
+  background: #fff8f0;
+  border: 1px solid #f5cba7;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+
+  h2 { margin: 0 0 0.6rem; font-size: 1rem; color: #935116; }
+}
+
+.alertas-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.88rem;
+
+    .badge { flex-shrink: 0; }
+  }
+}
+
+.celda-descripcion {
+  max-width: 22rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

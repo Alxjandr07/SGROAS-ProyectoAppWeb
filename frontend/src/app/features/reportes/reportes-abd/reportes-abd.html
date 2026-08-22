@@ -1,0 +1,59 @@
+<div class="page-header">
+  <div>
+    <h1>Reportes</h1>
+    <p class="page-desc">Indicadores generales del sistema sobre los datos operativos.</p>
+  </div>
+</div>
+
+@if (loading()) {
+  <p class="loading-text">Calculando indicadores...</p>
+} @else if (errorMsg()) {
+  <div class="alert-error">{{ errorMsg() }}</div>
+} @else {
+  <div class="cards-grid">
+    @for (tarjeta of tarjetas(); track tarjeta.etiqueta) {
+      <div class="card" [class.card--alerta]="tarjeta.destacar">
+        <span class="card__valor">{{ tarjeta.valor | number }}</span>
+        <span class="card__etiqueta">{{ tarjeta.etiqueta }}</span>
+      </div>
+    }
+  </div>
+
+  <div class="conteos">
+    <section class="conteo-panel">
+      <h2>Incidentes por nivel</h2>
+      @if (porNivel().length === 0) {
+        <p class="empty-msg">Sin datos.</p>
+      } @else {
+        <table class="data-table">
+          <thead>
+            <tr><th>Nivel</th><th>Total</th></tr>
+          </thead>
+          <tbody>
+            @for (c of porNivel(); track c.clave) {
+              <tr><td>{{ c.clave }}</td><td>{{ c.total | number }}</td></tr>
+            }
+          </tbody>
+        </table>
+      }
+    </section>
+
+    <section class="conteo-panel">
+      <h2>Incidentes por estado</h2>
+      @if (porEstado().length === 0) {
+        <p class="empty-msg">Sin datos.</p>
+      } @else {
+        <table class="data-table">
+          <thead>
+            <tr><th>Estado</th><th>Total</th></tr>
+          </thead>
+          <tbody>
+            @for (c of porEstado(); track c.clave) {
+              <tr><td>{{ c.clave }}</td><td>{{ c.total | number }}</td></tr>
+            }
+          </tbody>
+        </table>
+      }
+    </section>
+  </div>
+}

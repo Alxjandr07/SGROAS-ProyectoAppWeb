@@ -32,7 +32,7 @@ public class IncidenteAbdController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
         incidenteAbdService.eliminar(id);
         return ResponseEntity.noContent().build();
     }

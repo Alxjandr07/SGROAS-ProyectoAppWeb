@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface CiudadRepository extends JpaRepository<Ciudad, Long> {
+public interface CiudadRepository extends JpaRepository<Ciudad, Integer> {
 
-    List<Ciudad> findByProvinciaIdProvinciaOrderByIdCiudadAsc(Long idProvincia);
+    List<Ciudad> findByProvinciaIdProvinciaOrderByIdCiudadAsc(Integer idProvincia);
 }

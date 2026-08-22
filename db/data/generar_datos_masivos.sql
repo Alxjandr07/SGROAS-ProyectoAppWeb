@@ -69,15 +69,14 @@ WHERE NOT EXISTS (SELECT 1 FROM conductor WHERE cedula = lpad((0910000000 + g)::
 -- ---------- Unidades ----------
 INSERT INTO unidad (placa, numero_disco, modelo, capacidad, anio_fabricacion, estado)
 SELECT
-    CASE g % 24
-        WHEN 0 THEN 'Pich' WHEN 1 THEN 'Guay' WHEN 2 THEN 'Rios' ELSE substr('ABCDEGHJKLMNPQRSTUVWXY', 1 + g % 23, 1) || '-' || lpad(g::text, 4, '0') END,
-    'DISCO-' || lpad(g::text, 5, '0'),
+    substr('ABCDEGHJKLMNPQRSTUVWXY', 1 + g % 22, 1) || '-' || lpad(g::text, 4, '0'),
+    'D' || lpad(g::text, 5, '0'),
     (ARRAY['Hino FG','Mercedes OH-1621','Chevrolet NQR','Yutong ZK6122','Toyota Coaster','Hyundai County'])[1 + g % 6],
     (ARRAY[40,45,50,55,60])[1 + g % 5],
     2005 + (g % 20),
     CASE WHEN g % 30 = 0 THEN 'En Mantenimiento' WHEN g % 40 = 0 THEN 'Inactivo' ELSE 'Activo' END
 FROM generate_series(1, GREATEST(:escala / 500, 10)) AS g
-WHERE NOT EXISTS (SELECT 1 FROM unidad WHERE numero_disco = 'DISCO-' || lpad(g::text, 5, '0'));
+WHERE NOT EXISTS (SELECT 1 FROM unidad WHERE numero_disco = 'D' || lpad(g::text, 5, '0'));
 
 -- ---------- Rutas entre terminales ----------
 INSERT INTO ruta (id_terminal_origen, id_terminal_destino, precio_pasaje)
@@ -90,17 +89,22 @@ WHERE o.id_terminal <> d.id_terminal
 ON CONFLICT DO NOTHING;
 
 -- ---------- Programaciones ----------
+-- Los rangos de FK se derivan de MIN(id)/COUNT(*) reales (no se asume que
+-- los ids comienzan en 1: las secuencias no son transaccionales).
+-- Las tablas de hechos solo se llenan si estan vacias; para regenerar,
+-- trunquelas primero (TRUNCATE programacion, incidente, alerta, auditoria;).
 INSERT INTO programacion (fecha, hora_salida, hora_estimada_llegada, estado, id_ruta, id_unidad, id_conductor, id_usuario)
 SELECT
     CURRENT_DATE - ((g % 365)) * INTERVAL '1 day',
     TIME '05:00' + ((g % 60)) * INTERVAL '10 minutes',
     TIME '08:00' + ((g % 90)) * INTERVAL '10 minutes',
     CASE WHEN g % 10 = 0 THEN 'Completado' WHEN g % 17 = 0 THEN 'Cancelado' WHEN g % 23 = 0 THEN 'En Curso' ELSE 'Programado' END,
-    1 + (g % (SELECT GREATEST(COUNT(*), 1) FROM ruta)),
-    1 + (g % (SELECT GREATEST(COUNT(*), 1) FROM unidad)),
-    1 + (g % (SELECT GREATEST(COUNT(*), 1) FROM conductor)),
-    NULLIF(1 + (g % (SELECT GREATEST(COUNT(*), 1) FROM usuario)), 0)
-FROM generate_series(1, :escala / 2) AS g;
+    (SELECT MIN(id_ruta) FROM ruta) + (g % GREATEST((SELECT COUNT(*) FROM ruta), 1)),
+    (SELECT MIN(id_unidad) FROM unidad) + (g % GREATEST((SELECT COUNT(*) FROM unidad), 1)),
+    (SELECT MIN(id_conductor) FROM conductor) + (g % GREATEST((SELECT COUNT(*) FROM conductor), 1)),
+    NULLIF((SELECT MIN(id_usuario) FROM usuario) + (g % GREATEST((SELECT COUNT(*) FROM usuario), 1)), 0)
+FROM generate_series(1, :escala / 2) AS g
+WHERE NOT EXISTS (SELECT 1 FROM programacion LIMIT 1);
 
 -- ---------- Incidentes ----------
 INSERT INTO incidente (tipo, descripcion, nivel_sugerido, fecha_incidente, evidencia, estado, id_unidad)
@@ -111,8 +115,9 @@ SELECT
     CURRENT_TIMESTAMP - ((g % 180)) * INTERVAL '1 day',
     CASE WHEN g % 4 = 0 THEN '/evidencias/inc_' || g || '.jpg' ELSE NULL END,
     CASE WHEN g % 8 = 0 THEN 'En Revision' WHEN g % 15 = 0 THEN 'Cerrado' ELSE 'Reportado' END,
-    1 + (g % (SELECT GREATEST(COUNT(*), 1) FROM unidad))
-FROM generate_series(1, GREATEST(:escala / 100, 10)) AS g;
+    (SELECT MIN(id_unidad) FROM unidad) + (g % GREATEST((SELECT COUNT(*) FROM unidad), 1))
+FROM generate_series(1, GREATEST(:escala / 100, 10)) AS g
+WHERE NOT EXISTS (SELECT 1 FROM incidente LIMIT 1);
 
 -- ---------- Alertas (derivadas de incidentes ALTO) ----------
 INSERT INTO alerta (nivel_riesgo, descripcion, fecha, id_incidente)
@@ -130,5 +135,6 @@ SELECT
     (ARRAY['LOGIN','LOGOUT','CREATE_PROGRAMACION','UPDATE_UNIDAD','DELETE_INCIDENTE','VIEW_REPORTE'])[1 + g % 6],
     CURRENT_TIMESTAMP - ((g % 120)) * INTERVAL '1 hour',
     '192.168.' || (g % 255) || '.' || ((g * 31) % 255),
-    1 + (g % (SELECT GREATEST(COUNT(*), 1) FROM usuario))
-FROM generate_series(1, GREATEST(:escala / 10, 10)) AS g;
+    (SELECT MIN(id_usuario) FROM usuario) + (g % GREATEST((SELECT COUNT(*) FROM usuario), 1))
+FROM generate_series(1, GREATEST(:escala / 10, 10)) AS g
+WHERE NOT EXISTS (SELECT 1 FROM auditoria LIMIT 1);

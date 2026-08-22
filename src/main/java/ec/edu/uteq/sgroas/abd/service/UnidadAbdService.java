@@ -25,7 +25,7 @@ public class UnidadAbdService {
     }
 
     @Transactional(readOnly = true)
-    public AbdDtos.UnidadResponse buscarPorId(Long idUnidad) {
+    public AbdDtos.UnidadResponse buscarPorId(Integer idUnidad) {
         return unidadRepository.findById(idUnidad).map(this::aResponse)
                 .orElseThrow(() -> new IllegalArgumentException("Unidad no encontrada: " + idUnidad));
     }
@@ -43,7 +43,7 @@ public class UnidadAbdService {
         return aResponse(unidadRepository.save(unidad));
     }
 
-    public AbdDtos.UnidadResponse actualizar(Long idUnidad, AbdDtos.UnidadRequest request) {
+    public AbdDtos.UnidadResponse actualizar(Integer idUnidad, AbdDtos.UnidadRequest request) {
         Unidad unidad = unidadRepository.findById(idUnidad)
                 .orElseThrow(() -> new IllegalArgumentException("Unidad no encontrada: " + idUnidad));
         validarUnicidad(request.placa(), request.numeroDisco(), idUnidad);
@@ -58,14 +58,14 @@ public class UnidadAbdService {
         return aResponse(unidadRepository.save(unidad));
     }
 
-    public void eliminar(Long idUnidad) {
+    public void eliminar(Integer idUnidad) {
         if (!unidadRepository.existsById(idUnidad)) {
             throw new IllegalArgumentException("Unidad no encontrada: " + idUnidad);
         }
         unidadRepository.deleteById(idUnidad);
     }
 
-    private void validarUnicidad(String placa, String numeroDisco, Long idExcluir) {
+    private void validarUnicidad(String placa, String numeroDisco, Integer idExcluir) {
         if (idExcluir == null) {
             if (unidadRepository.existsByPlacaIgnoreCase(placa)) {
                 throw new IllegalArgumentException("Ya existe una unidad con la placa " + placa);

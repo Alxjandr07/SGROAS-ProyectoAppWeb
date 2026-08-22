@@ -1,0 +1,78 @@
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.card {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  &--alerta {
+    border-color: #f5b7b1;
+    background: #fdf2f0;
+
+    .card__valor { color: #c0392b; }
+  }
+
+  &__valor {
+    font-family: var(--font-heading);
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    line-height: 1;
+  }
+
+  &__etiqueta {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    font-weight: 600;
+  }
+}
+
+.conteos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.conteo-panel {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+
+  h2 {
+    margin: 0;
+    padding: 1rem 1.25rem;
+    font-size: 1rem;
+    font-family: var(--font-heading);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .empty-msg {
+    padding: 1.5rem;
+    text-align: center;
+    color: var(--color-text-muted);
+  }
+}
+
+.loading-text {
+  text-align: center;
+  color: var(--color-text-muted);
+  padding: 3rem;
+}
+
+.alert-error {
+  background: #fdecea;
+  color: #c0392b;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}

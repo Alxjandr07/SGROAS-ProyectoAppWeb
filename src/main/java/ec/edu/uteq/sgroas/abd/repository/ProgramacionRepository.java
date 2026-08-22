@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface ProgramacionRepository extends JpaRepository<Programacion, Long> {
+public interface ProgramacionRepository extends JpaRepository<Programacion, Integer> {
 
     Page<Programacion> findByEstadoIgnoreCase(String estado, Pageable pageable);
 
@@ -18,7 +18,7 @@ public interface ProgramacionRepository extends JpaRepository<Programacion, Long
               and (:idRuta is null or p.ruta.idRuta = :idRuta)
             """)
     Page<Programacion> buscarConFiltros(@Param("estado") String estado,
-                                        @Param("idConductor") Long idConductor,
-                                        @Param("idRuta") Long idRuta,
+                                        @Param("idConductor") Integer idConductor,
+                                        @Param("idRuta") Integer idRuta,
                                         Pageable pageable);
 }

@@ -1,0 +1,93 @@
+<div class="page-header">
+  <div>
+    <h1>Rutas</h1>
+    <p class="page-desc">Rutas registradas entre terminales del pais.</p>
+  </div>
+  <button class="btn-primary" (click)="abrirFormulario()">+ Nueva ruta</button>
+</div>
+
+@if (mostrandoFormulario()) {
+  <div class="form-panel">
+    <h3>{{ editId() ? 'Editar ruta' : 'Nueva ruta' }}</h3>
+    @if (errorForm()) {
+      <div class="alert-error">{{ errorForm() }}</div>
+    }
+    <form [formGroup]="form" (ngSubmit)="guardar()">
+      <div class="form-grid">
+        <label>
+          Terminal origen
+          <select formControlName="idTerminalOrigen">
+            <option [ngValue]="null" disabled>Seleccione...</option>
+            @for (t of terminales(); track t.idTerminal) {
+              <option [ngValue]="t.idTerminal">{{ t.nombre }} — {{ t.nombreCiudad }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          Terminal destino
+          <select formControlName="idTerminalDestino">
+            <option [ngValue]="null" disabled>Seleccione...</option>
+            @for (t of terminales(); track t.idTerminal) {
+              <option [ngValue]="t.idTerminal">{{ t.nombre }} — {{ t.nombreCiudad }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          Precio pasaje ($)
+          <input type="number" step="0.01" min="0.01" formControlName="precioPasaje" />
+        </label>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" [disabled]="form.invalid || guardando()">
+          {{ guardando() ? 'Guardando...' : 'Guardar' }}
+        </button>
+        <button type="button" class="btn-sm" (click)="cancelar()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+}
+
+@if (loading()) {
+  <p class="loading-text">Cargando rutas...</p>
+} @else if (errorMsg()) {
+  <div class="alert-error">{{ errorMsg() }}</div>
+} @else {
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Origen</th>
+          <th>Destino</th>
+          <th>Precio</th>
+          <th>Programaciones</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of rutas(); track r.idRuta) {
+          <tr>
+            <td>{{ r.idRuta }}</td>
+            <td>{{ r.terminalOrigen }}</td>
+            <td>{{ r.terminalDestino }}</td>
+            <td>${{ r.precioPasaje | number:'1.2-2' }}</td>
+            <td>{{ r.totalProgramaciones }}</td>
+            <td class="actions-cell">
+              <button class="btn-sm" (click)="editar(r)">Editar</button>
+              <button class="btn-sm btn-sm--danger" (click)="confirmarEliminar(r.idRuta)">Eliminar</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="6" class="empty-msg">No hay rutas registradas.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <app-paginador
+    [currentPage]="currentPage()"
+    [totalPages]="totalPages()"
+    [totalElements]="totalElements()"
+    (pageChange)="cambiarPagina($event)"
+  />
+}

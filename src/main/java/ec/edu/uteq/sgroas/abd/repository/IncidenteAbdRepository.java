@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface IncidenteAbdRepository extends JpaRepository<IncidenteAbd, Long> {
+public interface IncidenteAbdRepository extends JpaRepository<IncidenteAbd, Integer> {
 
     Page<IncidenteAbd> findByEstadoIgnoreCase(String estado, Pageable pageable);
 
@@ -33,12 +33,12 @@ public interface IncidenteAbdRepository extends JpaRepository<IncidenteAbd, Long
     interface ConteoPorNivel {
         String getNivel();
 
-        long getTotal();
+        Integer getTotal();
     }
 
     interface ConteoPorEstado {
         String getEstado();
 
-        long getTotal();
+        Integer getTotal();
     }
 }

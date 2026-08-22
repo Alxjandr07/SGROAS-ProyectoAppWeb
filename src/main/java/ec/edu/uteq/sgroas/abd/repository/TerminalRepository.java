@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface TerminalRepository extends JpaRepository<Terminal, Long> {
+public interface TerminalRepository extends JpaRepository<Terminal, Integer> {
 
-    List<Terminal> findByCiudadIdCiudadOrderByIdTerminalAsc(Long idCiudad);
+    List<Terminal> findByCiudadIdCiudadOrderByIdTerminalAsc(Integer idCiudad);
 }

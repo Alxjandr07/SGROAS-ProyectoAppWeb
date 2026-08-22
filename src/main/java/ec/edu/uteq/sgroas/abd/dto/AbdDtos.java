@@ -17,16 +17,16 @@ public final class AbdDtos {
 
     // ---------- Catalogos ----------
 
-    public record ProvinciaResponse(Long idProvincia, String nombre) {
+    public record ProvinciaResponse(Integer idProvincia, String nombre) {
     }
 
-    public record CiudadResponse(Long idCiudad, String nombre, Long idProvincia, String nombreProvincia) {
+    public record CiudadResponse(Integer idCiudad, String nombre, Integer idProvincia, String nombreProvincia) {
     }
 
-    public record TerminalResponse(Long idTerminal, String nombre, Long idCiudad, String nombreCiudad) {
+    public record TerminalResponse(Integer idTerminal, String nombre, Integer idCiudad, String nombreCiudad) {
     }
 
-    public record RolResponse(Long idRol, String nombre, String descripcion) {
+    public record RolResponse(Integer idRol, String nombre, String descripcion) {
     }
 
     public record CatalogosResponse(List<ProvinciaResponse> provincias,
@@ -38,16 +38,16 @@ public final class AbdDtos {
     // ---------- Rutas (ABD) ----------
 
     public record RutaAbdRequest(
-            @NotNull(message = "El terminal de origen es obligatorio") Long idTerminalOrigen,
-            @NotNull(message = "El terminal de destino es obligatorio") Long idTerminalDestino,
+            @NotNull(message = "El terminal de origen es obligatorio") Integer idTerminalOrigen,
+            @NotNull(message = "El terminal de destino es obligatorio") Integer idTerminalDestino,
             @NotNull @DecimalMin(value = "0.01", message = "El precio debe ser mayor a 0")
             @Digits(integer = 8, fraction = 2) BigDecimal precioPasaje
     ) {
     }
 
-    public record RutaAbdResponse(Long idRuta, Long idTerminalOrigen, String terminalOrigen,
-                                  Long idTerminalDestino, String terminalDestino,
-                                  BigDecimal precioPasaje, long totalProgramaciones) {
+    public record RutaAbdResponse(Integer idRuta, Integer idTerminalOrigen, String terminalOrigen,
+                                  Integer idTerminalDestino, String terminalDestino,
+                                  BigDecimal precioPasaje, Integer totalProgramaciones) {
     }
 
     // ---------- Unidades ----------
@@ -62,7 +62,7 @@ public final class AbdDtos {
     ) {
     }
 
-    public record UnidadResponse(Long idUnidad, String placa, String numeroDisco, String modelo,
+    public record UnidadResponse(Integer idUnidad, String placa, String numeroDisco, String modelo,
                                  Integer capacidad, Integer anioFabricacion, String estado) {
     }
 
@@ -73,17 +73,17 @@ public final class AbdDtos {
             @NotNull LocalTime horaSalida,
             @NotNull LocalTime horaEstimadaLlegada,
             @Pattern(regexp = "Programado|En Curso|Completado|Cancelado", message = "Estado invalido") String estado,
-            @NotNull Long idRuta,
-            @NotNull Long idUnidad,
-            @NotNull Long idConductor
+            @NotNull Integer idRuta,
+            @NotNull Integer idUnidad,
+            @NotNull Integer idConductor
     ) {
     }
 
-    public record ProgramacionResponse(Long idProgramacion, LocalDate fecha, LocalTime horaSalida,
+    public record ProgramacionResponse(Integer idProgramacion, LocalDate fecha, LocalTime horaSalida,
                                        LocalTime horaEstimadaLlegada, String estado,
-                                       Long idRuta, String rutaDescripcion,
-                                       Long idUnidad, String unidadPlaca,
-                                       Long idConductor, String conductorNombres) {
+                                       Integer idRuta, String rutaDescripcion,
+                                       Integer idUnidad, String unidadPlaca,
+                                       Integer idConductor, String conductorNombres) {
     }
 
     // ---------- Incidentes (ABD) ----------
@@ -94,17 +94,17 @@ public final class AbdDtos {
             @NotBlank @Pattern(regexp = "BAJO|MEDIO|ALTO", message = "Nivel sugerido debe ser BAJO, MEDIO o ALTO") String nivelSugerido,
             @Size(max = 255) String evidencia,
             @Pattern(regexp = "Reportado|En Revision|Cerrado", message = "Estado invalido") String estado,
-            @NotNull Long idUnidad
+            @NotNull Integer idUnidad
     ) {
     }
 
-    public record IncidenteAbdResponse(Long idIncidente, String tipo, String descripcion,
+    public record IncidenteAbdResponse(Integer idIncidente, String tipo, String descripcion,
                                        String nivelSugerido, String fechaIncidente, String evidencia,
-                                       String estado, Long idUnidad, String unidadPlaca) {
+                                       String estado, Integer idUnidad, String unidadPlaca) {
     }
 
-    public record AlertaResponse(Long idAlerta, String nivelRiesgo, String descripcion,
-                                 String fecha, Long idIncidente) {
+    public record AlertaResponse(Integer idAlerta, String nivelRiesgo, String descripcion,
+                                 String fecha, Integer idIncidente) {
     }
 
     // ---------- Reportes ----------

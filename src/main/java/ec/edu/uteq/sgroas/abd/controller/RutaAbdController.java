@@ -25,7 +25,7 @@ public class RutaAbdController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AbdDtos.RutaAbdResponse> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<AbdDtos.RutaAbdResponse> buscarPorId(@PathVariable Integer id) {
         return ResponseEntity.ok(rutaAbdService.buscarPorId(id));
     }
 
@@ -35,13 +35,13 @@ public class RutaAbdController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AbdDtos.RutaAbdResponse> actualizar(@PathVariable Long id,
+    public ResponseEntity<AbdDtos.RutaAbdResponse> actualizar(@PathVariable Integer id,
                                                               @Valid @RequestBody AbdDtos.RutaAbdRequest request) {
         return ResponseEntity.ok(rutaAbdService.actualizar(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
         rutaAbdService.eliminar(id);
         return ResponseEntity.noContent().build();
     }

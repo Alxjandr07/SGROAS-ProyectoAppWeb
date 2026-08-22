@@ -41,7 +41,7 @@ public class CatalogoAbdService {
         return new AbdDtos.CatalogosResponse(provincias, ciudades, terminales, roles);
     }
 
-    public Terminal buscarTerminal(Long idTerminal) {
+    public Terminal buscarTerminal(Integer idTerminal) {
         return terminalRepository.findById(idTerminal)
                 .orElseThrow(() -> new IllegalArgumentException("Terminal no encontrado: " + idTerminal));
     }
