@@ -69,6 +69,19 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    void rutaInexistenteDebeRetornarNoEncontrado() {
+        when(request.getRequestURI()).thenReturn("/api/auth/register");
+
+        ProblemDetail detail = handler.manejarRutaInexistente(
+                new org.springframework.web.servlet.resource.NoResourceFoundException(
+                        null, "api/auth/register"),
+                request);
+
+        assertEquals(HttpStatus.NOT_FOUND.value(), detail.getStatus());
+        assertEquals("Recurso no encontrado", detail.getTitle());
+    }
+
+    @Test
     void errorGeneralDebeRetornarInternalServerError() {
         when(request.getRequestURI()).thenReturn("/api/conductores");
 

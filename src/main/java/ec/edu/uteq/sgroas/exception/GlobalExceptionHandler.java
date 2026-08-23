@@ -77,6 +77,21 @@ public class GlobalExceptionHandler {
         return detail;
     }
 
+    /** Rutas inexistentes (ej. el antiguo /api/auth/register): 404, no 500. */
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    public ProblemDetail manejarRutaInexistente(
+            org.springframework.web.servlet.resource.NoResourceFoundException ex,
+            HttpServletRequest request
+    ) {
+        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+        detail.setType(URI.create("https://sgroas.uteq.edu.ec/errors/not-found"));
+        detail.setTitle("Recurso no encontrado");
+        detail.setDetail("La ruta solicitada no existe");
+        detail.setInstance(URI.create(request.getRequestURI()));
+
+        return detail;
+    }
+
     @ExceptionHandler(Exception.class)
     public ProblemDetail manejarErrorGeneral(
             Exception ex,
