@@ -6,6 +6,8 @@
   <button class="btn-primary" (click)="recargar()" [disabled]="loading()">Actualizar</button>
 </div>
 
+<app-reporte-personalizado />
+
 @if (loading()) {
   <p class="loading-text">Calculando indicadores...</p>
 } @else if (errorMsg()) {

@@ -59,13 +59,15 @@
       </div>
 
       <div class="user-chip">
-        <span class="user-nombre">{{ currentUser?.nombre }}</span>
-        <span class="user-rol">{{ rolEtiqueta }}</span>
+        <span class="avatar">{{ initials || 'AD' }}</span>
+        <span class="user-datos">
+          <span class="user-nombre">{{ currentUser?.nombre }}</span>
+          <span class="user-rol">{{ rolEtiqueta }}</span>
+        </span>
+        <button class="btn-logout" (click)="logout()" title="Cerrar sesión y salir del sistema">
+          Cerrar sesión
+        </button>
       </div>
-
-      <button class="avatar" (click)="logout()" title="Cerrar sesión">
-        {{ initials || 'AD' }}
-      </button>
     </div>
   </nav>
 

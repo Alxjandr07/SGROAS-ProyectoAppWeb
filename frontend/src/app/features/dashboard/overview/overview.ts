@@ -2,6 +2,7 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ReporteAbdService } from '../../../core/services/abd/reporte-abd.service';
+import { Auth } from '../../../core/services/auth';
 import { ConteoAbd, ResumenAbd } from '../../../core/models/abd.model';
 
 interface SummaryCard {
@@ -16,6 +17,7 @@ interface ModuleCard {
   title: string;
   description: string;
   path: string;
+  roles: string[] | null;
 }
 
 @Component({
@@ -27,6 +29,7 @@ interface ModuleCard {
 })
 export class Overview implements OnInit {
   private reportes = inject(ReporteAbdService);
+  private authService = inject(Auth);
 
   resumen = signal<ResumenAbd | null>(null);
   unidadesEstado = signal<ConteoAbd[]>([]);
@@ -81,14 +84,20 @@ export class Overview implements OnInit {
     ];
   });
 
-  modules: ModuleCard[] = [
-    { icon: '👤', title: 'Usuarios y Roles', description: 'Administra socios, choferes y permisos de acceso.', path: 'usuarios' },
-    { icon: '🚌', title: 'Flota Vehicular', description: 'Control de unidades, placas y mantenimiento.', path: 'flota' },
-    { icon: '🛣️', title: 'Rutas y Frecuencias', description: 'Asignación de horarios y recorridos por unidad.', path: 'rutas' },
-    { icon: '🛡️', title: 'Seguridad', description: 'Monitoreo, incidentes y alertas en tiempo real.', path: 'seguridad' },
-    { icon: '📅', title: 'Programaciones', description: 'Salidas diarias por ruta, unidad y conductor.', path: 'programaciones' },
-    { icon: '📊', title: 'Reportes', description: 'Estadísticas operativas y de seguridad exportables.', path: 'reportes' }
+  private readonly todosLosModules: ModuleCard[] = [
+    { icon: '👤', title: 'Usuarios y Roles', description: 'Administra socios, choferes y permisos de acceso.', path: 'usuarios', roles: ['ADMIN'] },
+    { icon: '🚌', title: 'Flota Vehicular', description: 'Control de unidades, placas y mantenimiento.', path: 'flota', roles: ['ADMIN', 'COORDINADOR'] },
+    { icon: '🛣️', title: 'Rutas y Frecuencias', description: 'Asignación de horarios y recorridos por unidad.', path: 'rutas', roles: ['ADMIN', 'COORDINADOR'] },
+    { icon: '🛡️', title: 'Seguridad', description: 'Monitoreo, incidentes y alertas en tiempo real.', path: 'seguridad', roles: ['ADMIN', 'SEGURIDAD'] },
+    { icon: '📅', title: 'Programaciones', description: 'Salidas diarias por ruta, unidad y conductor.', path: 'programaciones', roles: ['ADMIN', 'COORDINADOR', 'OPERADOR'] },
+    { icon: '📊', title: 'Reportes', description: 'Estadísticas operativas y de seguridad exportables.', path: 'reportes', roles: null }
   ];
+
+  get modules(): ModuleCard[] {
+    return this.todosLosModules.filter(
+      (m) => m.roles === null || this.authService.tieneRol(m.roles)
+    );
+  }
 
   ngOnInit(): void {
     this.cargar();

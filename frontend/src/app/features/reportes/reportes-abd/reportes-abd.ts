@@ -5,6 +5,7 @@ import { ConteoAbd, ItemGrafico, ResumenAbd, TopRutaAbd } from '../../../core/mo
 import { Barras } from '../../../shared/components/graficos/barras/barras';
 import { Anillo } from '../../../shared/components/graficos/anillo/anillo';
 import { Columnas } from '../../../shared/components/graficos/columnas/columnas';
+import { ReportePersonalizado } from '../reporte-personalizado/reporte-personalizado';
 
 const COLORES_ESTADO_PROG: Record<string, string> = {
   'Programado': '#3b82f6',
@@ -37,7 +38,7 @@ const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'o
 @Component({
   selector: 'app-reportes-abd',
   standalone: true,
-  imports: [CommonModule, Barras, Anillo, Columnas],
+  imports: [CommonModule, Barras, Anillo, Columnas, ReportePersonalizado],
   templateUrl: './reportes-abd.html',
   styleUrl: './reportes-abd.scss',
 })
