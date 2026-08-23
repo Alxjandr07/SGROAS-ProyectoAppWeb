@@ -1,0 +1,13 @@
+<div class="columnas">
+  @for (it of items(); track it.etiqueta) {
+    <div class="columnas__grupo" [title]="it.etiqueta + ': ' + (it.valor | number)">
+      <span class="columnas__valor">{{ it.valor | number }}</span>
+      <div class="columnas__zona">
+        <div class="columnas__barra" [style.height.%]="porcentaje(it.valor)" [style.background]="colorDe(it)"></div>
+      </div>
+      <span class="columnas__etiqueta">{{ it.etiqueta }}</span>
+    </div>
+  } @empty {
+    <p class="grafico-vacio">Sin datos.</p>
+  }
+</div>

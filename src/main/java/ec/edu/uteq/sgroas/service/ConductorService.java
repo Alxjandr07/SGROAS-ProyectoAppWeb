@@ -7,9 +7,7 @@ import ec.edu.uteq.sgroas.entity.EstadoConductor;
 import ec.edu.uteq.sgroas.repository.ConductorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -23,16 +21,12 @@ public class ConductorService {
 
     private final ConductorRepository conductorRepository;
 
-    public Page<ConductorResponse> listar(Pageable pageable) {
-        List<ConductorResponse> contenido = listarCacheable(pageable);
-        return new PageImpl<>(contenido, pageable, contenido.size());
-    }
-
-    @Cacheable(value = "conductores", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
-    public List<ConductorResponse> listarCacheable(Pageable pageable) {
-        return conductorRepository.findByActivoTrue(pageable)
-                .map(this::mapearAResponse)
-                .getContent();
+    public Page<ConductorResponse> listar(String search, Pageable pageable) {
+        if (search == null || search.isBlank()) {
+            return conductorRepository.findByActivoTrue(pageable).map(this::mapearAResponse);
+        }
+        return conductorRepository.buscarActivos(search.trim().toLowerCase(), pageable)
+                .map(this::mapearAResponse);
     }
 
     public ConductorResponse buscarPorId(Long id) {

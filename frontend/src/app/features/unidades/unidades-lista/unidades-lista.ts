@@ -1,6 +1,8 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { UnidadAbdService } from '../../../core/services/abd/unidad-abd.service';
 import { Paginador } from '../../../shared/components/paginador/paginador';
 import { UnidadAbd } from '../../../core/models/abd.model';
@@ -14,12 +16,15 @@ const ESTADOS = ['Activo', 'Inactivo', 'En Mantenimiento'];
   templateUrl: './unidades-lista.html',
   styleUrl: './unidades-lista.scss',
 })
-export class UnidadesLista implements OnInit {
+export class UnidadesLista implements OnInit, OnDestroy {
   private service = inject(UnidadAbdService);
   private fb = inject(FormBuilder);
+  private destruir$ = new Subject<void>();
+  private buscar$ = new Subject<string>();
 
   estados = ESTADOS;
   filtroEstado = signal('');
+  buscar = signal('');
 
   unidades = signal<UnidadAbd[]>([]);
   loading = signal(true);
@@ -44,12 +49,20 @@ export class UnidadesLista implements OnInit {
 
   ngOnInit(): void {
     this.cargar();
+    this.buscar$
+      .pipe(debounceTime(350), distinctUntilChanged(), takeUntil(this.destruir$))
+      .subscribe(() => this.cargar(0));
+  }
+
+  ngOnDestroy(): void {
+    this.destruir$.next();
+    this.destruir$.complete();
   }
 
   cargar(page = 0): void {
     this.loading.set(true);
     this.errorMsg.set(null);
-    this.service.listar(page, 50, this.filtroEstado()).subscribe({
+    this.service.listar(page, 50, this.filtroEstado(), this.buscar()).subscribe({
       next: (res) => {
         this.unidades.set(res.content);
         this.totalPages.set(res.totalPages);
@@ -67,6 +80,11 @@ export class UnidadesLista implements OnInit {
   aplicarFiltro(event: Event): void {
     this.filtroEstado.set((event.target as HTMLSelectElement).value);
     this.cargar(0);
+  }
+
+  enBuscar(event: Event): void {
+    this.buscar.set((event.target as HTMLInputElement).value);
+    this.buscar$.next(this.buscar());
   }
 
   cambiarPagina(p: number): void {

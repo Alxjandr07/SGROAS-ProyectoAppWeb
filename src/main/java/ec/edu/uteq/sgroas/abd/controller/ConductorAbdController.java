@@ -9,6 +9,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -20,7 +21,12 @@ public class ConductorAbdController {
 
     @GetMapping
     public ResponseEntity<Page<ConductorAbd>> listar(
+            @RequestParam(required = false) String search,
             @PageableDefault(size = 50, sort = "idConductor") Pageable pageable) {
-        return ResponseEntity.ok(conductorAbdRepository.findAll(pageable));
+        String filtro = (search == null || search.isBlank()) ? null : search.trim().toLowerCase();
+        Page<ConductorAbd> page = filtro == null
+                ? conductorAbdRepository.findAll(pageable)
+                : conductorAbdRepository.buscar(filtro, pageable);
+        return ResponseEntity.ok(page);
     }
 }

@@ -6,6 +6,14 @@
   <a class="btn-primary" routerLink="nuevo">+ Nuevo usuario</a>
 </div>
 
+<div class="filtros">
+  <label class="buscador">
+    Buscar
+    <input type="text" [value]="buscar()" (input)="enBuscar($event)"
+           placeholder="Nombre o email..." />
+  </label>
+</div>
+
 @if (loading()) {
   <p class="loading-text">Cargando usuarios...</p>
 } @else if (errorMsg()) {

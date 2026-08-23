@@ -1,6 +1,8 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { RutaAbdService } from '../../../core/services/abd/ruta-abd.service';
 import { CatalogoAbdService } from '../../../core/services/abd/catalogo-abd.service';
 import { Paginador } from '../../../shared/components/paginador/paginador';
@@ -13,10 +15,14 @@ import { RutaAbd, TerminalAbd } from '../../../core/models/abd.model';
   templateUrl: './rutas-lista.html',
   styleUrl: './rutas-lista.scss',
 })
-export class RutasLista implements OnInit {
+export class RutasLista implements OnInit, OnDestroy {
   private rutaService = inject(RutaAbdService);
   private catalogoService = inject(CatalogoAbdService);
   private fb = inject(FormBuilder);
+  private destruir$ = new Subject<void>();
+  private buscar$ = new Subject<string>();
+
+  buscar = signal('');
 
   rutas = signal<RutaAbd[]>([]);
   terminales = signal<TerminalAbd[]>([]);
@@ -40,6 +46,14 @@ export class RutasLista implements OnInit {
   ngOnInit(): void {
     this.cargarCatalogo();
     this.cargar();
+    this.buscar$
+      .pipe(debounceTime(350), distinctUntilChanged(), takeUntil(this.destruir$))
+      .subscribe(() => this.cargar(0));
+  }
+
+  ngOnDestroy(): void {
+    this.destruir$.next();
+    this.destruir$.complete();
   }
 
   cargarCatalogo(): void {
@@ -52,7 +66,7 @@ export class RutasLista implements OnInit {
   cargar(page = 0): void {
     this.loading.set(true);
     this.errorMsg.set(null);
-    this.rutaService.listar(page).subscribe({
+    this.rutaService.listar(page, 50, this.buscar()).subscribe({
       next: (res) => {
         this.rutas.set(res.content);
         this.totalPages.set(res.totalPages);
@@ -69,6 +83,11 @@ export class RutasLista implements OnInit {
 
   cambiarPagina(p: number): void {
     this.cargar(p);
+  }
+
+  enBuscar(event: Event): void {
+    this.buscar.set((event.target as HTMLInputElement).value);
+    this.buscar$.next(this.buscar());
   }
 
   abrirFormulario(): void {

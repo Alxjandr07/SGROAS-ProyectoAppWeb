@@ -21,8 +21,9 @@ public class UnidadAbdController {
     @GetMapping
     public ResponseEntity<Page<AbdDtos.UnidadResponse>> listar(
             @RequestParam(required = false) String estado,
+            @RequestParam(required = false) String search,
             @PageableDefault(size = 50, sort = "idUnidad") Pageable pageable) {
-        return ResponseEntity.ok(unidadAbdService.listar(estado, pageable));
+        return ResponseEntity.ok(unidadAbdService.listar(estado, search, pageable));
     }
 
     @GetMapping("/{id}")

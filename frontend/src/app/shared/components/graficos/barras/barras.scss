@@ -1,0 +1,49 @@
+.barras {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+
+  &__fila {
+    display: grid;
+    grid-template-columns: minmax(6rem, 10rem) 1fr auto;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  &__etiqueta {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__track {
+    height: 0.85rem;
+    background: #eef2f7;
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  &__fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  &__valor {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    min-width: 3.5rem;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.grafico-vacio {
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: 1.5rem;
+}

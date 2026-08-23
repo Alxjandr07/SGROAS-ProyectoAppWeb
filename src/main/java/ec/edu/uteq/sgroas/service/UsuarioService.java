@@ -21,8 +21,11 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public Page<UsuarioResponse> listar(Pageable pageable) {
-        return usuarioRepository.findByActivoTrue(pageable)
+    public Page<UsuarioResponse> listar(String search, Pageable pageable) {
+        if (search == null || search.isBlank()) {
+            return usuarioRepository.findByActivoTrue(pageable).map(this::toResponse);
+        }
+        return usuarioRepository.buscarActivos(search.trim().toLowerCase(), pageable)
                 .map(this::toResponse);
     }
 

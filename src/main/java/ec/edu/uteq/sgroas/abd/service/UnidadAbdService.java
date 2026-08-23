@@ -5,6 +5,7 @@ import ec.edu.uteq.sgroas.abd.entity.Unidad;
 import ec.edu.uteq.sgroas.abd.repository.UnidadRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,10 +18,16 @@ public class UnidadAbdService {
     private final UnidadRepository unidadRepository;
 
     @Transactional(readOnly = true)
-    public Page<AbdDtos.UnidadResponse> listar(String estado, Pageable pageable) {
-        Page<Unidad> page = (estado == null || estado.isBlank())
-                ? unidadRepository.findAll(pageable)
-                : unidadRepository.findByEstadoIgnoreCase(estado, pageable);
+    public Page<AbdDtos.UnidadResponse> listar(String estado, String search, Pageable pageable) {
+        String estadoFiltro = (estado == null || estado.isBlank()) ? null : estado.trim().toLowerCase();
+        String searchFiltro = (search == null || search.isBlank()) ? null : search.trim().toLowerCase();
+        Page<Unidad> page;
+        if (estadoFiltro == null && searchFiltro == null) {
+            page = unidadRepository.findAll(pageable);
+        } else {
+            page = unidadRepository.buscarConFiltros(estadoFiltro, searchFiltro,
+                    PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()));
+        }
         return page.map(this::aResponse);
     }
 

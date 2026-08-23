@@ -47,8 +47,10 @@ ON CONFLICT (id_rol) DO NOTHING;
 INSERT INTO usuario (cedula, nombre, correo, contrasena, estado, id_rol)
 SELECT
     lpad((1700000000 + g)::text, 10, '0'),
-    'Usuario ' || g,
-    'usuario' || g || '@sgroas.com',
+    (ARRAY['Juan','Maria','Carlos','Jose','Ana','Luis','Marta','Pedro','Lucia','Diego'])[1 + (g % 10)]
+        || ' ' ||
+        (ARRAY['Perez','Gomez','Rodriguez','Silva','Torres','Vera','Zambrano','Cabezas','Mendoza','Santos'])[1 + ((g / 10) % 10)],
+    LOWER((ARRAY['juan','maria','carlos','jose','ana','luis','marta','pedro','lucia','diego'])[1 + (g % 10)]) || g || '@sgroas.com',
     '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',
     CASE WHEN g % 50 = 0 THEN 'Inactivo' ELSE 'Activo' END,
     1 + (g % 4)
@@ -59,12 +61,34 @@ WHERE NOT EXISTS (SELECT 1 FROM usuario WHERE cedula = lpad((1700000000 + g)::te
 INSERT INTO conductor (cedula, nombres, licencia, fecha_vencimiento, telefono)
 SELECT
     lpad((0910000000 + g)::text, 10, '0'),
-    'Conductor ' || g,
+    (ARRAY['Juan Carlos','Maria Fernanda','Luis Alberto','Ana Lucia','Pedro Antonio','Gabriela Sofia','Miguel Angel','Carolina Esperanza','Jorge Enrique','Valeria Nicole'])[1 + (g % 10)]
+        || ' ' ||
+        (ARRAY['Perez Gomez','Rodriguez Silva','Torres Vera','Zambrano Cruz','Andrade Cevallos','Mendoza Barzallo','Franco Hinojosa','Santos Delgado','Cabrera Leon','Quiroz Paredes'])[1 + ((g / 10) % 10)],
     'LIC-' || lpad(g::text, 6, '0') || '-CAT' || (1 + g % 4)::text,
     CURRENT_DATE + ((g % 900) - 300) * INTERVAL '1 day',
     '+593' || (90 + g % 9) || lpad(((g * 7919) % 10000000)::text, 7, '0')
 FROM generate_series(1, GREATEST(:escala / 25, 10)) AS g
 WHERE NOT EXISTS (SELECT 1 FROM conductor WHERE cedula = lpad((0910000000 + g)::text, 10, '0'));
+
+-- ---------- Conductores del esquema original (modulo Flota Vehicular) ----------
+-- La tabla `conductores` (plural) pertenece al esquema del backend y no la
+-- cubre la replica ABD; se genera aqui para que el modulo Flota tenga datos.
+INSERT INTO conductores (nombres, apellidos, cedula, numero_licencia, tipo_licencia,
+                         fecha_vencimiento_licencia, telefono, email, estado, activo)
+SELECT
+    (ARRAY['Juan','Maria','Carlos','Jose','Ana','Luis','Marta','Pedro','Lucia','Diego'])[1 + g % 10],
+    (ARRAY['Perez','Gomez','Rodriguez','Silva','Torres','Vera','Zambrano','Cabezas','Mendoza','Santos'])[1 + g % 10]
+        || ' ' || (ARRAY['Andrade','Barzallo','Cevallos','Delgado','Estupinan','Franco','Garcia','Hinojosa','Ibarra','Jaramillo'])[1 + (g / 10) % 10],
+    lpad((0910000000 + g)::text, 10, '0'),
+    'LIC-' || lpad(g::text, 6, '0') || '-CAT' || (1 + g % 4)::text,
+    (ARRAY['A1','A2','B1','B2','C1','C2','D1','D2'])[1 + g % 8],
+    CURRENT_DATE + ((g % 900) - 300),
+    '+593' || (90 + g % 9) || lpad(((g * 7919) % 10000000)::text, 7, '0'),
+    LOWER((ARRAY['juan','maria','carlos','jose','ana','luis','marta','pedro','lucia','diego'])[1 + g % 10]) || g || '@sgroas.com',
+    CASE WHEN g % 40 = 0 THEN 'SUSPENDIDO' ELSE 'ACTIVO' END,
+    TRUE
+FROM generate_series(1, GREATEST(:escala / 25, 10)) AS g
+WHERE NOT EXISTS (SELECT 1 FROM conductores WHERE cedula = lpad((0910000000 + g)::text, 10, '0'));
 
 -- ---------- Unidades ----------
 INSERT INTO unidad (placa, numero_disco, modelo, capacidad, anio_fabricacion, estado)

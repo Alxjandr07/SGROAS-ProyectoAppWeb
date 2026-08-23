@@ -9,8 +9,10 @@ export class RutaAbdService {
   private http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/abd/rutas`;
 
-  listar(page = 0, size = 50): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}?page=${page}&size=${size}`);
+  listar(page = 0, size = 50, search = ''): Observable<any> {
+    const params = new URLSearchParams({ page: String(page), size: String(size) });
+    if (search) params.set('search', search);
+    return this.http.get<any>(`${this.apiUrl}?${params}`);
   }
 
   buscarPorId(id: number): Observable<RutaAbd> {

@@ -1,0 +1,61 @@
+.anillo {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+
+  &__svg {
+    width: 150px;
+    height: 150px;
+    flex-shrink: 0;
+  }
+
+  &__seg {
+    transition: stroke-dasharray 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  &__total {
+    font-size: 1.35rem;
+    font-weight: 800;
+    fill: var(--color-dark);
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__titulo {
+    font-size: 0.55rem;
+    fill: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  &__leyenda {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+    }
+  }
+
+  &__punto {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  &__valor {
+    margin-left: auto;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    padding-left: 1rem;
+    font-variant-numeric: tabular-nums;
+  }
+}

@@ -1,0 +1,16 @@
+<div class="barras">
+  @for (it of items(); track it.etiqueta) {
+    <div class="barras__fila">
+      <span class="barras__etiqueta">{{ it.etiqueta }}</span>
+      <div class="barras__track">
+        <div class="barras__fill"
+             [style.width.%]="porcentaje(it.valor)"
+             [style.background]="colorDe(it)">
+        </div>
+      </div>
+      <span class="barras__valor">{{ it.valor | number }}</span>
+    </div>
+  } @empty {
+    <p class="grafico-vacio">Sin datos.</p>
+  }
+</div>

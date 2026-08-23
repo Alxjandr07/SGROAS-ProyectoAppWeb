@@ -9,6 +9,7 @@ import ec.edu.uteq.sgroas.abd.repository.IncidenteAbdRepository;
 import ec.edu.uteq.sgroas.abd.repository.UnidadRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,14 +24,24 @@ public class IncidenteAbdService {
     private final UnidadRepository unidadRepository;
 
     @Transactional(readOnly = true)
-    public Page<AbdDtos.IncidenteAbdResponse> listar(String estado, String nivel, Pageable pageable) {
+    public Page<AbdDtos.IncidenteAbdResponse> listar(String estado, String nivel, String search, Pageable pageable) {
+        String estadoFiltro = (estado == null || estado.isBlank()) ? null : estado.trim().toLowerCase();
+        String nivelFiltro = (nivel == null || nivel.isBlank()) ? null : nivel.trim().toLowerCase();
+        String searchFiltro = (search == null || search.isBlank()) ? null : search.trim().toLowerCase();
+        if (estadoFiltro == null && nivelFiltro == null && searchFiltro == null) {
+            return incidenteRepository.findAll(pageable).map(this::aResponse);
+        }
+        if (searchFiltro != null) {
+            return incidenteRepository
+                    .buscarConFiltros(estadoFiltro, nivelFiltro, searchFiltro,
+                            PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()))
+                    .map(this::aResponse);
+        }
         Page<IncidenteAbd> page;
-        if (estado != null && !estado.isBlank()) {
-            page = incidenteRepository.findByEstadoIgnoreCase(estado, pageable);
-        } else if (nivel != null && !nivel.isBlank()) {
-            page = incidenteRepository.findByNivelSugeridoIgnoreCase(nivel, pageable);
+        if (estadoFiltro != null) {
+            page = incidenteRepository.findByEstadoIgnoreCase(estadoFiltro, pageable);
         } else {
-            page = incidenteRepository.findAll(pageable);
+            page = incidenteRepository.findByNivelSugeridoIgnoreCase(nivelFiltro, pageable);
         }
         return page.map(this::aResponse);
     }

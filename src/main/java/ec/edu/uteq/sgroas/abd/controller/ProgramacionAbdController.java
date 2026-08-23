@@ -23,8 +23,10 @@ public class ProgramacionAbdController {
             @RequestParam(required = false) String estado,
             @RequestParam(required = false) Integer idConductor,
             @RequestParam(required = false) Integer idRuta,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate fechaDesde,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate fechaHasta,
             @PageableDefault(size = 50, sort = "idProgramacion") Pageable pageable) {
-        return ResponseEntity.ok(programacionAbdService.listar(estado, idConductor, idRuta, pageable));
+        return ResponseEntity.ok(programacionAbdService.listar(estado, idConductor, idRuta, fechaDesde, fechaHasta, pageable));
     }
 
     @PostMapping

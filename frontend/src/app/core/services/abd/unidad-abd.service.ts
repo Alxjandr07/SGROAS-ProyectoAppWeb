@@ -9,9 +9,10 @@ export class UnidadAbdService {
   private http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/abd/unidades`;
 
-  listar(page = 0, size = 50, estado = ''): Observable<any> {
+  listar(page = 0, size = 50, estado = '', search = ''): Observable<any> {
     const params = new URLSearchParams({ page: String(page), size: String(size) });
     if (estado) params.set('estado', estado);
+    if (search) params.set('search', search);
     return this.http.get<any>(`${this.apiUrl}?${params}`);
   }
 

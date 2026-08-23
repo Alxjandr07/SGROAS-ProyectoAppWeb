@@ -31,4 +31,24 @@ public class ReporteAbdController {
     public ResponseEntity<List<AbdDtos.ConteoResponse>> incidentesPorEstado() {
         return ResponseEntity.ok(reporteAbdService.incidentesPorEstado());
     }
+
+    @GetMapping("/unidades-por-estado")
+    public ResponseEntity<List<AbdDtos.ConteoResponse>> unidadesPorEstado() {
+        return ResponseEntity.ok(reporteAbdService.unidadesPorEstado());
+    }
+
+    @GetMapping("/programaciones-por-estado")
+    public ResponseEntity<List<AbdDtos.ConteoResponse>> programacionesPorEstado() {
+        return ResponseEntity.ok(reporteAbdService.programacionesPorEstado());
+    }
+
+    @GetMapping("/programaciones-por-mes")
+    public ResponseEntity<List<AbdDtos.ConteoResponse>> programacionesPorMes() {
+        return ResponseEntity.ok(reporteAbdService.programacionesPorMes());
+    }
+
+    @GetMapping("/top-rutas")
+    public ResponseEntity<List<AbdDtos.TopRutaResponse>> topRutas() {
+        return ResponseEntity.ok(reporteAbdService.topRutas());
+    }
 }

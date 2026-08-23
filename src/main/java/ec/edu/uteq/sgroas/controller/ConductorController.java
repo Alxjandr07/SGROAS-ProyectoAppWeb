@@ -21,9 +21,10 @@ public class ConductorController {
 
     @GetMapping
     public ResponseEntity<Page<ConductorResponse>> listar(
+            @RequestParam(required = false) String search,
             @PageableDefault(size = 10, sort = "id") Pageable pageable
     ) {
-        return ResponseEntity.ok(conductorService.listar(pageable));
+        return ResponseEntity.ok(conductorService.listar(search, pageable));
     }
 
     @GetMapping("/{id}")

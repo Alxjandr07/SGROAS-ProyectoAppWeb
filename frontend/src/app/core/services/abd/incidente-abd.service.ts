@@ -9,10 +9,11 @@ export class IncidenteAbdService {
   private http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/abd/incidentes`;
 
-  listar(page = 0, size = 50, filtros?: { estado?: string; nivel?: string }): Observable<any> {
+  listar(page = 0, size = 50, filtros?: { estado?: string; nivel?: string; search?: string }): Observable<any> {
     let params = new HttpParams().set('page', page).set('size', size);
     if (filtros?.estado) params = params.set('estado', filtros.estado);
     if (filtros?.nivel) params = params.set('nivel', filtros.nivel);
+    if (filtros?.search) params = params.set('search', filtros.search);
     return this.http.get<any>(this.apiUrl, { params });
   }
 

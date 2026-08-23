@@ -22,8 +22,9 @@ public class IncidenteAbdController {
     public ResponseEntity<Page<AbdDtos.IncidenteAbdResponse>> listar(
             @RequestParam(required = false) String estado,
             @RequestParam(required = false) String nivel,
+            @RequestParam(required = false) String search,
             @PageableDefault(size = 50, sort = "idIncidente") Pageable pageable) {
-        return ResponseEntity.ok(incidenteAbdService.listar(estado, nivel, pageable));
+        return ResponseEntity.ok(incidenteAbdService.listar(estado, nivel, search, pageable));
     }
 
     @PostMapping

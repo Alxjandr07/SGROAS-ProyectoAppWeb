@@ -1,0 +1,52 @@
+.columnas {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+  gap: 0.5rem;
+  min-height: 11rem;
+
+  &__grupo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__valor {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__zona {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  &__barra {
+    width: 60%;
+    max-width: 3rem;
+    border-radius: 6px 6px 2px 2px;
+    transition: height 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    background: linear-gradient(180deg, #2563eb, #1e40af);
+  }
+
+  &__etiqueta {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+}
+
+.grafico-vacio {
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: 1.5rem;
+}

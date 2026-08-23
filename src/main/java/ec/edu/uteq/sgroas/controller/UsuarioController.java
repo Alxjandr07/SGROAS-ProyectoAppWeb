@@ -21,9 +21,10 @@ public class UsuarioController {
 
     @GetMapping
     public ResponseEntity<Page<UsuarioResponse>> listar(
+            @RequestParam(required = false) String search,
             @PageableDefault(size = 10, sort = "id") Pageable pageable
     ) {
-        return ResponseEntity.ok(usuarioService.listar(pageable));
+        return ResponseEntity.ok(usuarioService.listar(search, pageable));
     }
 
     @GetMapping("/{id}")

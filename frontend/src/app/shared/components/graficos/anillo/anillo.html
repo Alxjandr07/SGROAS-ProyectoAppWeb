@@ -1,0 +1,26 @@
+<div class="anillo">
+  <svg viewBox="0 0 140 140" class="anillo__svg">
+    <circle cx="70" cy="70" r="54" fill="none" stroke="#eef2f7" stroke-width="18" />
+    @for (seg of segmentos(); track seg.etiqueta; let i = $index) {
+      <circle cx="70" cy="70" r="54" fill="none"
+              [style.stroke]="colorDe(seg)"
+              stroke-width="18"
+              [attr.stroke-dasharray]="segmentos()[i].arco + ' ' + (circunferencia - segmentos()[i].arco)"
+              [attr.stroke-dashoffset]="-segmentos()[i].inicio"
+              transform="rotate(-90 70 70)"
+              class="anillo__seg" />
+    }
+    <text x="70" y="66" text-anchor="middle" class="anillo__total">{{ total() | number }}</text>
+    <text x="70" y="82" text-anchor="middle" class="anillo__titulo">{{ titulo() }}</text>
+  </svg>
+
+  <ul class="anillo__leyenda">
+    @for (seg of datos(); track seg.etiqueta) {
+      <li>
+        <span class="anillo__punto" [style.background]="colorDe(seg)"></span>
+        {{ seg.etiqueta }}
+        <span class="anillo__valor">{{ ((seg.valor / (total() || 1)) * 100).toFixed(1) }}%</span>
+      </li>
+    }
+  </ul>
+</div>

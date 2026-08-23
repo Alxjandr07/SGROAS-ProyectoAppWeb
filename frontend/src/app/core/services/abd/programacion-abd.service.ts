@@ -9,11 +9,16 @@ export class ProgramacionAbdService {
   private http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/abd/programaciones`;
 
-  listar(page = 0, size = 50, filtros?: { estado?: string; idConductor?: number; idRuta?: number }): Observable<any> {
+  listar(page = 0, size = 50, filtros?: {
+    estado?: string; idConductor?: number; idRuta?: number;
+    fechaDesde?: string; fechaHasta?: string;
+  }): Observable<any> {
     let params = new HttpParams().set('page', page).set('size', size);
     if (filtros?.estado) params = params.set('estado', filtros.estado);
     if (filtros?.idConductor) params = params.set('idConductor', filtros.idConductor);
     if (filtros?.idRuta) params = params.set('idRuta', filtros.idRuta);
+    if (filtros?.fechaDesde) params = params.set('fechaDesde', filtros.fechaDesde);
+    if (filtros?.fechaHasta) params = params.set('fechaHasta', filtros.fechaHasta);
     return this.http.get<any>(this.apiUrl, { params });
   }
 

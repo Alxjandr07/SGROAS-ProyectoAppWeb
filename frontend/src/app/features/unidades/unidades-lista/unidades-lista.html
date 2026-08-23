@@ -7,6 +7,11 @@
 </div>
 
 <div class="filtros">
+  <label class="buscador">
+    Buscar
+    <input type="text" [value]="buscar()" (input)="enBuscar($event)"
+           placeholder="Placa, disco o modelo..." />
+  </label>
   <label>
     Estado
     <select [value]="filtroEstado()" (change)="aplicarFiltro($event)">

@@ -53,4 +53,28 @@ public class ReporteAbdService {
                 .map(f -> new AbdDtos.ConteoResponse(f.getEstado(), f.getTotal()))
                 .toList();
     }
+
+    public java.util.List<AbdDtos.ConteoResponse> unidadesPorEstado() {
+        return unidadRepository.contarPorEstado().stream()
+                .map(f -> new AbdDtos.ConteoResponse(f.getClave(), f.getTotal()))
+                .toList();
+    }
+
+    public java.util.List<AbdDtos.ConteoResponse> programacionesPorEstado() {
+        return programacionRepository.contarPorEstado().stream()
+                .map(f -> new AbdDtos.ConteoResponse(f.getClave(), f.getTotal()))
+                .toList();
+    }
+
+    public java.util.List<AbdDtos.ConteoResponse> programacionesPorMes() {
+        return programacionRepository.contarPorMes().stream()
+                .map(f -> new AbdDtos.ConteoResponse(f.getClave(), f.getTotal()))
+                .toList();
+    }
+
+    public java.util.List<AbdDtos.TopRutaResponse> topRutas() {
+        return rutaAbdRepository.topRutas().stream()
+                .map(f -> new AbdDtos.TopRutaResponse(f.getId(), f.getDescripcion(), f.getTotal()))
+                .toList();
+    }
 }

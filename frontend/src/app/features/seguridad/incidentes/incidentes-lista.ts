@@ -1,7 +1,9 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { IncidenteAbdService } from '../../../core/services/abd/incidente-abd.service';
 import { UnidadAbdService } from '../../../core/services/abd/unidad-abd.service';
@@ -20,11 +22,13 @@ const LIMITE_SELECT = 200;
   templateUrl: './incidentes-lista.html',
   styleUrl: './incidentes-lista.scss',
 })
-export class IncidentesLista implements OnInit {
+export class IncidentesLista implements OnInit, OnDestroy {
   private service = inject(IncidenteAbdService);
   private unidadService = inject(UnidadAbdService);
   private http = inject(HttpClient);
   private fb = inject(FormBuilder);
+  private destruir$ = new Subject<void>();
+  private buscar$ = new Subject<string>();
 
   private readonly alertasUrl = `${environment.apiUrl}/abd/alertas`;
 
@@ -33,6 +37,7 @@ export class IncidentesLista implements OnInit {
   estadosIncidente = ESTADOS_INCIDENTE;
   filtroEstado = signal('');
   filtroNivel = signal('');
+  buscar = signal('');
 
   incidentes = signal<IncidenteAbd[]>([]);
   unidades = signal<UnidadAbd[]>([]);
@@ -64,6 +69,14 @@ export class IncidentesLista implements OnInit {
       next: (res) => this.unidades.set(res.content),
     });
     this.cargarAlertas(0);
+    this.buscar$
+      .pipe(debounceTime(350), distinctUntilChanged(), takeUntil(this.destruir$))
+      .subscribe(() => this.cargar(0));
+  }
+
+  ngOnDestroy(): void {
+    this.destruir$.next();
+    this.destruir$.complete();
   }
 
   cargar(page = 0): void {
@@ -72,6 +85,7 @@ export class IncidentesLista implements OnInit {
     this.service.listar(page, 50, {
       estado: this.filtroEstado() || undefined,
       nivel: this.filtroNivel() || undefined,
+      search: this.buscar() || undefined,
     }).subscribe({
       next: (res) => {
         this.incidentes.set(res.content);
@@ -109,6 +123,11 @@ export class IncidentesLista implements OnInit {
   aplicarFiltroNivel(event: Event): void {
     this.filtroNivel.set((event.target as HTMLSelectElement).value);
     this.cargar(0);
+  }
+
+  enBuscar(event: Event): void {
+    this.buscar.set((event.target as HTMLInputElement).value);
+    this.buscar$.next(this.buscar());
   }
 
   cambiarPagina(p: number): void {

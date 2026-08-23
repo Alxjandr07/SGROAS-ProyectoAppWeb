@@ -1,7 +1,9 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { ProgramacionAbdService } from '../../../core/services/abd/programacion-abd.service';
 import { RutaAbdService } from '../../../core/services/abd/ruta-abd.service';
@@ -19,12 +21,14 @@ const LIMITE_SELECT = 200;
   templateUrl: './programaciones-lista.html',
   styleUrl: './programaciones-lista.scss',
 })
-export class ProgramacionesLista implements OnInit {
+export class ProgramacionesLista implements OnInit, OnDestroy {
   private service = inject(ProgramacionAbdService);
   private rutaService = inject(RutaAbdService);
   private unidadService = inject(UnidadAbdService);
   private http = inject(HttpClient);
   private fb = inject(FormBuilder);
+  private destruir$ = new Subject<void>();
+  private buscar$ = new Subject<string>();
 
   private readonly conductoresUrl = `${environment.apiUrl}/abd/conductores`;
 
@@ -32,6 +36,9 @@ export class ProgramacionesLista implements OnInit {
   filtroEstado = signal('');
   filtroConductor = signal<number | null>(null);
   filtroRuta = signal<number | null>(null);
+  filtroFechaDesde = signal('');
+  filtroFechaHasta = signal('');
+  buscar = signal('');
 
   programaciones = signal<ProgramacionAbd[]>([]);
   rutas = signal<RutaAbd[]>([]);
@@ -61,6 +68,14 @@ export class ProgramacionesLista implements OnInit {
   ngOnInit(): void {
     this.cargar();
     this.cargarCatalogos();
+    this.buscar$
+      .pipe(debounceTime(350), distinctUntilChanged(), takeUntil(this.destruir$))
+      .subscribe(() => this.cargar(0));
+  }
+
+  ngOnDestroy(): void {
+    this.destruir$.next();
+    this.destruir$.complete();
   }
 
   cargar(page = 0): void {
@@ -70,6 +85,8 @@ export class ProgramacionesLista implements OnInit {
       estado: this.filtroEstado() || undefined,
       idConductor: this.filtroConductor() ?? undefined,
       idRuta: this.filtroRuta() ?? undefined,
+      fechaDesde: this.filtroFechaDesde() || undefined,
+      fechaHasta: this.filtroFechaHasta() || undefined,
     };
     this.service.listar(page, 50, filtros).subscribe({
       next: (res) => {
@@ -112,6 +129,21 @@ export class ProgramacionesLista implements OnInit {
   aplicarFiltroRuta(event: Event): void {
     const v = (event.target as HTMLSelectElement).value;
     this.filtroRuta.set(v ? Number(v) : null);
+    this.cargar(0);
+  }
+
+  enBuscar(event: Event): void {
+    this.buscar.set((event.target as HTMLInputElement).value);
+    this.buscar$.next(this.buscar());
+  }
+
+  enFechaDesde(event: Event): void {
+    this.filtroFechaDesde.set((event.target as HTMLInputElement).value);
+    this.cargar(0);
+  }
+
+  enFechaHasta(event: Event): void {
+    this.filtroFechaHasta.set((event.target as HTMLInputElement).value);
     this.cargar(0);
   }
 

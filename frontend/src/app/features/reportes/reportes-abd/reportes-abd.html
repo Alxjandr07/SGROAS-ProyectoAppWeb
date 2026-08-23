@@ -1,8 +1,9 @@
 <div class="page-header">
   <div>
     <h1>Reportes</h1>
-    <p class="page-desc">Indicadores generales del sistema sobre los datos operativos.</p>
+    <p class="page-desc">Panel de indicadores sobre los datos operativos del sistema.</p>
   </div>
+  <button class="btn-primary" (click)="recargar()" [disabled]="loading()">Actualizar</button>
 </div>
 
 @if (loading()) {
@@ -10,50 +11,52 @@
 } @else if (errorMsg()) {
   <div class="alert-error">{{ errorMsg() }}</div>
 } @else {
-  <div class="cards-grid">
-    @for (tarjeta of tarjetas(); track tarjeta.etiqueta) {
-      <div class="card" [class.card--alerta]="tarjeta.destacar">
-        <span class="card__valor">{{ tarjeta.valor | number }}</span>
-        <span class="card__etiqueta">{{ tarjeta.etiqueta }}</span>
-      </div>
+  <section class="kpis">
+    @for (t of tarjetas(); track t.etiqueta) {
+      <article class="kpi" [style.--acento]="t.color">
+        <span class="kpi__etiqueta">{{ t.etiqueta }}</span>
+        <span class="kpi__valor">{{ t.valor | number }}</span>
+        <span class="kpi__pie" [class.kpi__pie--alerta]="t.destacar">{{ t.pie }}</span>
+      </article>
     }
-  </div>
+  </section>
 
-  <div class="conteos">
-    <section class="conteo-panel">
-      <h2>Incidentes por nivel</h2>
-      @if (porNivel().length === 0) {
-        <p class="empty-msg">Sin datos.</p>
-      } @else {
-        <table class="data-table">
-          <thead>
-            <tr><th>Nivel</th><th>Total</th></tr>
-          </thead>
-          <tbody>
-            @for (c of porNivel(); track c.clave) {
-              <tr><td>{{ c.clave }}</td><td>{{ c.total | number }}</td></tr>
-            }
-          </tbody>
-        </table>
-      }
-    </section>
+  <section class="panel-grid">
+    <article class="panel">
+      <header><h2>Programaciones por estado</h2></header>
+      <app-anillo [datos]="programacionesEstadoGrafico()" titulo="Total salidas" />
+    </article>
 
-    <section class="conteo-panel">
-      <h2>Incidentes por estado</h2>
-      @if (porEstado().length === 0) {
-        <p class="empty-msg">Sin datos.</p>
-      } @else {
-        <table class="data-table">
-          <thead>
-            <tr><th>Estado</th><th>Total</th></tr>
-          </thead>
-          <tbody>
-            @for (c of porEstado(); track c.clave) {
-              <tr><td>{{ c.clave }}</td><td>{{ c.total | number }}</td></tr>
-            }
-          </tbody>
-        </table>
-      }
-    </section>
-  </div>
+    <article class="panel">
+      <header><h2>Incidentes por nivel</h2></header>
+      <app-barras [items]="incidentesNivelGrafico()" />
+    </article>
+
+    <article class="panel">
+      <header><h2>Flota por estado</h2></header>
+      <app-barras [items]="unidadesEstadoGrafico()" />
+    </article>
+
+    <article class="panel">
+      <header><h2>Programaciones — últimos 6 meses</h2></header>
+      <app-columnas [items]="programacionesMesGrafico()" />
+    </article>
+
+    <article class="panel panel--ancho">
+      <header><h2>Top 5 rutas más operadas</h2></header>
+      <app-barras [items]="topRutasGrafico()" />
+    </article>
+
+    <article class="panel panel--ancho panel--dos-col">
+      <div>
+        <header><h2>Incidentes por estado</h2></header>
+        <app-barras [items]="incidentesEstadoGrafico()" />
+      </div>
+      <div>
+        <header><h2>Alertas activas</h2></header>
+        <p class="panel__destacado">{{ resumen()?.totalAlertas | number }}</p>
+        <p class="panel__nota">Generadas automaticamente por incidentes de nivel ALTO.</p>
+      </div>
+    </article>
+  </section>
 }

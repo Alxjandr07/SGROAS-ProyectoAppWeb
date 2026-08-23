@@ -20,8 +20,9 @@ public class RutaAbdController {
 
     @GetMapping
     public ResponseEntity<Page<AbdDtos.RutaAbdResponse>> listar(
+            @RequestParam(required = false) String search,
             @PageableDefault(size = 50, sort = "idRuta") Pageable pageable) {
-        return ResponseEntity.ok(rutaAbdService.listar(pageable));
+        return ResponseEntity.ok(rutaAbdService.listar(search, pageable));
     }
 
     @GetMapping("/{id}")

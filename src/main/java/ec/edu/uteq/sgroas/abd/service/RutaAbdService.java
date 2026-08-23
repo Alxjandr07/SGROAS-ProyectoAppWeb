@@ -19,8 +19,12 @@ public class RutaAbdService {
     private final CatalogoAbdService catalogoAbdService;
 
     @Transactional(readOnly = true)
-    public Page<AbdDtos.RutaAbdResponse> listar(Pageable pageable) {
-        return rutaAbdRepository.findAll(pageable).map(this::aResponse);
+    public Page<AbdDtos.RutaAbdResponse> listar(String search, Pageable pageable) {
+        String filtro = (search == null || search.isBlank()) ? null : search.trim().toLowerCase();
+        Page<RutaAbd> page = filtro == null
+                ? rutaAbdRepository.findAll(pageable)
+                : rutaAbdRepository.buscar(filtro, pageable);
+        return page.map(this::aResponse);
     }
 
     @Transactional(readOnly = true)

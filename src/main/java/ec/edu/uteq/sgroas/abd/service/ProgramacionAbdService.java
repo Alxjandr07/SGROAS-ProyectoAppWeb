@@ -11,9 +11,12 @@ import ec.edu.uteq.sgroas.abd.repository.RutaAbdRepository;
 import ec.edu.uteq.sgroas.abd.repository.UnidadRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -26,14 +29,18 @@ public class ProgramacionAbdService {
     private final ConductorAbdRepository conductorAbdRepository;
 
     @Transactional(readOnly = true)
-    public Page<AbdDtos.ProgramacionResponse> listar(String estado, Integer idConductor, Integer idRuta, Pageable pageable) {
-        String estadoFiltro = (estado == null || estado.isBlank()) ? null : estado;
-        Integer conductorFiltro = idConductor != null && idConductor > 0 ? idConductor : null;
-        Integer rutaFiltro = idRuta != null && idRuta > 0 ? idRuta : null;
-        if (estadoFiltro == null && conductorFiltro == null && rutaFiltro == null) {
+    public Page<AbdDtos.ProgramacionResponse> listar(String estado, Integer idConductor, Integer idRuta,
+                                                     LocalDate fechaDesde, LocalDate fechaHasta, Pageable pageable) {
+        String estadoFiltro = (estado == null || estado.isBlank()) ? null : estado.trim().toLowerCase();
+        Integer conductorFiltro = (idConductor != null && idConductor > 0) ? idConductor : null;
+        Integer rutaFiltro = (idRuta != null && idRuta > 0) ? idRuta : null;
+        if (estadoFiltro == null && conductorFiltro == null && rutaFiltro == null
+                && fechaDesde == null && fechaHasta == null) {
             return programacionRepository.findAll(pageable).map(this::aResponse);
         }
-        return programacionRepository.buscarConFiltros(estadoFiltro, conductorFiltro, rutaFiltro, pageable).map(this::aResponse);
+        return programacionRepository.buscarConFiltros(estadoFiltro, conductorFiltro, rutaFiltro,
+                fechaDesde, fechaHasta, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()))
+                .map(this::aResponse);
     }
 
     public AbdDtos.ProgramacionResponse crear(AbdDtos.ProgramacionRequest request) {

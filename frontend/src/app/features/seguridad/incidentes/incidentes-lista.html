@@ -57,6 +57,11 @@
 }
 
 <div class="filtros">
+  <label class="buscador">
+    Buscar
+    <input type="text" [value]="buscar()" (input)="enBuscar($event)"
+           placeholder="Tipo, descripcion o placa..." />
+  </label>
   <label>
     Estado
     <select [value]="filtroEstado()" (change)="aplicarFiltroEstado($event)">

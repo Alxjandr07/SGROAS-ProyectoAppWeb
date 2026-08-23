@@ -1,21 +1,27 @@
 <div class="overview">
   <div class="overview-header">
     <div>
-      <span class="tag">PANEL PRINCIPAL · HOY</span>
+      <span class="tag">PANEL PRINCIPAL</span>
       <h1>Resumen general</h1>
     </div>
-    <button class="btn-primary">+ Nuevo registro</button>
+    <button class="btn-primary" (click)="cargar()" [disabled]="loading()">Actualizar</button>
   </div>
 
-  <div class="summary-grid">
-    @for (card of summary; track card.label) {
-      <div class="summary-card">
-        <span class="label">{{ card.label }}</span>
-        <strong class="value">{{ card.value }}</strong>
-        <span class="trend">{{ card.trend }}</span>
-      </div>
-    }
-  </div>
+  @if (loading()) {
+    <p class="overview-loading">Cargando indicadores...</p>
+  } @else if (errorMsg()) {
+    <div class="alert-error">{{ errorMsg() }}</div>
+  } @else {
+    <div class="summary-grid">
+      @for (card of summary(); track card.label) {
+        <div class="summary-card" [class.summary-card--alerta]="card.alerta">
+          <span class="label">{{ card.label }}</span>
+          <strong class="value">{{ card.value | number }}</strong>
+          <span class="trend">{{ card.trend }}</span>
+        </div>
+      }
+    </div>
+  }
 
   <h2>Módulos del sistema</h2>
   <div class="modules-grid">

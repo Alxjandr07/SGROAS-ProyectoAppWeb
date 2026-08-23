@@ -7,6 +7,11 @@
 </div>
 
 <div class="filtros">
+  <label class="buscador">
+    Buscar
+    <input type="text" [value]="buscar()" (input)="enBuscar($event)"
+           placeholder="Ruta, placa o conductor..." />
+  </label>
   <label>
     Estado
     <select [value]="filtroEstado()" (change)="aplicarFiltroEstado($event)">
@@ -34,6 +39,14 @@
         <option [value]="r.idRuta">{{ r.terminalOrigen }} → {{ r.terminalDestino }}</option>
       }
     </select>
+  </label>
+  <label>
+    Desde
+    <input type="date" [value]="filtroFechaDesde()" (change)="enFechaDesde($event)" />
+  </label>
+  <label>
+    Hasta
+    <input type="date" [value]="filtroFechaHasta()" (change)="enFechaHasta($event)" />
   </label>
 </div>
 

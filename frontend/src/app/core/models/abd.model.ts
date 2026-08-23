@@ -131,6 +131,18 @@ export interface ConteoAbd {
   total: number;
 }
 
+export interface TopRutaAbd {
+  idRuta: number;
+  descripcion: string;
+  totalProgramaciones: number;
+}
+
+export interface ItemGrafico {
+  etiqueta: string;
+  valor: number;
+  color?: string;
+}
+
 export interface ResumenAbd {
   totalProgramaciones: number;
   programacionesActivas: number;

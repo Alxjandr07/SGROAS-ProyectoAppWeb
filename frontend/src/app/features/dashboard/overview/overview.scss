@@ -39,6 +39,11 @@
   margin-bottom: 2.5rem;
 }
 
+.overview-loading {
+  color: var(--color-text-muted);
+  padding: 2rem 0;
+}
+
 .summary-card {
   background: white;
   border-left: 4px solid var(--color-accent);
@@ -48,6 +53,15 @@
   flex-direction: column;
   gap: 0.35rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+
+  &--alerta {
+    border-left-color: #ef4444;
+
+    .trend {
+      color: #ef4444;
+      font-weight: 600;
+    }
+  }
 
   .label {
     font-size: 0.75rem;

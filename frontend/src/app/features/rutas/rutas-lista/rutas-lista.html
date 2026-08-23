@@ -6,6 +6,14 @@
   <button class="btn-primary" (click)="abrirFormulario()">+ Nueva ruta</button>
 </div>
 
+<div class="filtros">
+  <label class="buscador">
+    Buscar
+    <input type="text" [value]="buscar()" (input)="enBuscar($event)"
+           placeholder="Terminal de origen o destino..." />
+  </label>
+</div>
+
 @if (mostrandoFormulario()) {
   <div class="form-panel">
     <h3>{{ editId() ? 'Editar ruta' : 'Nueva ruta' }}</h3>

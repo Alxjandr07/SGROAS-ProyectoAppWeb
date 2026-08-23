@@ -34,9 +34,10 @@
 
 .table-container {
   background: white;
-  border-radius: 8px;
+  border-radius: 10px;
   overflow-x: auto;
   border: 1px solid var(--color-border);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.07);
 }
 
 .data-table {
@@ -52,20 +53,27 @@
   }
 
   th {
-    background: var(--color-dark);
+    background: linear-gradient(135deg, #1f2937, #111827);
     color: white;
     font-weight: 600;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
+    position: sticky;
+    top: 0;
+    z-index: 1;
   }
 
   tr:not(:last-child) td {
     border-bottom: 1px solid var(--color-border);
   }
 
-  tbody tr:hover {
-    background: #f9f8f6;
+  tbody tr {
+    transition: background 0.12s ease-in-out;
+
+    &:hover {
+      background: #f4f7fa;
+    }
   }
 }
 
@@ -80,6 +88,21 @@
   &--inactivo { background: #fdecea; color: #c0392b; }
   &--warning { background: #fef3cd; color: #856404; }
   &--info { background: #d6eaf8; color: #1a5276; }
+}
+
+.form-panel {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+
+  h3 {
+    margin: 0 0 1rem;
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+  }
 }
 
 .actions-cell {
@@ -101,14 +124,18 @@
   background: var(--color-teal);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-weight: 600;
   font-size: 0.85rem;
   cursor: pointer;
   text-decoration: none;
-  transition: background 0.15s;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
 
-  &:hover:not(:disabled) { background: var(--color-teal-hover); }
+  &:hover:not(:disabled) {
+    background: var(--color-teal-hover);
+    box-shadow: 0 3px 10px rgba(13, 148, 136, 0.35);
+    transform: translateY(-1px);
+  }
 }
 
 .btn-sm {
@@ -132,6 +159,11 @@
   gap: 0.75rem;
   align-items: flex-end;
   margin-bottom: 1rem;
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 0.9rem 1.1rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
 
   label {
     display: flex;
@@ -146,26 +178,28 @@
     }
   }
 
-  select {
+  select,
+  input[type='text'],
+  input[type='date'] {
     padding: 0.45rem 0.6rem;
     border: 1px solid var(--color-border);
     border-radius: 6px;
     font-size: 0.85rem;
     background: white;
+
+    &:focus {
+      outline: 2px solid var(--color-teal);
+      outline-offset: -1px;
+    }
   }
-}
 
-.form-panel {
-  background: white;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 1.25rem 1.5rem;
-  margin-bottom: 1.5rem;
+  .buscador {
+    flex: 1 1 16rem;
+    max-width: 24rem;
 
-  h3 {
-    margin: 0 0 1rem;
-    font-family: var(--font-heading);
-    font-size: 1.1rem;
+    input {
+      width: 100%;
+    }
   }
 }
 

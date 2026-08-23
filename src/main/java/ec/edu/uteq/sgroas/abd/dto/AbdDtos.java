@@ -47,7 +47,7 @@ public final class AbdDtos {
 
     public record RutaAbdResponse(Integer idRuta, Integer idTerminalOrigen, String terminalOrigen,
                                   Integer idTerminalDestino, String terminalDestino,
-                                  BigDecimal precioPasaje, Integer totalProgramaciones) {
+                                  BigDecimal precioPasaje, long totalProgramaciones) {
     }
 
     // ---------- Unidades ----------
@@ -110,6 +110,9 @@ public final class AbdDtos {
     // ---------- Reportes ----------
 
     public record ConteoResponse(String clave, long total) {
+    }
+
+    public record TopRutaResponse(Integer idRuta, String descripcion, long totalProgramaciones) {
     }
 
     public record ResumenResponse(long totalProgramaciones, long programacionesActivas,
