@@ -7,6 +7,7 @@ import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { IncidenteAbdService } from '../../../core/services/abd/incidente-abd.service';
 import { UnidadAbdService } from '../../../core/services/abd/unidad-abd.service';
+import { Auth } from '../../../core/services/auth';
 import { Paginador } from '../../../shared/components/paginador/paginador';
 import { AlertaAbd, IncidenteAbd, UnidadAbd } from '../../../core/models/abd.model';
 
@@ -25,6 +26,7 @@ const LIMITE_SELECT = 200;
 export class IncidentesLista implements OnInit, OnDestroy {
   private service = inject(IncidenteAbdService);
   private unidadService = inject(UnidadAbdService);
+  private authService = inject(Auth);
   private http = inject(HttpClient);
   private fb = inject(FormBuilder);
   private destruir$ = new Subject<void>();
@@ -38,6 +40,10 @@ export class IncidentesLista implements OnInit, OnDestroy {
   filtroEstado = signal('');
   filtroNivel = signal('');
   buscar = signal('');
+
+  get puedeEditar(): boolean {
+    return this.authService.tieneRol(['ADMIN', 'SEGURIDAD']);
+  }
 
   incidentes = signal<IncidenteAbd[]>([]);
   unidades = signal<UnidadAbd[]>([]);

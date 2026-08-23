@@ -3,7 +3,9 @@
     <h1>Programaciones</h1>
     <p class="page-desc">Salidas programadas por ruta, unidad y conductor.</p>
   </div>
-  <button class="btn-primary" (click)="abrirFormulario()">+ Nueva programación</button>
+  @if (puedeEditar) {
+    <button class="btn-primary" (click)="abrirFormulario()">+ Nueva programación</button>
+  }
 </div>
 
 <div class="filtros">
@@ -120,7 +122,9 @@
           <th>Unidad</th>
           <th>Conductor</th>
           <th>Estado</th>
-          <th>Acciones</th>
+          @if (puedeEditar) {
+            <th>Acciones</th>
+          }
         </tr>
       </thead>
       <tbody>
@@ -142,9 +146,11 @@
                 {{ p.estado }}
               </span>
             </td>
-            <td class="actions-cell">
-              <button class="btn-sm btn-sm--danger" (click)="confirmarEliminar(p.idProgramacion)">Eliminar</button>
-            </td>
+            @if (puedeEditar) {
+              <td class="actions-cell">
+                <button class="btn-sm btn-sm--danger" (click)="confirmarEliminar(p.idProgramacion)">Eliminar</button>
+              </td>
+            }
           </tr>
         } @empty {
           <tr><td colspan="9" class="empty-msg">No hay programaciones registradas.</td></tr>

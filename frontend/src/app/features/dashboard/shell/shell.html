@@ -18,7 +18,51 @@
     </div>
 
     <div class="navbar-actions">
-      <button class="icon-btn" title="Notificaciones">🔔</button>
+      <div class="notif" [class.open]="panelAbierto()">
+        <button class="icon-btn" (click)="alternarPanel()" title="Alertas de seguridad">
+          🔔
+          @if (nuevasCount() > 0) {
+            <span class="notif-badge">{{ nuevasCount() > 9 ? '9+' : nuevasCount() }}</span>
+          }
+        </button>
+
+        @if (panelAbierto()) {
+          <div class="notif-panel">
+            <header>
+              <strong>Alertas de seguridad</strong>
+              <button type="button" (click)="marcarComoVistas()">Marcar como vistas</button>
+            </header>
+
+            @if (alertas().length === 0) {
+              <p class="notif-vacio">Sin alertas registradas.</p>
+            } @else {
+              <ul>
+                @for (a of alertas(); track a.idAlerta) {
+                  <li>
+                    <span class="notif-nivel"
+                          [class.notif-nivel--alto]="a.nivelRiesgo === 'ALTO'"
+                          [class.notif-nivel--medio]="a.nivelRiesgo === 'MEDIO'">{{ a.nivelRiesgo }}</span>
+                    <div class="notif-cuerpo">
+                      <p>{{ a.descripcion }}</p>
+                      <small>Incidente #{{ a.idIncidente }} · {{ a.fecha | date: 'dd/MM/yyyy HH:mm' }}</small>
+                    </div>
+                  </li>
+                }
+              </ul>
+            }
+
+            <footer>
+              <a routerLink="/dashboard/seguridad" (click)="alternarPanel()">Ver módulo de Seguridad</a>
+            </footer>
+          </div>
+        }
+      </div>
+
+      <div class="user-chip">
+        <span class="user-nombre">{{ currentUser?.nombre }}</span>
+        <span class="user-rol">{{ rolEtiqueta }}</span>
+      </div>
+
       <button class="avatar" (click)="logout()" title="Cerrar sesión">
         {{ initials || 'AD' }}
       </button>

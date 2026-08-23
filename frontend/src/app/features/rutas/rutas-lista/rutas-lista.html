@@ -3,7 +3,9 @@
     <h1>Rutas</h1>
     <p class="page-desc">Rutas registradas entre terminales del pais.</p>
   </div>
-  <button class="btn-primary" (click)="abrirFormulario()">+ Nueva ruta</button>
+  @if (puedeEditar) {
+    <button class="btn-primary" (click)="abrirFormulario()">+ Nueva ruta</button>
+  }
 </div>
 
 <div class="filtros">
@@ -69,7 +71,9 @@
           <th>Destino</th>
           <th>Precio</th>
           <th>Programaciones</th>
-          <th>Acciones</th>
+          @if (puedeEditar) {
+            <th>Acciones</th>
+          }
         </tr>
       </thead>
       <tbody>
@@ -80,10 +84,12 @@
             <td>{{ r.terminalDestino }}</td>
             <td>${{ r.precioPasaje | number:'1.2-2' }}</td>
             <td>{{ r.totalProgramaciones }}</td>
-            <td class="actions-cell">
-              <button class="btn-sm" (click)="editar(r)">Editar</button>
-              <button class="btn-sm btn-sm--danger" (click)="confirmarEliminar(r.idRuta)">Eliminar</button>
-            </td>
+            @if (puedeEditar) {
+              <td class="actions-cell">
+                <button class="btn-sm" (click)="editar(r)">Editar</button>
+                <button class="btn-sm btn-sm--danger" (click)="confirmarEliminar(r.idRuta)">Eliminar</button>
+              </td>
+            }
           </tr>
         } @empty {
           <tr><td colspan="6" class="empty-msg">No hay rutas registradas.</td></tr>

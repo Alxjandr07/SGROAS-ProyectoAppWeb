@@ -19,10 +19,22 @@ export class Login {
   loading = signal(false);
   errorMsg = signal<string | null>(null);
 
+  cuentasDemo = [
+    { email: 'admin@sgroas.com', rol: 'Administrador', detalle: 'Acceso total al sistema' },
+    { email: 'coordinador@sgroas.com', rol: 'Coordinador', detalle: 'Flota, unidades, rutas y programaciones' },
+    { email: 'seguridad@sgroas.com', rol: 'Seguridad', detalle: 'Incidentes y alertas' },
+    { email: 'operador@sgroas.com', rol: 'Operador', detalle: 'Registro de programaciones' },
+  ];
+
   loginForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]]
   });
+
+  usarCuenta(email: string): void {
+    this.loginForm.patchValue({ email, password: 'admin123' });
+    this.onSubmit();
+  }
 
   onSubmit(): void {
     if (this.loginForm.invalid) {

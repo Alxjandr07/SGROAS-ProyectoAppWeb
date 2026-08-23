@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -61,10 +62,26 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/docs/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
                         .requestMatchers("/actuator/health").permitAll()
-                        .requestMatchers("/api/conductores/**").hasAnyAuthority(
-                                "ROLE_ADMIN",
-                                "ROLE_COORDINADOR"
-                        )
+                        // ---------- Control de acceso por rol (RBAC) ----------
+                        // Usuarios del sistema: solo ADMINISTRACION
+                        .requestMatchers("/api/usuarios/**").hasAuthority("ROLE_ADMIN")
+                        // Escritura en flota, unidades y rutas: ADMIN y COORDINADOR
+                        .requestMatchers(HttpMethod.POST, "/api/conductores/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_COORDINADOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/conductores/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_COORDINADOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/conductores/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_COORDINADOR")
+                        .requestMatchers(HttpMethod.POST, "/api/abd/unidades/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_COORDINADOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/abd/unidades/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_COORDINADOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/abd/unidades/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_COORDINADOR")
+                        .requestMatchers(HttpMethod.POST, "/api/abd/rutas/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_COORDINADOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/abd/rutas/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_COORDINADOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/abd/rutas/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_COORDINADOR")
+                        // Programaciones: tambien el OPERADOR registra salidas
+                        .requestMatchers(HttpMethod.POST, "/api/abd/programaciones/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_COORDINADOR", "ROLE_OPERADOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/abd/programaciones/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_COORDINADOR", "ROLE_OPERADOR")
+                        // Incidentes: solo SEGURIDAD (y ADMIN) reportan o cierran
+                        .requestMatchers(HttpMethod.POST, "/api/abd/incidentes/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SEGURIDAD")
+                        .requestMatchers(HttpMethod.DELETE, "/api/abd/incidentes/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SEGURIDAD")
+                        // Lectura general para cualquier usuario autenticado
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(

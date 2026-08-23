@@ -8,6 +8,7 @@ import { environment } from '../../../../environments/environment';
 import { ProgramacionAbdService } from '../../../core/services/abd/programacion-abd.service';
 import { RutaAbdService } from '../../../core/services/abd/ruta-abd.service';
 import { UnidadAbdService } from '../../../core/services/abd/unidad-abd.service';
+import { Auth } from '../../../core/services/auth';
 import { Paginador } from '../../../shared/components/paginador/paginador';
 import { ProgramacionAbd, RutaAbd, UnidadAbd } from '../../../core/models/abd.model';
 
@@ -25,6 +26,7 @@ export class ProgramacionesLista implements OnInit, OnDestroy {
   private service = inject(ProgramacionAbdService);
   private rutaService = inject(RutaAbdService);
   private unidadService = inject(UnidadAbdService);
+  private authService = inject(Auth);
   private http = inject(HttpClient);
   private fb = inject(FormBuilder);
   private destruir$ = new Subject<void>();
@@ -39,6 +41,10 @@ export class ProgramacionesLista implements OnInit, OnDestroy {
   filtroFechaDesde = signal('');
   filtroFechaHasta = signal('');
   buscar = signal('');
+
+  get puedeEditar(): boolean {
+    return this.authService.tieneRol(['ADMIN', 'COORDINADOR', 'OPERADOR']);
+  }
 
   programaciones = signal<ProgramacionAbd[]>([]);
   rutas = signal<RutaAbd[]>([]);

@@ -3,7 +3,9 @@
     <h1>Conductores</h1>
     <p class="page-desc">Gestion de conductores registrados en el sistema.</p>
   </div>
-  <a class="btn-primary" routerLink="nuevo">+ Nuevo conductor</a>
+  @if (puedeEditar) {
+    <a class="btn-primary" routerLink="nuevo">+ Nuevo conductor</a>
+  }
 </div>
 
 <div class="filtros">
@@ -28,7 +30,9 @@
           <th>Apellidos</th>
           <th>Licencia</th>
           <th>Estado</th>
-          <th>Acciones</th>
+          @if (puedeEditar) {
+            <th>Acciones</th>
+          }
         </tr>
       </thead>
       <tbody>
@@ -44,10 +48,12 @@
                 {{ c.estado }}
               </span>
             </td>
-            <td class="actions-cell">
-              <a class="btn-sm" [routerLink]="['editar', c.id]">Editar</a>
-              <button class="btn-sm btn-sm--danger" (click)="confirmarEliminar(c.id)">Desactivar</button>
-            </td>
+            @if (puedeEditar) {
+              <td class="actions-cell">
+                <a class="btn-sm" [routerLink]="['editar', c.id]">Editar</a>
+                <button class="btn-sm btn-sm--danger" (click)="confirmarEliminar(c.id)">Desactivar</button>
+              </td>
+            }
           </tr>
         } @empty {
           <tr><td colspan="6" class="empty-msg">No hay conductores registrados.</td></tr>

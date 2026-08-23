@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { ConductorService } from '../../../core/services/conductor.service';
+import { Auth } from '../../../core/services/auth';
 import { Conductor } from '../../../core/models/conductor.model';
 
 @Component({
@@ -15,6 +16,7 @@ import { Conductor } from '../../../core/models/conductor.model';
 })
 export class ConductorLista implements OnInit, OnDestroy {
   private service = inject(ConductorService);
+  private authService = inject(Auth);
   private destruir$ = new Subject<void>();
   private buscar$ = new Subject<string>();
 
@@ -24,6 +26,10 @@ export class ConductorLista implements OnInit, OnDestroy {
   totalPages = signal(0);
   currentPage = signal(0);
   errorMsg = signal<string | null>(null);
+
+  get puedeEditar(): boolean {
+    return this.authService.tieneRol(['ADMIN', 'COORDINADOR']);
+  }
 
   ngOnInit(): void {
     this.cargar();

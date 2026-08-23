@@ -5,6 +5,7 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { RutaAbdService } from '../../../core/services/abd/ruta-abd.service';
 import { CatalogoAbdService } from '../../../core/services/abd/catalogo-abd.service';
+import { Auth } from '../../../core/services/auth';
 import { Paginador } from '../../../shared/components/paginador/paginador';
 import { RutaAbd, TerminalAbd } from '../../../core/models/abd.model';
 
@@ -18,11 +19,16 @@ import { RutaAbd, TerminalAbd } from '../../../core/models/abd.model';
 export class RutasLista implements OnInit, OnDestroy {
   private rutaService = inject(RutaAbdService);
   private catalogoService = inject(CatalogoAbdService);
+  private authService = inject(Auth);
   private fb = inject(FormBuilder);
   private destruir$ = new Subject<void>();
   private buscar$ = new Subject<string>();
 
   buscar = signal('');
+
+  get puedeEditar(): boolean {
+    return this.authService.tieneRol(['ADMIN', 'COORDINADOR']);
+  }
 
   rutas = signal<RutaAbd[]>([]);
   terminales = signal<TerminalAbd[]>([]);

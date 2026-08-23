@@ -4,8 +4,12 @@ import ec.edu.uteq.sgroas.dto.AuthResponse;
 import ec.edu.uteq.sgroas.dto.LoginRequest;
 import ec.edu.uteq.sgroas.dto.RefreshTokenRequest;
 import ec.edu.uteq.sgroas.dto.RegisterRequest;
+import ec.edu.uteq.sgroas.entity.Usuario;
+import ec.edu.uteq.sgroas.repository.UsuarioRepository;
+import ec.edu.uteq.sgroas.security.JwtService;
 import ec.edu.uteq.sgroas.security.LoginRateLimiter;
 import ec.edu.uteq.sgroas.service.AuthService;
+import ec.edu.uteq.sgroas.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +29,38 @@ public class AuthController {
 
     private final AuthService authService;
     private final LoginRateLimiter loginRateLimiter;
+    private final JwtService jwtService;
+    private final TokenService tokenService;
+    private final UsuarioRepository usuarioRepository;
+
+    @GetMapping("/me")
+    public ResponseEntity<AuthResponse> me(
+            @CookieValue(name = "access_token", required = false) String accessTokenCookie
+    ) {
+        if (accessTokenCookie == null || accessTokenCookie.isBlank()
+                || tokenService.accessTokenEnBlacklist(accessTokenCookie)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String email = jwtService.extraerEmail(accessTokenCookie);
+        if (email == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .filter(Usuario::getActivo)
+                .orElse(null);
+        if (usuario == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(new AuthResponse(
+                "",
+                "",
+                "Bearer",
+                jwtService.getExpirationMs(),
+                usuario.getNombre(),
+                usuario.getEmail(),
+                usuario.getRol().name()
+        ));
+    }
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> registrar(

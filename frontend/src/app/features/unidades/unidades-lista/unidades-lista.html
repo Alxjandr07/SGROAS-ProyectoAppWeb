@@ -3,7 +3,9 @@
     <h1>Unidades</h1>
     <p class="page-desc">Flota vehicular registrada en el sistema.</p>
   </div>
-  <button class="btn-primary" (click)="abrirFormulario()">+ Nueva unidad</button>
+  @if (puedeEditar) {
+    <button class="btn-primary" (click)="abrirFormulario()">+ Nueva unidad</button>
+  }
 </div>
 
 <div class="filtros">
@@ -70,7 +72,9 @@
           <th>Capacidad</th>
           <th>Año</th>
           <th>Estado</th>
-          <th>Acciones</th>
+          @if (puedeEditar) {
+            <th>Acciones</th>
+          }
         </tr>
       </thead>
       <tbody>
@@ -90,10 +94,12 @@
                 {{ u.estado }}
               </span>
             </td>
-            <td class="actions-cell">
-              <button class="btn-sm" (click)="editar(u)">Editar</button>
-              <button class="btn-sm btn-sm--danger" (click)="confirmarEliminar(u.idUnidad)">Eliminar</button>
-            </td>
+            @if (puedeEditar) {
+              <td class="actions-cell">
+                <button class="btn-sm" (click)="editar(u)">Editar</button>
+                <button class="btn-sm btn-sm--danger" (click)="confirmarEliminar(u.idUnidad)">Eliminar</button>
+              </td>
+            }
           </tr>
         } @empty {
           <tr><td colspan="8" class="empty-msg">No hay unidades registradas.</td></tr>

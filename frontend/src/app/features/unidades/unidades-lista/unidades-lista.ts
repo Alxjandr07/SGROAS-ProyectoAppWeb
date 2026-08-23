@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { UnidadAbdService } from '../../../core/services/abd/unidad-abd.service';
+import { Auth } from '../../../core/services/auth';
 import { Paginador } from '../../../shared/components/paginador/paginador';
 import { UnidadAbd } from '../../../core/models/abd.model';
 
@@ -18,6 +19,7 @@ const ESTADOS = ['Activo', 'Inactivo', 'En Mantenimiento'];
 })
 export class UnidadesLista implements OnInit, OnDestroy {
   private service = inject(UnidadAbdService);
+  private authService = inject(Auth);
   private fb = inject(FormBuilder);
   private destruir$ = new Subject<void>();
   private buscar$ = new Subject<string>();
@@ -25,6 +27,10 @@ export class UnidadesLista implements OnInit, OnDestroy {
   estados = ESTADOS;
   filtroEstado = signal('');
   buscar = signal('');
+
+  get puedeEditar(): boolean {
+    return this.authService.tieneRol(['ADMIN', 'COORDINADOR']);
+  }
 
   unidades = signal<UnidadAbd[]>([]);
   loading = signal(true);

@@ -3,7 +3,9 @@
     <h1>Incidentes y Alertas</h1>
     <p class="page-desc">Incidentes reportados por unidad y alertas generadas automaticamente.</p>
   </div>
-  <button class="btn-primary" (click)="abrirFormulario()">+ Reportar incidente</button>
+  @if (puedeEditar) {
+    <button class="btn-primary" (click)="abrirFormulario()">+ Reportar incidente</button>
+  }
 </div>
 
 @if (mostrandoFormulario()) {
@@ -112,7 +114,9 @@
           <th>Fecha</th>
           <th>Unidad</th>
           <th>Estado</th>
-          <th>Acciones</th>
+          @if (puedeEditar) {
+            <th>Acciones</th>
+          }
         </tr>
       </thead>
       <tbody>
@@ -132,9 +136,11 @@
             <td>{{ i.fechaIncidente }}</td>
             <td>{{ i.unidadPlaca }}</td>
             <td>{{ i.estado }}</td>
-            <td class="actions-cell">
-              <button class="btn-sm btn-sm--danger" (click)="confirmarEliminar(i.idIncidente)">Eliminar</button>
-            </td>
+            @if (puedeEditar) {
+              <td class="actions-cell">
+                <button class="btn-sm btn-sm--danger" (click)="confirmarEliminar(i.idIncidente)">Eliminar</button>
+              </td>
+            }
           </tr>
         } @empty {
           <tr><td colspan="8" class="empty-msg">No hay incidentes registrados.</td></tr>

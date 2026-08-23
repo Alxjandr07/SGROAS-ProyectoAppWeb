@@ -3,7 +3,9 @@
     <h1>Usuarios</h1>
     <p class="page-desc">Gestion de usuarios del sistema SGROAS.</p>
   </div>
-  <a class="btn-primary" routerLink="nuevo">+ Nuevo usuario</a>
+  @if (puedeEditar) {
+    <a class="btn-primary" routerLink="nuevo">+ Nuevo usuario</a>
+  }
 </div>
 
 <div class="filtros">
@@ -27,7 +29,9 @@
           <th>Email</th>
           <th>Rol</th>
           <th>Estado</th>
-          <th>Acciones</th>
+          @if (puedeEditar) {
+            <th>Acciones</th>
+          }
         </tr>
       </thead>
       <tbody>
@@ -41,10 +45,12 @@
                 {{ u.activo ? 'Activo' : 'Inactivo' }}
               </span>
             </td>
-            <td class="actions-cell">
-              <a class="btn-sm" [routerLink]="['editar', u.id]">Editar</a>
-              <button class="btn-sm btn-sm--danger" (click)="confirmarEliminar(u.id)">Desactivar</button>
-            </td>
+            @if (puedeEditar) {
+              <td class="actions-cell">
+                <a class="btn-sm" [routerLink]="['editar', u.id]">Editar</a>
+                <button class="btn-sm btn-sm--danger" (click)="confirmarEliminar(u.id)">Desactivar</button>
+              </td>
+            }
           </tr>
         } @empty {
           <tr><td colspan="5" class="empty-msg">No hay usuarios registrados.</td></tr>

@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { UsuarioService } from '../../../core/services/usuario.service';
+import { Auth } from '../../../core/services/auth';
 import { Usuario } from '../../../core/models/usuario.model';
 
 @Component({
@@ -15,6 +16,7 @@ import { Usuario } from '../../../core/models/usuario.model';
 })
 export class UsuarioLista implements OnInit, OnDestroy {
   private service = inject(UsuarioService);
+  private authService = inject(Auth);
   private destruir$ = new Subject<void>();
   private buscar$ = new Subject<string>();
 
@@ -24,6 +26,10 @@ export class UsuarioLista implements OnInit, OnDestroy {
   totalPages = signal(0);
   currentPage = signal(0);
   errorMsg = signal<string | null>(null);
+
+  get puedeEditar(): boolean {
+    return this.authService.tieneRol(['ADMIN']);
+  }
 
   ngOnInit(): void {
     this.cargar();
