@@ -51,7 +51,7 @@ class UsuarioControllerTest {
 
     @Test
     void listarDebeRetornar200() throws Exception {
-        when(usuarioService.listar(any()))
+        when(usuarioService.listar(any(), any()))
                 .thenReturn(new PageImpl<>(List.of(responseEjemplo())));
 
         mockMvc().perform(get("/api/usuarios"))

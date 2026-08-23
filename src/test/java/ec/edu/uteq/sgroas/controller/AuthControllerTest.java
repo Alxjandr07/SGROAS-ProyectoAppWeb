@@ -2,8 +2,11 @@ package ec.edu.uteq.sgroas.controller;
 
 import ec.edu.uteq.sgroas.dto.AuthResponse;
 import ec.edu.uteq.sgroas.exception.GlobalExceptionHandler;
+import ec.edu.uteq.sgroas.repository.UsuarioRepository;
+import ec.edu.uteq.sgroas.security.JwtService;
 import ec.edu.uteq.sgroas.security.LoginRateLimiter;
 import ec.edu.uteq.sgroas.service.AuthService;
+import ec.edu.uteq.sgroas.service.TokenService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -27,9 +30,19 @@ class AuthControllerTest {
     @Mock
     private LoginRateLimiter loginRateLimiter;
 
+    @Mock
+    private JwtService jwtService;
+
+    @Mock
+    private TokenService tokenService;
+
+    @Mock
+    private UsuarioRepository usuarioRepository;
+
     private MockMvc mockMvc() {
         return MockMvcBuilders.standaloneSetup(
-                        new AuthController(authService, loginRateLimiter))
+                        new AuthController(authService, loginRateLimiter, jwtService,
+                                tokenService, usuarioRepository))
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
     }

@@ -54,7 +54,7 @@ class ConductorControllerTest {
 
     @Test
     void listarDebeRetornar200() throws Exception {
-        when(conductorService.listar(any()))
+        when(conductorService.listar(any(), any()))
                 .thenReturn(new PageImpl<>(List.of(responseEjemplo())));
 
         mockMvc().perform(get("/api/conductores"))

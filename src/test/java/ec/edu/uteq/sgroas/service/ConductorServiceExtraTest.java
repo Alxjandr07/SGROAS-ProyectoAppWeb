@@ -64,7 +64,7 @@ class ConductorServiceExtraTest {
         when(conductorRepository.findByActivoTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(conductorEjemplo())));
 
-        Page<ConductorResponse> pagina = conductorService.listar(pageable);
+        Page<ConductorResponse> pagina = conductorService.listar(null, pageable);
 
         assertEquals(1, pagina.getTotalElements());
         assertEquals("Carlos Alberto", pagina.getContent().get(0).nombres());

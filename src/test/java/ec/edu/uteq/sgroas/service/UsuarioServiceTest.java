@@ -59,7 +59,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.findByActivoTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(usuarioEjemplo())));
 
-        Page<UsuarioResponse> pagina = usuarioService.listar(pageable);
+        Page<UsuarioResponse> pagina = usuarioService.listar(null, pageable);
 
         assertEquals(1, pagina.getTotalElements());
         assertEquals("ROLE_ADMIN", pagina.getContent().get(0).rol());
