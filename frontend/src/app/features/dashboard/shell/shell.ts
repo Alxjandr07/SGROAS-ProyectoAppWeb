@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Subject, interval, takeUntil } from 'rxjs';
+import { finalize } from 'rxjs';
 import { Auth } from '../../../core/services/auth';
 import { AlertaAbdService } from '../../../core/services/abd/alerta-abd.service';
 import { AlertaAbd } from '../../../core/models/abd.model';
@@ -127,9 +128,10 @@ export class Shell implements OnInit, OnDestroy {
   }
 
   logout(): void {
-    this.authService.logout().subscribe({
-      next: () => this.router.navigate(['/login']),
-      error: () => this.router.navigate(['/login'])
-    });
+    // finalize garantiza la navegacion al login aunque la peticion falle
+    this.authService
+      .logout()
+      .pipe(finalize(() => this.router.navigate(['/login'])))
+      .subscribe();
   }
 }

@@ -1,8 +1,7 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { HostListener, Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
-
 interface ColumnaReporte {
   clave: string;
   etiqueta: string;
@@ -24,6 +23,11 @@ interface TipoReporte {
 export class ReportePersonalizado {
   private http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/abd`;
+
+  @HostListener('document:keydown.escape')
+  alEscape(): void {
+    if (this.abierto()) this.abierto.set(false);
+  }
 
   readonly tipos: TipoReporte[] = [    {
       valor: 'programaciones', etiqueta: 'Programaciones',

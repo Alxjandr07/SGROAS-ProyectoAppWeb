@@ -29,15 +29,12 @@ export class Auth {
 
   logout(): Observable<void> {
     const refreshToken = this.currentUser()?.refreshToken ?? '';
+    // La sesion local se limpia de inmediato: el cierre nunca queda bloqueado
+    // si la peticion al servidor falla o responde con error.
+    this.limpiarSesion();
     return this.http
       .post<void>(`${this.apiUrl}/logout`, { refreshToken }, { withCredentials: true })
-      .pipe(
-        tap(() => this.limpiarSesion()),
-        catchError(() => {
-          this.limpiarSesion();
-          return EMPTY;
-        })
-      );
+      .pipe(catchError(() => EMPTY));
   }
 
   isAuthenticated(): boolean {

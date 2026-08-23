@@ -1,142 +1,154 @@
-@if (!abierto()) {
-  <button class="rp-abridor" (click)="alternar()">
-    <span class="rp-icono">🧾</span>
-    <span class="rp-textos">
-      <strong>Generar reporte personalizado</strong>
-      <small>Elige el módulo, aplica filtros y exporta o imprime el resultado.</small>
-    </span>
-    <span class="rp-flecha">›</span>
-  </button>
-} @else {
-  <section class="form-panel rp-panel">
-    <header class="rp-cabecera">
-      <h3>Generar reporte personalizado</h3>
-      <button type="button" class="rp-cerrar" (click)="alternar()" title="Cerrar generador">✕</button>
-    </header>
+<button class="rp-abridor" (click)="alternar()">
+  <span class="rp-icono">🧾</span>
+  <span class="rp-textos">
+    <strong>Generar reporte personalizado</strong>
+    <small>Elige el módulo, aplica filtros y exporta o imprime el resultado.</small>
+  </span>
+  <span class="rp-flecha">›</span>
+</button>
 
-    <div class="rp-filtros">
-      <label>Módulo
-        <select [value]="tipo()" (change)="cambiarTipo($event)">
-          @for (t of tipos; track t.valor) {
-            <option [value]="t.valor">{{ t.etiqueta }}</option>
-          }
-        </select>
-      </label>
-
-      @switch (tipo()) {
-        @case ('programaciones') {
-          <label>Estado
-            <select [value]="filtroEstado()" (change)="filtroEstado.set($any($event.target).value)">
-              <option value="">Todos</option>
-              @for (e of estadosProgramacion; track e) {
-                <option [value]="e">{{ e }}</option>
-              }
-            </select>
-          </label>
-          <label>Desde
-            <input type="date" [value]="filtroDesde()" (change)="filtroDesde.set($any($event.target).value)" />
-          </label>
-          <label>Hasta
-            <input type="date" [value]="filtroHasta()" (change)="filtroHasta.set($any($event.target).value)" />
-          </label>
-        }
-        @case ('unidades') {
-          <label>Estado
-            <select [value]="filtroEstado()" (change)="filtroEstado.set($any($event.target).value)">
-              <option value="">Todos</option>
-              @for (e of estadosUnidad; track e) {
-                <option [value]="e">{{ e }}</option>
-              }
-            </select>
-          </label>
-          <label class="rp-texto">Buscar
-            <input type="text" placeholder="Placa, disco o modelo..."
-                   [value]="filtroTexto()" (input)="filtroTexto.set($any($event.target).value)" />
-          </label>
-        }
-        @case ('incidentes') {
-          <label>Nivel
-            <select [value]="filtroNivel()" (change)="filtroNivel.set($any($event.target).value)">
-              <option value="">Todos</option>
-              @for (n of niveles; track n) {
-                <option [value]="n">{{ n }}</option>
-              }
-            </select>
-          </label>
-          <label>Estado
-            <select [value]="filtroEstado()" (change)="filtroEstado.set($any($event.target).value)">
-              <option value="">Todos</option>
-              @for (e of estadosIncidente; track e) {
-                <option [value]="e">{{ e }}</option>
-              }
-            </select>
-          </label>
-        }
-        @case ('rutas') {
-          <label class="rp-texto">Buscar
-            <input type="text" placeholder="Terminal de origen o destino..."
-                   [value]="filtroTexto()" (input)="filtroTexto.set($any($event.target).value)" />
-          </label>
-        }
-        @case ('conductores') {
-          <label class="rp-texto">Buscar
-            <input type="text" placeholder="Nombre, cédula o licencia..."
-                   [value]="filtroTexto()" (input)="filtroTexto.set($any($event.target).value)" />
-          </label>
-        }
-      }
-    </div>
-
-    <div class="rp-acciones">
-      <button type="button" class="btn-primary" (click)="generar()" [disabled]="generando()">
-        {{ generando() ? 'Generando...' : 'Generar reporte' }}
-      </button>
-      <button type="button" class="btn-sm btn-sm--secundario" (click)="limpiar()">Limpiar filtros</button>
-    </div>
-
-    @if (error()) {
-      <div class="alert-error">{{ error() }}</div>
-    }
-
-    @if (filas().length > 0) {
-      <div class="rp-resultado">
-        <header class="rp-res-cabecera">
-          <p>
-            <strong>{{ totalGeneral() ?? filas().length }}</strong> registros encontrados
-            @if (totalGeneral() !== null && (totalGeneral() ?? 0) > filas().length) {
-              <span class="rp-nota">(mostrando {{ filas().length }})</span>
-            }
-            · <em>{{ tipoActual().etiqueta }}</em>
-          </p>
-          <div class="rp-res-botones">
-            <button type="button" class="btn-sm" (click)="exportarCsv()">⬇ Exportar CSV</button>
-            <button type="button" class="btn-sm btn-sm--secundario" (click)="imprimir()">🖨 Imprimir</button>
+@if (abierto()) {
+  <div class="rp-overlay" (click)="alternar()">
+    <div class="rp-modal" (click)="$event.stopPropagation()">
+      <header class="rp-modal-cabecera">
+        <div class="rp-modal-titulo">
+          <span class="rp-modal-icono">🧾</span>
+          <div>
+            <h3>Generar reporte personalizado</h3>
+            <p>Selecciona el módulo, aplica filtros y genera tu reporte.</p>
           </div>
-        </header>
-
-        <div class="table-container">
-          <table class="data-table">
-            <thead>
-              <tr>
-                @for (c of columnas(); track c.clave) {
-                  <th>{{ c.etiqueta }}</th>
-                }
-              </tr>
-            </thead>
-            <tbody>
-              @for (f of filas(); track $index) {
-                <tr>
-                  @for (c of columnas(); track c.clave) {
-                    <td>{{ valorFila(f, c.clave) }}</td>
-                  }
-                </tr>
-              }
-            </tbody>
-          </table>
         </div>
+        <button type="button" class="rp-cerrar" (click)="alternar()" title="Cerrar (Esc)">✕</button>
+      </header>
+
+      <div class="rp-modal-cuerpo">
+        <div class="rp-filtros">
+          <label>Módulo
+            <select [value]="tipo()" (change)="cambiarTipo($event)">
+              @for (t of tipos; track t.valor) {
+                <option [value]="t.valor">{{ t.etiqueta }}</option>
+              }
+            </select>
+          </label>
+
+          @switch (tipo()) {
+            @case ('programaciones') {
+              <label>Estado
+                <select [value]="filtroEstado()" (change)="filtroEstado.set($any($event.target).value)">
+                  <option value="">Todos</option>
+                  @for (e of estadosProgramacion; track e) {
+                    <option [value]="e">{{ e }}</option>
+                  }
+                </select>
+              </label>
+              <label>Desde
+                <input type="date" [value]="filtroDesde()" (change)="filtroDesde.set($any($event.target).value)" />
+              </label>
+              <label>Hasta
+                <input type="date" [value]="filtroHasta()" (change)="filtroHasta.set($any($event.target).value)" />
+              </label>
+            }
+            @case ('unidades') {
+              <label>Estado
+                <select [value]="filtroEstado()" (change)="filtroEstado.set($any($event.target).value)">
+                  <option value="">Todos</option>
+                  @for (e of estadosUnidad; track e) {
+                    <option [value]="e">{{ e }}</option>
+                  }
+                </select>
+              </label>
+              <label class="rp-texto">Buscar
+                <input type="text" placeholder="Placa, disco o modelo..."
+                       [value]="filtroTexto()" (input)="filtroTexto.set($any($event.target).value)" />
+              </label>
+            }
+            @case ('incidentes') {
+              <label>Nivel
+                <select [value]="filtroNivel()" (change)="filtroNivel.set($any($event.target).value)">
+                  <option value="">Todos</option>
+                  @for (n of niveles; track n) {
+                    <option [value]="n">{{ n }}</option>
+                  }
+                </select>
+              </label>
+              <label>Estado
+                <select [value]="filtroEstado()" (change)="filtroEstado.set($any($event.target).value)">
+                  <option value="">Todos</option>
+                  @for (e of estadosIncidente; track e) {
+                    <option [value]="e">{{ e }}</option>
+                  }
+                </select>
+              </label>
+            }
+            @case ('rutas') {
+              <label class="rp-texto">Buscar
+                <input type="text" placeholder="Terminal de origen o destino..."
+                       [value]="filtroTexto()" (input)="filtroTexto.set($any($event.target).value)" />
+              </label>
+            }
+            @case ('conductores') {
+              <label class="rp-texto">Buscar
+                <input type="text" placeholder="Nombre, cédula o licencia..."
+                       [value]="filtroTexto()" (input)="filtroTexto.set($any($event.target).value)" />
+              </label>
+            }
+          }
+        </div>
+
+        @if (error()) {
+          <div class="alert-error">{{ error() }}</div>
+        }
+
+        @if (filas().length > 0) {
+          <div class="rp-resultado">
+            <header class="rp-res-cabecera">
+              <p>
+                <strong>{{ totalGeneral() ?? filas().length }}</strong> registros encontrados
+                @if (totalGeneral() !== null && (totalGeneral() ?? 0) > filas().length) {
+                  <span class="rp-nota">(mostrando {{ filas().length }})</span>
+                }
+                · <em>{{ tipoActual().etiqueta }}</em>
+              </p>
+              <div class="rp-res-botones">
+                <button type="button" class="btn-sm" (click)="exportarCsv()">⬇ Exportar CSV</button>
+                <button type="button" class="btn-sm btn-sm--secundario" (click)="imprimir()">🖨 Imprimir</button>
+              </div>
+            </header>
+
+            <div class="table-container rp-tabla">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    @for (c of columnas(); track c.clave) {
+                      <th>{{ c.etiqueta }}</th>
+                    }
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (f of filas(); track $index) {
+                    <tr>
+                      @for (c of columnas(); track c.clave) {
+                        <td>{{ valorFila(f, c.clave) }}</td>
+                      }
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        } @else if (busco()) {
+          <p class="rp-vacio">No se encontraron registros con los filtros seleccionados.</p>
+        }
       </div>
-    } @else if (busco()) {
-      <p class="rp-vacio">No se encontraron registros con los filtros seleccionados.</p>
-    }
-  </section>
+
+      <footer class="rp-modal-pie">
+        <button type="button" class="btn-sm btn-sm--secundario" (click)="limpiar()">Limpiar</button>
+        <span class="rp-pie-espacio"></span>
+        <button type="button" class="btn-sm rp-cancelar" (click)="alternar()">Cerrar</button>
+        <button type="button" class="btn-primary" (click)="generar()" [disabled]="generando()">
+          {{ generando() ? 'Generando...' : '⚡ Generar reporte' }}
+        </button>
+      </footer>
+    </div>
+  </div>
 }
