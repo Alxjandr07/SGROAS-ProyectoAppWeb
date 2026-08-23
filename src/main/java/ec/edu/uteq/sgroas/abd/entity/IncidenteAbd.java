@@ -43,7 +43,7 @@ public class IncidenteAbd {
     @Builder.Default
     private String estado = "Reportado";
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_unidad", nullable = false)
     private Unidad unidad;
 }

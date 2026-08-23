@@ -32,7 +32,8 @@ public class Alerta {
     @Builder.Default
     private LocalDateTime fecha = LocalDateTime.now();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    /** EAGER: las alertas se serializan a JSON fuera de la transaccion. */
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_incidente", nullable = false)
     private IncidenteAbd incidente;
 }
