@@ -33,6 +33,12 @@ class UsuarioServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private CodigoVerificacionService codigoVerificacionService;
+
+    @Mock
+    private EmailService emailService;
+
     @InjectMocks
     private UsuarioService usuarioService;
 
@@ -84,15 +90,24 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void crearDebeGuardarYRetornar() {
+    void crearDebeGuardarSinVerificarYEnviarCodigoActivacion() {
         when(usuarioRepository.existsByEmail("carlos@sgroas.com")).thenReturn(false);
         when(passwordEncoder.encode("123456")).thenReturn("hash-encrypted");
-        when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuarioEjemplo());
+        when(usuarioRepository.save(any(Usuario.class))).thenAnswer(inv -> {
+            Usuario u = inv.getArgument(0);
+            u.setId(1L);
+            return u;
+        });
+        when(codigoVerificacionService.generar("carlos@sgroas.com",
+                CodigoVerificacionService.Tipo.VERIFICACION)).thenReturn("123456");
 
         UsuarioResponse response = usuarioService.crear(requestEjemplo());
 
         assertEquals("carlos@sgroas.com", response.email());
-        verify(usuarioRepository).save(any(Usuario.class));
+        verify(usuarioRepository).save(argThat(u ->
+                Boolean.FALSE.equals(u.getVerificado()) && Boolean.TRUE.equals(u.getActivo())));
+        verify(emailService).enviarCodigoVerificacion(
+                "carlos@sgroas.com", "Carlos Mendoza", "123456");
     }
 
     @Test
@@ -101,6 +116,30 @@ class UsuarioServiceTest {
 
         assertThrows(IllegalArgumentException.class,
                 () -> usuarioService.crear(requestEjemplo()));
+    }
+
+    @Test
+    void reenviarActivacionDebeEnviarNuevoCodigo() {
+        Usuario sinVerificar = usuarioEjemplo();
+        sinVerificar.setVerificado(false);
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(sinVerificar));
+        when(codigoVerificacionService.puedeReenviar("carlos@sgroas.com",
+                CodigoVerificacionService.Tipo.VERIFICACION)).thenReturn(true);
+        when(codigoVerificacionService.generar("carlos@sgroas.com",
+                CodigoVerificacionService.Tipo.VERIFICACION)).thenReturn("654321");
+
+        usuarioService.reenviarCodigoActivacion(1L);
+
+        verify(emailService).enviarCodigoVerificacion(
+                "carlos@sgroas.com", "Carlos Mendoza", "654321");
+    }
+
+    @Test
+    void reenviarActivacionConCuentaYaVerificadaDebeLanzarExcepcion() {
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioEjemplo()));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> usuarioService.reenviarCodigoActivacion(1L));
     }
 
     @Test

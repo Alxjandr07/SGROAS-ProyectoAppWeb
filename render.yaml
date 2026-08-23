@@ -65,3 +65,17 @@ services:
         value: "https://sgroas-backend.onrender.com"
       - key: APP_JWT_AUDIENCE
         value: "sgroas-frontend"
+      # Correo (SMTP) para codigos de verificacion y restablecimiento.
+      # Configurar los valores secretos en el dashboard de Render.
+      # Ejemplo Gmail: SMTP_HOST=smtp.gmail.com + clave de aplicacion en SMTP_PASS.
+      # Sin SMTP_HOST la app queda en MODO CONSOLA (el codigo se imprime en el log).
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: MAIL_FROM
+        sync: false

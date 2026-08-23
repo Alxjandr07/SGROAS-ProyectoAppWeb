@@ -38,6 +38,13 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    /** Reenvia el codigo de activacion al correo de un usuario sin verificar. */
+    @PostMapping("/{id}/reenviar-activacion")
+    public ResponseEntity<Void> reenviarActivacion(@PathVariable Long id) {
+        usuarioService.reenviarCodigoActivacion(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<UsuarioResponse> actualizar(
             @PathVariable Long id,

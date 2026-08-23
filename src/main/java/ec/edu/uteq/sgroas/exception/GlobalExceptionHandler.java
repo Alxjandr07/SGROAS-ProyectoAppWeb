@@ -63,6 +63,20 @@ public class GlobalExceptionHandler {
         return detail;
     }
 
+    @ExceptionHandler(CorreoNoVerificadoException.class)
+    public ProblemDetail manejarCorreoNoVerificado(
+            CorreoNoVerificadoException ex,
+            HttpServletRequest request
+    ) {
+        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.FORBIDDEN);
+        detail.setType(URI.create("https://sgroas.uteq.edu.ec/errors/email-not-verified"));
+        detail.setTitle("Correo sin verificar");
+        detail.setDetail(ex.getMessage());
+        detail.setInstance(URI.create(request.getRequestURI()));
+
+        return detail;
+    }
+
     @ExceptionHandler(Exception.class)
     public ProblemDetail manejarErrorGeneral(
             Exception ex,

@@ -1,10 +1,11 @@
 package ec.edu.uteq.sgroas.service;
 
 import ec.edu.uteq.sgroas.dto.AuthResponse;
+import ec.edu.uteq.sgroas.dto.LoginRequest;
 import ec.edu.uteq.sgroas.dto.RefreshTokenRequest;
-import ec.edu.uteq.sgroas.dto.RegisterRequest;
 import ec.edu.uteq.sgroas.entity.Rol;
 import ec.edu.uteq.sgroas.entity.Usuario;
+import ec.edu.uteq.sgroas.exception.CorreoNoVerificadoException;
 import ec.edu.uteq.sgroas.repository.UsuarioRepository;
 import ec.edu.uteq.sgroas.security.JwtService;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +41,12 @@ class AuthServiceExtraTest {
     @Mock
     private TokenService tokenService;
 
+    @Mock
+    private CodigoVerificacionService codigoVerificacionService;
+
+    @Mock
+    private EmailService emailService;
+
     @InjectMocks
     private AuthService authService;
 
@@ -69,40 +76,92 @@ class AuthServiceExtraTest {
     }
 
     @Test
-    void registrarDebeRetornarTokens() {
+    void verificarEmailCorrectoDebeActivarCuentaYRetornarTokens() {
         Usuario usuario = usuarioEjemplo();
-        when(usuarioRepository.existsByEmail("admin@sgroas.com")).thenReturn(false);
-        when(passwordEncoder.encode("123456")).thenReturn("password-encriptado");
-        when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
+        usuario.setActivo(false);
+        usuario.setVerificado(false);
+        when(usuarioRepository.findByEmail("admin@sgroas.com"))
+                .thenReturn(Optional.of(usuario));
         simularGeneracionTokens(usuario);
 
-        AuthResponse response = authService.registrar(
-                new RegisterRequest("Administrador SGROAS", "admin@sgroas.com", "123456", "ROLE_ADMIN")
-        );
+        AuthResponse response = authService.verificarEmail("admin@sgroas.com", "654321");
 
-        assertNotNull(response);
         assertEquals("access-token-prueba", response.accessToken());
-        assertEquals("ROLE_ADMIN", response.rol());
+        verify(codigoVerificacionService).validar("admin@sgroas.com",
+                CodigoVerificacionService.Tipo.VERIFICACION, "654321");
+        verify(usuarioRepository).save(argThat(u ->
+                Boolean.TRUE.equals(u.getActivo()) && Boolean.TRUE.equals(u.getVerificado())));
     }
 
     @Test
-    void registrarConEmailExistenteDebeLanzarExcepcion() {
-        when(usuarioRepository.existsByEmail("admin@sgroas.com")).thenReturn(true);
+    void loginConCorreoNoVerificadoDebeLanzarExcepcion() {
+        Usuario sinVerificar = usuarioEjemplo();
+        sinVerificar.setActivo(false);
+        sinVerificar.setVerificado(false);
+        when(usuarioRepository.findByEmail("admin@sgroas.com"))
+                .thenReturn(Optional.of(sinVerificar));
+        when(passwordEncoder.matches("123456", "password-encriptado")).thenReturn(true);
 
-        assertThrows(IllegalArgumentException.class,
-                () -> authService.registrar(
-                        new RegisterRequest("Administrador", "admin@sgroas.com", "123456", "ROLE_ADMIN")
-                ));
+        assertThrows(CorreoNoVerificadoException.class,
+                () -> authService.login(new LoginRequest("admin@sgroas.com", "123456")));
     }
 
     @Test
-    void registrarConRolInvalidoDebeLanzarExcepcion() {
-        when(usuarioRepository.existsByEmail("admin@sgroas.com")).thenReturn(false);
+    void restablecerContrasenaDebeActualizarClave() {
+        Usuario usuario = usuarioEjemplo();
+        when(usuarioRepository.findByEmail("admin@sgroas.com"))
+                .thenReturn(Optional.of(usuario));
+        when(passwordEncoder.encode("nueva-clave-1")).thenReturn("hash-nuevo");
 
-        assertThrows(IllegalArgumentException.class,
-                () -> authService.registrar(
-                        new RegisterRequest("Administrador", "admin@sgroas.com", "123456", "ROL_INVALIDO")
-                ));
+        authService.restablecerContrasena("admin@sgroas.com", "111222", "nueva-clave-1");
+
+        verify(codigoVerificacionService).validar("admin@sgroas.com",
+                CodigoVerificacionService.Tipo.RESET_PASSWORD, "111222");
+        verify(usuarioRepository).save(argThat(u -> "hash-nuevo".equals(u.getPasswordHash())));
+    }
+
+    @Test
+    void reenviarCodigoDebeGenerarYEnviarNuevoCodigo() {
+        Usuario sinVerificar = usuarioEjemplo();
+        sinVerificar.setVerificado(false);
+        when(usuarioRepository.findByEmail("admin@sgroas.com"))
+                .thenReturn(Optional.of(sinVerificar));
+        when(codigoVerificacionService.puedeReenviar("admin@sgroas.com",
+                CodigoVerificacionService.Tipo.VERIFICACION)).thenReturn(true);
+        when(codigoVerificacionService.generar("admin@sgroas.com",
+                CodigoVerificacionService.Tipo.VERIFICACION)).thenReturn("999888");
+
+        authService.reenviarCodigoVerificacion("admin@sgroas.com");
+
+        verify(emailService).enviarCodigoVerificacion(
+                "admin@sgroas.com", "Administrador SGROAS", "999888");
+    }
+
+    @Test
+    void reenviarCodigoConCuentaVerificadaNoDebeEnviarNada() {
+        Usuario verificado = usuarioEjemplo();
+        verificado.setVerificado(true);
+        when(usuarioRepository.findByEmail("admin@sgroas.com"))
+                .thenReturn(Optional.of(verificado));
+
+        authService.reenviarCodigoVerificacion("admin@sgroas.com");
+
+        verifyNoInteractions(emailService);
+    }
+
+    @Test
+    void solicitarRestablecimientoDebeEnviarCodigo() {
+        Usuario usuario = usuarioEjemplo();
+        when(usuarioRepository.findByEmail("admin@sgroas.com"))
+                .thenReturn(Optional.of(usuario));
+        when(codigoVerificacionService.puedeReenviar("admin@sgroas.com",
+                CodigoVerificacionService.Tipo.RESET_PASSWORD)).thenReturn(true);
+        when(codigoVerificacionService.generar("admin@sgroas.com",
+                CodigoVerificacionService.Tipo.RESET_PASSWORD)).thenReturn("112233");
+
+        authService.solicitarRestablecimiento("admin@sgroas.com");
+
+        verify(emailService).enviarCodigoRestablecimiento("admin@sgroas.com", "112233");
     }
 
     @Test

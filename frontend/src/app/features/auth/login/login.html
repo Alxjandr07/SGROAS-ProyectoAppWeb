@@ -31,64 +31,238 @@
   </aside>
 
   <main class="login-panel">
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-      <span class="form-tag">ACCESO AL SISTEMA</span>
-      <h2>Iniciar sesión</h2>
-      <p class="form-subtitle">Ingresa tus credenciales para continuar a SGROAS.</p>
+    @switch (vista()) {
+      @case ('acceso') {
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+          <span class="form-tag">ACCESO AL SISTEMA</span>
+          <h2>Iniciar sesión</h2>
+          <p class="form-subtitle">Ingresa tus credenciales para continuar a SGROAS.</p>
 
-      <label for="email">Usuario o correo</label>
-      <input
-        id="email"
-        type="email"
-        formControlName="email"
-        placeholder="nombre.apellido@cooperativa.ec"
-      />
-      @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
-        <span class="field-error">Ingresa un correo válido.</span>
-      }
+          <label for="email">Usuario o correo</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="nombre.apellido@cooperativa.ec"
+          />
+          @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+            <span class="field-error">Ingresa un correo válido.</span>
+          }
 
-      <label for="password">Contraseña</label>
-      <input
-        id="password"
-        type="password"
-        formControlName="password"
-        placeholder="••••••••••"
-      />
-      @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
-        <span class="field-error">Mínimo 6 caracteres.</span>
-      }
+          <label for="password">Contraseña</label>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            placeholder="••••••••••"
+          />
+          @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+            <span class="field-error">Mínimo 6 caracteres.</span>
+          }
 
-      <div class="form-row">
-        <label class="checkbox">
-          <input type="checkbox" />
-          Recordarme
-        </label>
-        <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
-      </div>
+          <div class="form-row">
+            <button
+              type="button"
+              class="link-button forgot-link"
+              (click)="irA('olvidar')"
+            >
+              ¿Olvidaste tu contraseña?
+            </button>
+          </div>
 
-      @if (errorMsg()) {
-        <div class="alert-error">{{ errorMsg() }}</div>
-      }
+          @if (errorMsg()) {
+            <div class="alert-error">{{ errorMsg() }}</div>
+          }
+          @if (infoMsg()) {
+            <div class="alert-info">{{ infoMsg() }}</div>
+          }
 
-      <button type="submit" [disabled]="loading()">
-        {{ loading() ? 'Ingresando...' : 'Ingresar al sistema' }}
-      </button>
-
-      <div class="demo-divider"><span>CUENTAS DE DEMOSTRACIÓN · admin123</span></div>
-      <div class="cuentas-demo">
-        @for (c of cuentasDemo; track c.email) {
-          <button type="button" class="cuenta" (click)="usarCuenta(c.email)" [disabled]="loading()">
-            <strong>{{ c.rol }}</strong>
-            <span>{{ c.email }}</span>
-            <small>{{ c.detalle }}</small>
+          <button type="submit" [disabled]="loading()">
+            {{ loading() ? 'Ingresando...' : 'Ingresar al sistema' }}
           </button>
-        }
-      </div>
 
-      <div class="support-divider"><span>SOPORTE</span></div>
-      <p class="support-text">
-        ¿Problemas para ingresar? Contacta al administrador de tu cooperativa.
-      </p>
-    </form>
+          <div class="demo-divider"><span>CUENTAS DE DEMOSTRACIÓN · admin123</span></div>
+          <div class="cuentas-demo">
+            @for (c of cuentasDemo; track c.email) {
+              <button type="button" class="cuenta" (click)="usarCuenta(c.email)" [disabled]="loading()">
+                <strong>{{ c.rol }}</strong>
+                <span>{{ c.email }}</span>
+                <small>{{ c.detalle }}</small>
+              </button>
+            }
+          </div>
+
+          <p class="activacion-hint">
+            ¿Recibiste un código de activación del administrador?
+            <button type="button" class="link-button" (click)="irA('verificar')">
+              Activa tu cuenta aquí
+            </button>
+          </p>
+        </form>
+      }
+      @case ('verificar') {
+        <form [formGroup]="verificarForm" (ngSubmit)="verificar()" class="login-form">
+          <span class="form-tag">ACTIVACIÓN DE CUENTA</span>
+          <h2>Confirma tu código</h2>
+          <p class="form-subtitle">
+            Ingresa el código de 6 dígitos que enviamos a tu correo electrónico.
+          </p>
+
+          <label for="verificar-email">Correo</label>
+          <input
+            id="verificar-email"
+            type="email"
+            formControlName="email"
+            placeholder="nombre.apellido@cooperativa.ec"
+          />
+          @if (verificarForm.get('email')?.invalid && verificarForm.get('email')?.touched) {
+            <span class="field-error">Ingresa un correo válido.</span>
+          }
+
+          <label for="codigo">Código de activación</label>
+          <input
+            id="codigo"
+            type="text"
+            inputmode="numeric"
+            maxlength="6"
+            formControlName="codigo"
+            class="codigo-input"
+            placeholder="000000"
+          />
+          @if (verificarForm.get('codigo')?.invalid && verificarForm.get('codigo')?.touched) {
+            <span class="field-error">El código tiene 6 dígitos numéricos.</span>
+          }
+
+          @if (errorMsg()) {
+            <div class="alert-error">{{ errorMsg() }}</div>
+          }
+          @if (infoMsg()) {
+            <div class="alert-info">{{ infoMsg() }}</div>
+          }
+
+          <button type="submit" [disabled]="loading()">
+            {{ loading() ? 'Verificando...' : 'Activar mi cuenta' }}
+          </button>
+
+          <div class="links-row">
+            <button
+              type="button"
+              class="link-button"
+              [disabled]="cooldown() > 0 || loading()"
+              (click)="reenviar()"
+            >
+              {{
+                cooldown() > 0
+                  ? 'Reenviar código en ' + cooldown() + 's'
+                  : 'Reenviar código'
+              }}
+            </button>
+            <button type="button" class="link-button volver-link" (click)="irA('acceso')">
+              Volver al inicio de sesión
+            </button>
+          </div>
+        </form>
+      }
+      @case ('olvidar') {
+        <form [formGroup]="olvidarForm" (ngSubmit)="solicitarRestablecimiento()" class="login-form">
+          <span class="form-tag">RECUPERAR ACCESO</span>
+          <h2>Olvidé mi contraseña</h2>
+          <p class="form-subtitle">
+            Te enviaremos un código a tu correo para restablecer la contraseña.
+          </p>
+
+          <label for="recuperar-email">Correo</label>
+          <input
+            id="recuperar-email"
+            type="email"
+            formControlName="email"
+            placeholder="nombre.apellido@cooperativa.ec"
+          />
+          @if (olvidarForm.get('email')?.invalid && olvidarForm.get('email')?.touched) {
+            <span class="field-error">Ingresa un correo válido.</span>
+          }
+
+          @if (errorMsg()) {
+            <div class="alert-error">{{ errorMsg() }}</div>
+          }
+          @if (infoMsg()) {
+            <div class="alert-info">{{ infoMsg() }}</div>
+          }
+
+          <button type="submit" [disabled]="loading()">
+            {{ loading() ? 'Enviando...' : 'Enviar código de recuperación' }}
+          </button>
+
+          <div class="links-row">
+            <button type="button" class="link-button volver-link" (click)="irA('acceso')">
+              Volver al inicio de sesión
+            </button>
+          </div>
+        </form>
+      }
+      @case ('restablecer') {
+        <form [formGroup]="restablecerForm" (ngSubmit)="restablecer()" class="login-form">
+          <span class="form-tag">RECUPERAR ACCESO</span>
+          <h2>Nueva contraseña</h2>
+          <p class="form-subtitle">
+            Ingresa el código que enviamos a tu correo y define una nueva contraseña.
+          </p>
+
+          <label for="reset-codigo">Código de recuperación</label>
+          <input
+            id="reset-codigo"
+            type="text"
+            inputmode="numeric"
+            maxlength="6"
+            formControlName="codigo"
+            class="codigo-input"
+            placeholder="000000"
+          />
+          @if (restablecerForm.get('codigo')?.invalid && restablecerForm.get('codigo')?.touched) {
+            <span class="field-error">El código tiene 6 dígitos numéricos.</span>
+          }
+
+          <label for="nueva-password">Nueva contraseña</label>
+          <input
+            id="nueva-password"
+            type="password"
+            formControlName="nuevaPassword"
+            placeholder="Mínimo 6 caracteres"
+          />
+          @if (restablecerForm.get('nuevaPassword')?.invalid && restablecerForm.get('nuevaPassword')?.touched) {
+            <span class="field-error">Mínimo 6 caracteres.</span>
+          }
+
+          @if (errorMsg()) {
+            <div class="alert-error">{{ errorMsg() }}</div>
+          }
+          @if (infoMsg()) {
+            <div class="alert-info">{{ infoMsg() }}</div>
+          }
+
+          <button type="submit" [disabled]="loading()">
+            {{ loading() ? 'Guardando...' : 'Restablecer contraseña' }}
+          </button>
+
+          <div class="links-row">
+            <button
+              type="button"
+              class="link-button"
+              [disabled]="cooldown() > 0 || loading()"
+              (click)="solicitarRestablecimiento()"
+            >
+              {{
+                cooldown() > 0
+                  ? 'Reenviar código en ' + cooldown() + 's'
+                  : 'Reenviar código'
+              }}
+            </button>
+            <button type="button" class="link-button volver-link" (click)="irA('acceso')">
+              Volver al inicio de sesión
+            </button>
+          </div>
+        </form>
+      }
+    }
   </main>
 </div>

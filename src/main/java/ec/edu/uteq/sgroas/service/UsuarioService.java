@@ -20,6 +20,8 @@ public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CodigoVerificacionService codigoVerificacionService;
+    private final EmailService emailService;
 
     public Page<UsuarioResponse> listar(String search, Pageable pageable) {
         if (search == null || search.isBlank()) {
@@ -35,6 +37,11 @@ public class UsuarioService {
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con id: " + id));
     }
 
+    /**
+     * Crea el usuario y le envia por correo un codigo de activacion de 6 digitos.
+     * La cuenta nace con verificado = false: no podra iniciar sesion hasta
+     * confirmar el codigo en la pantalla de activacion del login.
+     */
     public UsuarioResponse crear(UsuarioRequest request) {
         if (usuarioRepository.existsByEmail(request.email())) {
             throw new IllegalArgumentException("Ya existe un usuario con ese email");
@@ -46,11 +53,37 @@ public class UsuarioService {
                 .passwordHash(passwordEncoder.encode(request.password()))
                 .rol(Rol.valueOf(request.rol().toUpperCase()))
                 .activo(true)
+                .verificado(false)
                 .creadoEn(Instant.now())
                 .actualizadoEn(Instant.now())
                 .build();
 
-        return toResponse(usuarioRepository.save(usuario));
+        Usuario guardado = usuarioRepository.save(usuario);
+        enviarCodigoActivacion(guardado);
+
+        return toResponse(guardado);
+    }
+
+    /** El ADMIN puede reenviar el codigo de activacion de una cuenta sin verificar. */
+    public void reenviarCodigoActivacion(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con id: " + id));
+
+        if (Boolean.TRUE.equals(usuario.getVerificado())) {
+            throw new IllegalArgumentException("Ese usuario ya verifico su correo");
+        }
+        if (!codigoVerificacionService.puedeReenviar(usuario.getEmail(),
+                CodigoVerificacionService.Tipo.VERIFICACION)) {
+            throw new IllegalArgumentException(
+                    "El codigo se envio hace menos de un minuto. Espera antes de reenviar.");
+        }
+        enviarCodigoActivacion(usuario);
+    }
+
+    private void enviarCodigoActivacion(Usuario usuario) {
+        String codigo = codigoVerificacionService.generar(usuario.getEmail(),
+                CodigoVerificacionService.Tipo.VERIFICACION);
+        emailService.enviarCodigoVerificacion(usuario.getEmail(), usuario.getNombre(), codigo);
     }
 
     public UsuarioResponse actualizar(Long id, UsuarioRequest request) {

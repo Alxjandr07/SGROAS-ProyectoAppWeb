@@ -21,22 +21,23 @@ public class ConductorController {
 
     @GetMapping
     public ResponseEntity&lt;Page&lt;ConductorResponse&gt;&gt; listar(
+            @RequestParam(required = false) String search,
             @PageableDefault(size = 10, sort = &quot;id&quot;) Pageable pageable
     ) {
-<span class="fc" id="L26">        return ResponseEntity.ok(conductorService.listar(pageable));</span>
+<span class="fc" id="L27">        return ResponseEntity.ok(conductorService.listar(search, pageable));</span>
     }
 
     @GetMapping(&quot;/{id}&quot;)
     public ResponseEntity&lt;ConductorResponse&gt; buscarPorId(@PathVariable Long id) {
-<span class="fc" id="L31">        return ResponseEntity.ok(conductorService.buscarPorId(id));</span>
+<span class="fc" id="L32">        return ResponseEntity.ok(conductorService.buscarPorId(id));</span>
     }
 
     @PostMapping
     public ResponseEntity&lt;ConductorResponse&gt; crear(
             @Valid @RequestBody ConductorRequest request
     ) {
-<span class="fc" id="L38">        ConductorResponse response = conductorService.crear(request);</span>
-<span class="fc" id="L39">        return ResponseEntity.status(HttpStatus.CREATED).body(response);</span>
+<span class="fc" id="L39">        ConductorResponse response = conductorService.crear(request);</span>
+<span class="fc" id="L40">        return ResponseEntity.status(HttpStatus.CREATED).body(response);</span>
     }
 
     @PutMapping(&quot;/{id}&quot;)
@@ -44,13 +45,13 @@ public class ConductorController {
             @PathVariable Long id,
             @Valid @RequestBody ConductorRequest request
     ) {
-<span class="fc" id="L47">        return ResponseEntity.ok(conductorService.actualizar(id, request));</span>
+<span class="fc" id="L48">        return ResponseEntity.ok(conductorService.actualizar(id, request));</span>
     }
 
     @DeleteMapping(&quot;/{id}&quot;)
     public ResponseEntity&lt;Void&gt; desactivar(@PathVariable Long id) {
-<span class="fc" id="L52">        conductorService.desactivar(id);</span>
-<span class="fc" id="L53">        return ResponseEntity.noContent().build();</span>
+<span class="fc" id="L53">        conductorService.desactivar(id);</span>
+<span class="fc" id="L54">        return ResponseEntity.noContent().build();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

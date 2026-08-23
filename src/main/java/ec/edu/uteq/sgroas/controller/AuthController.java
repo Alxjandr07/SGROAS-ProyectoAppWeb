@@ -1,9 +1,11 @@
 package ec.edu.uteq.sgroas.controller;
 
 import ec.edu.uteq.sgroas.dto.AuthResponse;
+import ec.edu.uteq.sgroas.dto.EmailRequest;
 import ec.edu.uteq.sgroas.dto.LoginRequest;
 import ec.edu.uteq.sgroas.dto.RefreshTokenRequest;
-import ec.edu.uteq.sgroas.dto.RegisterRequest;
+import ec.edu.uteq.sgroas.dto.RestablecerContrasenaRequest;
+import ec.edu.uteq.sgroas.dto.VerificarEmailRequest;
 import ec.edu.uteq.sgroas.entity.Usuario;
 import ec.edu.uteq.sgroas.repository.UsuarioRepository;
 import ec.edu.uteq.sgroas.security.JwtService;
@@ -21,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -62,14 +65,11 @@ public class AuthController {
         ));
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<AuthResponse> registrar(
-            @Valid @RequestBody RegisterRequest request
-    ) {
-        AuthResponse response = authService.registrar(request);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(response);
-    }
+    /*
+     * No existe registro publico: los usuarios los crea el ADMIN desde el
+     * modulo Usuarios (POST /api/usuarios) y ahi mismo se les envia por
+     * correo el codigo de activacion que se confirma en /verify-email.
+     */
 
     @PostMapping("/login")
     public ResponseEntity<?> login(
@@ -103,6 +103,52 @@ public class AuthController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, crearCookieAccessToken(response.accessToken()))
                 .body(response);
+    }
+
+    /** Confirma el codigo enviado al correo y activa la cuenta (inicia sesion). */
+    @PostMapping("/verify-email")
+    public ResponseEntity<AuthResponse> verificarEmail(
+            @Valid @RequestBody VerificarEmailRequest request
+    ) {
+        AuthResponse response = authService.verificarEmail(request.email(), request.codigo());
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, crearCookieAccessToken(response.accessToken()))
+                .body(response);
+    }
+
+    /** Reenvia el codigo de verificacion (respuesta generica para no revelar cuentas). */
+    @PostMapping("/resend-code")
+    public ResponseEntity<Map<String, String>> reenviarCodigo(
+            @Valid @RequestBody EmailRequest request
+    ) {
+        authService.reenviarCodigoVerificacion(request.email());
+        return ResponseEntity.ok(Map.of(
+                "mensaje",
+                "Si el correo corresponde a una cuenta pendiente, enviamos un nuevo codigo. Revisa tambien tu carpeta de spam."
+        ));
+    }
+
+    /** Solicita un codigo para restablecer la contrasena (respuesta generica). */
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Map<String, String>> olvidarContrasena(
+            @Valid @RequestBody EmailRequest request
+    ) {
+        authService.solicitarRestablecimiento(request.email());
+        return ResponseEntity.ok(Map.of(
+                "mensaje",
+                "Si el correo esta registrado, enviamos un codigo para restablecer la contrasena."
+        ));
+    }
+
+    /** Restablece la contrasena con el codigo recibido por correo. */
+    @PostMapping("/reset-password")
+    public ResponseEntity<Map<String, String>> restablecerContrasena(
+            @Valid @RequestBody RestablecerContrasenaRequest request
+    ) {
+        authService.restablecerContrasena(request.email(), request.codigo(), request.nuevaPassword());
+        return ResponseEntity.ok(Map.of(
+                "mensaje", "Contrasena actualizada correctamente. Ya puedes iniciar sesion."
+        ));
     }
 
     @PostMapping("/logout")

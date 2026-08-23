@@ -21,20 +21,28 @@ public class UsuarioController {
 
     @GetMapping
     public ResponseEntity&lt;Page&lt;UsuarioResponse&gt;&gt; listar(
+            @RequestParam(required = false) String search,
             @PageableDefault(size = 10, sort = &quot;id&quot;) Pageable pageable
     ) {
-<span class="fc" id="L26">        return ResponseEntity.ok(usuarioService.listar(pageable));</span>
+<span class="fc" id="L27">        return ResponseEntity.ok(usuarioService.listar(search, pageable));</span>
     }
 
     @GetMapping(&quot;/{id}&quot;)
     public ResponseEntity&lt;UsuarioResponse&gt; buscarPorId(@PathVariable Long id) {
-<span class="fc" id="L31">        return ResponseEntity.ok(usuarioService.buscarPorId(id));</span>
+<span class="fc" id="L32">        return ResponseEntity.ok(usuarioService.buscarPorId(id));</span>
     }
 
     @PostMapping
     public ResponseEntity&lt;UsuarioResponse&gt; crear(@Valid @RequestBody UsuarioRequest request) {
-<span class="fc" id="L36">        UsuarioResponse response = usuarioService.crear(request);</span>
-<span class="fc" id="L37">        return ResponseEntity.status(HttpStatus.CREATED).body(response);</span>
+<span class="fc" id="L37">        UsuarioResponse response = usuarioService.crear(request);</span>
+<span class="fc" id="L38">        return ResponseEntity.status(HttpStatus.CREATED).body(response);</span>
+    }
+
+    /** Reenvia el codigo de activacion al correo de un usuario sin verificar. */
+    @PostMapping(&quot;/{id}/reenviar-activacion&quot;)
+    public ResponseEntity&lt;Void&gt; reenviarActivacion(@PathVariable Long id) {
+<span class="nc" id="L44">        usuarioService.reenviarCodigoActivacion(id);</span>
+<span class="nc" id="L45">        return ResponseEntity.noContent().build();</span>
     }
 
     @PutMapping(&quot;/{id}&quot;)
@@ -42,13 +50,13 @@ public class UsuarioController {
             @PathVariable Long id,
             @Valid @RequestBody UsuarioRequest request
     ) {
-<span class="fc" id="L45">        return ResponseEntity.ok(usuarioService.actualizar(id, request));</span>
+<span class="fc" id="L53">        return ResponseEntity.ok(usuarioService.actualizar(id, request));</span>
     }
 
     @DeleteMapping(&quot;/{id}&quot;)
     public ResponseEntity&lt;Void&gt; desactivar(@PathVariable Long id) {
-<span class="fc" id="L50">        usuarioService.desactivar(id);</span>
-<span class="fc" id="L51">        return ResponseEntity.noContent().build();</span>
+<span class="fc" id="L58">        usuarioService.desactivar(id);</span>
+<span class="fc" id="L59">        return ResponseEntity.noContent().build();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

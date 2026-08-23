@@ -35,17 +35,31 @@ class DtoTest {
     }
 
     @Test
-    void registerRequestDebeConservarValores() {
-        RegisterRequest request = new RegisterRequest(
-                "Maria Poveda", "maria@sgroas.com", "123456", "ROLE_OPERADOR"
+    void emailRequestDebeConservarValores() {
+        EmailRequest request = new EmailRequest("maria@sgroas.com");
+
+        assertEquals("maria@sgroas.com", request.email());
+    }
+
+    @Test
+    void verificarEmailRequestDebeConservarValores() {
+        VerificarEmailRequest request = new VerificarEmailRequest(
+                "maria@sgroas.com", "123456"
         );
 
-        assertEquals("Maria Poveda", request.nombre());
         assertEquals("maria@sgroas.com", request.email());
-        assertEquals("123456", request.password());
-        assertEquals("ROLE_OPERADOR", request.rol());
-        assertNotEquals(request, new RegisterRequest(
-                "Otra", "maria@sgroas.com", "123456", "ROLE_OPERADOR"));
+        assertEquals("123456", request.codigo());
+    }
+
+    @Test
+    void restablecerContrasenaRequestDebeConservarValores() {
+        RestablecerContrasenaRequest request = new RestablecerContrasenaRequest(
+                "maria@sgroas.com", "654321", "nuevaClave1"
+        );
+
+        assertEquals("maria@sgroas.com", request.email());
+        assertEquals("654321", request.codigo());
+        assertEquals("nuevaClave1", request.nuevaPassword());
     }
 
     @Test

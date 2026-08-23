@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { catchError, EMPTY } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { LoginRequest, LoginResponse } from '../models/auth.model';
+import { LoginRequest, LoginResponse, MensajeResponse } from '../models/auth.model';
 
 const SESION_KEY = 'sgroas_sesion';
 
@@ -25,6 +25,37 @@ export class Auth {
         withCredentials: true
       })
       .pipe(tap((response) => this.guardarSesion(response)));
+  }
+
+  /** Confirma el codigo de 6 digitos y deja la sesion iniciada. */
+  verificarEmail(email: string, codigo: string): Observable<LoginResponse> {
+    return this.http
+      .post<LoginResponse>(
+        `${this.apiUrl}/verify-email`,
+        { email, codigo },
+        { withCredentials: true }
+      )
+      .pipe(tap((response) => this.guardarSesion(response)));
+  }
+
+  reenviarCodigo(email: string): Observable<MensajeResponse> {
+    return this.http.post<MensajeResponse>(`${this.apiUrl}/resend-code`, { email });
+  }
+
+  olvidarContrasena(email: string): Observable<MensajeResponse> {
+    return this.http.post<MensajeResponse>(`${this.apiUrl}/forgot-password`, { email });
+  }
+
+  restablecerContrasena(
+    email: string,
+    codigo: string,
+    nuevaPassword: string
+  ): Observable<MensajeResponse> {
+    return this.http.post<MensajeResponse>(`${this.apiUrl}/reset-password`, {
+      email,
+      codigo,
+      nuevaPassword
+    });
   }
 
   logout(): Observable<void> {

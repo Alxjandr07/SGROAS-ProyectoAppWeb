@@ -56,21 +56,48 @@ class AuthControllerTest {
     }
 
     @Test
-    void registrarDebeRetornar201() throws Exception {
-        when(authService.registrar(any())).thenReturn(authResponse());
+    void verificarEmailDebeRetornar200YCookie() throws Exception {
+        when(authService.verificarEmail(any(), any())).thenReturn(authResponse());
 
-        mockMvc().perform(post("/api/auth/register")
+        mockMvc().perform(post("/api/auth/verify-email")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "nombre": "Administrador SGROAS",
                                   "email": "admin@sgroas.com",
-                                  "password": "123456",
-                                  "rol": "ROLE_ADMIN"
+                                  "codigo": "123456"
                                 }
                                 """))
-                .andExpect(status().isCreated())
+                .andExpect(status().isOk())
+                .andExpect(header().exists("Set-Cookie"))
                 .andExpect(jsonPath("$.accessToken").value("access-token"));
+    }
+
+    @Test
+    void olvidarContrasenaDebeRetornar200ConMensajeGenerico() throws Exception {
+        mockMvc().perform(post("/api/auth/forgot-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "email": "admin@sgroas.com"
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.mensaje").exists());
+    }
+
+    @Test
+    void restablecerContrasenaDebeRetornar200() throws Exception {
+        mockMvc().perform(post("/api/auth/reset-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "email": "admin@sgroas.com",
+                                  "codigo": "654321",
+                                  "nuevaPassword": "nueva-clave-1"
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.mensaje").exists());
     }
 
     @Test

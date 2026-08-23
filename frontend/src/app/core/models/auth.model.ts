@@ -3,6 +3,10 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface MensajeResponse {
+  mensaje: string;
+}
+
 export interface LoginResponse {
   accessToken: string;
   refreshToken: string;

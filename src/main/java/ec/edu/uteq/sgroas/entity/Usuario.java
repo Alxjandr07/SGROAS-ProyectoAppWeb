@@ -34,6 +34,10 @@ public class Usuario {
     @Column(name = "activo", nullable = false)
     private Boolean activo;
 
+    /** false mientras la cuenta no confirma el codigo enviado a su correo. */
+    @Column(name = "verificado", nullable = false)
+    private Boolean verificado;
+
     @Column(name = "creado_en", nullable = false, updatable = false)
     private Instant creadoEn;
 
