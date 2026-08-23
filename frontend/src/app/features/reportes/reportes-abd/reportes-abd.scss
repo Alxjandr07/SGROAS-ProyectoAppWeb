@@ -2,6 +2,19 @@
   display: block;
 }
 
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+
+  h1 {
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    margin: 0;
+  }
+}
+
 .page-desc {
   color: var(--color-text-muted);
   margin-top: 0.25rem;
@@ -10,6 +23,31 @@
 .loading-text {
   color: var(--color-text-muted);
   padding: 2rem 0;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.2rem;
+  background: var(--color-teal);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s;
+
+  &:hover:not(:disabled) {
+    background: var(--color-teal-hover);
+  }
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .kpis {
