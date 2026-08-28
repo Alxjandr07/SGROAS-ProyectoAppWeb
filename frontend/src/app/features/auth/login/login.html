@@ -81,10 +81,10 @@
             {{ loading() ? 'Ingresando...' : 'Ingresar al sistema' }}
           </button>
 
-          <div class="demo-divider"><span>CUENTAS DE DEMOSTRACIÓN · admin123</span></div>
+          <div class="demo-divider"><span>CUENTAS DE DEMOSTRACIÓN</span></div>
           <div class="cuentas-demo">
             @for (c of cuentasDemo; track c.email) {
-              <button type="button" class="cuenta" (click)="usarCuenta(c.email)" [disabled]="loading()">
+              <button type="button" class="cuenta" (click)="usarCuenta(c)" [disabled]="loading()">
                 <strong>{{ c.rol }}</strong>
                 <span>{{ c.email }}</span>
                 <small>{{ c.detalle }}</small>

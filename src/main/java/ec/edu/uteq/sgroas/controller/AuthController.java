@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
@@ -36,15 +37,23 @@ public class AuthController {
     private final TokenService tokenService;
     private final UsuarioRepository usuarioRepository;
 
+    @Value("${app.cookie.secure:false}")
+    private boolean cookieSecure;
+
     @GetMapping("/me")
     public ResponseEntity<AuthResponse> me(
-            @CookieValue(name = "access_token", required = false) String accessTokenCookie
+            @CookieValue(name = "access_token", required = false) String accessTokenCookie,
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader
     ) {
-        if (accessTokenCookie == null || accessTokenCookie.isBlank()
-                || tokenService.accessTokenEnBlacklist(accessTokenCookie)) {
+        String token = accessTokenCookie;
+        if ((token == null || token.isBlank()) && authorizationHeader != null
+                && authorizationHeader.startsWith("Bearer ")) {
+            token = authorizationHeader.substring(7);
+        }
+        if (token == null || token.isBlank() || tokenService.accessTokenEnBlacklist(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        String email = jwtService.extraerEmail(accessTokenCookie);
+        String email = jwtService.extraerEmail(token);
         if (email == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -169,7 +178,7 @@ public class AuthController {
     private String crearCookieAccessToken(String token) {
         return ResponseCookie.from("access_token", token)
                 .httpOnly(true)
-                .secure(true)
+                .secure(cookieSecure)
                 .sameSite("Strict")
                 .path("/")
                 .maxAge(Duration.ofHours(1))
@@ -180,7 +189,7 @@ public class AuthController {
     private String eliminarCookieAccessToken() {
         return ResponseCookie.from("access_token", "")
                 .httpOnly(true)
-                .secure(true)
+                .secure(cookieSecure)
                 .sameSite("Strict")
                 .path("/")
                 .maxAge(0)

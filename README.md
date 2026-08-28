@@ -53,7 +53,10 @@ Sistema disponible en `http://localhost:8080`.
 |---|---|---|
 | admin@sgroas.com | ADMIN | admin123 |
 | coordinador@sgroas.com | COORDINADOR | coord123 |
-| seguridad@sgroas.com | SEGURIDAD | seg123 |
+| seguridad@sgroas.com | SEGURIDAD | segur123 |
+
+> Cada usuario tiene su contraseña propia (no se comparte). Los hashes se
+> generan con `BCryptPasswordEncoder` (strength 10) en `V2__seed.sql`.
 
 ## Estructura del repositorio
 

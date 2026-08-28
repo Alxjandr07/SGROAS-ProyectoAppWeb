@@ -30,10 +30,9 @@ export class Login implements OnDestroy {
   private temporizador: ReturnType<typeof setInterval> | null = null;
 
   cuentasDemo = [
-    { email: 'admin@sgroas.com', rol: 'Administrador', detalle: 'Acceso total al sistema' },
-    { email: 'coordinador@sgroas.com', rol: 'Coordinador', detalle: 'Flota, unidades, rutas y programaciones' },
-    { email: 'seguridad@sgroas.com', rol: 'Seguridad', detalle: 'Incidentes y alertas' },
-    { email: 'operador@sgroas.com', rol: 'Operador', detalle: 'Registro de programaciones' },
+    { email: 'admin@sgroas.com', password: 'admin123', rol: 'Administrador', detalle: 'Acceso total al sistema' },
+    { email: 'coordinador@sgroas.com', password: 'coord123', rol: 'Coordinador', detalle: 'Flota, unidades, rutas y programaciones' },
+    { email: 'seguridad@sgroas.com', password: 'segur123', rol: 'Seguridad', detalle: 'Incidentes y alertas' },
   ];
 
   loginForm = this.fb.group({
@@ -77,8 +76,8 @@ export class Login implements OnDestroy {
     this.vista.set(vista);
   }
 
-  usarCuenta(email: string): void {
-    this.loginForm.patchValue({ email, password: 'admin123' });
+  usarCuenta(cuenta: { email: string; password: string }): void {
+    this.loginForm.patchValue({ email: cuenta.email, password: cuenta.password });
     this.onSubmit();
   }
 

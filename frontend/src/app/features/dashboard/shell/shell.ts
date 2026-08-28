@@ -40,7 +40,7 @@ export class Shell implements OnInit, OnDestroy {
     { label: 'Flota Vehicular', path: 'flota', roles: ['ADMIN', 'COORDINADOR'] },
     { label: 'Unidades', path: 'unidades', roles: ['ADMIN', 'COORDINADOR'] },
     { label: 'Rutas', path: 'rutas', roles: ['ADMIN', 'COORDINADOR'] },
-    { label: 'Programaciones', path: 'programaciones', roles: ['ADMIN', 'COORDINADOR', 'OPERADOR'] },
+    { label: 'Programaciones', path: 'programaciones', roles: ['ADMIN', 'COORDINADOR'] },
     { label: 'Seguridad', path: 'seguridad', roles: ['ADMIN', 'SEGURIDAD'] },
     { label: 'Reportes', path: 'reportes', roles: null }
   ];

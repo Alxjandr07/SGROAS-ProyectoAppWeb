@@ -3,8 +3,13 @@
 -- Reproduce la carga de datos de sgroas_db de forma reproducible.
 -- Uso (pgAdmin4 Query Tool o psql):
 --   psql -d sgroas_db -v escala=1000000 -f db/data/generar_datos_masivos.sql
--- Parametro :escala = total aproximado de registros a generar (default 1M).
+-- Parametro :escala = numero de programaciones a generar (default 1M).
+-- Con escala=1000000 se superan 1 millon de registros en total
+-- (programacion = :escala, mas incidentes, alertas, auditoria, etc.).
 -- ============================================================
+
+-- Omite los disparadores de auditoria (V12) durante la carga masiva.
+SELECT set_config('app.bulk_load', 'on', false);
 
 -- ---------- Catalogos base ----------
 INSERT INTO provincia (id_provincia, nombre) VALUES
@@ -37,10 +42,10 @@ INSERT INTO terminal (id_terminal, nombre, id_ciudad) VALUES
 ON CONFLICT (id_terminal) DO NOTHING;
 
 INSERT INTO rol (id_rol, nombre, descripcion) VALUES
-    (1,'ADMIN','Acceso total al sistema'),
-    (2,'COORDINADOR','Gestion operativa de flota y rutas'),
-    (3,'SEGURIDAD','Consulta y registro de incidentes'),
-    (4,'OPERADOR','Registro de programaciones diarias')
+    (1,'ROLE_ADMIN','Acceso total al sistema'),
+    (2,'ROLE_COORDINADOR','Gestion operativa de flota y rutas'),
+    (3,'ROLE_SEGURIDAD','Consulta y registro de incidentes'),
+    (4,'ROLE_OPERADOR','Registro de programaciones diarias')
 ON CONFLICT (id_rol) DO NOTHING;
 
 -- ---------- Usuarios ----------
@@ -127,7 +132,7 @@ SELECT
     (SELECT MIN(id_unidad) FROM unidad) + (g % GREATEST((SELECT COUNT(*) FROM unidad), 1)),
     (SELECT MIN(id_conductor) FROM conductor) + (g % GREATEST((SELECT COUNT(*) FROM conductor), 1)),
     NULLIF((SELECT MIN(id_usuario) FROM usuario) + (g % GREATEST((SELECT COUNT(*) FROM usuario), 1)), 0)
-FROM generate_series(1, :escala / 2) AS g
+FROM generate_series(1, :escala) AS g
 WHERE NOT EXISTS (SELECT 1 FROM programacion LIMIT 1);
 
 -- ---------- Incidentes ----------
@@ -162,3 +167,6 @@ SELECT
     (SELECT MIN(id_usuario) FROM usuario) + (g % GREATEST((SELECT COUNT(*) FROM usuario), 1))
 FROM generate_series(1, GREATEST(:escala / 10, 10)) AS g
 WHERE NOT EXISTS (SELECT 1 FROM auditoria LIMIT 1);
+
+-- Reactiva la auditoria para el uso normal de la aplicacion.
+SELECT set_config('app.bulk_load', 'off', false);

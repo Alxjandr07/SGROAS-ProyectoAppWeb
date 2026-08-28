@@ -1,8 +1,10 @@
 <div class="overview">
   <div class="overview-header">
     <div>
-      <span class="tag">PANEL PRINCIPAL</span>
-      <h1>Resumen general</h1>
+      <span class="tag">{{ panel().tag }}</span>
+      <h1>{{ panel().titulo }}</h1>
+      <p class="bienvenida">Bienvenido, <strong>{{ userName() }}</strong></p>
+      <p class="panel-resumen">{{ panel().resumen }}</p>
     </div>
     <button class="btn-primary" (click)="cargar()" [disabled]="loading()">Actualizar</button>
   </div>
@@ -21,6 +23,41 @@
         </div>
       }
     </div>
+
+    @if (rol() === 'COORDINADOR') {
+      <section class="panel-detalle">
+        <h2>Rutas con mayor demanda</h2>
+        <ul class="lista-detalle">
+          @for (r of topRutas(); track r.idRuta) {
+            <li><span>{{ r.descripcion }}</span><strong>{{ r.totalProgramaciones | number }}</strong></li>
+          } @empty {
+            <li class="vacio">Sin datos todavía.</li>
+          }
+        </ul>
+      </section>
+    } @else if (rol() === 'SEGURIDAD') {
+      <section class="panel-detalle">
+        <h2>Incidentes por nivel de riesgo</h2>
+        <ul class="lista-detalle">
+          @for (c of incidentesNivel(); track c.clave) {
+            <li><span>{{ c.clave }}</span><strong>{{ c.total | number }}</strong></li>
+          } @empty {
+            <li class="vacio">Sin incidentes registrados.</li>
+          }
+        </ul>
+      </section>
+    } @else {
+      <section class="panel-detalle">
+        <h2>Programaciones por estado</h2>
+        <ul class="lista-detalle">
+          @for (c of programacionesEstado(); track c.clave) {
+            <li><span>{{ c.clave }}</span><strong>{{ c.total | number }}</strong></li>
+          } @empty {
+            <li class="vacio">Sin datos todavía.</li>
+          }
+        </ul>
+      </section>
+    }
   }
 
   <h2>Módulos del sistema</h2>
