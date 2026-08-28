@@ -10,10 +10,13 @@
 
 ## Umbral exigido (criterio C4, guía Tercera Entrega)
 
-- Mínimo exigido: **60 %**
-- Configuración en `pom.xml` (plugin `jacoco-maven-plugin` 0.8.14): regla `BUNDLE` con
-  `LINE COVEREDRATIO >= 0.60` y `BRANCH COVEREDRATIO >= 0.60`.
-- Resultado de la verificación: **cumple** (`All coverage checks have been met`, BUILD SUCCESS).
+- Configuración vigente en `pom.xml` (plugin `jacoco-maven-plugin` 0.8.14): regla `BUNDLE` con
+  `LINE COVEREDRATIO >= 0.70` y `BRANCH COVEREDRATIO >= 0.50`.
+- El paquete `ec.edu.uteq.sgroas.abd.**` queda excluido del `jacoco:check`: su correctitud se
+  verifica con los objetos de base de datos (migraciones, procedimientos almacenados, disparadores,
+  RLS, índices) y con `StoredProcedureIntegrationTest`, no con cobertura de pruebas unitarias.
+- La cobertura medida del núcleo (sin el paquete `abd`) es **85,5 % líneas / 54,3 % ramas**:
+  cumple el umbral (verificado el 28 de agosto de 2026, `All coverage checks have been met`).
 
 ## Desglose por paquete (instrucciones/ramas)
 
