@@ -42,9 +42,17 @@ check_grep "Concatenacion de texto en SQL" \
     "\|[[:space:]]*'|'[[:space:]]*\|" \
     "$ROOT/db/procs"
 
-# 3) Concatenacion de strings en consultas JPA/Hibernate del codigo Java
-check_grep "JPQL/HQL con concatenacion de entrada" \
-    "@Query|createQuery|nativeQuery" \
+# 3) Concatenacion de strings (operador +) en consultas JPA/Hibernate del codigo
+#    Java. Permite consultas estaticas y parametrizadas (text blocks o nativeQuery
+#    con :param); falla solo si se concatena texto para construir la consulta.
+check_grep "JPQL/HQL/SQL nativo con concatenacion Java (+)" \
+    "(createQuery|createNativeQuery|createSQLQuery|@Query)[^;]*\+" \
+    "$ROOT/src/main"
+
+# 3b) createNativeQuery invocado con un String construido dinamicamente
+#     (no literal), sinonimo de SQL construido en runtime.
+check_grep "createNativeQuery con argumento dinamico" \
+    "createNativeQuery[[:space:]]*\([[:space:]]*[A-Za-z_$]" \
     "$ROOT/src/main"
 
 # 4) Dependencia de ddl-auto=update en configuracion
