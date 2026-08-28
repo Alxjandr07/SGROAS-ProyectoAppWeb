@@ -58,6 +58,20 @@ Sistema disponible en `http://localhost:8080`.
 > Cada usuario tiene su contraseña propia (no se comparte). Los hashes se
 > generan con `BCryptPasswordEncoder` (strength 10) en `V2__seed.sql`.
 
+## Comprobación de funcionalidades (Bases de Datos Avanzadas - ABD)
+
+El repositorio incluye los elementos ABD requeridos y las instrucciones para
+reproducirlos y comprobarlos:
+
+| Requisito ABD | Dónde está | Cómo comprobar |
+|---|---|---|
+| BD con **+1M de registros** | `db/data/generar_datos_masivos.sql` + `docs/basedatos/CARGA-MASIVA-ABD.md` | `SELECT (SELECT count(*) FROM programacion) + ...` (> 1.000.000 de hechos) |
+| **Usuarios, roles y privilegios** | `db/seguridad/seguridades_bd_sgroas.sql` + `docs/basedatos/SEGURIDAD-ABD.md` | Roles `usr_admin_coop`, `usr_coordinador`, `usr_seguridad_vial` con RLS |
+| **Respaldos y recuperación** | `scripts/backup-prod.sh` + `docs/despliegue/BACKUP.md` + `docs/despliegue/RUNBOOK.md` | Ejecutar `bash scripts/backup-prod.sh` y restaurar con `pg_restore` |
+| **Optimización de consultas** | `V11`/`V13` índices + `docs/basedatos/INDICES-ABD.md` | `EXPLAIN (ANALYZE, BUFFERS)` muestra `Index Scan` en vez de `Seq Scan` |
+| **Auditoría de BD** | `V12` triggers + `docs/basedatos/AUDITORIA-ABD.md` | Insertar/actualizar y ver la fila nueva en `auditoria` |
+| **Elementos programables** | `V5`, `V12`, `V13` + `docs/basedatos/ELEMENTOS-PROGRAMABLES.md` | Funciones, cursores explícitos y procedimientos con validación (comandos incluidos) |
+
 ## Estructura del repositorio
 
 ```

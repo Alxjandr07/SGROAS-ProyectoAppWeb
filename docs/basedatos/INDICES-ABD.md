@@ -23,6 +23,11 @@ ANALYZE incidente;
 ANALYZE auditoria;
 ```
 
+> `idx_prog_estado` (V13) se agrego posteriormente para dar soporte a la funcion
+> escalar `fn_total_programaciones(p_estado)` (ver `ELEMENTOS-PROGRAMABLES.md`).
+> Su medicion con `EXPLAIN ANALYZE` sobre `WHERE estado = 'Programado'` reduce la
+> cantidad de filas leidas sobre el millon de programaciones respecto a un `Seq Scan`.
+
 ## Evidencia de rendimiento (promedio de 5 ejecuciones)
 
 | # | Índice | Tabla (columnas) | Antes (ms) | Después (ms) | Mejora |

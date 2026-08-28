@@ -11,6 +11,15 @@
 | 5 | `sp_reporte_rendimiento_rutas` | PROCEDURE | Reporte de rendimiento por ruta con metricas | `@Procedure` en `RutaRepository` |
 | 6 | `fn_licencias_por_vencer` | PROCEDURE | Conductores con licencias por vencer | `@Procedure` en `ConductorRepository` |
 | 7 | `fn_estadisticas_generales` | PROCEDURE | Estadisticas generales del sistema | `@Procedure` en `IncidenteRepository` |
+| 8 | `fn_total_programaciones` | FUNCTION | Total de programaciones (filtro por estado) | `SELECT fn_total_programaciones('Programado')` |
+| 9 | `fn_nivel_atencion_incidente` | FUNCTION | Clasifica nivel de atencion segun alertas | `SELECT fn_nivel_atencion_incidente(id) FROM incidente` |
+| 10 | `fn_resumen_programaciones_por_unidad` | FUNCTION | Agrega programaciones por unidad con cursor explicito | `SELECT * FROM fn_resumen_programaciones_por_unidad()` |
+| 11 | `sp_registrar_incidente` | PROCEDURE | Registra incidente con validacion y auditoria | `CALL sp_registrar_incidente(...)` |
+
+> Los elementos 8-11 se instalan en la migracion `V13__funciones_cursores_sgroas.sql`
+> (sincronizada con `db/procs/*.sql`) y completan la cobertura de las cuatro
+> categorias de elementos programables exigidas por ABD (funciones, procedimientos,
+> cursores y disparadores). Ver `docs/basedatos/ELEMENTOS-PROGRAMABLES.md`.
 
 > **Firma de invocacion (JPA 2.1+):** todos los procedimientos usan un parametro
 > `INOUT cur refcursor` que transporta el result set. Se invocan EXCLUSIVAMENTE
@@ -142,3 +151,88 @@ Estadisticas resumidas del sistema, util para dashboards.
 **Columnas retornadas:** `total_conductores`, `conductores_activos`, `total_vehiculos`, `vehiculos_activos`, `total_rutas`, `rutas_activas`, `total_asignaciones`, `asignaciones_activas`, `total_incidentes`, `incidentes_abiertos`
 
 **Uso:** Dashboard principal, KPIs del sistema.
+
+---
+
+## 8. `fn_total_programaciones`
+
+**Archivo:** `db/procs/fn_total_programaciones.sql`
+
+Funcion escalar que retorna la cantidad de programaciones, total o filtrada por estado. Es la implementacion SGROAS de la funcion escalar "count por categoria" (PARTE I del enunciado de ABD).
+
+**Parametros:**
+
+| Parametro | Tipo | Descripcion |
+|-----------|------|-------------|
+| `p_estado` | VARCHAR (opcional, `NULL` = todas) | Estados: `Programado`, `Realizado`, `Cancelado` |
+
+**Retorno:** `BIGINT` — el filtro por estado usa `idx_prog_estado`.
+
+**Uso:** `SELECT fn_total_programaciones('Programado');`
+
+---
+
+## 9. `fn_nivel_atencion_incidente`
+
+**Archivo:** `db/procs/fn_nivel_atencion_incidente.sql`
+
+Funcion escalar que clasifica el nivel de atencion de un incidente segun la cantidad de alertas asociadas, usando estructura de seleccion IF/ELSE (equivale a los ejercicios de clasificacion de la PARTE I).
+
+**Reglas:** 0 alertas → `SIN_ALERTA`; 1 → `BAJO`; 2 → `MEDIO`; 3+ → `CRITICO`.
+
+**Parametros:**
+
+| Parametro | Tipo | Descripcion |
+|-----------|------|-------------|
+| `p_id_incidente` | INTEGER | ID del incidente a clasificar |
+
+**Uso:** `SELECT fn_nivel_atencion_incidente(i.id_incidente) FROM incidente i;`
+
+---
+
+## 10. `fn_resumen_programaciones_por_unidad`
+
+**Archivo:** `db/procs/fn_resumen_programaciones_por_unidad.sql`
+
+Funcion que recorre todas las unidades con un **cursor explicito** (`DECLARE CURSOR`, `OPEN`, `FETCH NEXT INTO`, `EXIT WHEN NOT FOUND`, `CLOSE`) y agrega el total de programaciones, realizadas y canceladas por unidad (estructura de la PARTE III del enunciado).
+
+**Retorno (tabla):** `placa`, `modelo`, `capacidad`, `total_programaciones`, `programaciones_realizadas`, `programaciones_canceladas`.
+
+**Uso:** `SELECT * FROM fn_resumen_programaciones_por_unidad();`
+
+---
+
+## 11. `sp_registrar_incidente`
+
+**Archivo:** `db/procs/sp_registrar_incidente.sql`
+
+Procedimiento que registra un incidente **validando antes de insertar** (mismo patron `IF EXISTS` / validacion del `spInsertarCliente` de la PARTE II): la unidad debe existir, el nivel sugerido debe ser `ALTO`/`MEDIO`/`BAJO` y el usuario (opcional) debe existir. La insercion dispara el trigger de auditoria (`V12`), por lo que el alta queda auditada.
+
+**Parametros:**
+
+| Parametro | Tipo | Descripcion |
+|-----------|------|-------------|
+| `p_tipo` | VARCHAR | Tipo de incidente |
+| `p_descripcion` | TEXT | Descripcion |
+| `p_nivel_sugerido` | VARCHAR | `ALTO`, `MEDIO` o `BAJO` |
+| `p_id_unidad` | INTEGER | Unidad asociada (debe existir) |
+| `p_id_usuario` | INTEGER | Usuario que registra (opcional, se audita) |
+| `p_id_incidente` (OUT) | INTEGER | ID generado |
+
+**Uso (valido):**
+
+```sql
+DO $$
+DECLARE nuevo_id INTEGER;
+BEGIN
+    CALL sp_registrar_incidente('AVERIA_MECANICA', 'Fallo de frenos', 'ALTO', 1, 1, nuevo_id);
+    RAISE NOTICE 'Incidente registrado con id=%', nuevo_id;
+END $$;
+```
+
+**Uso (invalido, lanza excepcion y no inserta):**
+
+```sql
+CALL sp_registrar_incidente('AVERIA_MECANICA', 'x', 'ALTO', 999999, NULL, NULL);
+CALL sp_registrar_incidente('INFRACCION', 'y', 'CRITICO', 1, NULL, NULL);
+```
