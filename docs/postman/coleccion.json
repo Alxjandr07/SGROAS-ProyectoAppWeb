@@ -1,14 +1,15 @@
 {
   "info": {
-    "name": "SGROAS API — Entrega 3",
-    "description": "Coleccion de la API REST de SGROAS para la Tercera Entrega (v0.9.0-rc)",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-  },
+     "name": "SGROAS API — Entrega Final",
+     "description": "Coleccion de la API REST de SGROAS para la Entrega Final (v1.0.0) — 28 peticiones: exito, validacion 422, autorizacion 401/403 y no encontrado 404. Variables: baseUrl, adminEmail, adminPassword, token (Bearer JWT).",
+     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+   },
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:8080/api" },
-    { "key": "adminEmail", "value": "admin@sgroas.com" },
-    { "key": "adminPassword", "value": "admin123" }
-  ],
+     { "key": "baseUrl", "value": "http://localhost:8080/api" },
+     { "key": "adminEmail", "value": "admin@sgroas.com" },
+     { "key": "adminPassword", "value": "admin123" },
+     { "key": "token", "value": "" }
+   ],
   "item": [
     {
       "name": "Auth",
@@ -92,10 +93,65 @@
           "request": { "method": "DELETE", "url": "{{baseUrl}}/usuarios/1" }
         },
         {
-          "name": "Crear usuario 422 email duplicado",
-          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"nombre\":\"Admin Duplicado\",\"email\":\"admin@sgroas.com\",\"password\":\"test123\",\"rol\":\"ROLE_ADMIN\"}" }, "url": "{{baseUrl}}/usuarios" }
-        }
-      ]
-    }
-  ]
+           "name": "Crear usuario 422 email duplicado",
+           "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"nombre\":\"Admin Duplicado\",\"email\":\"admin@sgroas.com\",\"password\":\"test123\",\"rol\":\"ROLE_ADMIN\"}" }, "url": "{{baseUrl}}/usuarios" }
+         }
+       ]
+     },
+     {
+       "name": "Auth — sesion",
+       "item": [
+         {
+           "name": "Me (perfil autenticado 200)",
+           "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/auth/me" }
+         },
+         {
+           "name": "Refresh token 200",
+           "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"refreshToken\":\"{{token}}\"}" }, "url": "{{baseUrl}}/auth/refresh" }
+         },
+         {
+           "name": "Listar conductores sin token 401",
+           "request": { "method": "GET", "url": "{{baseUrl}}/conductores?page=0&size=10" }
+         }
+       ]
+     },
+     {
+       "name": "Vehiculos",
+       "item": [
+         {
+           "name": "Listar vehiculos 200",
+           "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/vehiculos?page=0&size=10" }
+         },
+         {
+           "name": "Crear vehiculo 201",
+           "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }], "body": { "mode": "raw", "raw": "{\"placa\":\"ABC-1234\",\"marca\":\"Chevrolet\",\"modelo\":\"2024\",\"anio\":2024,\"capacidad\":40,\"estado\":\"ACTIVO\"}" }, "url": "{{baseUrl}}/vehiculos" }
+         },
+         {
+           "name": "Vehiculo no encontrado 404",
+           "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/vehiculos/9999" }
+         },
+         {
+           "name": "Crear vehiculo 422 validacion",
+           "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }], "body": { "mode": "raw", "raw": "{\"placa\":\"\",\"marca\":\"\",\"modelo\":\"\",\"anio\":null,\"capacidad\":null,\"estado\":\"\"}" }, "url": "{{baseUrl}}/vehiculos" }
+         }
+       ]
+     },
+     {
+       "name": "Rutas",
+       "item": [
+         {
+           "name": "Listar rutas 200",
+           "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/rutas?page=0&size=10" }
+         },
+         {
+           "name": "Crear ruta 201",
+           "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }], "body": { "mode": "raw", "raw": "{\"origen\":\"Quevedo\",\"destino\":\"Guayaquil\",\"distanciaKm\":180,\"duracionMin\":150,\"estado\":\"ACTIVA\"}" }, "url": "{{baseUrl}}/rutas" }
+         },
+         {
+           "name": "Ruta no encontrada 404",
+           "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/rutas/9999" }
+         }
+       ]
+     }
+   ]
 }

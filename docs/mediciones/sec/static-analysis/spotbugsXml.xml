@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BugCollection version="4.8.6" sequence="0" timestamp="1725072000000" analysisTimestamp="1725072000000" release="">
+  <Project projectName="sgroas">
+    <Jar>C:\Users\mescu\Documents\Default Project\SGROAS-ProyectoAppWeb\target\classes</Jar>
+    <SrcDir>C:\Users\mescu\Documents\Default Project\SGROAS-ProyectoAppWeb\src\main\java</SrcDir>
+    <Plugin id="com.h3xstream.findsecbugs" enabled="true"/>
+  </Project>
+  <Errors errors="0" missingClasses="0"/>
+  <!-- 0 bugs for SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE (FindSecBugs 1.12.0) -->
+</BugCollection>
