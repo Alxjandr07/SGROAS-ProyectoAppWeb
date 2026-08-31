@@ -1,5 +1,6 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Location } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConductorService } from '../../../core/services/conductor.service';
@@ -19,6 +20,7 @@ export class ConductorFormulario implements OnInit {
   private service = inject(ConductorService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private location = inject(Location);
 
   editId = signal<number | null>(null);
   loading = signal(false);
@@ -66,6 +68,14 @@ export class ConductorFormulario implements OnInit {
           this.loadingData.set(false);
         },
       });
+    }
+  }
+
+  volver(): void {
+    if (window.history.length > 1) {
+      this.location.back();
+    } else {
+      this.router.navigate(['/dashboard/flota']);
     }
   }
 

@@ -32,7 +32,7 @@ dataset-sgroas/
 ├── perf/                     ← 3 corridas k6 + análisis + figuras
 ├── sus/                      ← SUS P01–P10 + análisis + figura
 ├── lighthouse/               ← JSON de corridas LHCI + resúmenes
-├── zap/                      ← resumen del baseline planificado
+├── zap/                      ← resumen del baseline OWASP ZAP
 └── jacoco/                   ← informe Jacoco (jacoco.xml + csv)
 ```
 

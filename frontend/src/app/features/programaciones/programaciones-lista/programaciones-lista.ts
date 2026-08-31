@@ -56,6 +56,7 @@ export class ProgramacionesLista implements OnInit, OnDestroy {
   errorMsg = signal<string | null>(null);
   errorForm = signal<string | null>(null);
   mostrandoFormulario = signal(false);
+  editandoId = signal<number | null>(null);
 
   totalPages = signal(0);
   totalElements = signal(0);
@@ -160,12 +161,29 @@ export class ProgramacionesLista implements OnInit, OnDestroy {
   abrirFormulario(): void {
     this.form.reset({ estado: 'Programado' });
     this.errorForm.set(null);
+    this.editandoId.set(null);
+    this.mostrandoFormulario.set(true);
+  }
+
+  editar(p: ProgramacionAbd): void {
+    this.form.setValue({
+      fecha: p.fecha,
+      horaSalida: p.horaSalida,
+      horaEstimadaLlegada: p.horaEstimadaLlegada,
+      estado: p.estado,
+      idRuta: p.idRuta,
+      idUnidad: p.idUnidad,
+      idConductor: p.idConductor,
+    });
+    this.errorForm.set(null);
+    this.editandoId.set(p.idProgramacion);
     this.mostrandoFormulario.set(true);
   }
 
   cancelar(): void {
     this.mostrandoFormulario.set(false);
     this.form.reset();
+    this.editandoId.set(null);
   }
 
   guardar(): void {
@@ -182,7 +200,10 @@ export class ProgramacionesLista implements OnInit, OnDestroy {
     };
     this.guardando.set(true);
     this.errorForm.set(null);
-    this.service.crear(data).subscribe({
+    const peticion = this.editandoId() === null
+      ? this.service.crear(data)
+      : this.service.actualizar(this.editandoId()!, data);
+    peticion.subscribe({
       next: () => {
         this.guardando.set(false);
         this.cancelar();

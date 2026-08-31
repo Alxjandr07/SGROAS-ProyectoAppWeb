@@ -54,7 +54,7 @@
 
 @if (mostrandoFormulario()) {
   <div class="form-panel">
-    <h3>Nueva programación</h3>
+    <h3>{{ editandoId() === null ? 'Nueva programación' : 'Editar programación' }}</h3>
     @if (errorForm()) {
       <div class="alert-error">{{ errorForm() }}</div>
     }
@@ -148,6 +148,7 @@
             </td>
             @if (puedeEditar) {
               <td class="actions-cell">
+                <button class="btn-sm btn-sm--secundario" (click)="editar(p)">Editar</button>
                 <button class="btn-sm btn-sm--danger" (click)="confirmarEliminar(p.idProgramacion)">Eliminar</button>
               </td>
             }

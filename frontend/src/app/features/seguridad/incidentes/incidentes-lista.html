@@ -3,14 +3,17 @@
     <h1>Incidentes y Alertas</h1>
     <p class="page-desc">Incidentes reportados por unidad y alertas generadas automaticamente.</p>
   </div>
-  @if (puedeEditar) {
-    <button class="btn-primary" (click)="abrirFormulario()">+ Reportar incidente</button>
-  }
+  <div class="page-header-actions">
+    <button class="btn-primary" (click)="verAlertas()">Alertas activas ({{ alertas().length }})</button>
+    @if (puedeEditar) {
+      <button class="btn-primary" (click)="abrirFormulario()">+ Reportar incidente</button>
+    }
+  </div>
 </div>
 
 @if (mostrandoFormulario()) {
   <div class="form-panel">
-    <h3>Reportar incidente</h3>
+    <h3>{{ editandoId() === null ? 'Reportar incidente' : 'Editar incidente' }}</h3>
     @if (errorForm()) {
       <div class="alert-error">{{ errorForm() }}</div>
     }
@@ -50,7 +53,7 @@
       <label class="campo-ancho">Descripción<textarea formControlName="descripcion"></textarea></label>
       <div class="form-actions">
         <button type="submit" class="btn-primary" [disabled]="form.invalid || guardando()">
-          {{ guardando() ? 'Guardando...' : 'Reportar' }}
+          {{ guardando() ? 'Guardando...' : (editandoId() === null ? 'Reportar' : 'Guardar') }}
         </button>
         <button type="button" class="btn-sm btn-sm--secundario" (click)="cancelar()">Cancelar</button>
       </div>
@@ -89,20 +92,6 @@
 } @else if (errorMsg()) {
   <div class="alert-error">{{ errorMsg() }}</div>
 } @else {
-  @if (alertas().length > 0) {
-    <section class="alertas-seccion">
-      <h2>Alertas activas</h2>
-      <ul class="alertas-lista">
-        @for (a of alertas(); track a.idAlerta) {
-          <li>
-            <span class="badge badge--inactivo">ALERTA {{ a.nivelRiesgo }}</span>
-            {{ a.descripcion }}
-          </li>
-        }
-      </ul>
-    </section>
-  }
-
   <div class="table-container">
     <table class="data-table">
       <thead>
@@ -138,6 +127,7 @@
             <td>{{ i.estado }}</td>
             @if (puedeEditar) {
               <td class="actions-cell">
+                <button class="btn-sm btn-sm--secundario" (click)="editar(i)">Editar</button>
                 <button class="btn-sm btn-sm--danger" (click)="confirmarEliminar(i.idIncidente)">Eliminar</button>
               </td>
             }
@@ -148,6 +138,36 @@
       </tbody>
     </table>
   </div>
+
+  @if (mostrandoAlertas() && alertas().length > 0) {
+    <section id="alertas" class="alertas-seccion">
+      <h2>Alertas activas</h2>
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nivel de riesgo</th>
+              <th>Descripción</th>
+              <th>Fecha</th>
+              <th>Incidente</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (a of alertas(); track a.idAlerta) {
+              <tr>
+                <td>{{ a.idAlerta }}</td>
+                <td><span class="badge badge--inactivo">ALERTA {{ a.nivelRiesgo }}</span></td>
+                <td>{{ a.descripcion }}</td>
+                <td>{{ a.fecha }}</td>
+                <td>#{{ a.idIncidente }} — {{ a.incidenteTipo }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
 
   <app-paginador
     [currentPage]="currentPage()"

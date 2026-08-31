@@ -66,6 +66,31 @@ public class ProgramacionAbdService {
         return aResponse(programacionRepository.save(programacion));
     }
 
+    public AbdDtos.ProgramacionResponse actualizar(Integer idProgramacion, AbdDtos.ProgramacionRequest request) {
+        Programacion programacion = programacionRepository.findById(idProgramacion)
+                .orElseThrow(() -> new IllegalArgumentException("Programacion no encontrada: " + idProgramacion));
+        validarHoras(request.horaSalida(), request.horaEstimadaLlegada());
+        RutaAbd ruta = rutaAbdRepository.findById(request.idRuta())
+                .orElseThrow(() -> new IllegalArgumentException("Ruta no encontrada: " + request.idRuta()));
+        Unidad unidad = unidadRepository.findById(request.idUnidad())
+                .orElseThrow(() -> new IllegalArgumentException("Unidad no encontrada: " + request.idUnidad()));
+        ConductorAbd conductor = conductorAbdRepository.findById(request.idConductor())
+                .orElseThrow(() -> new IllegalArgumentException("Conductor no encontrado: " + request.idConductor()));
+        if (!"Activo".equalsIgnoreCase(unidad.getEstado())) {
+            throw new IllegalStateException("La unidad " + unidad.getPlaca() + " no esta activa");
+        }
+        programacion.setFecha(request.fecha());
+        programacion.setHoraSalida(request.horaSalida());
+        programacion.setHoraEstimadaLlegada(request.horaEstimadaLlegada());
+        if (request.estado() != null) {
+            programacion.setEstado(request.estado());
+        }
+        programacion.setRuta(ruta);
+        programacion.setUnidad(unidad);
+        programacion.setConductor(conductor);
+        return aResponse(programacionRepository.save(programacion));
+    }
+
     public void eliminar(Integer idProgramacion) {
         if (!programacionRepository.existsById(idProgramacion)) {
             throw new IllegalArgumentException("Programacion no encontrada: " + idProgramacion);

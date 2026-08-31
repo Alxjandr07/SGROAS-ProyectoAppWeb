@@ -54,6 +54,8 @@ export class IncidentesLista implements OnInit, OnDestroy {
   errorMsg = signal<string | null>(null);
   errorForm = signal<string | null>(null);
   mostrandoFormulario = signal(false);
+  editandoId = signal<number | null>(null);
+  mostrandoAlertas = signal(false);
 
   totalPages = signal(0);
   totalElements = signal(0);
@@ -140,15 +142,38 @@ export class IncidentesLista implements OnInit, OnDestroy {
     this.cargar(p);
   }
 
+  verAlertas(): void {
+    this.mostrandoAlertas.set(true);
+    requestAnimationFrame(() => {
+      document.getElementById('alertas')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
   abrirFormulario(): void {
     this.form.reset({ tipo: TIPOS[0], nivelSugerido: NIVELES[0], estado: ESTADOS_INCIDENTE[0] });
     this.errorForm.set(null);
+    this.editandoId.set(null);
+    this.mostrandoFormulario.set(true);
+  }
+
+  editar(i: IncidenteAbd): void {
+    this.form.setValue({
+      tipo: i.tipo,
+      descripcion: i.descripcion,
+      nivelSugerido: i.nivelSugerido,
+      evidencia: i.evidencia ?? '',
+      estado: i.estado,
+      idUnidad: i.idUnidad,
+    });
+    this.errorForm.set(null);
+    this.editandoId.set(i.idIncidente);
     this.mostrandoFormulario.set(true);
   }
 
   cancelar(): void {
     this.mostrandoFormulario.set(false);
     this.form.reset();
+    this.editandoId.set(null);
   }
 
   guardar(): void {
@@ -164,7 +189,10 @@ export class IncidentesLista implements OnInit, OnDestroy {
     };
     this.guardando.set(true);
     this.errorForm.set(null);
-    this.service.crear(data).subscribe({
+    const peticion = this.editandoId() === null
+      ? this.service.crear(data)
+      : this.service.actualizar(this.editandoId()!, data);
+    peticion.subscribe({
       next: () => {
         this.guardando.set(false);
         this.cancelar();

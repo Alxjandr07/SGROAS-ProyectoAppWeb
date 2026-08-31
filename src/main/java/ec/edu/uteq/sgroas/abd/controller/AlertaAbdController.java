@@ -1,5 +1,6 @@
 package ec.edu.uteq.sgroas.abd.controller;
 
+import ec.edu.uteq.sgroas.abd.dto.AbdDtos;
 import ec.edu.uteq.sgroas.abd.entity.Alerta;
 import ec.edu.uteq.sgroas.abd.repository.AlertaRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +20,13 @@ public class AlertaAbdController {
     private final AlertaRepository alertaRepository;
 
     @GetMapping
-    public ResponseEntity<Page<Alerta>> listar(
+    public ResponseEntity<Page<AbdDtos.AlertaResponse>> listar(
             @PageableDefault(size = 50, sort = "idAlerta") Pageable pageable) {
-        return ResponseEntity.ok(alertaRepository.findAll(pageable));
+        Page<Alerta> page = alertaRepository.findAll(pageable);
+        return ResponseEntity.ok(page.map(a -> new AbdDtos.AlertaResponse(
+                a.getIdAlerta(), a.getNivelRiesgo(), a.getDescripcion(),
+                a.getFecha() != null ? a.getFecha().toString() : null,
+                a.getIncidente() != null ? a.getIncidente().getIdIncidente() : null,
+                a.getIncidente() != null ? a.getIncidente().getTipo() : null)));
     }
 }

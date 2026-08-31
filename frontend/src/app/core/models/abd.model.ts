@@ -124,6 +124,7 @@ export interface AlertaAbd {
   descripcion: string;
   fecha: string;
   idIncidente: number;
+  incidenteTipo: string;
 }
 
 export interface ConteoAbd {

@@ -63,7 +63,7 @@ GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_
 ,ec.edu.uteq.sgroas.security,LoginRateLimiter,11,88,1,9,0,17,1,9,0,5
 ,ec.edu.uteq.sgroas.security,CustomUserDetailsService,0,30,0,0,0,7,0,2,0,2
 ,ec.edu.uteq.sgroas.security,JwtAuthenticationFilter,2,130,4,18,0,32,4,9,0,2
-,ec.edu.uteq.sgroas.controller,AuthController,69,179,10,4,18,49,7,10,2,8
+,ec.edu.uteq.sgroas.controller,AuthController,86,181,18,4,21,49,11,10,2,8
 ,ec.edu.uteq.sgroas.controller,ConductorController,0,37,0,0,0,7,0,5,0,5
 ,ec.edu.uteq.sgroas.controller,IncidenteController,0,36,0,0,0,7,0,5,0,5
 ,ec.edu.uteq.sgroas.controller,VehiculoController,0,36,0,0,0,7,0,5,0,5

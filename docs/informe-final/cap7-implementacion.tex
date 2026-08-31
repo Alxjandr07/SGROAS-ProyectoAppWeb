@@ -1,0 +1,149 @@
+\chapter{Implementación}
+\label{cap:implementacion}
+
+Este capítulo describe las decisiones de implementación más significativas del sistema SGROAS, con énfasis en la estrategia híbrida de acceso a datos y los patrones de código más relevantes.
+
+\section{Configuración general}
+\label{sec:configuracion}
+
+El sistema se compila con Java 21 LTS y Spring Boot 3.2.x. La configuración principal se define en \texttt{application.properties} con valores por defecto para desarrollo y variables de entorno para producción (patrón 12-factor). Las dependencias principales se administran con Maven (\texttt{pom.xml}).
+
+\section{Aislamiento de capas}
+\label{sec:aislamiento}
+
+El código fuente se organiza en paquetes que reflejan la arquitectura limpia \cite{martin2017}:
+
+\begin{itemize}
+  \item \texttt{controller}: recibe peticiones HTTP, valida entrada con DTOs, delega a servicios.
+  \item \texttt{service}: lógica de negocio, orquestación de repositorios, transacciones.
+  \item \texttt{repository}: acceso a datos mediante Spring Data JPA.
+  \item \texttt{entity}: mapeo ORM con anotaciones JPA y \texttt{@NamedStoredProcedureQuery}.
+  \item \texttt{dto}: contratos de entrada/salida como Java Records.
+  \item \texttt{config}: configuración de seguridad, caché, CORS y manejo de excepciones.
+\end{itemize}
+
+\section{Manejo de errores globales}
+\label{sec:errores}
+
+El manejo de errores se centraliza en \texttt{GlobalExceptionHandler} (\texttt{@RestControllerAdvice}), que convierte excepciones en respuestas Problem Details (RFC 7807) \cite{rfc7807} con los campos \texttt{type}, \texttt{title}, \texttt{status}, \texttt{detail} e \texttt{instance}. Esto garantiza consistencia en todas las respuestas de error de la API.
+
+\section{Esquema de caching}
+\label{sec:caching}
+
+La caché se implementa con Spring Cache + Redis \cite{redis}. Los listados paginados de conductores, vehículos, rutas y asignaciones se almacenan en Redis con TTL configurable. La invalidación se realiza automáticamente al crear, actualizar o eliminar registros mediante \texttt{@CacheEvict} en los métodos de servicio correspondientes.
+
+\section{Mecanismo de seguridad}
+\label{sec:seguridad-impl}
+
+La pila de seguridad se compone de:
+
+\begin{enumerate}
+  \item \textbf{Filtro JWT} (\texttt{JwtAuthenticationFilter}): intercepta cada petición, extrae el token de la cookie HttpOnly, valida la firma y carga el usuario en el contexto de seguridad.
+  \item \textbf{Autorización por rol}: \texttt{SecurityConfig} define reglas de acceso por endpoint según el rol (ADMIN, COORDINADOR, SEGURIDAD).
+  \item \textbf{CORS}: configurado por origen específico en producción (\texttt{cors-spec} \cite{cors-spec}).
+  \item \textbf{Rate limiting}: control de intentos de login mediante Redis (6 intentos, respuesta 429).
+  \item \textbf{BCrypt}: contraseñas cifradas con factor de trabajo $\geq$ 10.
+\end{enumerate}
+
+\section{Estrategia híbrida de acceso a datos}
+\label{sec:acceso-datos-impl}
+
+La estrategia híbrida documentada en ADR-006 (Sección~\ref{sec:adr006}) se implementa con dos patrones claros:
+
+\subsection{CRUD con Spring Data JPA}
+
+Las operaciones CRUD elementales utilizan repositorios que extienden \texttt{JpaRepository}. El siguiente listado muestra el repositorio de conductores con consultas derivadas de nombres de métodos:
+
+\begin{lstlisting}[language=Java, caption={Repositorio de conductores con consultas derivadas.}, label={lst:conductor-repo}]
+@Repository
+public interface ConductorRepository
+        extends JpaRepository<Conductor, Long> {
+
+    Page<Conductor> findByActivoTrue(Pageable pageable);
+
+    List<Conductor> findByLicenciaVencimientoBefore(LocalDate fecha);
+
+    @Query("SELECT c FROM Conductor c WHERE " +
+           "LOWER(c.nombre) LIKE LOWER(CONCAT('%', :busqueda, '%'))")
+    Page<Conductor> buscar(@Param("busqueda") String busqueda,
+                           Pageable pageable);
+}
+\end{lstlisting}
+
+Los métodos \texttt{findByActivoTrue} y \texttt{buscar} utilizan consultas derivadas y JPQL estática respectivamente, sin concatenación de SQL dinámico.
+
+\subsection{Stored procedures con @NamedStoredProcedureQuery}
+
+Las operaciones de reportes y agregaciones se encapsulan en stored procedures de PostgreSQL. El siguiente listado muestra la declaración en la entidad \texttt{Incidente} y la invocación desde el repositorio:
+
+\begin{lstlisting}[language=Java, caption={Declaración @NamedStoredProcedureQuery en Incidente.}, label={lst:incidente-sp}]
+@NamedStoredProcedureQuery(
+    name = "Incidente.incidentesPorGravedad",
+    procedureName = "sp_incidentes_por_gravedad",
+    parameters = {
+        @StoredProcedureParameter(
+            mode = ParameterMode.IN,
+            name = "p_tipo", type = String.class),
+        @StoredProcedureParameter(
+            mode = ParameterMode.REF_CURSOR,
+            name = "cur", type = Class.class)
+    })
+public class Incidente { ... }
+\end{lstlisting}
+
+\begin{lstlisting}[language=Java, caption={Invocación del SP desde el repositorio.}, label={lst:incidente-repo}]
+@Repository
+public interface IncidenteRepository
+        extends JpaRepository<Incidente, Long> {
+
+    @Procedure(name = "Incidente.incidentesPorGravedad")
+    List<IncidenteGravedadDTO> incidentesPorGravedad(
+            @Param("p_tipo") String tipo);
+}
+\end{lstlisting}
+
+El cursor REFCURSOR se lee dentro de la misma transacción JDBC, por lo que \texttt{ReporteService} está anotado con \texttt{@Transactional}.
+
+\subsection{Funciones SQL}
+
+Las funciones SQL se invocan con \texttt{SELECT}. El siguiente listado muestra la función \texttt{fn\_total\_programaciones}:
+
+\begin{lstlisting}[language=Java, caption={Invocación de función SQL escalar.}, label={lst:fn-programaciones}]
+@Repository
+public interface ProgramacionRepository
+        extends JpaRepository<Programacion, Long> {
+
+    @Query(value = "SELECT fn_total_programaciones(:estado)",
+           nativeQuery = true)
+    Long totalProgramaciones(@Param("estado") String estado);
+}
+\end{lstlisting}
+
+\section{Estrategia de seguridad estática}
+\label{sec:seguridad-estatica}
+
+El script \texttt{scripts/audit-sql-dynamic.sh} se ejecuta en el pipeline de CI y verifica:
+
+\begin{itemize}
+  \item Ausencia de \texttt{EXECUTE IMMEDIATE}, \texttt{sp\_executesql} o equivalentes en \texttt{db/procs/*.sql}.
+  \item Ausencia de concatenación con \texttt{||} en consultas SQL dentro de \texttt{db/procs/}.
+  \item Ausencia de \texttt{@Query} o \texttt{createNativeQuery} con concatenación en \texttt{src/main/}.
+  \item Ausencia de \texttt{ddl-auto=update} en la configuración.
+\end{itemize}
+
+El análisis estático con SpotBugs y Find-Sec-Bugs complementa esta verificación, enfocándose en la regla \texttt{SQL\_NONCONSTANT\_STRING\_PASSED\_TO\_EXECUTE}.
+
+\section{Pipeline de CI}
+\label{sec:ci}
+
+El pipeline de GitHub Actions (\texttt{.github/workflows/ci.yml}) ejecuta las siguientes etapas:
+
+\begin{enumerate}
+  \item Build y pruebas (\texttt{./mvnw verify}).
+  \item Reporte JaCoCo con umbral mínimo de 70\,\%.
+  \item Auditoría SQL dinámico (\texttt{audit-sql-dynamic.sh}).
+  \item Validación de trazabilidad (\texttt{validate-traceability.sh}).
+  \item Análisis estático (SpotBugs).
+\end{enumerate}
+
+El pipeline muestra al menos tres ejecuciones consecutivas exitosas con badge passing en el README.

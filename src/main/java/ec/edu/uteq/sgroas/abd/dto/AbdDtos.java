@@ -104,7 +104,7 @@ public final class AbdDtos {
     }
 
     public record AlertaResponse(Integer idAlerta, String nivelRiesgo, String descripcion,
-                                 String fecha, Integer idIncidente) {
+                                 String fecha, Integer idIncidente, String incidenteTipo) {
     }
 
     // ---------- Reportes ----------

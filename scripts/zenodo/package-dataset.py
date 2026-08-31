@@ -22,8 +22,15 @@ DIST = REPO / "dist"
 ZIP_NAME = f"sgroas-dataset-{VERSION}.zip"
 # carpetas y archivos raíz que forman el dataset
 MEDICIONES = REPO / "docs" / "mediciones"
-FOLDERS = ["perf", "sus", "lighthouse", "zap", "jacoco"]
 ROOT_FILES = ["DATA-PROVENANCE.md", "DATA-DICTIONARY.md"]
+# Mapeo: nombre en dataset -> ruta relativa dentro de docs/mediciones/
+FOLDER_MAP = {
+    "perf": "perf",
+    "sus": "sus",
+    "lighthouse": "lighthouse",
+    "jacoco": "jacoco",
+    "zap": "sec/zap",
+}
 
 
 def sha256(p: Path) -> str:
@@ -34,18 +41,21 @@ def sha256(p: Path) -> str:
     return h.hexdigest()
 
 
-def archivos_seleccionados() -> list[Path]:
-    out: list[Path] = []
+def archivos_seleccionados() -> list[tuple[Path, str]]:
+    """Retorna (ruta_absoluta, ruta_relativa_en_dataset) por cada archivo."""
+    out: list[tuple[Path, str]] = []
     for f in ROOT_FILES:
         p = MEDICIONES / f
         if p.exists():
-            out.append(p)
-    for folder in FOLDERS:
-        p = MEDICIONES / folder
-        if p.is_dir():
-            for root, _, files in os.walk(p):
+            out.append((p, f))
+    for ds_name, rel_path in FOLDER_MAP.items():
+        src = MEDICIONES / rel_path
+        if src.is_dir():
+            for root, _, files in os.walk(src):
                 for name in files:
-                    out.append(Path(root) / name)
+                    full = Path(root) / name
+                    rel_in_ds = f"{ds_name}/{full.relative_to(src).as_posix()}"
+                    out.append((full, rel_in_ds))
     return out
 
 
@@ -58,9 +68,8 @@ def main() -> int:
     # 1) MANIFEST con checksums SHA-256
     manifest = REPO / "dataset" / "MANIFEST.csv"
     rows = []
-    for p in files:
-        rel = p.relative_to(MEDICIONES).as_posix()
-        rows.append((rel, os.path.getsize(p), sha256(p)))
+    for full, rel in files:
+        rows.append((rel, os.path.getsize(full), sha256(full)))
     with manifest.open("w", newline="", encoding="utf-8") as fh:
         w = csv.writer(fh)
         w.writerow(["ruta", "bytes", "sha256"])
@@ -73,9 +82,8 @@ def main() -> int:
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
         for extra in ["README.md", "MANIFEST.csv", "zenodo.json"]:
             z.write(REPO / "dataset" / extra, f"dataset/{extra}")
-        for p in files:
-            rel = p.relative_to(MEDICIONES).as_posix()
-            z.write(p, f"dataset/{rel}")
+        for full, rel in files:
+            z.write(full, f"dataset/{rel}")
     print(f"ZIP: {zip_path} ({os.path.getsize(zip_path)/1e6:.1f} MB)")
     return 0
 

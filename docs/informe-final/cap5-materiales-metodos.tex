@@ -1,0 +1,160 @@
+\chapter{Materiales y Métodos}
+\label{cap:metodos}
+
+Este capítulo describe el enfoque metodológico del trabajo, siguiendo la metodología de Design Science Research (DSR) de Peffers et al.~\cite{peffers2007}, articulada con los criterios de calidad de Hevner et al.~\cite{hevner2004} y con los estándares empíricos de la comunidad \cite{ralph2021}. La orientación metodológica complementaria se acoge a Runeson y H\"ost para el estudio de caso \cite{runeson2009}, Wohlin et al.~para la experimentación \cite{wohlin2012} y Baltes y Ralph para el muestreo \cite{baltes2022}.
+
+\section{Enfoque metodológico global}
+\label{sec:dsr}
+
+El trabajo se instancia en las seis actividades de DSR \cite{peffers2007}:
+
+\begin{enumerate}
+  \item \textbf{Identificación del problema:} La cooperativa de transporte carece de un sistema integrado de gestión (Capítulo~\ref{cap:introduccion}, Sección~\ref{sec:problema}).
+
+  \item \textbf{Definición de los objetivos de la solución:} El sistema SGROAS debe gestionar conductores, usuarios, rutas, vehículos, asignaciones e incidentes, con autenticación JWT, 70\% de cobertura mínima y p95 $<$ 200\,ms.
+
+  \item \textbf{Diseño y desarrollo:} Arquitectura de tres capas (Angular + Spring Boot + PostgreSQL + Redis), documentada con ADRs y diagramas C4 (Capítulos~\ref{cap:diseno} y~\ref{cap:implementacion}).
+
+  \item \textbf{Demonstración:} El sistema funcional se despliega con Docker Compose y se verifica con pruebas automatizadas, k6, Lighthouse y OWASP ZAP (Capítulo~\ref{cap:evaluacion}).
+
+  \item \textbf{Evaluación:} Evaluación empírica con métricas de rendimiento, seguridad, usabilidad, cobertura y calidad web (Capítulo~\ref{cap:evaluacion}).
+
+  \item \textbf{Comunicación:} El presente informe y el repositorio público con DOI en Zenodo.
+\end{enumerate}
+
+\section{Goal-Question-Metric (GQM)}
+\label{sec:gqm}
+
+El diseño empírico se formaliza con el enfoque GQM de Basili et al.~\cite{basili1994}. La meta, preguntas y métricas se resumen en la Tabla~\ref{tab:gqm}.
+
+\begin{longtable}{@{}p{3cm}p{4.5cm}p{5cm}@{}}
+\caption{Desglose Goal-Question-Metric del estudio empírico.}
+\label{tab:gqm}\\
+\toprule
+\textbf{Meta} & \textbf{Pregunta} & \textbf{Métrica} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Meta} & \textbf{Pregunta} & \textbf{Métrica} \\
+\midrule
+\endhead
+G1: Rendimiento & RQ1: ¿El acceso híbrido CRUD/ORM + SP mantiene latencia aceptable bajo carga? & p95, media, DT, IC 95\% de \texttt{http\_req\_duration}; tasa de error; throughput \\
+\midrule
+G2: Seguridad & RQ2: ¿El sistema mitiga los riesgos OWASP Top 10 con controles verificables? & Controles A01--A09 verificados; conteo de SQL dinámico (audit-sql-dynamic.sh) \\
+\midrule
+G3: Usabilidad & RQ3: ¿Qué nivel de usabilidad perciben los usuarios? & SUS media, DT, IC 95\%; escala adjetiva de Bangor \\
+\midrule
+G4: Calidad web & RQ4: ¿La interfaz cumple estándares de rendimiento, accesibilidad y SEO? & Lighthouse: Performance, Accessibility, Best Practices, SEO \\
+\bottomrule
+\end{longtable}
+
+\section{Instrumentos de medición}
+\label{sec:instrumentos}
+
+Cada instrumento se describe con la versión exacta y la configuración utilizada:
+
+\begin{itemize}
+  \item \textbf{k6 (v0.57):} Pruebas de carga contra \texttt{GET /api/conductores} con 50 VUs y 30\,s. Script versionado en \texttt{k6/script.js} con opciones en \texttt{k6/opts.js}. Datos crudos en \texttt{docs/mediciones/perf/k01--k03.json}.
+
+  \item \textbf{Lighthouse (v12):} Auditoría de calidad web con configuración \texttt{lighthouserc.js}. Perfiles mobile y desktop. Datos en \texttt{docs/mediciones/lighthouse/}.
+
+  \item \textbf{JaCoCo (v0.8.14):} Cobertura de código con reporte XML y HTML generado por \texttt{./mvnw verify}. Datos en \texttt{docs/mediciones/jacoco/jacoco.csv}.
+
+  \item \textbf{OWASP ZAP:} Escaneo baseline de seguridad. Script en \texttt{scripts/zap/run-zap.sh}. Reporte en \texttt{docs/mediciones/sec/zap/}.
+
+  \item \textbf{System Usability Scale (SUS):} Cuestionario de Brooke \cite{brooke1996} con los 10 ítems originales en escala Likert 1--5. Protocolo en \texttt{docs/checklists/ralph2021-<estandar>.md}.
+
+  \item \textbf{SpotBugs/Find-Sec-Bugs:} Análisis estático de seguridad en el pipeline de CI. Regla \texttt{SQL\_NONCONSTANT\_STRING\_PASSED\_TO\_EXECUTE}. Reporte en \texttt{docs/mediciones/sec/static-analysis/}.
+
+  \item \textbf{audit-sql-dynamic.sh:} Script versionado que rechaza SQL dinámico por concatenación en \texttt{db/procs/*.sql} y en el código fuente Java.
+\end{itemize}
+
+\section{Población, muestreo y participantes}
+\label{sec:muestreo}
+
+La evaluación involucra dos componentes con poblaciones diferentes:
+
+\subsection{Sistema (rendimiento, seguridad, cobertura, calidad web)}
+
+La población de referencia son los endpoints CRUD del sistema SGROAS. Se seleccionó el endpoint \texttt{GET /api/conductores} como representativo por ser el más consultado y el que involucra JOIN con tablas relacionadas. El muestreo es intencional \cite{baltes2022}: se elige un endpoint representativo en lugar de muestrear aleatoriamente entre todos los endpoints, dado el alcance de un PFC.
+
+\subsection{Participantes SUS (usabilidad)}
+
+Participaron 10 personas (P01--P10) anonimizadas, reclutadas por muestreo de conveniencia entre estudiantes y personal de la cooperativa. El perfil declarado incluye: 5 hombres y 5 mujeres, edades entre 20 y 45 años, experiencia web de nivel bajo a alto, y dispositivos mixture (escritorio y móvil). El tamaño muestral (n = 10) cumple la recomendación mínima de Kortum y Bangor \cite{kortum2013}. Los consentimientos informados se archivan fuera del repositorio público, conforme a \texttt{docs/etica/ETHICS.md}.
+
+\section{Protocolo experimental}
+\label{sec:protocolo}
+
+\subsection{Rendimiento (k6)}
+
+\begin{enumerate}
+  \item Se ejecutan tres corridas independientes de k6 con 50 VUs durante 30\,s contra el endpoint \texttt{GET /api/conductores} protegido con JWT.
+  \item Cada corrida se inicia después de reiniciar Redis (cache frío) o manteniendo Redis activo (cache caliente), según la condición.
+  \item Se exporta el resumen de cada corrida a \texttt{docs/mediciones/perf/k0N-runN.json}.
+  \item Se calcula la media de las medias por corrida, la DT, el IC 95\% con t de Student (gl = $n - 1$), y los percentiles p50, p90, p95, p99.
+  \item El umbral declarado a priori es p95 $<$ 200\,ms y tasa de error $<$ 1\,\%.
+\end{enumerate}
+
+\subsection{Seguridad (OWASP + ZAP)}
+
+\begin{enumerate}
+  \item Se verifican seis controles OWASP Top 10 (A01, A02, A03, A05, A07, A09) con evidencia reproducible (curl o script).
+  \item Se ejecuta \texttt{audit-sql-dynamic.sh} sobre \texttt{db/procs/*.sql} y el código fuente Java.
+  \item Se ejecuta SpotBugs con Find-Sec-Bugs en el pipeline de CI.
+  \item Se ejecuta el escaneo baseline de OWASP ZAP contra la URL pública.
+\end{enumerate}
+
+\subsection{Usabilidad (SUS)}
+
+\begin{enumerate}
+  \item Cada participante completa las 10 tareas del cuestionario SUS \cite{brooke1996} después de interactuar con el sistema durante 15 minutos.
+  \item Las respuestas se registran en escala Likert 1--5.
+  \item Se calcula la puntuación SUS: (suma de contribuciones) $\times$ 2.5.
+  \item Se reporta media, DT e IC 95\% con t de Student.
+  \item Se interpreta con la escala adjetiva de Bangor et al.~\cite{bangor2009,bangor2008}.
+\end{enumerate}
+
+\subsection{Cobertura (JaCoCo)}
+
+\begin{enumerate}
+  \item Se ejecuta \texttt{./mvnw clean verify} que ejecuta las 150 pruebas JUnit 5 y genera el reporte JaCoCo.
+  \item Se extraen los contadores de instrucciones, ramas y líneas del CSV exportado.
+  \item El umbral declarado es líneas $\geq$ 70\,\%.
+\end{enumerate}
+
+\subsection{Calidad web (Lighthouse)}
+
+\begin{enumerate}
+  \item Se ejecutan al menos tres corridas de Lighthouse por perfil (mobile y desktop) contra el frontend Angular.
+  \item Se exportan los resultados JSON a \texttt{docs/mediciones/lighthouse/}.
+  \item Se reportan las cuatro categorías: Performance, Accessibility, Best Practices, SEO.
+  \item Los umbrales declarados son: Performance $\geq$ 80, Accessibility $>$ 90, Best Practices $\geq$ 90, SEO $\geq$ 90.
+\end{enumerate}
+
+\section{Análisis estadístico}
+\label{sec:estadistica}
+
+Todos los datos cuantitativos presentan media, desviación estándar (DT) e intervalo de confianza al 95\,\% (IC 95\%).
+
+Para el contraste entre condiciones (cache caliente vs cache frío), se utiliza el test de Wilcoxon de muestras pareadas \cite{wilcoxon1945} como test no paramétrico por defecto, acompañado del tamaño de efecto d de Cliff \cite{cliff1993}. Cuando se comparan más de dos condiciones, se aplica la corrección de Holm \cite{wohlin2012}.
+
+El IC 95\% se calcula con la distribución t de Student \cite{student1908}, appropriada para muestras pequeñas ($n < 30$).
+
+\section{Semillas y determinismo}
+\label{sec:semillas}
+
+Las versiones exactas de las herramientas se capturan en \texttt{docs/entorno/versions.txt}. Las semillas aleatorias usadas en k6 se declaran en \texttt{k6/opts.js}. Los scripts de análisis (Python) se ejecutan con semillas fijas para garantizar reproducibilidad.
+
+\section{Protocolo de reproducibilidad}
+\label{sec:reproducibilidad}
+
+El protocolo completo de reproducibilidad se describe en \texttt{docs/REPRODUCIR.md}. La secuencia end-to-end es:
+
+\begin{verbatim}
+git clone https://github.com/Alxjandr07/SGROAS-ProyectoAppWeb.git
+cd SGROAS-ProyectoAppWeb
+git checkout v1.0.0
+make all
+\end{verbatim}
+
+El comando \texttt{make all} ejecuta: levantar contenedores (\texttt{docker compose up --build}), pruebas (\texttt{./mvnw test}), benchmarks k6, auditorías estáticas, regeneración de reportes JaCoCo y generación de versiones.

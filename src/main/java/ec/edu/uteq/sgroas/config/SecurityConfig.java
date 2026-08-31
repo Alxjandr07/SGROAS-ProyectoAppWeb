@@ -77,9 +77,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/abd/rutas/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_COORDINADOR")
                         // Programaciones: tambien el OPERADOR registra salidas
                         .requestMatchers(HttpMethod.POST, "/api/abd/programaciones/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_COORDINADOR", "ROLE_OPERADOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/abd/programaciones/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_COORDINADOR", "ROLE_OPERADOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/abd/programaciones/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_COORDINADOR", "ROLE_OPERADOR")
                         // Incidentes: solo SEGURIDAD (y ADMIN) reportan o cierran
                         .requestMatchers(HttpMethod.POST, "/api/abd/incidentes/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SEGURIDAD")
+                        .requestMatchers(HttpMethod.PUT, "/api/abd/incidentes/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SEGURIDAD")
                         .requestMatchers(HttpMethod.DELETE, "/api/abd/incidentes/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SEGURIDAD")
                         // Lectura general para cualquier usuario autenticado
                         .anyRequest().authenticated()

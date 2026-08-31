@@ -1,3 +1,44 @@
+\chapter{Cadena de búsqueda de trabajos relacionados}
+\label{app:cadena-busqueda}
+
+La cadena de búsqueda utilizada en la revisión sistemática (Capítulo~\ref{cap:trabajos-relacionados}) fue:
+
+\begin{verbatim}
+("transport management" OR "fleet management" OR "public transit")
+AND ("web application" OR "web system" OR "information system")
+AND ("Spring Boot" OR "Java" OR "Angular" OR "React" OR "PostgreSQL")
+AND ("REST API" OR "microservices" OR "monolith")
+\end{verbatim}
+
+La ventana temporal fue 2018--2026. Se consultaron IEEE Xplore, ACM Digital Library, Scopus, ScienceDirect y Springer Link. El proceso PRISMA se documenta en la Sección~\ref{sec:prisma}.
+
+\chapter{Protocolo SUS}
+\label{app:sus}
+
+El cuestionario System Usability Scale \cite{brooke1996} se aplicó con los 10 ítems originales en escala Likert 1--5 (1 = Totalmente en desacuerdo, 5 = Totalmente de acuerdo). Los ítems alternan entre positivos (\#1, \#3, \#5, \#7, \#9) y negativos (\#2, \#4, \#6, \#8, \#10). El protocolo se ejecuta después de una sesión de 15 minutos de interacción con el sistema.
+
+\chapter{Configuración de integración continua}
+\label{app:ci}
+
+El pipeline de GitHub Actions (\texttt{.github/workflows/ci.yml}) ejecuta:
+\begin{enumerate}
+  \item Build y pruebas JUnit 5 (\texttt{./mvnw verify}).
+  \item Reporte JaCoCo con umbral mínimo de 70\,\%.
+  \item Auditoría SQL dinámico (\texttt{audit-sql-dynamic.sh}).
+  \item Validación de trazabilidad (\texttt{validate-traceability.sh}).
+  \item Análisis estático (SpotBugs + Find-Sec-Bugs).
+\end{enumerate}
+
+\chapter{Checklists de verificación}
+\label{app:checklists}
+
+Los checklists se encuentran en \texttt{docs/checklists/}:
+\begin{itemize}
+  \item ISO-29148-checklist.md
+  \item ralph2021-verificacion.md
+  \item ralph2021-validacion.md
+\end{itemize}
+
 \chapter{Observaciones de auditoría}
 \label{app:observaciones}
 

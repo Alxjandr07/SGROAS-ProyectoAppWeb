@@ -43,6 +43,19 @@ frontend/dist/
 backend.err
 backend.log
 
+### LaTeX build artifacts (repo structure per Entrega Final guide) ###
+docs/informe-final/*.aux
+docs/informe-final/*.log
+docs/informe-final/*.toc
+docs/informe-final/*.lof
+docs/informe-final/*.lot
+docs/informe-final/*.lol
+docs/informe-final/*.out
+docs/informe-final/*.bbl
+docs/informe-final/*.bcf
+docs/informe-final/*.blg
+docs/informe-final/*.run.xml
+docs/informe-final/main.pdf
 
 # Python
 __pycache__/

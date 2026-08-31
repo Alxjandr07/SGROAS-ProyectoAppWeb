@@ -1,5 +1,6 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Location } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UsuarioService } from '../../../core/services/usuario.service';
@@ -18,6 +19,7 @@ export class UsuarioFormulario implements OnInit {
   private service = inject(UsuarioService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private location = inject(Location);
 
   editId = signal<number | null>(null);
   loading = signal(false);
@@ -54,6 +56,14 @@ export class UsuarioFormulario implements OnInit {
           this.loadingData.set(false);
         },
       });
+    }
+  }
+
+  volver(): void {
+    if (window.history.length > 1) {
+      this.location.back();
+    } else {
+      this.router.navigate(['/dashboard/usuarios']);
     }
   }
 

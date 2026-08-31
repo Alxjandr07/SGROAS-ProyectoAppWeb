@@ -21,6 +21,10 @@ export class IncidenteAbdService {
     return this.http.post<IncidenteAbd>(this.apiUrl, data);
   }
 
+  actualizar(id: number, data: IncidenteAbdRequest): Observable<IncidenteAbd> {
+    return this.http.put<IncidenteAbd>(`${this.apiUrl}/${id}`, data);
+  }
+
   eliminar(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }

@@ -26,6 +26,10 @@ export class ProgramacionAbdService {
     return this.http.post<ProgramacionAbd>(this.apiUrl, data);
   }
 
+  actualizar(id: number, data: ProgramacionAbdRequest): Observable<ProgramacionAbd> {
+    return this.http.put<ProgramacionAbd>(`${this.apiUrl}/${id}`, data);
+  }
+
   eliminar(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }

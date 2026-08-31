@@ -11,7 +11,7 @@ autoridad: PRISMA 2020 \cite{prisma2021} y guías de revisión sistemática
 
 | Criterio | Valor |
 |---|---|
-| Referencias en `Referencias.bib` | 38 (documento de evaluación) + 10 existentes en informe principal |
+| Referencias en `refs.bib` | 71 (56 citadas en el documento + 15 de respaldo) |
 | Con DOI verificado en Crossref | 27 |
 | Sin DOI (clásicas: SUS, RFC, libros, tech reports) | 11 |
 | Repositorios/alternos con URL verificada | 2 (`jacoco`, `k6`) |
@@ -34,7 +34,7 @@ autoridad: PRISMA 2020 \cite{prisma2021} y guías de revisión sistemática
 | Artefacto | Fuente |
 |---|---|
 | Consultas a Crossref | script puntual (16-ago-2026) |
-| Base de datos de citas | `docs/informe-final/Referencias.bib` |
+| Base de datos de citas | `docs/informe-final/refs.bib` |
 | Cadena de búsqueda | ver anexo del informe (PRISMA) |
 
 Regla de oro del plan: *referencias reales y verificables; fabricar = -25 % en D6

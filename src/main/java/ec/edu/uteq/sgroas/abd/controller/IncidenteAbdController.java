@@ -32,6 +32,12 @@ public class IncidenteAbdController {
         return ResponseEntity.status(HttpStatus.CREATED).body(incidenteAbdService.crear(request));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<AbdDtos.IncidenteAbdResponse> actualizar(@PathVariable Integer id,
+                                                                  @Valid @RequestBody AbdDtos.IncidenteAbdRequest request) {
+        return ResponseEntity.ok(incidenteAbdService.actualizar(id, request));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
         incidenteAbdService.eliminar(id);

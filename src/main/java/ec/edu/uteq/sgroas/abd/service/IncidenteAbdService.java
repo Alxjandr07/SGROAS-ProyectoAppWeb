@@ -65,6 +65,24 @@ public class IncidenteAbdService {
         return aResponse(incidente);
     }
 
+    public AbdDtos.IncidenteAbdResponse actualizar(Integer idIncidente, AbdDtos.IncidenteAbdRequest request) {
+        IncidenteAbd incidente = incidenteRepository.findById(idIncidente)
+                .orElseThrow(() -> new IllegalArgumentException("Incidente no encontrado: " + idIncidente));
+        Unidad unidad = unidadRepository.findById(request.idUnidad())
+                .orElseThrow(() -> new IllegalArgumentException("Unidad no encontrada: " + request.idUnidad()));
+        incidente.setTipo(request.tipo());
+        incidente.setDescripcion(request.descripcion());
+        incidente.setNivelSugerido(request.nivelSugerido());
+        if (request.evidencia() != null) {
+            incidente.setEvidencia(request.evidencia());
+        }
+        if (request.estado() != null) {
+            incidente.setEstado(request.estado());
+        }
+        incidente.setUnidad(unidad);
+        return aResponse(incidenteRepository.save(incidente));
+    }
+
     public void eliminar(Integer idIncidente) {
         if (!incidenteRepository.existsById(idIncidente)) {
             throw new IllegalArgumentException("Incidente no encontrado: " + idIncidente);
@@ -75,7 +93,7 @@ public class IncidenteAbdService {
     private void generarAlerta(IncidenteAbd incidente) {
         Alerta alerta = Alerta.builder()
                 .nivelRiesgo("ALTO")
-                .descripcion("Alerta por incidente " + incidente.getIdIncidente() + ": " + incidente.getTipo())
+                .descripcion(incidente.getDescripcion())
                 .incidente(incidente)
                 .build();
         alertaRepository.save(alerta);

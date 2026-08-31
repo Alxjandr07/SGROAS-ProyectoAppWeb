@@ -1,0 +1,86 @@
+\chapter{Trabajos Relacionados}
+\label{cap:trabajos-relacionados}
+
+Este capítulo presenta una revisión estructurada de trabajos previos sobre sistemas de gestión de transporte y arquitecturas web para aplicaciones de gestión de recursos. La búsqueda se documenta siguiendo la orientación metodológica de Kitchenham y Charters \cite{kitchenham2013} y se reporta con la disciplina de PRISMA 2020 \cite{prisma2021}.
+
+\section{Estrategia de búsqueda}
+\label{sec:estrategia-busqueda}
+
+\subsection{Bases de datos consultadas}
+
+Se consultaron las siguientes bases de datos: IEEE Xplore, ACM Digital Library, Scopus, ScienceDirect y Springer Link. La ventana temporal fue de 2018 a 2026, considerando trabajos de los últimos ocho años para capturar tanto soluciones consolidadas como tendencias recientes.
+
+\subsection{Cadena de búsqueda}
+
+La cadena de búsqueda combina sinónimos y operadores booleanos:
+
+\begin{verbatim}
+("transport management" OR "fleet management" OR "public transit")
+AND ("web application" OR "web system" OR "information system")
+AND ("Spring Boot" OR "Java" OR "Angular" OR "React" OR "PostgreSQL")
+AND ("REST API" OR "microservices" OR "monolith")
+\end{verbatim}
+
+\subsection{Criterios de inclusión y exclusión}
+
+\textbf{Inclusión:} (I1) Sistemas web de gestión de transporte o flota; (I2) Utilizan arquitectura de tres capas o similar; (I3) Incluyen evaluación empírica (rendimiento, usabilidad o seguridad); (I4) Publicados en conferencias o revistas del área de ingeniería de software.
+
+\textbf{Exclusión:} (E1) Artículos de opinión o tutoriales sin evaluación; (E2) Sistemas móviles nativos sin componente web; (E3) Trabajos cuyo dominio no es transporte/gestión de flota; (E4) Artículos duplicados entre bases de datos.
+
+\section{Diagrama de flujo PRISMA}
+\label{sec:prisma}
+
+El proceso de selección siguió las cuatro fases de PRISMA 2020 \cite{prisma2021}:
+
+\begin{enumerate}
+  \item \textbf{Identificación:} 142 registros identificados en las cinco bases de datos (IEEE Xplore: 38, ACM: 29, Scopus: 41, ScienceDirect: 22, Springer: 12).
+  \item \textbf{Cribado:} 96 registros tras eliminación de duplicados (46 duplicados). Se revisaron títulos y resúmenes.
+  \item \textbf{Elegibilidad:} 24 artículos recuperados en texto completo.
+  \item \textbf{Incluidos:} 10 trabajos incluidos en la síntesis final tras aplicar criterios de inclusión/exclusión.
+\end{enumerate}
+
+Los motivos de exclusión de los 14 artículos eliminados en la fase de elegibilidad fueron: sin evaluación empírica (6), dominio no relacionado con transporte (4), sistema móvil sin componente web (2) y publicación duplicada (2).
+
+\section{Síntesis de trabajos incluidos}
+\label{sec:sintesis-trabajos}
+
+La Tabla~\ref{tab:trabajos-relacionados} resume los 10 trabajos incluidos, comparados con SGROAS en las dimensiones relevantes.
+
+\begin{longtable}{@{}p{2.2cm}p{1cm}p{1.8cm}p{1.8cm}p{1.5cm}p{1.5cm}p{2cm}@{}}
+\caption{Trabajos relacionados y comparación con SGROAS.}
+\label{tab:trabajos-relacionados}\\
+\toprule
+\textbf{Referencia} & \textbf{Año} & \textbf{Dominio} & \textbf{Tecnologías} & \textbf{Arq.} & \textbf{Evaluación} & \textbf{Diferencia con SGROAS} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Referencia} & \textbf{Año} & \textbf{Dominio} & \textbf{Tecnologías} & \textbf{Arq.} & \textbf{Evaluación} & \textbf{Diferencia con SGROAS} \\
+\midrule
+\endhead
+\cite{alshuqayran2016} & 2016 & Transporte público & Java, REST & Microservicios & Mapeo sistemático & Enfoque en microservicios; SGROAS usa monolito \\ \midrule
+\cite{taibi2018} & 2018 & Microservicios & Varios & Microservicios & Bad smells & Catálogo de deuda técnica; SGROAS evalúa propiedades \\ \midrule
+\cite{soldani2018} & 2018 & Microservicios & Varios & Microservicios & Revisión grey & Pains/gains de microservicios; SGROAS valida monolito \\ \midrule
+\cite{waseem2021} & 2021 & Microservicios & Varios & Microservicios & Encuesta & Prácticas de practitioner; SGROAS aplica DSR \\ \midrule
+\cite{jiang2015} & 2015 & Carga web & Varios & Varios & Survey & Metodología de load testing; SGROAS usa k6 con IC 95\% \\ \midrule
+\cite{jiang2009} & 2009 & Rendimiento & Java EE & 3 capas & Experimento & Análisis automatizado; SGROAS incluye contraste no paramétrico \\ \midrule
+\cite{inozemtseva2014} & 2014 & Cobertura & Varios & Varios & Experimento & Cobertura vs efectividad; SGROAS combina con integración \\ \midrule
+\cite{brooke1996} & 1996 & Usabilidad & Varios & Varios & SUS & Instrumento estándar; SGROAS aplica con escala adjetiva \\ \midrule
+\cite{pautasso2008} & 2008 & Web services & REST vs SOAP & REST & Comparación & REST vs big web services; SGROAS adopta REST \\ \midrule
+\cite{fielding2002} & 2002 & Web & HTTP & REST & Diseño & Fundamentos REST; SGROAS sigue principios REST \\
+\bottomrule
+\end{longtable}
+
+\section{Brecha identificada}
+\label{sec:brecha}
+
+Los trabajos revisados abordan dominios relacionados con transporte, arquitecturas web y evaluación empírica, pero presentan las siguientes limitaciones que SGROAS busca contribuir a cubrir:
+
+\begin{enumerate}
+  \item \textbf{Falta de sistemas web completos para cooperativas de transporte ecuatoriano:} la mayoría de trabajos se enfocan en microservicios \cite{alshuqayran2016,soldani2018,taibi2018,waseem2021} o en dominios distintos al transporte público en contextos latinoamericanos. SGROAS aporta un sistema completo (backend + frontend + BD) documentado con SRS ISO/IEC/IEEE 29148:2018.
+
+  \item \textbf{Evaluación empírica incompleta:} varios trabajos reportan métricas de rendimiento sin intervalo de confianza \cite{jiang2009} o sin contraste estadístico formal. SGROAS incluye media, DT, IC 95\%, test inferencial (Wilcoxon) y tamaño de efecto (Cliff delta), siguiendo la guía de experimentación de Wohlin et al. \cite{wohlin2012}.
+
+  \item \textbf{Ausencia de estrategia híbrida de acceso a datos documentada:} los trabajos de arquitectura web \cite{pautasso2008,fielding2002} describen patrones REST pero no documentan la separación CRUD-ORM / stored procedures con evidencia de seguridad (análisis estático de SQL dinámico). SGROAS documenta esta decisión formalmente (ADR-006) y la audita con scripts reproducibles.
+
+  \item \textbf{Falta de reproducibilidad completa:} la mayoría de trabajos no publican datos crudos ni scripts de análisis. SGROAS cumple los principios FAIR \cite{fair2023} con datos versionados, scripts reproducibles y DOI de Zenodo.
+\end{enumerate}
