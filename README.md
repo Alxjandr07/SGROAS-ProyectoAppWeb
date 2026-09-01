@@ -45,7 +45,7 @@ make audit
 make down
 ```
 
-Sistema disponible en `http://localhost:8080`.
+Sistema disponible en `https://sgroas-backend.onrender.com` (Render Free, datos de muestra `V1..V9`; `>1M` reproducible en local con `psql -f db/data/generar_datos_masivos.sql`) — desarrollo local: `http://localhost:8080`.
 
 ### Credenciales por defecto
 
@@ -118,8 +118,4 @@ dataset de acceso abierto en Zenodo:
 - Empaquetado reproducible: `scripts/zenodo/package-dataset.py`
 - Descripción y checksums: [`dataset/`](dataset/)
 
-## Video
 
-Video de reproducibilidad (`make all`) y recorrido por los reportes:
-**enlace pendiente** (YouTube no listado) — guion en
-[`docs/video/GUION-video.md`](docs/video/GUION-video.md).
