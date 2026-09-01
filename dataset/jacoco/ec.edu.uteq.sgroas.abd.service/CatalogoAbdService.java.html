@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CatalogoAbdService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">ec.edu.uteq.sgroas.abd.service</a> &gt; <span class="el_source">CatalogoAbdService.java</span></div><h1>CatalogoAbdService.java</h1><pre class="source lang-java linenums">package ec.edu.uteq.sgroas.abd.service;
+
+import ec.edu.uteq.sgroas.abd.dto.AbdDtos;
+import ec.edu.uteq.sgroas.abd.entity.Ciudad;
+import ec.edu.uteq.sgroas.abd.entity.Provincia;
+import ec.edu.uteq.sgroas.abd.entity.RolAbd;
+import ec.edu.uteq.sgroas.abd.entity.Terminal;
+import ec.edu.uteq.sgroas.abd.repository.CiudadRepository;
+import ec.edu.uteq.sgroas.abd.repository.ProvinciaRepository;
+import ec.edu.uteq.sgroas.abd.repository.RolAbdRepository;
+import ec.edu.uteq.sgroas.abd.repository.TerminalRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class CatalogoAbdService {
+
+    private final ProvinciaRepository provinciaRepository;
+    private final CiudadRepository ciudadRepository;
+    private final TerminalRepository terminalRepository;
+    private final RolAbdRepository rolAbdRepository;
+
+    public AbdDtos.CatalogosResponse obtenerCatalogos() {
+<span class="nc" id="L29">        List&lt;AbdDtos.ProvinciaResponse&gt; provincias = provinciaRepository.findAll().stream()</span>
+<span class="nc" id="L30">                .map(p -&gt; new AbdDtos.ProvinciaResponse(p.getIdProvincia(), p.getNombre()))</span>
+<span class="nc" id="L31">                .toList();</span>
+<span class="nc" id="L32">        List&lt;AbdDtos.CiudadResponse&gt; ciudades = ciudadRepository.findAll().stream()</span>
+<span class="nc" id="L33">                .map(this::aCiudadResponse)</span>
+<span class="nc" id="L34">                .toList();</span>
+<span class="nc" id="L35">        List&lt;AbdDtos.TerminalResponse&gt; terminales = terminalRepository.findAll().stream()</span>
+<span class="nc" id="L36">                .map(this::aTerminalResponse)</span>
+<span class="nc" id="L37">                .toList();</span>
+<span class="nc" id="L38">        List&lt;AbdDtos.RolResponse&gt; roles = rolAbdRepository.findAll().stream()</span>
+<span class="nc" id="L39">                .map(r -&gt; new AbdDtos.RolResponse(r.getIdRol(), r.getNombre(), r.getDescripcion()))</span>
+<span class="nc" id="L40">                .toList();</span>
+<span class="nc" id="L41">        return new AbdDtos.CatalogosResponse(provincias, ciudades, terminales, roles);</span>
+    }
+
+    public Terminal buscarTerminal(Integer idTerminal) {
+<span class="nc" id="L45">        return terminalRepository.findById(idTerminal)</span>
+<span class="nc" id="L46">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Terminal no encontrado: &quot; + idTerminal));</span>
+    }
+
+    private AbdDtos.CiudadResponse aCiudadResponse(Ciudad c) {
+<span class="nc" id="L50">        Provincia p = c.getProvincia();</span>
+<span class="nc" id="L51">        return new AbdDtos.CiudadResponse(c.getIdCiudad(), c.getNombre(), p.getIdProvincia(), p.getNombre());</span>
+    }
+
+    private AbdDtos.TerminalResponse aTerminalResponse(Terminal t) {
+<span class="nc" id="L55">        Ciudad c = t.getCiudad();</span>
+<span class="nc" id="L56">        return new AbdDtos.TerminalResponse(t.getIdTerminal(), t.getNombre(), c.getIdCiudad(), c.getNombre());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

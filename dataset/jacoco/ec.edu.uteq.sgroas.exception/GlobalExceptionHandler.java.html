@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GlobalExceptionHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">ec.edu.uteq.sgroas.exception</a> &gt; <span class="el_source">GlobalExceptionHandler.java</span></div><h1>GlobalExceptionHandler.java</h1><pre class="source lang-java linenums">package ec.edu.uteq.sgroas.exception;
+
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestControllerAdvice
+<span class="fc" id="L16">public class GlobalExceptionHandler {</span>
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ProblemDetail manejarErroresValidacion(
+            MethodArgumentNotValidException ex,
+            HttpServletRequest request
+    ) {
+<span class="fc" id="L23">        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_ENTITY);</span>
+<span class="fc" id="L24">        detail.setType(URI.create(&quot;https://sgroas.uteq.edu.ec/errors/validation&quot;));</span>
+<span class="fc" id="L25">        detail.setTitle(&quot;Error de validacion&quot;);</span>
+<span class="fc" id="L26">        detail.setDetail(&quot;Existen campos invalidos en la solicitud&quot;);</span>
+<span class="fc" id="L27">        detail.setInstance(URI.create(request.getRequestURI()));</span>
+
+<span class="fc" id="L29">        Map&lt;String, String&gt; errores = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L30">        ex.getBindingResult().getFieldErrors().forEach(error -&gt;</span>
+<span class="fc" id="L31">                errores.put(error.getField(), error.getDefaultMessage())</span>
+        );
+<span class="fc" id="L33">        detail.setProperty(&quot;errors&quot;, errores);</span>
+
+<span class="fc" id="L35">        return detail;</span>
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ProblemDetail manejarArgumentosInvalidos(
+            IllegalArgumentException ex,
+            HttpServletRequest request
+    ) {
+<span class="fc" id="L43">        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);</span>
+<span class="fc" id="L44">        detail.setType(URI.create(&quot;https://sgroas.uteq.edu.ec/errors/bad-request&quot;));</span>
+<span class="fc" id="L45">        detail.setTitle(&quot;Solicitud invalida&quot;);</span>
+<span class="fc" id="L46">        detail.setDetail(ex.getMessage());</span>
+<span class="fc" id="L47">        detail.setInstance(URI.create(request.getRequestURI()));</span>
+
+<span class="fc" id="L49">        return detail;</span>
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ProblemDetail manejarCredencialesInvalidas(
+            BadCredentialsException ex,
+            HttpServletRequest request
+    ) {
+<span class="fc" id="L57">        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);</span>
+<span class="fc" id="L58">        detail.setType(URI.create(&quot;https://sgroas.uteq.edu.ec/errors/unauthorized&quot;));</span>
+<span class="fc" id="L59">        detail.setTitle(&quot;Credenciales invalidas&quot;);</span>
+<span class="fc" id="L60">        detail.setDetail(&quot;El email o la contrasena son incorrectos&quot;);</span>
+<span class="fc" id="L61">        detail.setInstance(URI.create(request.getRequestURI()));</span>
+
+<span class="fc" id="L63">        return detail;</span>
+    }
+
+    @ExceptionHandler(CorreoNoVerificadoException.class)
+    public ProblemDetail manejarCorreoNoVerificado(
+            CorreoNoVerificadoException ex,
+            HttpServletRequest request
+    ) {
+<span class="nc" id="L71">        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.FORBIDDEN);</span>
+<span class="nc" id="L72">        detail.setType(URI.create(&quot;https://sgroas.uteq.edu.ec/errors/email-not-verified&quot;));</span>
+<span class="nc" id="L73">        detail.setTitle(&quot;Correo sin verificar&quot;);</span>
+<span class="nc" id="L74">        detail.setDetail(ex.getMessage());</span>
+<span class="nc" id="L75">        detail.setInstance(URI.create(request.getRequestURI()));</span>
+
+<span class="nc" id="L77">        return detail;</span>
+    }
+
+    /** Rutas inexistentes (ej. el antiguo /api/auth/register): 404, no 500. */
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    public ProblemDetail manejarRutaInexistente(
+            org.springframework.web.servlet.resource.NoResourceFoundException ex,
+            HttpServletRequest request
+    ) {
+<span class="fc" id="L86">        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);</span>
+<span class="fc" id="L87">        detail.setType(URI.create(&quot;https://sgroas.uteq.edu.ec/errors/not-found&quot;));</span>
+<span class="fc" id="L88">        detail.setTitle(&quot;Recurso no encontrado&quot;);</span>
+<span class="fc" id="L89">        detail.setDetail(&quot;La ruta solicitada no existe&quot;);</span>
+<span class="fc" id="L90">        detail.setInstance(URI.create(request.getRequestURI()));</span>
+
+<span class="fc" id="L92">        return detail;</span>
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ProblemDetail manejarErrorGeneral(
+            Exception ex,
+            HttpServletRequest request
+    ) {
+<span class="fc" id="L100">        ex.printStackTrace();</span>
+
+<span class="fc" id="L102">        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+<span class="fc" id="L103">        detail.setType(URI.create(&quot;https://sgroas.uteq.edu.ec/errors/internal&quot;));</span>
+<span class="fc" id="L104">        detail.setTitle(&quot;Error interno del servidor&quot;);</span>
+<span class="fc" id="L105">        detail.setDetail(ex.getClass().getSimpleName() + &quot;: &quot; + ex.getMessage());</span>
+<span class="fc" id="L106">        detail.setInstance(URI.create(request.getRequestURI()));</span>
+
+<span class="fc" id="L108">        return detail;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

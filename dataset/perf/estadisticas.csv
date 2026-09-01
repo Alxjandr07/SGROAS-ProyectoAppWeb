@@ -1,0 +1,4 @@
+corrida,archivo,iteraciones,vus,media_ms,mediana_ms,min_ms,max_ms,p90_ms,p95_ms,p99_ms,error_rate,checks_ok,checks_fail
+k01-run1,C:\Users\USUARIO\Documents\Default Project\docs\mediciones\perf\k01-run1.json,1465,50,37.324,17.885,7.326,286.028,82.062,173.13,251.443,0.0,2930,0
+k02-run2,C:\Users\USUARIO\Documents\Default Project\docs\mediciones\perf\k02-run2.json,1500,50,16.897,10.477,5.648,251.105,23.64,35.3,155.98,0.0,3000,0
+k03-run3,C:\Users\USUARIO\Documents\Default Project\docs\mediciones\perf\k03-run3.json,1500,50,14.818,9.126,4.916,187.762,26.881,37.843,159.622,0.0,3000,0

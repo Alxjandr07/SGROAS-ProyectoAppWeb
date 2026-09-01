@@ -1,0 +1,21 @@
+{
+  "codigo": "P08",
+  "edad": 20,
+  "sexo": "Femenino",
+  "experiencia_web": "Media",
+  "dispositivo": "Computadora",
+  "consentimiento": "Sí",
+  "respuestas": [
+    4,
+    2,
+    3,
+    3,
+    4,
+    4,
+    4,
+    2,
+    4,
+    2
+  ],
+  "sus_score": 65.0
+}

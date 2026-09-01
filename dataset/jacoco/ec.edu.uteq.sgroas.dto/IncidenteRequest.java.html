@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>IncidenteRequest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">ec.edu.uteq.sgroas.dto</a> &gt; <span class="el_source">IncidenteRequest.java</span></div><h1>IncidenteRequest.java</h1><pre class="source lang-java linenums">package ec.edu.uteq.sgroas.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
+import java.time.LocalDateTime;
+
+<span class="fc" id="L9">public record IncidenteRequest(</span>
+
+        @NotNull(message = &quot;La asignacion es obligatoria&quot;)
+        Long asignacionId,
+
+        @NotBlank(message = &quot;El reportante es obligatorio&quot;)
+        @Size(max = 100, message = &quot;El reportante no puede superar los 100 caracteres&quot;)
+        String reportadoPor,
+
+        @NotBlank(message = &quot;El tipo es obligatorio&quot;)
+        String tipo,
+
+        @NotBlank(message = &quot;La descripcion es obligatoria&quot;)
+        String descripcion,
+
+        @NotNull(message = &quot;La fecha del incidente es obligatoria&quot;)
+        LocalDateTime fechaIncidente,
+
+        @Size(max = 255, message = &quot;La ubicacion no puede superar los 255 caracteres&quot;)
+        String ubicacion,
+
+        @NotBlank(message = &quot;La gravedad es obligatoria&quot;)
+        String gravedad,
+
+        @NotBlank(message = &quot;El estado es obligatorio&quot;)
+        String estado
+) {
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

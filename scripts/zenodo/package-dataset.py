@@ -12,6 +12,7 @@ from __future__ import annotations
 import csv
 import hashlib
 import os
+import shutil
 import sys
 import zipfile
 from pathlib import Path
@@ -59,16 +60,35 @@ def archivos_seleccionados() -> list[tuple[Path, str]]:
     return out
 
 
+def materializar(files: list[tuple[Path, str]]) -> list[tuple[Path, str]]:
+    """Copia cada archivo seleccionado a dataset/ con su ruta relativa.
+
+    El MANIFEST solo es verificable si las rutas que lista existen en el
+    repositorio; sin esto el dataset queda vacio (rutas muertas del ZIP).
+    """
+    ds = REPO / "dataset"
+    copiados: list[tuple[Path, str]] = []
+    for full, rel in files:
+        dest = ds / rel
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(full, dest)
+        copiados.append((dest, rel))
+    return copiados
+
+
 def main() -> int:
     files = sorted(archivos_seleccionados())
     if not files:
         print("ERROR: no se encontraron archivos en docs/mediciones")
         return 1
 
-    # 1) MANIFEST con checksums SHA-256
+    # 1) Los datos reales viven en docs/mediciones; materializalos en dataset/
+    materializados = materializar(files)
+
+    # 2) MANIFEST con checksums SHA-256 de los archivos ya en el repo
     manifest = REPO / "dataset" / "MANIFEST.csv"
     rows = []
-    for full, rel in files:
+    for full, rel in materializados:
         rows.append((rel, os.path.getsize(full), sha256(full)))
     with manifest.open("w", newline="", encoding="utf-8") as fh:
         w = csv.writer(fh)
@@ -76,13 +96,13 @@ def main() -> int:
         w.writerows(rows)
     print(f"MANIFEST: {len(rows)} archivos -> {manifest}")
 
-    # 2) ZIP para subir a Zenodo
+    # 3) ZIP para subir a Zenodo (mismo contenido que dataset/ del repo)
     DIST.mkdir(exist_ok=True)
     zip_path = DIST / ZIP_NAME
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
         for extra in ["README.md", "MANIFEST.csv", "zenodo.json"]:
             z.write(REPO / "dataset" / extra, f"dataset/{extra}")
-        for full, rel in files:
+        for full, rel in materializados:
             z.write(full, f"dataset/{rel}")
     print(f"ZIP: {zip_path} ({os.path.getsize(zip_path)/1e6:.1f} MB)")
     return 0

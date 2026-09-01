@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UsuarioService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">ec.edu.uteq.sgroas.service</a> &gt; <span class="el_source">UsuarioService.java</span></div><h1>UsuarioService.java</h1><pre class="source lang-java linenums">package ec.edu.uteq.sgroas.service;
+
+import ec.edu.uteq.sgroas.dto.UsuarioRequest;
+import ec.edu.uteq.sgroas.dto.UsuarioResponse;
+import ec.edu.uteq.sgroas.entity.Rol;
+import ec.edu.uteq.sgroas.entity.Usuario;
+import ec.edu.uteq.sgroas.repository.UsuarioRepository;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+
+@Service
+@RequiredArgsConstructor
+public class UsuarioService {
+
+    private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final CodigoVerificacionService codigoVerificacionService;
+    private final EmailService emailService;
+
+    public Page&lt;UsuarioResponse&gt; listar(String search, Pageable pageable) {
+<span class="pc bpc" id="L27" title="3 of 4 branches missed.">        if (search == null || search.isBlank()) {</span>
+<span class="fc" id="L28">            return usuarioRepository.findByActivoTrue(pageable).map(this::toResponse);</span>
+        }
+<span class="nc" id="L30">        return usuarioRepository.buscarActivos(search.trim().toLowerCase(), pageable)</span>
+<span class="nc" id="L31">                .map(this::toResponse);</span>
+    }
+
+    public UsuarioResponse buscarPorId(Long id) {
+<span class="fc" id="L35">        return usuarioRepository.findById(id)</span>
+<span class="fc" id="L36">                .map(this::toResponse)</span>
+<span class="fc" id="L37">                .orElseThrow(() -&gt; new EntityNotFoundException(&quot;Usuario no encontrado con id: &quot; + id));</span>
+    }
+
+    /**
+     * Crea el usuario y le envia por correo un codigo de activacion de 6 digitos.
+     * La cuenta nace con verificado = false: no podra iniciar sesion hasta
+     * confirmar el codigo en la pantalla de activacion del login.
+     */
+    public UsuarioResponse crear(UsuarioRequest request) {
+<span class="fc bfc" id="L46" title="All 2 branches covered.">        if (usuarioRepository.existsByEmail(request.email())) {</span>
+<span class="fc" id="L47">            throw new IllegalArgumentException(&quot;Ya existe un usuario con ese email&quot;);</span>
+        }
+
+<span class="fc" id="L50">        Usuario usuario = Usuario.builder()</span>
+<span class="fc" id="L51">                .nombre(request.nombre())</span>
+<span class="fc" id="L52">                .email(request.email())</span>
+<span class="fc" id="L53">                .passwordHash(passwordEncoder.encode(request.password()))</span>
+<span class="fc" id="L54">                .rol(Rol.valueOf(request.rol().toUpperCase()))</span>
+<span class="fc" id="L55">                .activo(true)</span>
+<span class="fc" id="L56">                .verificado(false)</span>
+<span class="fc" id="L57">                .creadoEn(Instant.now())</span>
+<span class="fc" id="L58">                .actualizadoEn(Instant.now())</span>
+<span class="fc" id="L59">                .build();</span>
+
+<span class="fc" id="L61">        Usuario guardado = usuarioRepository.save(usuario);</span>
+<span class="fc" id="L62">        enviarCodigoActivacion(guardado);</span>
+
+<span class="fc" id="L64">        return toResponse(guardado);</span>
+    }
+
+    /** El ADMIN puede reenviar el codigo de activacion de una cuenta sin verificar. */
+    public void reenviarCodigoActivacion(Long id) {
+<span class="fc" id="L69">        Usuario usuario = usuarioRepository.findById(id)</span>
+<span class="pc" id="L70">                .orElseThrow(() -&gt; new EntityNotFoundException(&quot;Usuario no encontrado con id: &quot; + id));</span>
+
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">        if (Boolean.TRUE.equals(usuario.getVerificado())) {</span>
+<span class="nc" id="L73">            throw new IllegalArgumentException(&quot;Ese usuario ya verifico su correo&quot;);</span>
+        }
+<span class="fc bfc" id="L75" title="All 2 branches covered.">        if (!codigoVerificacionService.puedeReenviar(usuario.getEmail(),</span>
+                CodigoVerificacionService.Tipo.VERIFICACION)) {
+<span class="fc" id="L77">            throw new IllegalArgumentException(</span>
+                    &quot;El codigo se envio hace menos de un minuto. Espera antes de reenviar.&quot;);
+        }
+<span class="fc" id="L80">        enviarCodigoActivacion(usuario);</span>
+<span class="fc" id="L81">    }</span>
+
+    private void enviarCodigoActivacion(Usuario usuario) {
+<span class="fc" id="L84">        String codigo = codigoVerificacionService.generar(usuario.getEmail(),</span>
+                CodigoVerificacionService.Tipo.VERIFICACION);
+<span class="fc" id="L86">        emailService.enviarCodigoVerificacion(usuario.getEmail(), usuario.getNombre(), codigo);</span>
+<span class="fc" id="L87">    }</span>
+
+    public UsuarioResponse actualizar(Long id, UsuarioRequest request) {
+<span class="fc" id="L90">        Usuario usuario = usuarioRepository.findById(id)</span>
+<span class="fc" id="L91">                .orElseThrow(() -&gt; new EntityNotFoundException(&quot;Usuario no encontrado con id: &quot; + id));</span>
+
+<span class="fc" id="L93">        usuario.setNombre(request.nombre());</span>
+<span class="fc" id="L94">        usuario.setEmail(request.email());</span>
+<span class="fc" id="L95">        usuario.setRol(Rol.valueOf(request.rol().toUpperCase()));</span>
+<span class="fc" id="L96">        usuario.setActualizadoEn(Instant.now());</span>
+
+<span class="pc bpc" id="L98" title="2 of 4 branches missed.">        if (request.password() != null &amp;&amp; !request.password().isBlank()) {</span>
+<span class="fc" id="L99">            usuario.setPasswordHash(passwordEncoder.encode(request.password()));</span>
+        }
+
+<span class="fc" id="L102">        return toResponse(usuarioRepository.save(usuario));</span>
+    }
+
+    public void desactivar(Long id) {
+<span class="fc" id="L106">        Usuario usuario = usuarioRepository.findById(id)</span>
+<span class="fc" id="L107">                .orElseThrow(() -&gt; new EntityNotFoundException(&quot;Usuario no encontrado con id: &quot; + id));</span>
+<span class="fc" id="L108">        usuario.setActivo(false);</span>
+<span class="fc" id="L109">        usuario.setActualizadoEn(Instant.now());</span>
+<span class="fc" id="L110">        usuarioRepository.save(usuario);</span>
+<span class="fc" id="L111">    }</span>
+
+    private UsuarioResponse toResponse(Usuario u) {
+<span class="fc" id="L114">        return new UsuarioResponse(</span>
+<span class="fc" id="L115">                u.getId(), u.getNombre(), u.getEmail(),</span>
+<span class="fc" id="L116">                u.getRol().name(), u.getActivo(),</span>
+<span class="fc" id="L117">                u.getCreadoEn(), u.getActualizadoEn()</span>
+        );
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AsignacionRutaRequest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">ec.edu.uteq.sgroas.dto</a> &gt; <span class="el_source">AsignacionRutaRequest.java</span></div><h1>AsignacionRutaRequest.java</h1><pre class="source lang-java linenums">package ec.edu.uteq.sgroas.dto;
+
+import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDate;
+
+<span class="fc" id="L7">public record AsignacionRutaRequest(</span>
+
+        @NotNull(message = &quot;El conductor es obligatorio&quot;)
+        Long conductorId,
+
+        @NotNull(message = &quot;El vehiculo es obligatorio&quot;)
+        Long vehiculoId,
+
+        @NotNull(message = &quot;La ruta es obligatoria&quot;)
+        Long rutaId,
+
+        @NotNull(message = &quot;La fecha de asignacion es obligatoria&quot;)
+        LocalDate fechaAsignacion,
+
+        @NotNull(message = &quot;La fecha de inicio es obligatoria&quot;)
+        LocalDate fechaInicio,
+
+        LocalDate fechaFin,
+
+        @NotNull(message = &quot;El estado es obligatorio&quot;)
+        String estado
+) {
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

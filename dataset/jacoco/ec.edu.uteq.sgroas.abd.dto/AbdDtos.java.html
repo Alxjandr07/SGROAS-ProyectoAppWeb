@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbdDtos.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">ec.edu.uteq.sgroas.abd.dto</a> &gt; <span class="el_source">AbdDtos.java</span></div><h1>AbdDtos.java</h1><pre class="source lang-java linenums">package ec.edu.uteq.sgroas.abd.dto;
+
+import jakarta.validation.constraints.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+
+/**
+ * DTOs de la capa ABD. Records inmutables con validacion Jakarta.
+ */
+public final class AbdDtos {
+
+    private AbdDtos() {
+    }
+
+    // ---------- Catalogos ----------
+
+<span class="nc" id="L20">    public record ProvinciaResponse(Integer idProvincia, String nombre) {</span>
+    }
+
+<span class="nc" id="L23">    public record CiudadResponse(Integer idCiudad, String nombre, Integer idProvincia, String nombreProvincia) {</span>
+    }
+
+<span class="nc" id="L26">    public record TerminalResponse(Integer idTerminal, String nombre, Integer idCiudad, String nombreCiudad) {</span>
+    }
+
+<span class="nc" id="L29">    public record RolResponse(Integer idRol, String nombre, String descripcion) {</span>
+    }
+
+<span class="nc" id="L32">    public record CatalogosResponse(List&lt;ProvinciaResponse&gt; provincias,</span>
+                                    List&lt;CiudadResponse&gt; ciudades,
+                                    List&lt;TerminalResponse&gt; terminales,
+                                    List&lt;RolResponse&gt; roles) {
+    }
+
+    // ---------- Rutas (ABD) ----------
+
+<span class="nc" id="L40">    public record RutaAbdRequest(</span>
+            @NotNull(message = &quot;El terminal de origen es obligatorio&quot;) Integer idTerminalOrigen,
+            @NotNull(message = &quot;El terminal de destino es obligatorio&quot;) Integer idTerminalDestino,
+            @NotNull @DecimalMin(value = &quot;0.01&quot;, message = &quot;El precio debe ser mayor a 0&quot;)
+            @Digits(integer = 8, fraction = 2) BigDecimal precioPasaje
+    ) {
+    }
+
+<span class="nc" id="L48">    public record RutaAbdResponse(Integer idRuta, Integer idTerminalOrigen, String terminalOrigen,</span>
+                                  Integer idTerminalDestino, String terminalDestino,
+                                  BigDecimal precioPasaje, long totalProgramaciones) {
+    }
+
+    // ---------- Unidades ----------
+
+<span class="nc" id="L55">    public record UnidadRequest(</span>
+            @NotBlank @Size(max = 15) String placa,
+            @NotBlank @Size(max = 10) String numeroDisco,
+            @NotBlank @Size(max = 50) String modelo,
+            @NotNull @Min(1) @Max(200) Integer capacidad,
+            @Min(1950) @Max(2100) Integer anioFabricacion,
+            @Pattern(regexp = &quot;Activo|Inactivo|En Mantenimiento&quot;, message = &quot;Estado invalido&quot;) String estado
+    ) {
+    }
+
+<span class="nc" id="L65">    public record UnidadResponse(Integer idUnidad, String placa, String numeroDisco, String modelo,</span>
+                                 Integer capacidad, Integer anioFabricacion, String estado) {
+    }
+
+    // ---------- Programaciones ----------
+
+<span class="nc" id="L71">    public record ProgramacionRequest(</span>
+            @NotNull LocalDate fecha,
+            @NotNull LocalTime horaSalida,
+            @NotNull LocalTime horaEstimadaLlegada,
+            @Pattern(regexp = &quot;Programado|En Curso|Completado|Cancelado&quot;, message = &quot;Estado invalido&quot;) String estado,
+            @NotNull Integer idRuta,
+            @NotNull Integer idUnidad,
+            @NotNull Integer idConductor
+    ) {
+    }
+
+<span class="nc" id="L82">    public record ProgramacionResponse(Integer idProgramacion, LocalDate fecha, LocalTime horaSalida,</span>
+                                       LocalTime horaEstimadaLlegada, String estado,
+                                       Integer idRuta, String rutaDescripcion,
+                                       Integer idUnidad, String unidadPlaca,
+                                       Integer idConductor, String conductorNombres) {
+    }
+
+    // ---------- Incidentes (ABD) ----------
+
+<span class="nc" id="L91">    public record IncidenteAbdRequest(</span>
+            @NotBlank @Size(max = 50) String tipo,
+            @NotBlank String descripcion,
+            @NotBlank @Pattern(regexp = &quot;BAJO|MEDIO|ALTO&quot;, message = &quot;Nivel sugerido debe ser BAJO, MEDIO o ALTO&quot;) String nivelSugerido,
+            @Size(max = 255) String evidencia,
+            @Pattern(regexp = &quot;Reportado|En Revision|Cerrado&quot;, message = &quot;Estado invalido&quot;) String estado,
+            @NotNull Integer idUnidad
+    ) {
+    }
+
+<span class="nc" id="L101">    public record IncidenteAbdResponse(Integer idIncidente, String tipo, String descripcion,</span>
+                                       String nivelSugerido, String fechaIncidente, String evidencia,
+                                       String estado, Integer idUnidad, String unidadPlaca) {
+    }
+
+<span class="nc" id="L106">    public record AlertaResponse(Integer idAlerta, String nivelRiesgo, String descripcion,</span>
+                                 String fecha, Integer idIncidente) {
+    }
+
+    // ---------- Reportes ----------
+
+<span class="nc" id="L112">    public record ConteoResponse(String clave, long total) {</span>
+    }
+
+<span class="nc" id="L115">    public record TopRutaResponse(Integer idRuta, String descripcion, long totalProgramaciones) {</span>
+    }
+
+<span class="nc" id="L118">    public record ResumenResponse(long totalProgramaciones, long programacionesActivas,</span>
+                                  long totalIncidentes, long incidentesAltoNivel,
+                                  long totalAlertas, long totalUnidades, long unidadesEnMantenimiento,
+                                  long totalRutas) {
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">ec.edu.uteq.sgroas.service</a> &gt; <span class="el_source">AuthService.java</span></div><h1>AuthService.java</h1><pre class="source lang-java linenums">package ec.edu.uteq.sgroas.service;
+
+import ec.edu.uteq.sgroas.dto.AuthResponse;
+import ec.edu.uteq.sgroas.dto.LoginRequest;
+import ec.edu.uteq.sgroas.dto.RefreshTokenRequest;
+import ec.edu.uteq.sgroas.entity.Usuario;
+import ec.edu.uteq.sgroas.exception.CorreoNoVerificadoException;
+import ec.edu.uteq.sgroas.repository.UsuarioRepository;
+import ec.edu.uteq.sgroas.security.JwtService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+
+/**
+ * Autenticacion de SGROAS. No existe registro publico: los usuarios los crea
+ * el ADMIN desde el modulo Usuarios (UsuarioService), que envia por correo un
+ * codigo de activacion; aqui solo se valida ese codigo y se gestionan las
+ * sesiones y el restablecimiento de contrasena.
+ */
+@Service
+@RequiredArgsConstructor
+public class AuthService {
+
+    private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+    private final TokenService tokenService;
+    private final CodigoVerificacionService codigoVerificacionService;
+    private final EmailService emailService;
+
+    @Value(&quot;${app.jwt.refresh-expiration-ms}&quot;)
+    private Long refreshExpirationMs;
+
+    public AuthResponse login(LoginRequest request) {
+<span class="fc" id="L39">        Usuario usuario = usuarioRepository.findByEmail(request.email())</span>
+<span class="pc" id="L40">                .orElseThrow(() -&gt; new BadCredentialsException(&quot;Credenciales invalidas&quot;));</span>
+
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        if (!passwordEncoder.matches(request.password(), usuario.getPasswordHash())) {</span>
+<span class="fc" id="L43">            throw new BadCredentialsException(&quot;Credenciales invalidas&quot;);</span>
+        }
+
+<span class="fc bfc" id="L46" title="All 2 branches covered.">        if (Boolean.FALSE.equals(usuario.getVerificado())) {</span>
+<span class="fc" id="L47">            throw new CorreoNoVerificadoException(</span>
+                    &quot;Tu cuenta aun no esta verificada. Revisa tu correo e ingresa el codigo de 6 digitos.&quot;);
+        }
+
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">        if (!usuario.getActivo()) {</span>
+<span class="nc" id="L52">            throw new BadCredentialsException(&quot;Credenciales invalidas&quot;);</span>
+        }
+
+<span class="fc" id="L55">        return generarRespuestaAutenticacion(usuario);</span>
+    }
+
+    /** Confirma el codigo de activacion enviado por el administrador e inicia sesion. */
+    public AuthResponse verificarEmail(String email, String codigo) {
+<span class="fc" id="L60">        Usuario usuario = usuarioRepository.findByEmail(email)</span>
+<span class="pc" id="L61">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;No existe una cuenta con ese email&quot;));</span>
+
+<span class="fc" id="L63">        codigoVerificacionService.validar(email, CodigoVerificacionService.Tipo.VERIFICACION, codigo);</span>
+
+<span class="fc" id="L65">        usuario.setVerificado(true);</span>
+<span class="fc" id="L66">        usuario.setActivo(true);</span>
+<span class="fc" id="L67">        usuario.setActualizadoEn(Instant.now());</span>
+<span class="fc" id="L68">        usuarioRepository.save(usuario);</span>
+
+<span class="fc" id="L70">        return generarRespuestaAutenticacion(usuario);</span>
+    }
+
+    /** Reenvia el codigo de activacion si la cuenta sigue sin verificar y respetando la espera minima. */
+    public void reenviarCodigoVerificacion(String email) {
+<span class="fc" id="L75">        usuarioRepository.findByEmail(email)</span>
+<span class="fc" id="L76">                .filter(u -&gt; Boolean.FALSE.equals(u.getVerificado()))</span>
+<span class="fc" id="L77">                .filter(u -&gt; codigoVerificacionService.puedeReenviar(email,</span>
+                        CodigoVerificacionService.Tipo.VERIFICACION))
+<span class="fc" id="L79">                .ifPresent(this::enviarCodigoActivacion);</span>
+<span class="fc" id="L80">    }</span>
+
+    /** Envia un codigo para restablecer la contrasena (respuesta siempre generica en el controlador). */
+    public void solicitarRestablecimiento(String email) {
+<span class="fc" id="L84">        usuarioRepository.findByEmail(email)</span>
+<span class="fc" id="L85">                .filter(Usuario::getActivo)</span>
+<span class="fc" id="L86">                .filter(u -&gt; codigoVerificacionService.puedeReenviar(email,</span>
+                        CodigoVerificacionService.Tipo.RESET_PASSWORD))
+<span class="fc" id="L88">                .ifPresent(u -&gt; {</span>
+<span class="fc" id="L89">                    String codigo = codigoVerificacionService.generar(email,</span>
+                            CodigoVerificacionService.Tipo.RESET_PASSWORD);
+<span class="fc" id="L91">                    emailService.enviarCodigoRestablecimiento(email, codigo);</span>
+<span class="fc" id="L92">                });</span>
+<span class="fc" id="L93">    }</span>
+
+    /** Valida el codigo y cambia la contrasena de la cuenta. */
+    public void restablecerContrasena(String email, String codigo, String nuevaPassword) {
+<span class="fc" id="L97">        Usuario usuario = usuarioRepository.findByEmail(email)</span>
+<span class="pc" id="L98">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;No existe una cuenta con ese email&quot;));</span>
+
+<span class="fc" id="L100">        codigoVerificacionService.validar(email, CodigoVerificacionService.Tipo.RESET_PASSWORD, codigo);</span>
+
+<span class="fc" id="L102">        usuario.setPasswordHash(passwordEncoder.encode(nuevaPassword));</span>
+<span class="fc" id="L103">        usuario.setActivo(true);</span>
+<span class="fc" id="L104">        usuario.setVerificado(true);</span>
+<span class="fc" id="L105">        usuario.setActualizadoEn(Instant.now());</span>
+<span class="fc" id="L106">        usuarioRepository.save(usuario);</span>
+<span class="fc" id="L107">    }</span>
+
+    private void enviarCodigoActivacion(Usuario usuario) {
+<span class="fc" id="L110">        String codigo = codigoVerificacionService.generar(usuario.getEmail(),</span>
+                CodigoVerificacionService.Tipo.VERIFICACION);
+<span class="fc" id="L112">        emailService.enviarCodigoVerificacion(usuario.getEmail(), usuario.getNombre(), codigo);</span>
+<span class="fc" id="L113">    }</span>
+
+    public AuthResponse refresh(RefreshTokenRequest request) {
+<span class="fc" id="L116">        String email = tokenService.obtenerEmailDesdeRefreshToken(request.refreshToken());</span>
+
+<span class="fc" id="L118">        Usuario usuario = usuarioRepository.findByEmail(email)</span>
+<span class="fc" id="L119">                .filter(Usuario::getActivo)</span>
+<span class="fc" id="L120">                .orElseThrow(() -&gt; new BadCredentialsException(&quot;Usuario no valido&quot;));</span>
+
+<span class="fc" id="L122">        tokenService.eliminarRefreshToken(request.refreshToken());</span>
+
+<span class="fc" id="L124">        return generarRespuestaAutenticacion(usuario);</span>
+    }
+
+    public void logout(String accessToken, RefreshTokenRequest request) {
+<span class="fc" id="L128">        tokenService.agregarAccessTokenABlacklist(accessToken);</span>
+<span class="fc" id="L129">        tokenService.eliminarRefreshToken(request.refreshToken());</span>
+<span class="fc" id="L130">    }</span>
+
+    private AuthResponse generarRespuestaAutenticacion(Usuario usuario) {
+<span class="fc" id="L133">        String accessToken = jwtService.generarToken(usuario);</span>
+<span class="fc" id="L134">        String refreshToken = tokenService.generarRefreshToken(</span>
+<span class="fc" id="L135">                usuario.getEmail(),</span>
+                refreshExpirationMs
+        );
+
+<span class="fc" id="L139">        return new AuthResponse(</span>
+                accessToken,
+                refreshToken,
+                &quot;Bearer&quot;,
+<span class="fc" id="L143">                jwtService.getExpirationMs(),</span>
+<span class="fc" id="L144">                usuario.getNombre(),</span>
+<span class="fc" id="L145">                usuario.getEmail(),</span>
+<span class="fc" id="L146">                usuario.getRol().name()</span>
+        );
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

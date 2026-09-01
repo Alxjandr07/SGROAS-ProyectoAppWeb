@@ -1,0 +1,66 @@
+{
+  "generado": "2026-08-17",
+  "n": 10,
+  "items": [
+    {
+      "item": "q1",
+      "media_respuesta": 3.6,
+      "dt_respuesta": 0.7,
+      "media_contribucion": 2.6
+    },
+    {
+      "item": "q2",
+      "media_respuesta": 2.7,
+      "dt_respuesta": 1.16,
+      "media_contribucion": 2.3
+    },
+    {
+      "item": "q3",
+      "media_respuesta": 3.4,
+      "dt_respuesta": 0.52,
+      "media_contribucion": 2.4
+    },
+    {
+      "item": "q4",
+      "media_respuesta": 2.4,
+      "dt_respuesta": 1.17,
+      "media_contribucion": 2.6
+    },
+    {
+      "item": "q5",
+      "media_respuesta": 3.7,
+      "dt_respuesta": 0.67,
+      "media_contribucion": 2.7
+    },
+    {
+      "item": "q6",
+      "media_respuesta": 2.7,
+      "dt_respuesta": 0.67,
+      "media_contribucion": 2.3
+    },
+    {
+      "item": "q7",
+      "media_respuesta": 3.5,
+      "dt_respuesta": 1.18,
+      "media_contribucion": 2.5
+    },
+    {
+      "item": "q8",
+      "media_respuesta": 2.0,
+      "dt_respuesta": 0.82,
+      "media_contribucion": 3.0
+    },
+    {
+      "item": "q9",
+      "media_respuesta": 3.4,
+      "dt_respuesta": 1.17,
+      "media_contribucion": 2.4
+    },
+    {
+      "item": "q10",
+      "media_respuesta": 2.6,
+      "dt_respuesta": 1.07,
+      "media_contribucion": 2.4
+    }
+  ]
+}

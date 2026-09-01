@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReporteService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">ec.edu.uteq.sgroas.service</a> &gt; <span class="el_source">ReporteService.java</span></div><h1>ReporteService.java</h1><pre class="source lang-java linenums">package ec.edu.uteq.sgroas.service;
+
+import ec.edu.uteq.sgroas.repository.AsignacionRutaRepository;
+import ec.edu.uteq.sgroas.repository.ConductorRepository;
+import ec.edu.uteq.sgroas.repository.IncidenteRepository;
+import ec.edu.uteq.sgroas.repository.RutaRepository;
+import ec.edu.uteq.sgroas.repository.VehiculoRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+ * Servicio de reportes que invoca los stored procedures a traves de
+ * @Procedure (estrategia hibrida CRUD-ORM + SP, ver ADR-006).
+ * Transaccional: los cursores REFCURSOR de PostgreSQL solo pueden leerse
+ * dentro de la misma transaccion JDBC (ver CATALOGO-SP.md).
+ */
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class ReporteService {
+
+    private final IncidenteRepository incidenteRepository;
+    private final ConductorRepository conductorRepository;
+    private final VehiculoRepository vehiculoRepository;
+    private final RutaRepository rutaRepository;
+    private final AsignacionRutaRepository asignacionRutaRepository;
+
+    public List&lt;Map&lt;String, Object&gt;&gt; estadisticasGenerales() {
+<span class="nc" id="L36">        return incidenteRepository.estadisticasGenerales().stream()</span>
+<span class="nc" id="L37">                .map(fila -&gt; mapa(</span>
+                        &quot;total_conductores&quot;, fila[0],
+                        &quot;conductores_activos&quot;, fila[1],
+                        &quot;total_vehiculos&quot;, fila[2],
+                        &quot;vehiculos_activos&quot;, fila[3],
+                        &quot;total_rutas&quot;, fila[4],
+                        &quot;rutas_activas&quot;, fila[5],
+                        &quot;total_asignaciones&quot;, fila[6],
+                        &quot;asignaciones_activas&quot;, fila[7],
+                        &quot;total_incidentes&quot;, fila[8],
+                        &quot;incidentes_abiertos&quot;, fila[9]))
+<span class="nc" id="L48">                .collect(Collectors.toList());</span>
+    }
+
+    public List&lt;Map&lt;String, Object&gt;&gt; incidentesPorGravedad(String tipo) {
+<span class="nc" id="L52">        return incidenteRepository.incidentesPorGravedad(tipo).stream()</span>
+<span class="nc" id="L53">                .map(fila -&gt; mapa(</span>
+                        &quot;gravedad&quot;, fila[0],
+                        &quot;total_incidentes&quot;, fila[1],
+                        &quot;ultimo_incidente&quot;, fila[2]))
+<span class="nc" id="L57">                .collect(Collectors.toList());</span>
+    }
+
+    public List&lt;Map&lt;String, Object&gt;&gt; incidentesPorRango(Instant desde, Instant hasta) {
+<span class="nc" id="L61">        return incidenteRepository.obtenerIncidentesPorRango(desde, hasta).stream()</span>
+<span class="nc" id="L62">                .map(fila -&gt; mapa(</span>
+                        &quot;incidente_id&quot;, fila[0],
+                        &quot;tipo&quot;, fila[1],
+                        &quot;gravedad&quot;, fila[2],
+                        &quot;estado&quot;, fila[3],
+                        &quot;descripcion&quot;, fila[4],
+                        &quot;fecha_incidente&quot;, fila[5],
+                        &quot;ubicacion&quot;, fila[6],
+                        &quot;conductor_nombre&quot;, fila[7],
+                        &quot;vehiculo_placa&quot;, fila[8],
+                        &quot;ruta_codigo&quot;, fila[9]))
+<span class="nc" id="L73">                .collect(Collectors.toList());</span>
+    }
+
+    public List&lt;Map&lt;String, Object&gt;&gt; licenciasPorVencer(Integer dias) {
+<span class="nc" id="L77">        return conductorRepository.licenciasPorVencer(dias).stream()</span>
+<span class="nc" id="L78">                .map(fila -&gt; mapa(</span>
+                        &quot;conductor_id&quot;, fila[0],
+                        &quot;nombre_completo&quot;, fila[1],
+                        &quot;cedula&quot;, fila[2],
+                        &quot;numero_licencia&quot;, fila[3],
+                        &quot;tipo_licencia&quot;, fila[4],
+                        &quot;fecha_vencimiento&quot;, fila[5],
+                        &quot;asignacion_activa&quot;, fila[6]))
+<span class="nc" id="L86">                .collect(Collectors.toList());</span>
+    }
+
+    public List&lt;Map&lt;String, Object&gt;&gt; vehiculosEnMantenimiento() {
+<span class="nc" id="L90">        return vehiculoRepository.vehiculosEnMantenimiento().stream()</span>
+<span class="nc" id="L91">                .map(fila -&gt; mapa(</span>
+                        &quot;vehiculo_id&quot;, fila[0],
+                        &quot;placa&quot;, fila[1],
+                        &quot;marca&quot;, fila[2],
+                        &quot;modelo&quot;, fila[3],
+                        &quot;anio&quot;, fila[4],
+                        &quot;total_asignaciones&quot;, fila[5],
+                        &quot;total_incidentes&quot;, fila[6]))
+<span class="nc" id="L99">                .collect(Collectors.toList());</span>
+    }
+
+    public List&lt;Map&lt;String, Object&gt;&gt; reporteRendimientoRutas() {
+<span class="nc" id="L103">        return rutaRepository.reporteRendimientoRutas().stream()</span>
+<span class="nc" id="L104">                .map(fila -&gt; mapa(</span>
+                        &quot;ruta_id&quot;, fila[0],
+                        &quot;ruta_codigo&quot;, fila[1],
+                        &quot;ruta_nombre&quot;, fila[2],
+                        &quot;total_asignaciones&quot;, fila[3],
+                        &quot;total_incidentes&quot;, fila[4],
+                        &quot;incidentes_criticos&quot;, fila[5],
+                        &quot;incidentes_altos&quot;, fila[6],
+                        &quot;incidentes_medios&quot;, fila[7],
+                        &quot;incidentes_bajos&quot;, fila[8],
+                        &quot;promedio_distancia_km&quot;, fila[9]))
+<span class="nc" id="L115">                .collect(Collectors.toList());</span>
+    }
+
+    public List&lt;Map&lt;String, Object&gt;&gt; asignacionesActivasPorConductor(Long conductorId) {
+<span class="nc" id="L119">        return asignacionRutaRepository.asignacionesActivasPorConductor(conductorId).stream()</span>
+<span class="nc" id="L120">                .map(fila -&gt; mapa(</span>
+                        &quot;asignacion_id&quot;, fila[0],
+                        &quot;vehiculo_placa&quot;, fila[1],
+                        &quot;vehiculo_marca&quot;, fila[2],
+                        &quot;ruta_codigo&quot;, fila[3],
+                        &quot;ruta_nombre&quot;, fila[4],
+                        &quot;fecha_inicio&quot;, fila[5],
+                        &quot;fecha_fin&quot;, fila[6]))
+<span class="nc" id="L128">                .collect(Collectors.toList());</span>
+    }
+
+    private Map&lt;String, Object&gt; mapa(Object... pares) {
+<span class="nc" id="L132">        Map&lt;String, Object&gt; m = new LinkedHashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L133" title="All 2 branches missed.">        for (int i = 0; i &lt; pares.length; i += 2) {</span>
+<span class="nc" id="L134">            m.put((String) pares[i], pares[i + 1]);</span>
+        }
+<span class="nc" id="L136">        return m;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

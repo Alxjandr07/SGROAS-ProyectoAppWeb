@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">ec.edu.uteq.sgroas.security</a> &gt; <span class="el_source">JwtService.java</span></div><h1>JwtService.java</h1><pre class="source lang-java linenums">package ec.edu.uteq.sgroas.security;
+
+import ec.edu.uteq.sgroas.entity.Usuario;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.UUID;
+import java.util.function.Function;
+
+@Service
+<span class="fc" id="L17">public class JwtService {</span>
+
+    @Value(&quot;${app.jwt.secret}&quot;)
+    private String jwtSecret;
+
+    @Value(&quot;${app.jwt.expiration-ms}&quot;)
+    private Long jwtExpirationMs;
+
+    @Value(&quot;${app.jwt.issuer}&quot;)
+    private String jwtIssuer;
+
+    @Value(&quot;${app.jwt.audience}&quot;)
+    private String jwtAudience;
+
+    private SecretKey getSigningKey() {
+<span class="fc" id="L32">        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));</span>
+    }
+
+    public String generarToken(Usuario usuario) {
+<span class="fc" id="L36">        Date ahora = new Date();</span>
+<span class="fc" id="L37">        Date expiracion = new Date(ahora.getTime() + jwtExpirationMs);</span>
+<span class="fc" id="L38">        String jti = UUID.randomUUID().toString();</span>
+
+<span class="fc" id="L40">        return Jwts.builder()</span>
+<span class="fc" id="L41">                .id(jti)</span>
+<span class="fc" id="L42">                .issuer(jwtIssuer)</span>
+<span class="fc" id="L43">                .subject(usuario.getEmail())</span>
+<span class="fc" id="L44">                .audience().add(jwtAudience).and()</span>
+<span class="fc" id="L45">                .issuedAt(ahora)</span>
+<span class="fc" id="L46">                .notBefore(ahora)</span>
+<span class="fc" id="L47">                .expiration(expiracion)</span>
+<span class="fc" id="L48">                .claim(&quot;nombre&quot;, usuario.getNombre())</span>
+<span class="fc" id="L49">                .claim(&quot;rol&quot;, usuario.getRol().name())</span>
+<span class="fc" id="L50">                .signWith(getSigningKey(), Jwts.SIG.HS256)</span>
+<span class="fc" id="L51">                .compact();</span>
+    }
+
+    public String extraerEmail(String token) {
+<span class="fc" id="L55">        return extraerClaim(token, Claims::getSubject);</span>
+    }
+
+    public String extraerJti(String token) {
+<span class="fc" id="L59">        return extraerClaim(token, Claims::getId);</span>
+    }
+
+    public Date extraerExpiracion(String token) {
+<span class="fc" id="L63">        return extraerClaim(token, Claims::getExpiration);</span>
+    }
+
+    public Long getExpirationMs() {
+<span class="fc" id="L67">        return jwtExpirationMs;</span>
+    }
+
+    public boolean tokenValido(String token, String email) {
+<span class="fc" id="L71">        String emailToken = extraerEmail(token);</span>
+<span class="pc bpc" id="L72" title="1 of 4 branches missed.">        return emailToken.equals(email) &amp;&amp; !tokenExpirado(token);</span>
+    }
+
+    private boolean tokenExpirado(String token) {
+<span class="fc" id="L76">        return extraerExpiracion(token).before(new Date());</span>
+    }
+
+    private &lt;T&gt; T extraerClaim(String token, Function&lt;Claims, T&gt; claimsResolver) {
+<span class="fc" id="L80">        Claims claims = extraerTodosLosClaims(token);</span>
+<span class="fc" id="L81">        return claimsResolver.apply(claims);</span>
+    }
+
+    private Claims extraerTodosLosClaims(String token) {
+<span class="fc" id="L85">        return Jwts.parser()</span>
+<span class="fc" id="L86">                .verifyWith(getSigningKey())</span>
+<span class="fc" id="L87">                .build()</span>
+<span class="fc" id="L88">                .parseSignedClaims(token)</span>
+<span class="fc" id="L89">                .getPayload();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>
