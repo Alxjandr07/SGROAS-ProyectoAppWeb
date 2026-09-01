@@ -1,10 +1,9 @@
-﻿# A07 - Autenticacion (Rate Limiting: 6 intentos -> 429)
-# Fecha: 2026-07-30 00:09:12
+﻿# A07 - Autenticacion (Rate Limiting: 6 intentos fallidos -> 429)
+# Fecha: 2026-09-01 18:02:11
 Intento 1: {"type":"https://sgroas.uteq.edu.ec/errors/unauthorized","title":"Credenciales invalidas","status":401,"detail":"El email o la contrasena son incorrectos","instance":"/api/auth/login"}|HTTP_CODE:401
 Intento 2: {"type":"https://sgroas.uteq.edu.ec/errors/unauthorized","title":"Credenciales invalidas","status":401,"detail":"El email o la contrasena son incorrectos","instance":"/api/auth/login"}|HTTP_CODE:401
 Intento 3: {"type":"https://sgroas.uteq.edu.ec/errors/unauthorized","title":"Credenciales invalidas","status":401,"detail":"El email o la contrasena son incorrectos","instance":"/api/auth/login"}|HTTP_CODE:401
 Intento 4: {"type":"https://sgroas.uteq.edu.ec/errors/unauthorized","title":"Credenciales invalidas","status":401,"detail":"El email o la contrasena son incorrectos","instance":"/api/auth/login"}|HTTP_CODE:401
 Intento 5: {"type":"https://sgroas.uteq.edu.ec/errors/unauthorized","title":"Credenciales invalidas","status":401,"detail":"El email o la contrasena son incorrectos","instance":"/api/auth/login"}|HTTP_CODE:401
 Intento 6: {"type":"https://sgroas.uteq.edu.ec/errors/unauthorized","title":"Credenciales invalidas","status":401,"detail":"El email o la contrasena son incorrectos","instance":"/api/auth/login"}|HTTP_CODE:401
-Intento 7: {"type":"https://sgroas.uteq.edu.ec/errors/unauthorized","title":"Credenciales invalidas","status":401,"detail":"El email o la contrasena son incorrectos","instance":"/api/auth/login"}|HTTP_CODE:401
-
+Intento 7: {"type":"about:blank","title":"Demasiadas solicitudes","status":429,"detail":"Has superado el limite de intentos de inicio de sesion. Espera 60 segundos.","instance":"/api/auth/login"}|HTTP_CODE:429

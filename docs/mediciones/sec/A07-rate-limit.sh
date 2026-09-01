@@ -1,16 +1,17 @@
 #!/bin/bash
 # A07 - Fallo de identificacion y autenticacion
-# Verifica rate limiting: 6 intentos fallidos -> 429 Too Many Requests
+# Verifica rate limiting: tras 6 intentos fallidos, el 7o se bloquea con 429.
+# Registro de salida reproducido en A07-rate-limit.txt.
 
-echo "=== A07: Rate limiting ==="
+URL="http://localhost:8080/api/auth/login"
+OUT="docs/mediciones/sec/A07-rate-limit.txt"
 
-for i in $(seq 1 6); do
-  echo "--- Intento $i ---"
-  STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:8080/api/auth/login \
+echo "# A07 - Autenticacion (Rate Limiting: 6 intentos fallidos -> 429)" > "$OUT"
+echo "# Fecha: $(date '+%Y-%m-%d %H:%M:%S')" >> "$OUT"
+
+for i in $(seq 1 7); do
+  RESP=$(curl -s -w '|HTTP_CODE:%{http_code}' -X POST "$URL" \
     -H "Content-Type: application/json" \
     -d '{"email":"admin@sgroas.com","password":"wrongpass"}')
-  echo "HTTP $STATUS"
+  echo "Intento $i: $RESP" | tee -a "$OUT"
 done
-
-echo ""
-echo "--- Resultado esperado: intento 6 -> 429 Too Many Requests ---"
