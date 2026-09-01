@@ -55,25 +55,34 @@ El pipeline de GitHub Actions (\texttt{.github/workflows/ci.yml}) ejecuta:
 
 Los checklists se encuentran en \texttt{docs/checklists/}:
 \begin{itemize}
-  \item ISO-29148-checklist.md
-  \item ralph2021-verificacion.md
-  \item ralph2021-validacion.md
+  \item \texttt{prisma2020.md} — PRISMA 2020 de la revisión sistemática (Cap. 3)
+  \item \texttt{ralph2021-empirical.md} — estándar empírico principal (ACM SIGSOFT)
+  \item \texttt{fair.md} — principios FAIR (datos y software)
+  \item \texttt{incose2023-req.md} — 15 características INCOSE v4 (42 reglas)
 \end{itemize}
 
 \chapter{Observaciones de auditoría}
 \label{app:observaciones}
 
-Este anexo reproduce el contenido del archivo \texttt{docs/observaciones/OBSERVACIONES.md}, que documenta las observaciones identificadas durante las revisiones de las entregas anteriores del proyecto SGROAS.
+Este anexo sintetiza \texttt{docs/observaciones/OBSERVACIONES.md} (12/12 cerradas, 100\,\%). Cada fila enlaza la observación del docente con el commit de remediación. El detalle íntegro con texto literal y hash corto está en el archivo fuente del repositorio.
 
-\begin{itemize}
-  \item \textbf{OBS-01:} El tag v0.9.0-rc no contiene la evidencia de las mediciones.
-  \item \textbf{OBS-02:} El PDF del informe no se encuentra en la ruta declarada.
-  \item \textbf{OBS-03:} El informe tiene 18 páginas, menor al rango 20--30 exigido.
-  \item \textbf{OBS-04:} La portada no incluye hash del repositorio ni DOI.
-  \item \textbf{OBS-05:} Vue.js aparece en ADR-003 y diagramas C4 (el frontend es Angular).
-  \item \textbf{OBS-06:} El README contiene placeholder XXXXXX en la línea 84.
-  \item \textbf{OBS-07:} El Postman collection tiene 18 requests, menor al mínimo 20.
-  \item \textbf{OBS-08:} VERSIONING.md está en la raíz del repositorio en lugar de \texttt{docs/}.
-\end{itemize}
+\begin{longtable}{p{1.4cm}p{2.2cm}p{8.5cm}}
+\toprule
+\textbf{Código} & \textbf{Fuente/Criterio} & \textbf{Remediación verificable} \\
+\midrule
+OBS-01 & 1A / C5 Wireframes & 4 wireframes adicionales (Conductores, Usuarios, Rutas, Reportes) en \texttt{docs/prototipo/} (\texttt{75ecc15}) \\
+OBS-02 & 1A / C7 Repositorio & Tareas redistribuidas; commits verificables de los integrantes (\texttt{6cf0ef8}, \texttt{567f5c3}) \\
+OBS-03 & 1A / C2 Referencias & Citas unificadas a APA 7 y referencia ANT 2022 verificable (\texttt{4ca9736}) \\
+OBS-04 & 1A / C4 Modelo BD & Diccionario sincronizado con DDL (teléfono/ nivel\_sugerido NULL, \texttt{id\_novedad} en Alerta) (\texttt{caf906f}) \\
+OBS-05 & 1B / C1 UML/C4 & C4 Nivel 2 (Structurizr DSL) y diagrama de clases completados (\texttt{336f28b}) \\
+OBS-06 & 1B / C4 OWASP & \texttt{@PreAuthorize}, cabeceras HSTS/CSP/X-Frame-Options y CORS en \texttt{SecurityConfig} (\texttt{34f3a6a}) \\
+OBS-07 & 1B / C5 Postman & \texttt{docs/postman/coleccion.json} con 28 peticiones (éxito/401/403/404/422) (\texttt{17f484a}) \\
+OBS-08 & 1B / C6 Rendimiento & 3 corridas k6 50 VUs/30\,s con p95 y speedup con/sin caché en \texttt{docs/mediciones/perf/} (\texttt{ef35d14}) \\
+OBS-09 & 3 / P3 Cobertura & 150 tests JUnit 5; JaCoCo núcleo 85,5\% líneas / 54,3\% ramas (\texttt{5f3b472}, reconciliado \texttt{17f484a}) \\
+OBS-10 & 3 / D3 SUS & SUS n=10 (P01..P10) con consentimiento en \texttt{docs/etica/}, media 63,0 IC95\% [53,1;72,9] (\texttt{df6e784}) \\
+OBS-11 & 3 / D5 Amenazas & Sección amenazas (4 categorías) con mitigaciones y cifras reales k6/JaCoCo (\texttt{df6e784}) \\
+OBS-12 & 3 / P5 Integración & Origen único (proxy \texttt{serve-gzip.js} \texttt{/api}) elimina CORS en demo (\texttt{50fcc4c}) \\
+\bottomrule
+\end{longtable}
 
-Todas las observaciones han sido remediadas en la versión v1.0.0 del sistema.
+\noindent Estado: \textbf{12/12 cerradas (100\,\%)} — 8/8 de 1A/1B y 4/4 de la Entrega 3. Trazabilidad completa en el historial \texttt{git log} y tabla-resumen en este anexo.

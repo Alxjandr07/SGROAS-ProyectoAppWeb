@@ -72,6 +72,10 @@ reproducirlos y comprobarlos:
 | **Auditoría de BD** | `V12` triggers + `docs/basedatos/AUDITORIA-ABD.md` | Insertar/actualizar y ver la fila nueva en `auditoria` |
 | **Elementos programables** | `V5`, `V12`, `V13` + `docs/basedatos/ELEMENTOS-PROGRAMABLES.md` | Funciones, cursores explícitos y procedimientos con validación (comandos incluidos) |
 
+## Informe final (Entrega Final v1.0.0)
+
+Documento académico completo — **94 páginas** con anexos y capturas CI/Render: [`docs/informe-final.pdf`](docs/informe-final.pdf) · Fuente LaTeX: [`docs/informe-final/main.tex`](docs/informe-final/main.tex) + `refs.bib` (wrappers `docs/informe-final.tex` / `docs/refs.bib` por Listing 1 p.17) — compila con `pdflatex`+`biber` (MiKTeX 26.5, 01-sep-2026).
+
 ## Estructura del repositorio
 
 ```
