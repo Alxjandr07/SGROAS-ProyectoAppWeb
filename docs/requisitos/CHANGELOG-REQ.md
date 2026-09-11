@@ -2,6 +2,13 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [v1.1.0] — sin publicar
+
+### Added
+
+- REQ-NF-011: degradacion segura ante indisponibilidad de Redis (revocacion de tokens en `TokenService`, `POST /api/auth/logout`) — estado pendiente
+- REQ-NF-012: respaldo diario de PostgreSQL y recuperacion probada (`scripts/backup-prod.sh`, `docs/despliegue/BACKUP.md`) — estado verificado
+
 ## [v1.0.0] — 2026-08-17
 
 ### Added
