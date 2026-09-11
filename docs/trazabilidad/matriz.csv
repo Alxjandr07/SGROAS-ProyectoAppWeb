@@ -86,5 +86,3 @@ REQ-NF-007,No funcional,Should,,,Backend,GET /api/docs,SecurityConfigTest,CRUD-O
 REQ-NF-008,No funcional,Must,,,GlobalExceptionHandler,,GlobalExceptionHandlerTest,CRUD-ORM,docs/mediciones/sec/A03-inyeccion.txt,verificado
 REQ-NF-009,No funcional,Must,,,SecurityConfig,,SecurityConfigTest,CRUD-ORM,docs/mediciones/sec/A05-headers.txt,verificado
 REQ-NF-010,No funcional,Must,,,SecurityConfig,,SecurityConfigTest,CRUD-ORM,docs/mediciones/sec/A01-acceso.txt,verificado
-REQ-NF-011,No funcional,Must,,,TokenService,POST /api/auth/logout,TokenServiceTest,,,pendiente
-REQ-NF-012,No funcional,Must,,,scripts/backup-prod.sh,,,,docs/despliegue/BACKUP.md,verificado

@@ -1,0 +1,276 @@
+% =====================================================================
+% SRS v1.1.0 — SGROAS (rev1 editorial 11-sep-2026)
+% Fuente LaTeX del documento "para firma". Generada por transcripcion
+% fiel del PDF v1.1.0 (09-sep-2026) + correcciones M3/M5/M6/NF-006/NF-010/
+% F-045/3.4.15/3.4.24/3.4.28/§1.5 + REQ-F-078, todas derivadas del
+% repositorio https://github.com/Alxjandr07/SGROAS-ProyectoAppWeb
+% (ver Registro de correcciones al final). Compilar con pdflatex+biber.
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\setlength{\parskip}{4pt}
+\newcommand{\est}[1]{\textbf{Estado:} #1.}
+\newcommand{\crit}[1]{\textbf{Criterio:} #1.}
+\newcommand{\rid}[1]{\item \textbf{#1}.}
+
+\begin{document}
+
+% ---------------- PORTADA ----------------
+\begin{center}
+{\large UNIVERSIDAD T\'ECNICA ESTATAL DE QUEVEDO\\[0.2cm]
+FACULTAD DE CIENCIAS DE LA COMPUTACI\'ON\\[0.2cm]
+CARRERA DE INGENIER\'IA DE SOFTWARE}\\[0.4cm]
+{\normalsize ASIGNATURA: APLICACIONES WEB\\[0.2cm]
+CURSO: 5TO SOFTWARE ``A''}\\[0.8cm]
+{\Large \textbf{Sistema de Gesti\'on de Recursos Operativos,\\[0.2cm]
+Administrativos y de Seguridad para\\[0.2cm]
+Cooperativas de Transporte (SGROAS)}}\\[0.6cm]
+{\large Especificaci\'on de Requisitos de Software (SRS) --- v1.1.0}\\[0.2cm]
+{\small \url{https://github.com/Alxjandr07/SGROAS-ProyectoAppWeb}}\\[0.2cm]
+{\small DOI Software: 10.5281/zenodo.22522109 $\vert$ DOI Dataset: 10.5281/zenodo.21973297}\\[0.8cm]
+{\normalsize Docente-director: Guerrero Ulloa Gleiston Cicer\'on}\\[0.4cm]
+\textbf{Equipo: ACERS}\\[0.4cm]
+CASTRO ESPINOZA KEVIN MOIS\'ES\\ ORCID: 0009-0004-4935-0439\\[0.2cm]
+ESCUDERO PLAZA MAR\'IA DEL ROSARIO\\ ORCID: 0009-0007-3212-9924\\[0.2cm]
+TEJADA BAJA\~NA LUIS ALEJANDRO\\ ORCID: 0009-0006-2080-1798\\[0.6cm]
+\textbf{Periodo acad\'emico:} 2026--2027 PPA\\[0.2cm]
+\textbf{Fecha de emisi\'on:} 09 de septiembre de 2026\\[0.2cm]
+{\small Rev1 editorial 11-sep-2026 (ver Registro de correcciones). Quevedo --- Ecuador.}
+\end{center}
+\newpage
+
+Versi\'on: v1.1.0 (corregida tras revisi\'on del docente-director, 09-sep-2026; rev1 editorial 11-sep-2026).
+Conforme a: ISO/IEC/IEEE 29148:2018, INCOSE Guide to Writing Requirements v4, criterios INVEST de Cohn, plantilla de Cockburn.
+
+\textbf{Estado:} documento corregido seg\'un 16 observaciones del docente-director. Se agregaron 25 requisitos nuevos, se corrigieron conteos, endpoints, estados y cifras inconsistentes.
+
+\section{Introducci\'on}
+\subsection{Prop\'osito}
+Este documento especifica los requisitos funcionales y no funcionales del sistema SGROAS v1.1.0. Sirve como fuente \'unica de verdad para la matriz de trazabilidad, las pruebas automatizadas y la evidencia emp\'irica.
+\subsection{Alcance}
+SGROAS es un sistema web para centralizar la gesti\'on de recursos operativos, administrativos y de seguridad de cooperativas de transporte urbano en Ecuador.
+
+\textbf{Alcance implementado en v1.1.0:} autenticaci\'on completa (login, refresh, logout con revocaci\'on, verificaci\'on de correo, recuperaci\'on de contrase\~na), control de acceso por rol (RBAC: ADMIN, COORDINADOR, SEGURIDAD), CRUD completo del m\'odulo funcional (conductores, usuarios, rutas, veh\'iculos, asignaciones, incidentes), subsistema ABD (programaciones, unidades, rutas ABD, incidentes ABD, alertas, cat\'alogos, reportes ABD), cach\'e Redis, procedimientos almacenados y funciones SQL, auditor\'ia mediante triggers, y respaldo con pg\_dump.
+
+\textbf{Alcance excluido de este SRS:} m\'odulos de facturaci\'on y pagos.
+\subsection{Definiciones, acr\'onimos y abreviaturas}
+\begin{description}[leftmargin=3cm,style=nextline]
+\item[SGROAS] Sistema de Gesti\'on de Recursos Operativos, Administrativos y de Seguridad.
+\item[JWT] JSON Web Token (RFC 7519).
+\item[RBAC] Role-Based Access Control.
+\item[ORM] Object-Relational Mapping (Spring Data JPA / Hibernate).
+\item[SP] Stored Procedure en el motor de base de datos.
+\item[FN] Funci\'on SQL almacenada en el motor de base de datos.
+\item[MoSCoW] Must, Should, Could, Won't.
+\item[shall] Verbo modal normativo de ISO/IEC/IEEE 29148.
+\item[TTL] Time To Live de una entrada de cach\'e.
+\item[INCOSE] International Council on Systems Engineering.
+\item[CORS] Cross-Origin Resource Sharing.
+\item[ABD] Subsistema de Administraci\'on de Bases de Datos: m\'odulo con tablas propias y 28 rutas API bajo \verb|/api/abd/**| (verificado en 8 controladores: 1+1+1+4+4+7+5+5).
+\item[N\'ucleo del sistema] Paquetes excluidos del c\'omputo de cobertura JaCoCo: \verb|ec.edu.uteq.sgroas.abd.*|. La cobertura del n\'ucleo (sin ABD) es 87,5 \% instrucciones; la cobertura global (incluyendo ABD), derivada de \verb|docs/mediciones/jacoco/jacoco.csv|, es 83,1 \% instrucciones (88,4 \% ramas, 90,0 \% l\'ineas).
+\end{description}
+\subsection{Referencias}
+[1] ISO/IEC/IEEE 29148:2018. [2] INCOSE Guide to Writing Requirements v4. [3] Cohn, \textit{User Stories Applied} (2004). [4] Cockburn, \textit{Writing Effective Use Cases} (2001). [5] RFC 7519 (JWT). [6] RFC 7807 (Problem Details). [7] OWASP Top 10:2021. [8] ISO/IEC 25010:2011. Gu\'ia de la Entrega Final --- PFC Aplicaciones Web 2026--2027, UTEQ.
+\subsection{Resumen del documento}
+La secci\'on 2 describe el producto global. La secci\'on 3 contiene los requisitos. La secci\'on 4 contiene los requisitos no funcionales. La secci\'on 5 resume la trazabilidad. La secci\'on 6 describe el modelo de datos. La secci\'on 7 documenta interfaces. La secci\'on 8 resume lo pendiente y la aprobaci\'on del docente.
+
+\section{Descripci\'on global}
+\subsection{Perspectiva del producto}
+SGROAS es un sistema nuevo que reemplaza procesos manuales por una plataforma web centralizada.
+\subsection{Funciones del producto (resumen)}
+Autenticaci\'on completa; RBAC (ADMIN, COORDINADOR, SEGURIDAD); CRUD funcional; subsistema ABD; reportes por SP/FN; cach\'e Redis con TTL; auditor\'ia por triggers; respaldo pg\_dump \verb|--format=custom| diario con retenci\'on de 30 d\'ias; errores ProblemDetails (RFC 7807).
+\subsection{Caracter\'isticas de los usuarios}
+Administrador (total), Coordinador (operativo, sin usuarios ni ABD ni configuraci\'on), Seguridad (consulta).
+\subsection{Restricciones}
+Esquema por migraciones Flyway (prohibido \verb|ddl-auto=update|). No-CRUD elemental como SP/FN en \verb|db/procs/|. Prohibida concatenaci\'on de entrada de usuario en SQL/JPQL/HQL. TLS v1.3 en producci\'on; HTTP plano en local.
+\subsection{Supuestos y dependencias}
+Docker Desktop y Java 21. Credenciales semilla (\verb|admin@sgroas.com| / \verb|admin123|) exclusivas del entorno local (en \verb|db/seed.sql| y README), inexistentes en producci\'on. Mediciones seg\'un Makefile.
+
+\section{Requisitos espec\'ificos}
+\subsection{Vocabulario de estados de verificaci\'on}
+\textbf{Verificado:} la evidencia confirma el cumplimiento y es reproducible. \textbf{Parcialmente verificado:} se cumple solo bajo condiciones declaradas (ej: entorno local). \textbf{Pendiente:} especificado pero no implementado o no verificado.
+\subsection{Vocabulario de m\'etodos de verificaci\'on}
+\textbf{test} (prueba automatizada), \textbf{demonstration} (curl/Postman/navegador), \textbf{analysis} (revisi\'on est\'atica), \textbf{inspection} (verificaci\'on visual de archivos/estructuras).
+\subsection{Matriz de permisos por rol y operaci\'on}
+Login/Refresh/Logout: los 3 roles. CRUD conductores/rutas/veh\'iculos: ADMIN+COORDINADOR (lectura Seguridad). CRUD usuarios: solo ADMIN (\verb|SecurityConfig| exige \verb|ROLE_ADMIN| en \verb|/api/usuarios/**|). CRUD asignaciones: ADMIN+COORDINADOR. CRUD incidentes: los 3 (Seguridad lectura+registro). Reportes: ADMIN+COORDINADOR (lectura Seguridad). ABD y configuraci\'on: solo ADMIN.
+\subsection{Requisitos funcionales (REQ-F)}
+Cada requisito sigue el patr\'on ISO 29148 con identificador persistente, rationale, prioridad MoSCoW, criterio de aceptaci\'on medible individual y m\'etodo de verificaci\'on (M6: cada identificador declara su propio criterio y su propio estado).
+
+\subsubsection{REQ-F-001 --- Inicio de sesi\'on} Must. \textbf{Enunciado:} autenticar por \verb|POST /api/auth/login|, emitir JWT y cookie HttpOnly+Secure+SameSite=Strict. \crit{200 OK + cookie con v\'alidas; 401 + ProblemDetails con inv\'alidas} \textbf{Verificaci\'on:} test (AuthServiceTest), demonstration (Postman). \textbf{Trazabilidad:} HU-001, CU-001, AuthController. \est{verificado}
+\subsubsection{REQ-F-002 --- Consulta de usuario autenticado} Must. \textbf{Enunciado:} \verb|GET /api/auth/me| con identidad del JWT. \crit{200 con nombre/correo/rol con JWT; 401 sin JWT} \textbf{Verificaci\'on:} test (AuthServiceTest). \textbf{Trazabilidad:} HU-001, AuthController. \est{verificado}
+\subsubsection{REQ-F-003 --- Renovaci\'on de token} Must. \textbf{Enunciado:} \verb|POST /api/auth/refresh| verificando el refresh token. \crit{200 + nuevo JWT con v\'alido; 401 con inv\'alido/revocado} \textbf{Verificaci\'on:} test (AuthServiceTest). \textbf{Trazabilidad:} HU-001, AuthController. \est{verificado}
+\subsubsection{REQ-F-004 --- Cierre de sesi\'on con revocaci\'on} Must. \textbf{Enunciado:} revocar (JTI en lista negra Redis con TTL) por \verb|POST /api/auth/logout|. \crit{204 y token revocado en Redis} \textbf{Verificaci\'on:} test (AuthServiceTest). \textbf{Trazabilidad:} HU-001, AuthController. \est{verificado}
+\subsubsection{REQ-F-005 --- Verificaci\'on de correo} Should. \textbf{Enunciado:} \verb|POST /api/auth/verify-email| con c\'odigo de 6 d\'igitos. \crit{200 con v\'alido; 400 con inv\'alido/expirado} \textbf{Verificaci\'on:} test (AuthServiceTest). \textbf{Trazabilidad:} HU-001, AuthController. \est{verificado}
+\subsubsection{REQ-F-006 --- Reenv\'io de c\'odigo} Should. \textbf{Enunciado:} \verb|POST /api/auth/resend-code| con l\'imite por ventana. \crit{200 con confirmaci\'on; 429 ante exceso} \textbf{Verificaci\'on:} test (AuthServiceTest). \textbf{Trazabilidad:} HU-001, AuthController. \est{verificado}
+\subsubsection{REQ-F-007 --- Solicitud de restablecimiento} Should. \textbf{Enunciado:} \verb|POST /api/auth/forgot-password|, enlace de 24 h. \crit{200 exista o no el correo; enlace v\'alido 24 h} \textbf{Verificaci\'on:} test (AuthServiceTest). \textbf{Trazabilidad:} HU-001, AuthController. \est{verificado}
+\subsubsection{REQ-F-008 --- Restablecimiento efectivo} Should. \textbf{Enunciado:} \verb|POST /api/auth/reset-password| validando el token; revoca sesiones. \crit{200 con token v\'alido y pol\'itica cumplida; 400 con inv\'alido/expirado} \textbf{Verificaci\'on:} test (AuthServiceTest). \textbf{Trazabilidad:} HU-001, AuthController. \est{verificado}
+\subsubsection{REQ-F-009 --- RBAC} Must. \textbf{Enunciado:} restringir por rol con \verb|@EnableMethodSecurity| + \verb|@PreAuthorize|; 403 ante rol no autorizado. \crit{recurso con rol no autorizado recibe 403} \textbf{Verificaci\'on:} test (SecurityConfigTest), demonstration (Postman). \textbf{Trazabilidad:} HU-002, CU-002, SecurityConfig. \est{verificado}
+\subsubsection{REQ-F-010 --- Listado de conductores} Must. \textbf{Enunciado:} \verb|GET /api/conductores| paginado/filtrable (cach\'e Redis con TTL). \crit{200 con p\'agina/tama\~no/total} \textbf{Verificaci\'on:} test (ConductorServiceTest), demonstration. \textbf{Trazabilidad:} HU-002, CU-002, ConductorController. \est{verificado}
+\subsubsection{REQ-F-011 --- Conductor por id} Must. \textbf{Enunciado:} \verb|GET /api/conductores/{id}|. \crit{200 con objeto o 404} \textbf{Verificaci\'on:} test (ConductorServiceTest). \est{verificado}
+\subsubsection{REQ-F-012 --- Alta de conductor} Must. \textbf{Enunciado:} \verb|POST /api/conductores| con c\'edula \'unica. \crit{201; duplicada 409} \textbf{Verificaci\'on:} test (ConductorServiceTest). \est{verificado}
+\subsubsection{REQ-F-013 --- Actualizaci\'on de conductor} Must. \textbf{Enunciado:} \verb|PUT /api/conductores/{id}|. \crit{200 con objeto actualizado} \textbf{Verificaci\'on:} test (ConductorServiceTest). \est{verificado}
+\subsubsection{REQ-F-014 --- Eliminaci\'on l\'ogica de conductor} Must. \textbf{Enunciado:} \verb|DELETE /api/conductores/{id}| sin borrar la fila. \crit{204; estado inactivo} \textbf{Verificaci\'on:} test (ConductorServiceTest). \est{verificado}
+
+\subsubsection{REQ-F-015 a REQ-F-019 --- CRUD de usuarios} Must c/u. Rationale: el administrador gestiona las cuentas. Verificaci\'on: test (UsuarioServiceTest), demonstration. Trazabilidad: HU-003, CU-003, UsuarioController.
+\begin{itemize}[leftmargin=*]
+\rid{REQ-F-015} Listado: \verb|GET /api/usuarios|. \crit{200 con p\'agina/tama\~no/total; solo ADMIN} \est{verificado}
+\rid{REQ-F-016} Por id: \verb|GET /api/usuarios/{id}|. \crit{200 con objeto o 404; solo ADMIN} \est{verificado}
+\rid{REQ-F-017} Alta: \verb|POST /api/usuarios|. \crit{201 con datos v\'alidos; solo ADMIN} \est{verificado}
+\rid{REQ-F-018} Actualizaci\'on: \verb|PUT /api/usuarios/{id}|. \crit{200 con objeto actualizado; solo ADMIN} \est{verificado}
+\rid{REQ-F-019} Eliminaci\'on l\'ogica: \verb|DELETE /api/usuarios/{id}|. \crit{204; solo ADMIN} \est{verificado}
+\end{itemize}
+
+\subsubsection{REQ-F-020 a REQ-F-024 --- CRUD de rutas} Must c/u. Verificaci\'on: test (RutaServiceTest). Trazabilidad: HU-004, CU-004, RutaController.
+\begin{itemize}[leftmargin=*]
+\rid{REQ-F-020} Listado: \verb|GET /api/rutas|. \crit{200 con p\'agina/tama\~no/total} \est{verificado}
+\rid{REQ-F-021} Por id: \verb|GET /api/rutas/{id}|. \crit{200 o 404} \est{verificado}
+\rid{REQ-F-022} Alta: \verb|POST /api/rutas|. \crit{201; nombre \'unico y distancia $>$ 0} \est{verificado}
+\rid{REQ-F-023} Actualizaci\'on: \verb|PUT /api/rutas/{id}|. \crit{200 con objeto actualizado} \est{verificado}
+\rid{REQ-F-024} Eliminaci\'on l\'ogica: \verb|DELETE /api/rutas/{id}|. \crit{204} \est{verificado}
+\end{itemize}
+
+\subsubsection{REQ-F-025 a REQ-F-029 --- CRUD de veh\'iculos} Must c/u. Verificaci\'on: test (VehiculoServiceTest). Trazabilidad: HU-005, CU-005, VehiculoController.
+\begin{itemize}[leftmargin=*]
+\rid{REQ-F-025} Listado: \verb|GET /api/vehiculos|. \crit{200 con p\'agina/tama\~no/total} \est{verificado}
+\rid{REQ-F-026} Por id: \verb|GET /api/vehiculos/{id}|. \crit{200 o 404} \est{verificado}
+\rid{REQ-F-027} Alta: \verb|POST /api/vehiculos|. \crit{201; placa \'unica y a\~no v\'alido} \est{verificado}
+\rid{REQ-F-028} Actualizaci\'on: \verb|PUT /api/vehiculos/{id}|. \crit{200 con objeto actualizado} \est{verificado}
+\rid{REQ-F-029} Desactivaci\'on: \verb|DELETE /api/vehiculos/{id}|. \crit{204} \est{verificado}
+\end{itemize}
+
+\subsubsection{REQ-F-030 a REQ-F-034 --- CRUD de asignaciones} Must c/u. Verificaci\'on: test (AsignacionRutaServiceTest). Trazabilidad: HU-006, CU-006, AsignacionRutaController.
+\begin{itemize}[leftmargin=*]
+\rid{REQ-F-030} Listado: \verb|GET /api/asignaciones|. \crit{200 con p\'agina/tama\~no/total y disponibilidad validada} \est{pendiente --- endpoint devuelve 500 en producci\'on por LazyInitializationException}
+\rid{REQ-F-031} Por id: \verb|GET /api/asignaciones/{id}|. \crit{200 o 404} \est{verificado}
+\rid{REQ-F-032} Alta: \verb|POST /api/asignaciones|. \crit{201 con disponibilidad validada} \est{verificado}
+\rid{REQ-F-033} Actualizaci\'on: \verb|PUT /api/asignaciones/{id}|. \crit{200 con objeto actualizado} \est{verificado}
+\rid{REQ-F-034} Eliminaci\'on: \verb|DELETE /api/asignaciones/{id}|. \crit{204} \est{verificado}
+\end{itemize}
+
+\subsubsection{REQ-F-035 a REQ-F-039 --- CRUD de incidentes} Must c/u. Verificaci\'on: test (IncidenteServiceTest). Trazabilidad: HU-007, CU-006, IncidenteController.
+\begin{itemize}[leftmargin=*]
+\rid{REQ-F-035} Listado: \verb|GET /api/incidentes|. \crit{200 con p\'agina/tama\~no/total} \est{verificado}
+\rid{REQ-F-036} Por id: \verb|GET /api/incidentes/{id}|. \crit{200 o 404} \est{verificado}
+\rid{REQ-F-037} Alta: \verb|POST /api/incidentes|. \crit{201; gravedad ALTA/MEDIA/BAJA y fecha no futura} \est{verificado}
+\rid{REQ-F-038} Actualizaci\'on: \verb|PUT /api/incidentes/{id}|. \crit{200 con objeto actualizado} \est{verificado}
+\rid{REQ-F-039} Eliminaci\'on l\'ogica: \verb|DELETE /api/incidentes/{id}|. \crit{204} \est{verificado}
+\end{itemize}
+
+\subsubsection{REQ-F-040 a REQ-F-045 --- Reportes funcionales} Should c/u. Verificaci\'on: test (ReporteControllerTest), demonstration (Postman). Trazabilidad: HU-008, CU-006, ReporteController.
+\begin{itemize}[leftmargin=*]
+\rid{REQ-F-040} Rendimiento de rutas: \verb|GET /api/reportes/rendimiento-rutas| (SP \verb|sp_reporte_rendimiento_rutas|). \crit{retorna campos esperados; sin SQL din\'amico} \est{verificado}
+\rid{REQ-F-041} Estad\'isticas: \verb|GET /api/reportes/estadisticas-generales| (FN \verb|fn_estadisticas_generales|). \crit{retorna campos esperados} \est{verificado}
+\rid{REQ-F-042} Licencias por vencer: \verb|GET /api/reportes/licencias-por-vencer| (FN \verb|fn_licencias_por_vencer|). \crit{retorna campos esperados} \est{verificado}
+\rid{REQ-F-043} Incidentes por gravedad: \verb|GET /api/reportes/incidentes-por-gravedad| (SP \verb|sp_incidentes_por_gravedad|). \crit{retorna campos esperados} \est{verificado}
+\rid{REQ-F-044} Incidentes por rango: \verb|GET /api/reportes/incidentes-por-rango| (SP \verb|sp_obtener_incidentes_por_rango|). \crit{retorna campos esperados} \est{verificado}
+\rid{REQ-F-045} Asignaciones activas: \verb|GET /api/reportes/asignaciones-activas/{conductorId}| (SP \verb|sp_asignaciones_activas_por_conductor|). \crit{retorna campos esperados} \est{verificado}
+\end{itemize}
+
+\subsubsection{REQ-F-046 a REQ-F-049 --- CRUD de programaciones (ABD)} Must c/u. Verificaci\'on: test y demonstration. Trazabilidad: ProgramacionAbdController.
+\begin{itemize}[leftmargin=*]
+\rid{REQ-F-046} Listado: \verb|GET /api/abd/programaciones|. \crit{200 con ruta/unidad/conductor existentes} \est{verificado}
+\rid{REQ-F-047} Alta: \verb|POST /api/abd/programaciones|. \crit{201 con ruta/unidad/conductor existentes} \est{verificado}
+\rid{REQ-F-048} Actualizaci\'on: \verb|PUT /api/abd/programaciones/{id}|. \crit{200 con objeto actualizado} \est{verificado}
+\rid{REQ-F-049} Eliminaci\'on: \verb|DELETE /api/abd/programaciones/{id}|. \crit{204} \est{verificado}
+\end{itemize}
+
+\subsubsection{REQ-F-050 a REQ-F-054 --- CRUD de unidades (ABD)} Must c/u. Verificaci\'on: test y demonstration. Trazabilidad: UnidadAbdController.
+\begin{itemize}[leftmargin=*]
+\rid{REQ-F-050} Listado: \verb|GET /api/abd/unidades|. \crit{200 con listado} \est{verificado}
+\rid{REQ-F-051} Por id: \verb|GET /api/abd/unidades/{id}|. \crit{200 o 404} \est{verificado}
+\rid{REQ-F-052} Alta: \verb|POST /api/abd/unidades|. \crit{201; placa \'unica y estado v\'alido} \est{verificado}
+\rid{REQ-F-053} Actualizaci\'on: \verb|PUT /api/abd/unidades/{id}|. \crit{200 con objeto actualizado} \est{verificado}
+\rid{REQ-F-054} Eliminaci\'on: \verb|DELETE /api/abd/unidades/{id}|. \crit{204} \est{verificado}
+\end{itemize}
+
+\subsubsection{REQ-F-055 a REQ-F-059 --- CRUD de rutas ABD} Must c/u. Verificaci\'on: test y demonstration. Trazabilidad: RutaAbdController.
+\begin{itemize}[leftmargin=*]
+\rid{REQ-F-055} Listado: \verb|GET /api/abd/rutas|. \crit{200 con listado} \est{verificado}
+\rid{REQ-F-056} Por id: \verb|GET /api/abd/rutas/{id}|. \crit{200 o 404} \est{verificado}
+\rid{REQ-F-057} Alta: \verb|POST /api/abd/rutas|. \crit{201; origen distinto de destino} \est{verificado}
+\rid{REQ-F-058} Actualizaci\'on: \verb|PUT /api/abd/rutas/{id}|. \crit{200 con objeto actualizado} \est{verificado}
+\rid{REQ-F-059} Eliminaci\'on: \verb|DELETE /api/abd/rutas/{id}|. \crit{204} \est{verificado}
+\end{itemize}
+
+\subsubsection{REQ-F-060 a REQ-F-063 --- CRUD de incidentes ABD} Must c/u. Verificaci\'on: test y demonstration. Trazabilidad: IncidenteAbdController.
+\begin{itemize}[leftmargin=*]
+\rid{REQ-F-060} Listado: \verb|GET /api/abd/incidentes|. \crit{200 con listado} \est{verificado}
+\rid{REQ-F-061} Alta: \verb|POST /api/abd/incidentes|. \crit{201; nivel ALTO/MEDIO/BAJO} \est{verificado}
+\rid{REQ-F-062} Actualizaci\'on: \verb|PUT /api/abd/incidentes/{id}|. \crit{200 con objeto actualizado} \est{verificado}
+\rid{REQ-F-063} Eliminaci\'on: \verb|DELETE /api/abd/incidentes/{id}|. \crit{204} \est{verificado}
+\end{itemize}
+
+\subsubsection{REQ-F-064 --- Alertas ABD} Should. \textbf{Enunciado:} \verb|GET /api/abd/alertas| (incidentes nivel ALTO). \crit{200 con listado} \textbf{Verificaci\'on:} demonstration. \textbf{Trazabilidad:} AlertaAbdController. \est{verificado}
+\subsubsection{REQ-F-065 --- Cat\'alogos ABD} Should. \textbf{Enunciado:} \verb|GET /api/abd/catalogos| (provincias, ciudades, terminales, roles). \crit{200 con las cuatro colecciones} \textbf{Verificaci\'on:} demonstration. \textbf{Trazabilidad:} CatalogoAbdController. \est{verificado}
+\subsubsection{REQ-F-066 --- Conductores ABD} Should. \textbf{Enunciado:} \verb|GET /api/abd/conductores|. \crit{200 con listado paginado} \textbf{Verificaci\'on:} demonstration. \textbf{Trazabilidad:} ConductorAbdController. \est{verificado}
+
+\subsubsection{REQ-F-067 a REQ-F-073 --- Reportes ABD} Should c/u. Verificaci\'on: demonstration (Postman). Trazabilidad: ReporteAbdController.
+\begin{itemize}[leftmargin=*]
+\rid{REQ-F-067} Resumen: \verb|GET /api/abd/reportes/resumen|. \crit{retorna campos esperados} \est{verificado}
+\rid{REQ-F-068} Por nivel: \verb|GET /api/abd/reportes/incidentes-por-nivel|. \crit{retorna campos esperados} \est{verificado}
+\rid{REQ-F-069} Por estado: \verb|GET /api/abd/reportes/incidentes-por-estado|. \crit{retorna campos esperados} \est{verificado}
+\rid{REQ-F-070} Unidades por estado: \verb|GET /api/abd/reportes/unidades-por-estado|. \crit{retorna campos esperados} \est{verificado}
+\rid{REQ-F-071} Programaciones por estado: \verb|GET /api/abd/reportes/programaciones-por-estado|. \crit{retorna campos esperados} \est{verificado}
+\rid{REQ-F-072} Por mes: \verb|GET /api/abd/reportes/programaciones-por-mes|. \crit{retorna campos esperados} \est{verificado}
+\rid{REQ-F-073} Top rutas: \verb|GET /api/abd/reportes/top-rutas|. \crit{retorna campos esperados} \est{verificado}
+\end{itemize}
+
+\subsubsection{REQ-F-074 --- Pol\'itica de contrase\~nas} Must. \textbf{Enunciado:} m\'inimo 8 caracteres con may\'uscula, min\'uscula y n\'umero; hash BCrypt. \crit{no conforme rechazada 400; v\'alida almacenada hashada} \textbf{Verificaci\'on:} test. \textbf{Trazabilidad:} AuthController. \est{verificado}
+\subsubsection{REQ-F-075 --- Protecci\'on de datos personales} Should. \textbf{Enunciado:} eliminaci\'on l\'ogica de conductores/incidentes con datos personales; agregados en reportes. \crit{elimina sin borrar fila; reportes agregados sin personas} \textbf{Verificaci\'on:} inspection. \textbf{Trazabilidad:} ConductorController, IncidenteController. \est{verificado}
+\subsubsection{REQ-F-076 --- Respaldo de la base de datos} Must. \textbf{Enunciado:} respaldo diario pg\_dump \verb|--format=custom|, retenci\'on 30 d\'ias (\verb|scripts/backup-prod.sh|). \crit{respaldo verificable con \verb|pg_restore --list|} \textbf{Verificaci\'on:} demonstration (\verb|backups/sgroas-2026-08-28.sql.dump|, 17,25 MB, 228 TOC). \textbf{Trazabilidad:} \verb|scripts/backup-prod.sh|, \verb|docs/despliegue/BACKUP.md|. \est{verificado}
+\subsubsection{REQ-F-077 --- Accesibilidad y usabilidad} Should. \textbf{Enunciado:} frontend Angular 20 con Lighthouse Accessibility $\geq$ 85 (desktop) y SUS media $\geq$ 68. \crit{A $\geq$ 85 desktop; SUS $\geq$ 68 con n $\geq$ 15} \textbf{Verificaci\'on:} test (Lighthouse A=91 desktop, SUS=68,5 n=15). \textbf{Trazabilidad:} \verb|docs/mediciones/lighthouse/|, \verb|docs/mediciones/sus/|. \est{verificado}
+\subsubsection{REQ-F-078 --- Auditor\'ia de operaciones} Should. \textbf{Enunciado:} el sistema deber\'a registrar trazabilidad de las operaciones cr\'iticas de negocio (altas, bajas y modificaciones) con fecha, usuario y valores afectados, apoy\'andose en triggers de BD (existe \verb|trg_abd_incidente_alto| en \verb|db/abd/objetos_abd.sql| como evidencia parcial). \crit{existe registro consultable por operaci\'on cr\'itica} \textbf{Verificaci\'on:} inspection. \textbf{Trazabilidad:} \verb|db/abd/objetos_abd.sql|. \est{pendiente}
+
+\section{Requisitos no funcionales (REQ-NF)}
+\subsubsection{REQ-NF-001 --- Cabeceras HTTP} Must, Seguridad (OWASP A05). \textbf{Enunciado:} HSTS, X-Frame-Options DENY, nosniff y CSP en toda respuesta. \crit{curl -I muestra las cuatro} \textbf{Verificaci\'on:} test, demonstration (\verb|docs/mediciones/sec/|). \est{verificado}
+\subsubsection{REQ-NF-002 --- Cifrado en tr\'ansito} Must, Seguridad (OWASP A02). \textbf{Enunciado:} TLS v1.3 AEAD en producci\'on; HTTP plano en local. \crit{producci\'on muestra TLSv1.3} \textbf{Verificaci\'on:} demonstration. \est{parcialmente verificado --- solo local; producci\'on requiere reverse proxy TLS}
+\subsubsection{REQ-NF-003 --- Rendimiento} Must. \textbf{Enunciado:} \verb|GET /api/conductores| en caliente con p95 $<$ 200 ms. \crit{3 corridas k6 (50 VUs, 30 s): p95 medio 23,01 ms, 0 \% errores} \textbf{Verificaci\'on:} test (k6, \verb|docs/mediciones/perf/|). \est{verificado}
+\subsubsection{REQ-NF-004 --- Anti inyecci\'on SQL} Must, Seguridad (OWASP A03). \textbf{Enunciado:} par\'ametros estrictos; SP sin SQL din\'amico. \crit{\verb|scripts/audit-sql-dynamic.sh| sin violaciones} \textbf{Verificaci\'on:} test, analysis (\verb|docs/mediciones/sec/|). \est{verificado}
+\subsubsection{REQ-NF-005 --- Rate limiting login} Must, Seguridad (OWASP A07). \textbf{Enunciado:} 6 fallidos por IP responden 429. \crit{7.\textordmasculine{} petici\'on responde 429} \textbf{Verificaci\'on:} demonstration (\verb|docs/mediciones/sec/|). \est{verificado}
+\subsubsection{REQ-NF-006 --- Cobertura} Should, Mantenibilidad. \textbf{Enunciado:} JaCoCo del n\'ucleo ($\geq$ 70 \% instrucciones). \crit{\verb|jacoco.csv| del n\'ucleo $\geq$ 70 \%} \textbf{Verificaci\'on:} test (\verb|docs/mediciones/jacoco/|). \est{verificado --- n\'ucleo: 87,5 \% instr, 87,9 \% ramas, 95,5 \% l\'ineas (222 pruebas). Completo: 83,1 \% instr, 88,4 \% ramas, 90,0 \% l\'ineas (derivado de \texttt{jacoco.csv})}
+\subsubsection{REQ-NF-007 --- Errores uniformes} Must, Usabilidad. \textbf{Enunciado:} ProblemDetails RFC 7807 (type/title/status/detail/instance). \textbf{Verificaci\'on:} test, demonstration (Postman). \est{verificado}
+\subsubsection{REQ-NF-008 --- Capas} Must, Mantenibilidad. \textbf{Enunciado:} controller/service/repository-entity separados. \textbf{Verificaci\'on:} inspection. \est{verificado}
+\subsubsection{REQ-NF-009 --- Acceso a datos} Must, Mantenibilidad/Seguridad. \textbf{Enunciado:} no-CRUD como SP/FN en \verb|db/procs/|; sin concatenaci\'on en JPQL/HQL/SQL. \textbf{Verificaci\'on:} test, \verb|scripts/audit-sql-dynamic.sh|, \verb|docs/basedatos/CATALOGO-SP.md|. \est{verificado --- 6 SP + 5 FN = 11 objetos en \texttt{db/procs/}, 0 hallazgos}
+\subsubsection{REQ-NF-010 --- Disponibilidad de Redis} Should, Disponibilidad. \textbf{Enunciado:} sin Redis: operar sin cach\'e y rechazar logout con 503 controlado. \crit{listado sin cach\'e; logout 503 sin Redis} \textbf{Verificaci\'on:} inspection. \textbf{Trazabilidad:} SecurityConfig, ConductorController. \est{pendiente --- en el c\'odigo no existe manejo 503 ante ca\'ida de Redis ni prueba de ese comportamiento}
+
+\section{Trazabilidad (resumen)}
+La matriz end-to-end se versiona en \verb|docs/trazabilidad/matriz.csv|. Contiene 88 requisitos (78 funcionales REQ-F-001 a REQ-F-078 + 10 no funcionales REQ-NF-001 a REQ-NF-010). La validez se comprueba con \verb|scripts/validate-traceability.sh|, que verifica coherencia SRS-matriz en ambas direcciones, unicidad de identificadores y vocabulario de estados.
+\subsection{Trazabilidad hist\'orica}
+Cambios en \verb|docs/requisitos/CHANGELOG-REQ.md| (Keep a Changelog); decisiones en \verb|docs/adr/|.
+\section{Modelo de datos (referencia)}
+Relacional en migraciones Flyway (V1--V13): Usuario, Conductor, Vehiculo, Ruta, AsignacionRuta, Incidente; ABD: Provincia, Ciudad, Terminal, Rol, Unidad, Programacion, Alerta, Auditor\'ia. DER en \verb|docs/arquitectura/|.
+\section{Interfaces de usuario (referencia)}
+Angular 20: login, dashboard, conductores, usuarios, rutas, veh\'iculos, asignaciones, incidentes, ABD. Lighthouse desktop P=95, A=91, BP=92, SEO=90; m\'ovil P=77, A=91, BP=92, SEO=90.
+\section{Observaciones e informaci\'on pendiente}
+\textbf{Resuelto} \verb|@EnableMethodSecurity| en \verb|SecurityConfig.java|; ReporteController con ocho \verb|@PreAuthorize|. \textbf{Resuelto} cookie JWT Secure (\verb|.secure(cookieSecure)|, \verb|app.cookie.secure|). \textbf{Pendiente} \verb|GET /api/asignaciones|: 500 en producci\'on por LazyInitializationException (REQ-F-030 pendiente).
+
+\section*{Aprobaci\'on del docente-director}
+Proyecto SGROAS. Documento: SRS v1.1.0 (rev1). Emisi\'on: 09-sep-2026. Estudiantes: Castro Espinoza Kevin Mois\'es (0009-0004-4935-0439), Escudero Plaza Mar\'ia del Rosario (0009-0007-3212-9924), Tejada Baja\~na Luis Alejandro (0009-0006-2080-1798). Firma: \rule{6cm}{0.4pt} Fecha: \rule{3cm}{0.4pt} Ing. Guerrero Ulloa Gleiston Cicer\'on. Observaciones: \rule{14cm}{0.4pt}
+
+\section*{Referencias}
+[1] ISO/IEC/IEEE 29148:2018. [2] INCOSE Guide to Writing Requirements v4 (2023). [3] Cohn, \textit{User Stories Applied} (2004). [4] Cockburn, \textit{Writing Effective Use Cases} (2001). [5] RFC 7519. [6] RFC 7807. [7] OWASP Top 10:2021. [8] ISO/IEC 25010:2011.
+
+\section*{Registro de correcciones (rev1, 11-sep-2026)}
+Derivadas del repositorio \url{https://github.com/Alxjandr07/SGROAS-ProyectoAppWeb} (main), sin inventar contenido:
+\begin{itemize}[leftmargin=*]
+\item \textbf{M3:} \S5 dec\'ia ``77 requisitos (69 funcionales + 8 NF)''; ahora ``88 (78F REQ-F-001--078 + 10NF)'', derivado del cuerpo + matriz.
+\item \textbf{M5:} t\'itulo 3.4.21 ``046 a 050'' $\rightarrow$ ``046 a 049'' (el cuerpo lista 4); 3.4.28 ``067 a 071'' $\rightarrow$ ``067 a 073'' (lista 7).
+\item \textbf{M6:} cada identificador declara criterio y estado propios.
+\item \textbf{NF-006 y \S1.3:} ``sistema completo 64,8/46,2/73,2'' $\rightarrow$ 83,1/88,4/90,0 (calculado de \verb|docs/mediciones/jacoco/jacoco.csv|).
+\item \textbf{NF-010:} verificado $\rightarrow$ pendiente (no hay manejo 503 ni prueba de ca\'ida de Redis en el c\'odigo).
+\item \textbf{F-045:} endpoint $\rightarrow$ \verb|GET /api/reportes/asignaciones-activas/{conductorId}| (mapeo real de ReporteController).
+\item \textbf{3.4.15:} criterio $\rightarrow$ solo ADMIN (\verb|SecurityConfig| exige \verb|ROLE_ADMIN| en \verb|/api/usuarios/**|).
+\item \textbf{3.4.20:} ``ReportesController'' $\rightarrow$ ReporteController (clase real).
+\item \textbf{3.4.24:} criterio recompuesto ``nivel restringido a ALTO, MEDIO, BAJO'' (texto pegado en el PDF).
+\item \textbf{\S1.5:} numeraci\'on de secciones corregida (5 trazabilidad, 6 modelo, 7 interfaces, 8 pendiente/aprobaci\'on).
+\item \textbf{A3:} nuevo REQ-F-078 Auditor\'ia (pendiente; \'unico trigger en repo: \verb|trg_abd_incidente_alto|). Datos personales (F-075), respaldo (F-076), accesibilidad (F-077) y Redis (NF-010) ya exist\'ian en el documento.
+\item \textbf{Pendiente fuera de este archivo:} subir esta fuente como \verb|docs/requisitos/SRS-v1.1.0.tex| + PDF (M1); alinear matriz (029/030, retirar NF-011/012 duplicados de NF-010/F-076, agregar F-078, aceptar ``parcialmente verificado'' en el validador).
+\end{itemize}
+
+\end{document}
