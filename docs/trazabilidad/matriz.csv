@@ -85,5 +85,5 @@ REQ-NF-006,No funcional,Should,,,Backend,,,CRUD-ORM,docs/mediciones/jacoco/jacoc
 REQ-NF-007,No funcional,Should,,,Backend,GET /api/docs,SecurityConfigTest,CRUD-ORM,docs/despliegue/DEPLOYMENT.md,verificado
 REQ-NF-008,No funcional,Must,,,GlobalExceptionHandler,,GlobalExceptionHandlerTest,CRUD-ORM,docs/mediciones/sec/A03-inyeccion.txt,verificado
 REQ-NF-009,No funcional,Must,,,SecurityConfig,,SecurityConfigTest,CRUD-ORM,docs/mediciones/sec/A05-headers.txt,verificado
-REQ-NF-010,No funcional,Must,,,SecurityConfig,,SecurityConfigTest,CRUD-ORM,docs/mediciones/sec/A01-acceso.txt,verificado
-REQ-NF-011,No funcional,Must,,,,,,scripts/backup-prod.sh,verificado
+REQ-NF-010,No funcional,Must,,,SecurityConfig,,SecurityConfigTest,CRUD-ORM,docs/mediciones/sec/A01-acceso.txt,pendiente
+REQ-NF-011,No funcional,Must,,,,,,,scripts/backup-prod.sh,verificado
