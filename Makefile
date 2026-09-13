@@ -51,6 +51,8 @@ audit:
 	scripts/audit-sql-dynamic.sh
 	@echo "Auditoria: trazabilidad end-to-end..."
 	scripts/validate-traceability.sh
+	@echo "Auditoria: listados LaTeX vs codigo..."
+	scripts/validate-listings.sh
 	@echo "Auditorias completas (exit 0 = OK)."
 
 jacoco:
