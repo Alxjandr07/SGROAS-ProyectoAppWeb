@@ -48,9 +48,9 @@ def fig_percentiles(corridas) -> Path:
         ]
         ax.plot(NIVELES, valores, marker="o", color=color, label=corrida.nombre)
     ax.set_yscale("log")
-    ax.set_ylabel("Latencia (ms, escala log)")
-    ax.set_xlabel("Percentil")
-    ax.set_title("Perfil de percentiles de http_req_duration por corrida")
+    ax.set_ylabel("Latency (ms, log scale)")
+    ax.set_xlabel("Percentile")
+    ax.set_title("Percentile profile of http_req_duration per run")
     ax.grid(True, which="both", linestyle=":", alpha=0.5)
     ax.legend()
     ruta = FIGURAS / "fig-percentiles-corridas.png"
@@ -67,10 +67,10 @@ def fig_p95(corridas) -> Path:
     fig, ax = plt.subplots(figsize=(FIGW, FIGH))
     barras = ax.bar(nombres, p95, color=PALETA_PRINCIPAL[: len(corridas)])
     ax.axhline(UMBRAL_P95_MS, color=GRIS_SUAVE, linestyle="--", linewidth=1.2,
-               label=f"umbral p95 < {UMBRAL_P95_MS} ms")
+               label=f"p95 threshold < {UMBRAL_P95_MS} ms")
     ax.bar_label(barras, fmt="%.1f", fontsize=8)
     ax.set_ylabel("p95 (ms)")
-    ax.set_title("Percentil 95 de http_req_duration por corrida")
+    ax.set_title("95th percentile of http_req_duration per run")
     ax.legend()
     ax.grid(True, axis="y", linestyle=":", alpha=0.5)
     ruta = FIGURAS / "fig-p95-por-corrida.png"
@@ -88,10 +88,10 @@ def fig_media_ic95(corridas) -> Path:
 
     fig, ax = plt.subplots(figsize=(FIGW, FIGH))
     ax.bar(nombres, medias, color=PALETA_PRINCIPAL[: len(corridas)], alpha=0.85)
-    ax.axhline(m, color="black", linestyle="-", linewidth=1.4, label=f"media global = {m:.2f} ms")
-    ax.axhspan(inf, sup, color=PALETA_PRINCIPAL[0], alpha=0.15, label=f"IC 95% [{inf:.1f}; {sup:.1f}] ms")
-    ax.set_ylabel("Media de http_req_duration (ms)")
-    ax.set_title("Media por corrida y media global con IC 95%")
+    ax.axhline(m, color="black", linestyle="-", linewidth=1.4, label=f"global mean = {m:.2f} ms")
+    ax.axhspan(inf, sup, color=PALETA_PRINCIPAL[0], alpha=0.15, label=f"95% CI [{inf:.1f}; {sup:.1f}] ms")
+    ax.set_ylabel("Mean http_req_duration (ms)")
+    ax.set_title("Mean per run with global mean and 95% CI")
     ax.legend()
     ax.grid(True, axis="y", linestyle=":", alpha=0.5)
     ruta = FIGURAS / "fig-media-ic95.png"
@@ -107,8 +107,8 @@ def fig_error_rate(corridas) -> Path:
     errores = [c.error_rate for c in corridas]
     fig, ax = plt.subplots(figsize=(FIGW, FIGH))
     ax.bar(nombres, errores, color=PALETA_PRINCIPAL[: len(corridas)])
-    ax.set_ylabel("Tasa de error (http_req_failed)")
-    ax.set_title("Tasa de error por corrida (objetivo < 0.01)")
+    ax.set_ylabel("Error rate (http_req_failed)")
+    ax.set_title("Error rate per run (target < 0.01)")
     ax.set_ylim(0, max(0.02, max(errores) * 1.5))
     ax.grid(True, axis="y", linestyle=":", alpha=0.5)
     ruta = FIGURAS / "fig-error-rate.png"

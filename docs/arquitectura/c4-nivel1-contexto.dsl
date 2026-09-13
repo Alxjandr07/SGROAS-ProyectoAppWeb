@@ -1,14 +1,14 @@
-workspace "SGROAS - Sistema de Gestion de Rutas y Asignaciones Operativas" "Sistema de gestion de flota de transporte" {
+workspace "SGROAS - Route and Operations Assignment Management System" "Fleet management platform" {
 
     model {
-        u = person "Usuario" "Operador del sistema (admin, coordinador, seguridad)"
-        s = softwareSystem "SGROAS API" "Plataforma de gestion de rutas, conductores, vehiculos e incidentes"
+        u = person "User" "System operator (admin, coordinator, security)"
+        s = softwareSystem "SGROAS API" "Management platform for routes, drivers, vehicles and incidents"
 
-        u -> s "Utiliza la plataforma via" "API REST / Frontend Vue.js"
+        u -> s "Uses the platform via" "REST API / Vue.js frontend"
     }
 
     views {
-        systemContext s "Nivel 1 - Diagrama de Contexto" {
+        systemContext s context "Level 1 - System Context Diagram" {
             include *
             autoLayout
         }

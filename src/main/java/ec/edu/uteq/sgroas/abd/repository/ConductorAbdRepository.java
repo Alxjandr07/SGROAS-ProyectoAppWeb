@@ -9,6 +9,12 @@ import org.springframework.data.repository.query.Param;
 
 public interface ConductorAbdRepository extends JpaRepository<ConductorAbd, Integer> {
 
+    /**
+     * Consulta los conductores que coinciden con un texto de busqueda por nombres o cedula.
+     * @param search texto de busqueda, puede ser nulo para traer todos.
+     * @param pageable configuracion de paginacion y ordenamiento.
+     * @return pagina con los conductores encontrados.
+     */
     @Query("""
             SELECT c FROM ConductorAbd c
             WHERE (:search IS NULL OR LOWER(c.nombres) LIKE LOWER(CONCAT('%', :search, '%'))

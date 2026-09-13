@@ -245,12 +245,12 @@ def main() -> int:
         nombres = [f["codigo"] for f in filas]
         ax.bar(nombres, puntuaciones, color=OKABE_ITO["celeste"], alpha=0.85)
         ax.axhline(UMBRAL_ACEPTABLE, color=OKABE_ITO["granate"], linestyle="--",
-                   linewidth=1.3, label=f"umbral 70")
-        ax.axhline(m, color="black", linewidth=1.5, label=f"media = {m:.1f}")
+                   linewidth=1.3, label=f"threshold 70")
+        ax.axhline(m, color="black", linewidth=1.5, label=f"mean = {m:.1f}")
         ax.axhspan(inf, sup, color=OKABE_ITO["azul"], alpha=0.18,
-                   label=f"IC 95% [{inf:.1f}; {sup:.1f}]")
-        ax.set_ylabel("Puntuacion SUS (0-100)")
-        ax.set_title("SUS por participante (n = %d)" % len(puntuaciones))
+                   label=f"95% CI [{inf:.1f}; {sup:.1f}]")
+        ax.set_ylabel("SUS score (0-100)")
+        ax.set_title("SUS per participant (n = %d)" % len(puntuaciones))
         ax.set_ylim(0, 100)
         ax.legend()
         ax.grid(True, axis="y", linestyle=":", alpha=0.5)
@@ -267,9 +267,9 @@ def main() -> int:
             for i in range(len(items))
         ]
         ax2.bar(nombres, medias, color=colores, alpha=0.85)
-        ax2.axhline(3.0, color="black", linestyle="--", linewidth=1.2, label="punto medio 3")
-        ax2.set_ylabel("Media de respuesta Likert (1-5)")
-        ax2.set_title("Media de respuesta por item del SUS (n = %d)" % len(filas))
+        ax2.axhline(3.0, color="black", linestyle="--", linewidth=1.2, label="midpoint 3")
+        ax2.set_ylabel("Mean Likert response (1-5)")
+        ax2.set_title("Mean response per SUS item (n = %d)" % len(filas))
         ax2.set_ylim(1, 5)
         ax2.legend()
         ax2.grid(True, axis="y", linestyle=":", alpha=0.5)

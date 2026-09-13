@@ -11,13 +11,30 @@ import java.util.List;
 
 public interface RutaAbdRepository extends JpaRepository<RutaAbd, Integer> {
 
+    /**
+     * Consulta si existe una ruta con el terminal de origen y destino dados.
+     * @param idOrigen identificador del terminal de origen.
+     * @param idDestino identificador del terminal de destino.
+     * @return verdadero si existe la ruta con ese origen y destino.
+     */
     boolean existsByTerminalOrigenIdTerminalAndTerminalDestinoIdTerminal(Integer idOrigen, Integer idDestino);
 
+    /**
+     * Consulta el total de programaciones de una ruta.
+     * @param idRuta identificador de la ruta.
+     * @return total de programaciones de la ruta.
+     */
     @Query("""
             SELECT COUNT(p) FROM Programacion p WHERE p.ruta.idRuta = :idRuta
             """)
     long contarProgramaciones(@Param("idRuta") Integer idRuta);
 
+    /**
+     * Consulta las rutas que coinciden con un texto de busqueda por terminales o ciudades.
+     * @param search texto de busqueda, puede ser nulo para traer todas.
+     * @param pageable configuracion de paginacion y ordenamiento.
+     * @return pagina con las rutas encontradas.
+     */
     @Query("""
             SELECT r FROM RutaAbd r
             WHERE (:search IS NULL
@@ -28,6 +45,10 @@ public interface RutaAbdRepository extends JpaRepository<RutaAbd, Integer> {
             """)
     Page<RutaAbd> buscar(@Param("search") String search, Pageable pageable);
 
+    /**
+     * Consulta las 5 rutas con mayor numero de programaciones.
+     * @return lista con las rutas mas programadas.
+     */
     @Query(value = """
             SELECT r.id_ruta AS id,
                    t1.nombre || ' -> ' || t2.nombre AS descripcion,

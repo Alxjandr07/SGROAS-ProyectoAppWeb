@@ -7,5 +7,10 @@ import java.util.List;
 
 public interface CiudadRepository extends JpaRepository<Ciudad, Integer> {
 
+    /**
+     * Consulta las ciudades de una provincia ordenadas por identificador ascendente.
+     * @param idProvincia identificador de la provincia.
+     * @return lista de ciudades de la provincia.
+     */
     List<Ciudad> findByProvinciaIdProvinciaOrderByIdCiudadAsc(Integer idProvincia);
 }

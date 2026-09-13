@@ -12,8 +12,24 @@ import java.util.List;
 
 public interface ProgramacionRepository extends JpaRepository<Programacion, Integer> {
 
+    /**
+     * Consulta las programaciones con el estado dado de forma paginada sin distinguir mayusculas.
+     * @param estado estado de la programacion a filtrar.
+     * @param pageable configuracion de paginacion y ordenamiento.
+     * @return pagina con las programaciones del estado indicado.
+     */
     Page<Programacion> findByEstadoIgnoreCase(String estado, Pageable pageable);
 
+    /**
+     * Consulta las programaciones con filtros opcionales de estado, conductor, ruta y rango de fechas.
+     * @param estado estado a filtrar, puede ser nulo.
+     * @param idConductor identificador del conductor, puede ser nulo.
+     * @param idRuta identificador de la ruta, puede ser nulo.
+     * @param fechaDesde fecha inicial del rango, puede ser nula.
+     * @param fechaHasta fecha final del rango, puede ser nula.
+     * @param pageable configuracion de paginacion y ordenamiento.
+     * @return pagina con las programaciones que cumplen los filtros.
+     */
     @Query(value = """
             SELECT * FROM programacion p
             WHERE (CAST(:estado AS text) IS NULL OR LOWER(p.estado) = CAST(:estado AS text))
@@ -30,10 +46,18 @@ public interface ProgramacionRepository extends JpaRepository<Programacion, Inte
                                         @Param("fechaHasta") LocalDate fechaHasta,
                                         Pageable pageable);
 
+    /**
+     * Consulta el conteo de programaciones agrupadas por estado.
+     * @return lista con el total por cada estado.
+     */
     @Query(value = "SELECT estado AS clave, COUNT(*) AS total FROM programacion GROUP BY estado ORDER BY total DESC",
            nativeQuery = true)
     List<ConteoProjection> contarPorEstado();
 
+    /**
+     * Consulta el conteo de programaciones por mes de los ultimos 180 dias.
+     * @return lista con el total por cada mes.
+     */
     @Query(value = """
             SELECT TO_CHAR(fecha, 'YYYY-MM') AS clave, COUNT(*) AS total
             FROM programacion

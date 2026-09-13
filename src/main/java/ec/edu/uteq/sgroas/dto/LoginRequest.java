@@ -3,6 +3,11 @@ package ec.edu.uteq.sgroas.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
+/**
+ * Peticion de inicio de sesion con credenciales del usuario.
+ * @param email correo del usuario.
+ * @param password contrasena del usuario.
+ */
 public record LoginRequest(
 
         @NotBlank(message = "El email es obligatorio")
