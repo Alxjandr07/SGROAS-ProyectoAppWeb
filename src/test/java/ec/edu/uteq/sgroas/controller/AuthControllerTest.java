@@ -1,10 +1,10 @@
 package ec.edu.uteq.sgroas.controller;
 
 import ec.edu.uteq.sgroas.dto.AuthResponse;
-import ec.edu.uteq.sgroas.entity.Rol;
-import ec.edu.uteq.sgroas.entity.Usuario;
+import ec.edu.uteq.sgroas.entity.Role;
+import ec.edu.uteq.sgroas.entity.User;
 import ec.edu.uteq.sgroas.exception.GlobalExceptionHandler;
-import ec.edu.uteq.sgroas.repository.UsuarioRepository;
+import ec.edu.uteq.sgroas.repository.UserRepository;
 import ec.edu.uteq.sgroas.security.JwtService;
 import ec.edu.uteq.sgroas.security.LoginRateLimiter;
 import ec.edu.uteq.sgroas.service.AuthService;
@@ -42,7 +42,7 @@ class AuthControllerTest {
     private TokenService tokenService;
 
     @Mock
-    private UsuarioRepository usuarioRepository;
+    private UserRepository usuarioRepository;
 
     private MockMvc mockMvc() {
         return MockMvcBuilders.standaloneSetup(
@@ -60,13 +60,13 @@ class AuthControllerTest {
         );
     }
 
-    private Usuario usuarioActivo() {
-        return Usuario.builder()
+    private User usuarioActivo() {
+        return User.builder()
                 .id(1L)
                 .nombre("Administrador SGROAS")
                 .email("admin@sgroas.com")
                 .passwordHash("hash")
-                .rol(Rol.ROLE_ADMIN)
+                .rol(Role.ROLE_ADMIN)
                 .activo(true)
                 .verificado(true)
                 .creadoEn(Instant.now())
@@ -131,7 +131,7 @@ class AuthControllerTest {
 
     @Test
     void meConUsuarioInactivoDebeRetornar401() throws Exception {
-        Usuario inactivo = usuarioActivo();
+        User inactivo = usuarioActivo();
         inactivo.setActivo(false);
         when(tokenService.accessTokenEnBlacklist("access-token")).thenReturn(false);
         when(jwtService.extraerEmail("access-token")).thenReturn("admin@sgroas.com");

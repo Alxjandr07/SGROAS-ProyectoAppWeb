@@ -1,10 +1,10 @@
 package ec.edu.uteq.sgroas.abd.service;
 
 import ec.edu.uteq.sgroas.abd.dto.AbdDtos;
-import ec.edu.uteq.sgroas.abd.entity.Ciudad;
-import ec.edu.uteq.sgroas.abd.entity.RutaAbd;
+import ec.edu.uteq.sgroas.abd.entity.City;
+import ec.edu.uteq.sgroas.abd.entity.AbdRoute;
 import ec.edu.uteq.sgroas.abd.entity.Terminal;
-import ec.edu.uteq.sgroas.abd.repository.RutaAbdRepository;
+import ec.edu.uteq.sgroas.abd.repository.AbdRouteRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,20 +25,20 @@ import static org.mockito.Mockito.*;
 class RutaAbdServiceTest {
 
     @Mock
-    private RutaAbdRepository rutaAbdRepository;
+    private AbdRouteRepository rutaAbdRepository;
     @Mock
-    private CatalogoAbdService catalogoAbdService;
+    private AbdCatalogService catalogoAbdService;
 
     @InjectMocks
-    private RutaAbdService service;
+    private AbdRouteService service;
 
     private Terminal terminal(int id, String nombre) {
         return Terminal.builder().idTerminal(id).nombre(nombre)
-                .ciudad(Ciudad.builder().idCiudad(1).nombre("Quevedo").build()).build();
+                .ciudad(City.builder().idCiudad(1).nombre("Quevedo").build()).build();
     }
 
-    private RutaAbd ruta() {
-        return RutaAbd.builder().idRuta(1)
+    private AbdRoute ruta() {
+        return AbdRoute.builder().idRuta(1)
                 .terminalOrigen(terminal(1, "T1")).terminalDestino(terminal(2, "T2"))
                 .precioPasaje(new BigDecimal("2.50")).build();
     }
@@ -82,7 +82,7 @@ class RutaAbdServiceTest {
     void crearOkYMismoTerminalFalla() {
         when(catalogoAbdService.buscarTerminal(1)).thenReturn(terminal(1, "T1"));
         when(catalogoAbdService.buscarTerminal(2)).thenReturn(terminal(2, "T2"));
-        when(rutaAbdRepository.save(any(RutaAbd.class))).thenReturn(ruta());
+        when(rutaAbdRepository.save(any(AbdRoute.class))).thenReturn(ruta());
         when(rutaAbdRepository.contarProgramaciones(1)).thenReturn(0L);
 
         assertNotNull(service.crear(request(1, 2)));
@@ -94,7 +94,7 @@ class RutaAbdServiceTest {
         when(rutaAbdRepository.findById(1)).thenReturn(Optional.of(ruta()));
         when(catalogoAbdService.buscarTerminal(1)).thenReturn(terminal(1, "T1"));
         when(catalogoAbdService.buscarTerminal(2)).thenReturn(terminal(2, "T2"));
-        when(rutaAbdRepository.save(any(RutaAbd.class))).thenAnswer(i -> i.getArgument(0));
+        when(rutaAbdRepository.save(any(AbdRoute.class))).thenAnswer(i -> i.getArgument(0));
         when(rutaAbdRepository.contarProgramaciones(1)).thenReturn(0L);
 
         assertNotNull(service.actualizar(1, request(1, 2)));

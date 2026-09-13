@@ -27,19 +27,19 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class StoredProcedureIntegrationTest {
 
     @Autowired
-    private IncidenteRepository incidenteRepository;
+    private IncidentRepository incidenteRepository;
 
     @Autowired
-    private ConductorRepository conductorRepository;
+    private DriverRepository conductorRepository;
 
     @Autowired
-    private VehiculoRepository vehiculoRepository;
+    private VehicleRepository vehiculoRepository;
 
     @Autowired
-    private RutaRepository rutaRepository;
+    private RouteRepository rutaRepository;
 
     @Autowired
-    private AsignacionRutaRepository asignacionRutaRepository;
+    private RouteAssignmentRepository asignacionRutaRepository;
 
     @Test
     @DisplayName("fn_estadisticas_generales via @Procedure")

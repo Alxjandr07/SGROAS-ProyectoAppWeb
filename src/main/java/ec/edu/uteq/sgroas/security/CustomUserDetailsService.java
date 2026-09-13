@@ -1,7 +1,6 @@
 package ec.edu.uteq.sgroas.security;
 
-import ec.edu.uteq.sgroas.entity.Usuario;
-import ec.edu.uteq.sgroas.repository.UsuarioRepository;
+import ec.edu.uteq.sgroas.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -16,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UsuarioRepository usuarioRepository;
+    private final UserRepository usuarioRepository;
 
     /**
      * Carga los datos de seguridad del usuario activo para el proceso de autenticacion.
@@ -26,9 +25,9 @@ public class CustomUserDetailsService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Usuario usuario = usuarioRepository.findByEmail(email)
-                .filter(Usuario::getActivo)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+        ec.edu.uteq.sgroas.entity.User usuario = usuarioRepository.findByEmail(email)
+                .filter(ec.edu.uteq.sgroas.entity.User::getActivo)
+                .orElseThrow(() -> new UsernameNotFoundException("User no encontrado"));
 
         return new User(
                 usuario.getEmail(),

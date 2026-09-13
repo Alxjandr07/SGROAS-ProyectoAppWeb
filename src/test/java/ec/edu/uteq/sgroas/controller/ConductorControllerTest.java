@@ -1,7 +1,7 @@
 package ec.edu.uteq.sgroas.controller;
 
-import ec.edu.uteq.sgroas.dto.ConductorResponse;
-import ec.edu.uteq.sgroas.service.ConductorService;
+import ec.edu.uteq.sgroas.dto.DriverResponse;
+import ec.edu.uteq.sgroas.service.DriverService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -30,10 +30,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ConductorControllerTest {
 
     @Mock
-    private ConductorService conductorService;
+    private DriverService conductorService;
 
     private MockMvc mockMvc() {
-        return MockMvcBuilders.standaloneSetup(new ConductorController(conductorService))
+        return MockMvcBuilders.standaloneSetup(new DriverController(conductorService))
                 .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .setMessageConverters(new MappingJackson2HttpMessageConverter(
                         Jackson2ObjectMapperBuilder.json()
@@ -43,8 +43,8 @@ class ConductorControllerTest {
                 .build();
     }
 
-    private ConductorResponse responseEjemplo() {
-        return new ConductorResponse(
+    private DriverResponse responseEjemplo() {
+        return new DriverResponse(
                 1L, "Carlos Alberto", "Mendoza Vera", "1200000001", "LIC-001-2026",
                 "E", LocalDate.now().plusDays(20), "0988888888",
                 "carlos.mendoza@sgroas.com", "ACTIVO", true, true,

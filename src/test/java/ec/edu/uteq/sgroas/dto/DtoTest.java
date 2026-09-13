@@ -43,7 +43,7 @@ class DtoTest {
 
     @Test
     void verificarEmailRequestDebeConservarValores() {
-        VerificarEmailRequest request = new VerificarEmailRequest(
+        VerifyEmailRequest request = new VerifyEmailRequest(
                 "maria@sgroas.com", "123456"
         );
 
@@ -53,7 +53,7 @@ class DtoTest {
 
     @Test
     void restablecerContrasenaRequestDebeConservarValores() {
-        RestablecerContrasenaRequest request = new RestablecerContrasenaRequest(
+        ResetPasswordRequest request = new ResetPasswordRequest(
                 "maria@sgroas.com", "654321", "nuevaClave1"
         );
 
@@ -71,7 +71,7 @@ class DtoTest {
 
     @Test
     void usuarioRequestDebeConservarValores() {
-        UsuarioRequest request = new UsuarioRequest(
+        UserRequest request = new UserRequest(
                 "Carlos Mendoza", "carlos@sgroas.com", "123456", "ROLE_ADMIN"
         );
 
@@ -84,7 +84,7 @@ class DtoTest {
     @Test
     void usuarioResponseDebeConservarValores() {
         Instant ahora = Instant.now();
-        UsuarioResponse response = new UsuarioResponse(
+        UserResponse response = new UserResponse(
                 1L, "Carlos Mendoza", "carlos@sgroas.com",
                 "ROLE_ADMIN", true, ahora, ahora
         );
@@ -100,7 +100,7 @@ class DtoTest {
 
     @Test
     void vehiculoRequestDebeConservarValores() {
-        VehiculoRequest request = new VehiculoRequest(
+        VehicleRequest request = new VehicleRequest(
                 "GTU-001", "Toyota", "Hiace", 2020, 14,
                 "MOT-123", "CHAS-123", "Blanco", "ACTIVO"
         );
@@ -119,7 +119,7 @@ class DtoTest {
     @Test
     void vehiculoResponseDebeConservarValores() {
         Instant ahora = Instant.now();
-        VehiculoResponse response = new VehiculoResponse(
+        VehicleResponse response = new VehicleResponse(
                 1L, "GTU-001", "Toyota", "Hiace", 2020, 14,
                 "MOT-123", "CHAS-123", "Blanco", "ACTIVO", true, ahora, ahora
         );
@@ -139,7 +139,7 @@ class DtoTest {
 
     @Test
     void rutaRequestDebeConservarValores() {
-        RutaRequest request = new RutaRequest(
+        RouteRequest request = new RouteRequest(
                 "R-001", "Quito - Guayaquil", "Quito", "Guayaquil",
                 420.0, 480, "ACTIVA"
         );
@@ -156,7 +156,7 @@ class DtoTest {
     @Test
     void rutaResponseDebeConservarValores() {
         Instant ahora = Instant.now();
-        RutaResponse response = new RutaResponse(
+        RouteResponse response = new RouteResponse(
                 1L, "R-001", "Quito - Guayaquil", "Quito", "Guayaquil",
                 420.0, 480, "ACTIVA", true, ahora, ahora
         );
@@ -175,7 +175,7 @@ class DtoTest {
     @Test
     void incidenteRequestDebeConservarValores() {
         LocalDateTime fecha = LocalDateTime.now();
-        IncidenteRequest request = new IncidenteRequest(
+        IncidentRequest request = new IncidentRequest(
                 1L, "Carlos Mendoza", "AVERIA_MECANICA", "Falla en el motor",
                 fecha, "Km 12", "MEDIA", "REPORTADO"
         );
@@ -194,7 +194,7 @@ class DtoTest {
     void incidenteResponseDebeConservarValores() {
         Instant ahora = Instant.now();
         LocalDateTime fecha = LocalDateTime.now();
-        IncidenteResponse response = new IncidenteResponse(
+        IncidentResponse response = new IncidentResponse(
                 1L, 1L, "Carlos Mendoza", "AVERIA_MECANICA",
                 "Falla en el motor", fecha, "Km 12", "MEDIA",
                 "REPORTADO", true, ahora, ahora
@@ -215,7 +215,7 @@ class DtoTest {
     @Test
     void asignacionRutaRequestDebeConservarValores() {
         LocalDate fecha = LocalDate.now();
-        AsignacionRutaRequest request = new AsignacionRutaRequest(
+        RouteAssignmentRequest request = new RouteAssignmentRequest(
                 1L, 1L, 1L, fecha, fecha, fecha.plusDays(1), "ACTIVA"
         );
 
@@ -232,7 +232,7 @@ class DtoTest {
     void asignacionRutaResponseDebeConservarValores() {
         Instant ahora = Instant.now();
         LocalDate fecha = LocalDate.now();
-        AsignacionRutaResponse response = new AsignacionRutaResponse(
+        RouteAssignmentResponse response = new RouteAssignmentResponse(
                 1L, 1L, "Carlos Mendoza", 1L, "GTU-001", 1L,
                 "Quito - Guayaquil", fecha, fecha, fecha.plusDays(1),
                 "ACTIVA", true, ahora, ahora

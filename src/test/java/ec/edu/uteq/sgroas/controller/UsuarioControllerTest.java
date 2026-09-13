@@ -1,7 +1,7 @@
 package ec.edu.uteq.sgroas.controller;
 
-import ec.edu.uteq.sgroas.dto.UsuarioResponse;
-import ec.edu.uteq.sgroas.service.UsuarioService;
+import ec.edu.uteq.sgroas.dto.UserResponse;
+import ec.edu.uteq.sgroas.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -29,10 +29,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UsuarioControllerTest {
 
     @Mock
-    private UsuarioService usuarioService;
+    private UserService usuarioService;
 
     private MockMvc mockMvc() {
-        return MockMvcBuilders.standaloneSetup(new UsuarioController(usuarioService))
+        return MockMvcBuilders.standaloneSetup(new UserController(usuarioService))
                 .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .setMessageConverters(new MappingJackson2HttpMessageConverter(
                         Jackson2ObjectMapperBuilder.json()
@@ -42,8 +42,8 @@ class UsuarioControllerTest {
                 .build();
     }
 
-    private UsuarioResponse responseEjemplo() {
-        return new UsuarioResponse(
+    private UserResponse responseEjemplo() {
+        return new UserResponse(
                 1L, "Administrador SGROAS", "admin@sgroas.com",
                 "ROLE_ADMIN", true, Instant.now(), Instant.now()
         );

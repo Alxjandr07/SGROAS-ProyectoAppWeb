@@ -1,7 +1,11 @@
 package ec.edu.uteq.sgroas.abd.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 
 @Getter
 @Setter
@@ -22,5 +26,5 @@ public class Terminal {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_ciudad", nullable = false)
-    private Ciudad ciudad;
+    private City ciudad;
 }

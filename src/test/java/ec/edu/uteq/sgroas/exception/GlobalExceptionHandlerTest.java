@@ -51,10 +51,10 @@ class GlobalExceptionHandlerTest {
         when(request.getRequestURI()).thenReturn("/api/conductores");
 
         ProblemDetail detail = handler.manejarArgumentosInvalidos(
-                new IllegalArgumentException("Conductor no encontrado"), request);
+                new IllegalArgumentException("Driver no encontrado"), request);
 
         assertEquals(HttpStatus.BAD_REQUEST.value(), detail.getStatus());
-        assertEquals("Conductor no encontrado", detail.getDetail());
+        assertEquals("Driver no encontrado", detail.getDetail());
     }
 
     @Test

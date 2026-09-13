@@ -3,9 +3,9 @@ package ec.edu.uteq.sgroas.service;
 import ec.edu.uteq.sgroas.dto.AuthResponse;
 import ec.edu.uteq.sgroas.dto.LoginRequest;
 import ec.edu.uteq.sgroas.dto.RefreshTokenRequest;
-import ec.edu.uteq.sgroas.entity.Usuario;
-import ec.edu.uteq.sgroas.exception.CorreoNoVerificadoException;
-import ec.edu.uteq.sgroas.repository.UsuarioRepository;
+import ec.edu.uteq.sgroas.entity.User;
+import ec.edu.uteq.sgroas.exception.UnverifiedEmailException;
+import ec.edu.uteq.sgroas.repository.UserRepository;
 import ec.edu.uteq.sgroas.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +17,7 @@ import java.time.Instant;
 
 /**
  * Autenticacion de SGROAS. No existe registro publico: los usuarios los crea
- * el ADMIN desde el modulo Usuarios (UsuarioService), que envia por correo un
+ * el ADMIN desde el modulo Usuarios (UserService), que envia por correo un
  * codigo de activacion; aqui solo se valida ese codigo y se gestionan las
  * sesiones y el restablecimiento de contrasena.
  */
@@ -25,11 +25,11 @@ import java.time.Instant;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UsuarioRepository usuarioRepository;
+    private final UserRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final TokenService tokenService;
-    private final CodigoVerificacionService codigoVerificacionService;
+    private final VerificationCodeService codigoVerificacionService;
     private final EmailService emailService;
 
     @Value("${app.jwt.refresh-expiration-ms}")
@@ -40,10 +40,10 @@ public class AuthService {
      * @param request datos de acceso con correo y contrasenia ingresados por el usuario
      * @return respuesta con los tokens generados y los datos basicos de la sesion
      * @throws BadCredentialsException cuando el correo no existe, la contrasenia no coincide o la cuenta esta inactiva
-     * @throws CorreoNoVerificadoException cuando la cuenta aun no confirma su correo de activacion
+     * @throws UnverifiedEmailException cuando la cuenta aun no confirma su correo de activacion
      */
     public AuthResponse login(LoginRequest request) {
-        Usuario usuario = usuarioRepository.findByEmail(request.email())
+        User usuario = usuarioRepository.findByEmail(request.email())
                 .orElseThrow(() -> new BadCredentialsException("Credenciales invalidas"));
 
         if (!passwordEncoder.matches(request.password(), usuario.getPasswordHash())) {
@@ -51,7 +51,7 @@ public class AuthService {
         }
 
         if (Boolean.FALSE.equals(usuario.getVerificado())) {
-            throw new CorreoNoVerificadoException(
+            throw new UnverifiedEmailException(
                     "Tu cuenta aun no esta verificada. Revisa tu correo e ingresa el codigo de 6 digitos.");
         }
 
@@ -71,10 +71,10 @@ public class AuthService {
      * @throws IllegalArgumentException cuando no existe una cuenta con ese correo o el codigo es invalido o expiro
      */
     public AuthResponse verificarEmail(String email, String codigo) {
-        Usuario usuario = usuarioRepository.findByEmail(email)
+        User usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("No existe una cuenta con ese email"));
 
-        codigoVerificacionService.validar(email, CodigoVerificacionService.Tipo.VERIFICACION, codigo);
+        codigoVerificacionService.validar(email, VerificationCodeService.Tipo.VERIFICACION, codigo);
 
         usuario.setVerificado(true);
         usuario.setActivo(true);
@@ -93,7 +93,7 @@ public class AuthService {
         usuarioRepository.findByEmail(email)
                 .filter(u -> Boolean.FALSE.equals(u.getVerificado()))
                 .filter(u -> codigoVerificacionService.puedeReenviar(email,
-                        CodigoVerificacionService.Tipo.VERIFICACION))
+                        VerificationCodeService.Tipo.VERIFICACION))
                 .ifPresent(this::enviarCodigoActivacion);
     }
 
@@ -104,12 +104,12 @@ public class AuthService {
      */
     public void solicitarRestablecimiento(String email) {
         usuarioRepository.findByEmail(email)
-                .filter(Usuario::getActivo)
+                .filter(User::getActivo)
                 .filter(u -> codigoVerificacionService.puedeReenviar(email,
-                        CodigoVerificacionService.Tipo.RESET_PASSWORD))
+                        VerificationCodeService.Tipo.RESET_PASSWORD))
                 .ifPresent(u -> {
                     String codigo = codigoVerificacionService.generar(email,
-                            CodigoVerificacionService.Tipo.RESET_PASSWORD);
+                            VerificationCodeService.Tipo.RESET_PASSWORD);
                     emailService.enviarCodigoRestablecimiento(email, codigo);
                 });
     }
@@ -123,10 +123,10 @@ public class AuthService {
      * @throws IllegalArgumentException cuando no existe una cuenta con ese correo o el codigo es invalido o expiro
      */
     public void restablecerContrasena(String email, String codigo, String nuevaPassword) {
-        Usuario usuario = usuarioRepository.findByEmail(email)
+        User usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("No existe una cuenta con ese email"));
 
-        codigoVerificacionService.validar(email, CodigoVerificacionService.Tipo.RESET_PASSWORD, codigo);
+        codigoVerificacionService.validar(email, VerificationCodeService.Tipo.RESET_PASSWORD, codigo);
 
         usuario.setPasswordHash(passwordEncoder.encode(nuevaPassword));
         usuario.setActivo(true);
@@ -135,9 +135,9 @@ public class AuthService {
         usuarioRepository.save(usuario);
     }
 
-    private void enviarCodigoActivacion(Usuario usuario) {
+    private void enviarCodigoActivacion(User usuario) {
         String codigo = codigoVerificacionService.generar(usuario.getEmail(),
-                CodigoVerificacionService.Tipo.VERIFICACION);
+                VerificationCodeService.Tipo.VERIFICACION);
         emailService.enviarCodigoVerificacion(usuario.getEmail(), usuario.getNombre(), codigo);
     }
 
@@ -152,9 +152,9 @@ public class AuthService {
     public AuthResponse refresh(RefreshTokenRequest request) {
         String email = tokenService.obtenerEmailDesdeRefreshToken(request.refreshToken());
 
-        Usuario usuario = usuarioRepository.findByEmail(email)
-                .filter(Usuario::getActivo)
-                .orElseThrow(() -> new BadCredentialsException("Usuario no valido"));
+        User usuario = usuarioRepository.findByEmail(email)
+                .filter(User::getActivo)
+                .orElseThrow(() -> new BadCredentialsException("User no valido"));
 
         tokenService.eliminarRefreshToken(request.refreshToken());
 
@@ -172,7 +172,7 @@ public class AuthService {
         tokenService.eliminarRefreshToken(request.refreshToken());
     }
 
-    private AuthResponse generarRespuestaAutenticacion(Usuario usuario) {
+    private AuthResponse generarRespuestaAutenticacion(User usuario) {
         String accessToken = jwtService.generarToken(usuario);
         String refreshToken = tokenService.generarRefreshToken(
                 usuario.getEmail(),

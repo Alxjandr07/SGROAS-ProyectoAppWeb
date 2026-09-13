@@ -2,9 +2,9 @@ package ec.edu.uteq.sgroas.service;
 
 import ec.edu.uteq.sgroas.dto.AuthResponse;
 import ec.edu.uteq.sgroas.dto.LoginRequest;
-import ec.edu.uteq.sgroas.entity.Rol;
-import ec.edu.uteq.sgroas.entity.Usuario;
-import ec.edu.uteq.sgroas.repository.UsuarioRepository;
+import ec.edu.uteq.sgroas.entity.Role;
+import ec.edu.uteq.sgroas.entity.User;
+import ec.edu.uteq.sgroas.repository.UserRepository;
 import ec.edu.uteq.sgroas.security.JwtService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 class AuthServiceTest {
 
     @Mock
-    private UsuarioRepository usuarioRepository;
+    private UserRepository usuarioRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -40,12 +40,12 @@ class AuthServiceTest {
 
     @Test
     void loginCorrectoDebeRetornarTokens() {
-        Usuario usuario = Usuario.builder()
+        User usuario = User.builder()
                 .id(1L)
                 .nombre("Administrador SGROAS")
                 .email("admin@sgroas.com")
                 .passwordHash("password-encriptado")
-                .rol(Rol.ROLE_ADMIN)
+                .rol(Role.ROLE_ADMIN)
                 .activo(true)
                 .creadoEn(Instant.now())
                 .actualizadoEn(Instant.now())
@@ -75,12 +75,12 @@ class AuthServiceTest {
 
     @Test
     void loginConPasswordIncorrectoDebeLanzarExcepcion() {
-        Usuario usuario = Usuario.builder()
+        User usuario = User.builder()
                 .id(1L)
                 .nombre("Administrador SGROAS")
                 .email("admin@sgroas.com")
                 .passwordHash("password-encriptado")
-                .rol(Rol.ROLE_ADMIN)
+                .rol(Role.ROLE_ADMIN)
                 .activo(true)
                 .creadoEn(Instant.now())
                 .actualizadoEn(Instant.now())

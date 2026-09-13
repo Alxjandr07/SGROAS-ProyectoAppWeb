@@ -1,10 +1,10 @@
 package ec.edu.uteq.sgroas.service;
 
-import ec.edu.uteq.sgroas.dto.RutaRequest;
-import ec.edu.uteq.sgroas.dto.RutaResponse;
-import ec.edu.uteq.sgroas.entity.EstadoRuta;
-import ec.edu.uteq.sgroas.entity.Ruta;
-import ec.edu.uteq.sgroas.repository.RutaRepository;
+import ec.edu.uteq.sgroas.dto.RouteRequest;
+import ec.edu.uteq.sgroas.dto.RouteResponse;
+import ec.edu.uteq.sgroas.entity.RouteStatus;
+import ec.edu.uteq.sgroas.entity.Route;
+import ec.edu.uteq.sgroas.repository.RouteRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,13 +26,13 @@ import static org.mockito.Mockito.*;
 class RutaServiceTest {
 
     @Mock
-    private RutaRepository rutaRepository;
+    private RouteRepository rutaRepository;
 
     @InjectMocks
-    private RutaService rutaService;
+    private RouteService rutaService;
 
-    private Ruta rutaEjemplo() {
-        return Ruta.builder()
+    private Route rutaEjemplo() {
+        return Route.builder()
                 .id(1L)
                 .codigo("R-001")
                 .nombre("Quito - Guayaquil")
@@ -40,15 +40,15 @@ class RutaServiceTest {
                 .destino("Guayaquil")
                 .distanciaKm(420.0)
                 .duracionEstimadaMin(480)
-                .estado(EstadoRuta.ACTIVA)
+                .estado(RouteStatus.ACTIVA)
                 .activo(true)
                 .creadoEn(Instant.now())
                 .actualizadoEn(Instant.now())
                 .build();
     }
 
-    private RutaRequest requestEjemplo() {
-        return new RutaRequest(
+    private RouteRequest requestEjemplo() {
+        return new RouteRequest(
                 "R-001", "Quito - Guayaquil", "Quito", "Guayaquil",
                 420.0, 480, "ACTIVA"
         );
@@ -60,7 +60,7 @@ class RutaServiceTest {
         when(rutaRepository.findByActivoTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(rutaEjemplo())));
 
-        Page<RutaResponse> pagina = rutaService.listar(pageable);
+        Page<RouteResponse> pagina = rutaService.listar(pageable);
 
         assertEquals(1, pagina.getTotalElements());
         assertEquals("R-001", pagina.getContent().get(0).codigo());
@@ -70,7 +70,7 @@ class RutaServiceTest {
     void buscarPorIdDebeRetornarRuta() {
         when(rutaRepository.findById(1L)).thenReturn(Optional.of(rutaEjemplo()));
 
-        RutaResponse response = rutaService.buscarPorId(1L);
+        RouteResponse response = rutaService.buscarPorId(1L);
 
         assertEquals(1L, response.id());
         assertEquals("Quito", response.origen());
@@ -87,12 +87,12 @@ class RutaServiceTest {
     @Test
     void crearDebeGuardarYRetornar() {
         when(rutaRepository.existsByCodigo("R-001")).thenReturn(false);
-        when(rutaRepository.save(any(Ruta.class))).thenReturn(rutaEjemplo());
+        when(rutaRepository.save(any(Route.class))).thenReturn(rutaEjemplo());
 
-        RutaResponse response = rutaService.crear(requestEjemplo());
+        RouteResponse response = rutaService.crear(requestEjemplo());
 
         assertEquals("R-001", response.codigo());
-        verify(rutaRepository).save(any(Ruta.class));
+        verify(rutaRepository).save(any(Route.class));
     }
 
     @Test
@@ -106,7 +106,7 @@ class RutaServiceTest {
     @Test
     void crearConEstadoInvalidoDebeLanzarExcepcion() {
         when(rutaRepository.existsByCodigo("R-001")).thenReturn(false);
-        RutaRequest request = new RutaRequest(
+        RouteRequest request = new RouteRequest(
                 "R-001", "Quito - Guayaquil", "Quito", "Guayaquil",
                 420.0, 480, "INVALIDO"
         );
@@ -118,9 +118,9 @@ class RutaServiceTest {
     @Test
     void actualizarDebeModificarYRetornar() {
         when(rutaRepository.findById(1L)).thenReturn(Optional.of(rutaEjemplo()));
-        when(rutaRepository.save(any(Ruta.class))).thenReturn(rutaEjemplo());
+        when(rutaRepository.save(any(Route.class))).thenReturn(rutaEjemplo());
 
-        RutaResponse response = rutaService.actualizar(1L, requestEjemplo());
+        RouteResponse response = rutaService.actualizar(1L, requestEjemplo());
 
         assertEquals(1L, response.id());
     }
@@ -130,7 +130,7 @@ class RutaServiceTest {
         when(rutaRepository.findById(1L)).thenReturn(Optional.of(rutaEjemplo()));
         when(rutaRepository.existsByCodigo("R-999")).thenReturn(true);
 
-        RutaRequest request = new RutaRequest(
+        RouteRequest request = new RouteRequest(
                 "R-999", "Quito - Guayaquil", "Quito", "Guayaquil",
                 420.0, 480, "ACTIVA"
         );
@@ -146,6 +146,6 @@ class RutaServiceTest {
         rutaService.desactivar(1L);
 
         verify(rutaRepository).save(argThat(r ->
-                !r.getActivo() && r.getEstado() == EstadoRuta.INACTIVA));
+                !r.getActivo() && r.getEstado() == RouteStatus.INACTIVA));
     }
 }

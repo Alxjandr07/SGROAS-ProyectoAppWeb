@@ -1,7 +1,7 @@
 package ec.edu.uteq.sgroas.controller;
 
 import ec.edu.uteq.sgroas.exception.GlobalExceptionHandler;
-import ec.edu.uteq.sgroas.service.ReporteService;
+import ec.edu.uteq.sgroas.service.ReportService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -26,10 +26,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ReporteControllerTest {
 
     @Mock
-    private ReporteService reporteService;
+    private ReportService reporteService;
 
     private MockMvc mockMvc() {
-        return MockMvcBuilders.standaloneSetup(new ReporteController(reporteService))
+        return MockMvcBuilders.standaloneSetup(new ReportController(reporteService))
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
     }

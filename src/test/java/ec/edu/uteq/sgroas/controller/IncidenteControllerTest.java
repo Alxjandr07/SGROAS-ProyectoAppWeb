@@ -1,7 +1,7 @@
 package ec.edu.uteq.sgroas.controller;
 
-import ec.edu.uteq.sgroas.dto.IncidenteResponse;
-import ec.edu.uteq.sgroas.service.IncidenteService;
+import ec.edu.uteq.sgroas.dto.IncidentResponse;
+import ec.edu.uteq.sgroas.service.IncidentService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -30,10 +30,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class IncidenteControllerTest {
 
     @Mock
-    private IncidenteService incidenteService;
+    private IncidentService incidenteService;
 
     private MockMvc mockMvc() {
-        return MockMvcBuilders.standaloneSetup(new IncidenteController(incidenteService))
+        return MockMvcBuilders.standaloneSetup(new IncidentController(incidenteService))
                 .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .setMessageConverters(new MappingJackson2HttpMessageConverter(
                         Jackson2ObjectMapperBuilder.json()
@@ -43,8 +43,8 @@ class IncidenteControllerTest {
                 .build();
     }
 
-    private IncidenteResponse responseEjemplo() {
-        return new IncidenteResponse(
+    private IncidentResponse responseEjemplo() {
+        return new IncidentResponse(
                 1L, 1L, "Carlos Mendoza", "AVERIA_MECANICA",
                 "Falla en el motor", LocalDateTime.now(), "Km 12 Via Quito",
                 "MEDIA", "REPORTADO", true, Instant.now(), Instant.now()

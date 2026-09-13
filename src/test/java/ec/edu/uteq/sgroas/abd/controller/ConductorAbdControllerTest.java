@@ -1,7 +1,7 @@
 package ec.edu.uteq.sgroas.abd.controller;
 
-import ec.edu.uteq.sgroas.abd.entity.ConductorAbd;
-import ec.edu.uteq.sgroas.abd.repository.ConductorAbdRepository;
+import ec.edu.uteq.sgroas.abd.entity.AbdDriver;
+import ec.edu.uteq.sgroas.abd.repository.AbdDriverRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -30,10 +30,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ConductorAbdControllerTest {
 
     @Mock
-    private ConductorAbdRepository conductorAbdRepository;
+    private AbdDriverRepository conductorAbdRepository;
 
     private MockMvc mockMvc() {
-        return MockMvcBuilders.standaloneSetup(new ConductorAbdController(conductorAbdRepository))
+        return MockMvcBuilders.standaloneSetup(new AbdDriverController(conductorAbdRepository))
                 .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .setMessageConverters(new MappingJackson2HttpMessageConverter(
                         Jackson2ObjectMapperBuilder.json()
@@ -43,8 +43,8 @@ class ConductorAbdControllerTest {
                 .build();
     }
 
-    private ConductorAbd conductor() {
-        return ConductorAbd.builder().idConductor(1).cedula("1200000001")
+    private AbdDriver conductor() {
+        return AbdDriver.builder().idConductor(1).cedula("1200000001")
                 .nombres("Carlos").licencia("E").build();
     }
 

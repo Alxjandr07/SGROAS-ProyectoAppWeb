@@ -1,10 +1,10 @@
 package ec.edu.uteq.sgroas.service;
 
-import ec.edu.uteq.sgroas.dto.ConductorRequest;
-import ec.edu.uteq.sgroas.dto.ConductorResponse;
-import ec.edu.uteq.sgroas.entity.Conductor;
-import ec.edu.uteq.sgroas.entity.EstadoConductor;
-import ec.edu.uteq.sgroas.repository.ConductorRepository;
+import ec.edu.uteq.sgroas.dto.DriverRequest;
+import ec.edu.uteq.sgroas.dto.DriverResponse;
+import ec.edu.uteq.sgroas.entity.Driver;
+import ec.edu.uteq.sgroas.entity.DriverStatus;
+import ec.edu.uteq.sgroas.repository.DriverRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,13 +27,13 @@ import static org.mockito.Mockito.*;
 class ConductorServiceExtraTest {
 
     @Mock
-    private ConductorRepository conductorRepository;
+    private DriverRepository conductorRepository;
 
     @InjectMocks
-    private ConductorService conductorService;
+    private DriverService conductorService;
 
-    private Conductor conductorEjemplo() {
-        return Conductor.builder()
+    private Driver conductorEjemplo() {
+        return Driver.builder()
                 .id(1L)
                 .nombres("Carlos Alberto")
                 .apellidos("Mendoza Vera")
@@ -43,15 +43,15 @@ class ConductorServiceExtraTest {
                 .fechaVencimientoLicencia(LocalDate.now().plusDays(40))
                 .telefono("0988888888")
                 .email("carlos.mendoza@sgroas.com")
-                .estado(EstadoConductor.ACTIVO)
+                .estado(DriverStatus.ACTIVO)
                 .activo(true)
                 .creadoEn(Instant.now())
                 .actualizadoEn(Instant.now())
                 .build();
     }
 
-    private ConductorRequest requestEjemplo() {
-        return new ConductorRequest(
+    private DriverRequest requestEjemplo() {
+        return new DriverRequest(
                 "Carlos Alberto", "Mendoza Vera", "1200000001", "LIC-001-2026",
                 "E", LocalDate.of(2026, 7, 15), "0988888888",
                 "carlos.mendoza@sgroas.com", "ACTIVO"
@@ -64,7 +64,7 @@ class ConductorServiceExtraTest {
         when(conductorRepository.findByActivoTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(conductorEjemplo())));
 
-        Page<ConductorResponse> pagina = conductorService.listar(null, pageable);
+        Page<DriverResponse> pagina = conductorService.listar(null, pageable);
 
         assertEquals(1, pagina.getTotalElements());
         assertEquals("Carlos Alberto", pagina.getContent().get(0).nombres());
@@ -80,7 +80,7 @@ class ConductorServiceExtraTest {
 
     @Test
     void buscarConductorInactivoDebeLanzarExcepcion() {
-        Conductor inactivo = conductorEjemplo();
+        Driver inactivo = conductorEjemplo();
         inactivo.setActivo(false);
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(inactivo));
 
@@ -102,7 +102,7 @@ class ConductorServiceExtraTest {
         when(conductorRepository.existsByCedula("1200000001")).thenReturn(false);
         when(conductorRepository.existsByNumeroLicencia("LIC-001-2026")).thenReturn(false);
 
-        ConductorRequest request = new ConductorRequest(
+        DriverRequest request = new DriverRequest(
                 "Carlos Alberto", "Mendoza Vera", "1200000001", "LIC-001-2026",
                 "E", LocalDate.of(2026, 7, 15), "0988888888",
                 "carlos.mendoza@sgroas.com", "INVALIDO"
@@ -115,12 +115,12 @@ class ConductorServiceExtraTest {
     @Test
     void actualizarDebeModificarYRetornar() {
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductorEjemplo()));
-        when(conductorRepository.save(any(Conductor.class))).thenReturn(conductorEjemplo());
+        when(conductorRepository.save(any(Driver.class))).thenReturn(conductorEjemplo());
 
-        ConductorResponse response = conductorService.actualizar(1L, requestEjemplo());
+        DriverResponse response = conductorService.actualizar(1L, requestEjemplo());
 
         assertEquals(1L, response.id());
-        verify(conductorRepository).save(any(Conductor.class));
+        verify(conductorRepository).save(any(Driver.class));
     }
 
     @Test
@@ -128,7 +128,7 @@ class ConductorServiceExtraTest {
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductorEjemplo()));
         when(conductorRepository.existsByCedula("1299999999")).thenReturn(true);
 
-        ConductorRequest request = new ConductorRequest(
+        DriverRequest request = new DriverRequest(
                 "Carlos Alberto", "Mendoza Vera", "1299999999", "LIC-001-2026",
                 "E", LocalDate.of(2026, 7, 15), "0988888888",
                 "carlos.mendoza@sgroas.com", "ACTIVO"
@@ -143,7 +143,7 @@ class ConductorServiceExtraTest {
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductorEjemplo()));
         when(conductorRepository.existsByNumeroLicencia("LIC-999-2026")).thenReturn(true);
 
-        ConductorRequest request = new ConductorRequest(
+        DriverRequest request = new DriverRequest(
                 "Carlos Alberto", "Mendoza Vera", "1200000001", "LIC-999-2026",
                 "E", LocalDate.of(2026, 7, 15), "0988888888",
                 "carlos.mendoza@sgroas.com", "ACTIVO"
@@ -160,16 +160,16 @@ class ConductorServiceExtraTest {
         conductorService.desactivar(1L);
 
         verify(conductorRepository).save(argThat(c ->
-                !c.getActivo() && c.getEstado() == EstadoConductor.INACTIVO));
+                !c.getActivo() && c.getEstado() == DriverStatus.INACTIVO));
     }
 
     @Test
     void licenciaVencidaDebeMarcarseComoNoPorVencer() {
-        Conductor conductor = conductorEjemplo();
+        Driver conductor = conductorEjemplo();
         conductor.setFechaVencimientoLicencia(LocalDate.now().minusDays(5));
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductor));
 
-        ConductorResponse response = conductorService.buscarPorId(1L);
+        DriverResponse response = conductorService.buscarPorId(1L);
 
         assertFalse(response.licenciaPorVencer());
     }

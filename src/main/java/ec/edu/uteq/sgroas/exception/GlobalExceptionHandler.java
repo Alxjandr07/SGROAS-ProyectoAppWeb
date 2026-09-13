@@ -87,9 +87,9 @@ public class GlobalExceptionHandler {
      * @param request petición HTTP que originó el acceso con correo sin verificar.
      * @return detalle del problema con estado de acceso prohibido.
      */
-    @ExceptionHandler(CorreoNoVerificadoException.class)
+    @ExceptionHandler(UnverifiedEmailException.class)
     public ProblemDetail manejarCorreoNoVerificado(
-            CorreoNoVerificadoException ex,
+            UnverifiedEmailException ex,
             HttpServletRequest request
     ) {
         ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.FORBIDDEN);

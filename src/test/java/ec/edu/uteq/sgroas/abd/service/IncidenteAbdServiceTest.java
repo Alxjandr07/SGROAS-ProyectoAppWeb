@@ -1,11 +1,11 @@
 package ec.edu.uteq.sgroas.abd.service;
 
 import ec.edu.uteq.sgroas.abd.dto.AbdDtos;
-import ec.edu.uteq.sgroas.abd.entity.IncidenteAbd;
-import ec.edu.uteq.sgroas.abd.entity.Unidad;
-import ec.edu.uteq.sgroas.abd.repository.AlertaRepository;
-import ec.edu.uteq.sgroas.abd.repository.IncidenteAbdRepository;
-import ec.edu.uteq.sgroas.abd.repository.UnidadRepository;
+import ec.edu.uteq.sgroas.abd.entity.AbdIncident;
+import ec.edu.uteq.sgroas.abd.entity.Unit;
+import ec.edu.uteq.sgroas.abd.repository.AlertRepository;
+import ec.edu.uteq.sgroas.abd.repository.AbdIncidentRepository;
+import ec.edu.uteq.sgroas.abd.repository.UnitRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,22 +26,22 @@ import static org.mockito.Mockito.*;
 class IncidenteAbdServiceTest {
 
     @Mock
-    private IncidenteAbdRepository incidenteRepository;
+    private AbdIncidentRepository incidenteRepository;
     @Mock
-    private AlertaRepository alertaRepository;
+    private AlertRepository alertaRepository;
     @Mock
-    private UnidadRepository unidadRepository;
+    private UnitRepository unidadRepository;
 
     @InjectMocks
-    private IncidenteAbdService service;
+    private AbdIncidentService service;
 
-    private Unidad unidad() {
-        return Unidad.builder().idUnidad(1).placa("ABC-1234").numeroDisco("001")
+    private Unit unidad() {
+        return Unit.builder().idUnidad(1).placa("ABC-1234").numeroDisco("001")
                 .modelo("Hiace").capacidad(14).anioFabricacion(2020).estado("Activo").build();
     }
 
-    private IncidenteAbd incidente(String nivel) {
-        return IncidenteAbd.builder().idIncidente(1).tipo("Choque")
+    private AbdIncident incidente(String nivel) {
+        return AbdIncident.builder().idIncidente(1).tipo("Choque")
                 .descripcion("Choque leve").nivelSugerido(nivel)
                 .fechaIncidente(LocalDateTime.now()).evidencia("foto.jpg")
                 .estado("Reportado").unidad(unidad()).build();
@@ -89,7 +89,7 @@ class IncidenteAbdServiceTest {
     @Test
     void crearNivelAltoGeneraAlerta() {
         when(unidadRepository.findById(1)).thenReturn(Optional.of(unidad()));
-        when(incidenteRepository.save(any(IncidenteAbd.class))).thenReturn(incidente("ALTO"));
+        when(incidenteRepository.save(any(AbdIncident.class))).thenReturn(incidente("ALTO"));
 
         assertNotNull(service.crear(request("ALTO", "foto.jpg", null)));
         verify(alertaRepository).save(any());
@@ -98,7 +98,7 @@ class IncidenteAbdServiceTest {
     @Test
     void crearNivelBajoNoGeneraAlerta() {
         when(unidadRepository.findById(1)).thenReturn(Optional.of(unidad()));
-        when(incidenteRepository.save(any(IncidenteAbd.class))).thenReturn(incidente("BAJO"));
+        when(incidenteRepository.save(any(AbdIncident.class))).thenReturn(incidente("BAJO"));
 
         assertNotNull(service.crear(request("BAJO", null, "Reportado")));
         verify(alertaRepository, never()).save(any());
@@ -113,10 +113,10 @@ class IncidenteAbdServiceTest {
 
     @Test
     void actualizarConEvidenciaYEstado() {
-        IncidenteAbd i = incidente("MEDIO");
+        AbdIncident i = incidente("MEDIO");
         when(incidenteRepository.findById(1)).thenReturn(Optional.of(i));
         when(unidadRepository.findById(1)).thenReturn(Optional.of(unidad()));
-        when(incidenteRepository.save(any(IncidenteAbd.class))).thenAnswer(a -> a.getArgument(0));
+        when(incidenteRepository.save(any(AbdIncident.class))).thenAnswer(a -> a.getArgument(0));
 
         AbdDtos.IncidenteAbdResponse r = service.actualizar(1, request("MEDIO", "nueva.jpg", "Cerrado"));
 
@@ -126,10 +126,10 @@ class IncidenteAbdServiceTest {
 
     @Test
     void actualizarSinEvidenciaNiEstadoMantiene() {
-        IncidenteAbd i = incidente("MEDIO");
+        AbdIncident i = incidente("MEDIO");
         when(incidenteRepository.findById(1)).thenReturn(Optional.of(i));
         when(unidadRepository.findById(1)).thenReturn(Optional.of(unidad()));
-        when(incidenteRepository.save(any(IncidenteAbd.class))).thenAnswer(a -> a.getArgument(0));
+        when(incidenteRepository.save(any(AbdIncident.class))).thenAnswer(a -> a.getArgument(0));
 
         AbdDtos.IncidenteAbdResponse r = service.actualizar(1, request("MEDIO", null, null));
 

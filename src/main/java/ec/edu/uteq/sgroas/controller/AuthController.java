@@ -4,11 +4,11 @@ import ec.edu.uteq.sgroas.dto.AuthResponse;
 import ec.edu.uteq.sgroas.dto.EmailRequest;
 import ec.edu.uteq.sgroas.dto.LoginRequest;
 import ec.edu.uteq.sgroas.dto.RefreshTokenRequest;
-import ec.edu.uteq.sgroas.dto.RestablecerContrasenaRequest;
-import ec.edu.uteq.sgroas.dto.SesionResponse;
-import ec.edu.uteq.sgroas.dto.VerificarEmailRequest;
-import ec.edu.uteq.sgroas.entity.Usuario;
-import ec.edu.uteq.sgroas.repository.UsuarioRepository;
+import ec.edu.uteq.sgroas.dto.ResetPasswordRequest;
+import ec.edu.uteq.sgroas.dto.SessionResponse;
+import ec.edu.uteq.sgroas.dto.VerifyEmailRequest;
+import ec.edu.uteq.sgroas.entity.User;
+import ec.edu.uteq.sgroas.repository.UserRepository;
 import ec.edu.uteq.sgroas.security.JwtService;
 import ec.edu.uteq.sgroas.security.LoginRateLimiter;
 import ec.edu.uteq.sgroas.service.AuthService;
@@ -36,7 +36,7 @@ public class AuthController {
     private final LoginRateLimiter loginRateLimiter;
     private final JwtService jwtService;
     private final TokenService tokenService;
-    private final UsuarioRepository usuarioRepository;
+    private final UserRepository usuarioRepository;
 
     @Value("${app.cookie.secure:false}")
     private boolean cookieSecure;
@@ -51,7 +51,7 @@ public class AuthController {
      * @return respuesta HTTP con el perfil de la sesión o estado no autorizado.
      */
     @GetMapping("/me")
-    public ResponseEntity<SesionResponse> me(
+    public ResponseEntity<SessionResponse> me(
             @CookieValue(name = "access_token", required = false) String accessTokenCookie,
             @RequestHeader(value = "Authorization", required = false) String authorizationHeader
     ) {
@@ -67,13 +67,13 @@ public class AuthController {
         if (email == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        Usuario usuario = usuarioRepository.findByEmail(email)
-                .filter(Usuario::getActivo)
+        User usuario = usuarioRepository.findByEmail(email)
+                .filter(User::getActivo)
                 .orElse(null);
         if (usuario == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return ResponseEntity.ok(new SesionResponse(
+        return ResponseEntity.ok(new SessionResponse(
                 usuario.getNombre(),
                 usuario.getEmail(),
                 usuario.getRol().name(),
@@ -128,7 +128,7 @@ public class AuthController {
      * @return respuesta HTTP con el perfil renovado y las nuevas galletas de seguridad.
      */
     @PostMapping("/refresh")
-    public ResponseEntity<SesionResponse> refresh(
+    public ResponseEntity<SessionResponse> refresh(
             @CookieValue(name = "refresh_token", required = false) String refreshCookie,
             @RequestBody(required = false) RefreshTokenRequest body
     ) {
@@ -152,8 +152,8 @@ public class AuthController {
      * @return respuesta HTTP con el perfil de la sesión recién activada.
      */
     @PostMapping("/verify-email")
-    public ResponseEntity<SesionResponse> verificarEmail(
-            @Valid @RequestBody VerificarEmailRequest request
+    public ResponseEntity<SessionResponse> verificarEmail(
+            @Valid @RequestBody VerifyEmailRequest request
     ) {
         AuthResponse response = authService.verificarEmail(request.email(), request.codigo());
         return ResponseEntity.ok()
@@ -201,7 +201,7 @@ public class AuthController {
      */
     @PostMapping("/reset-password")
     public ResponseEntity<Map<String, String>> restablecerContrasena(
-            @Valid @RequestBody RestablecerContrasenaRequest request
+            @Valid @RequestBody ResetPasswordRequest request
     ) {
         authService.restablecerContrasena(request.email(), request.codigo(), request.nuevaPassword());
         return ResponseEntity.ok(Map.of(
@@ -235,8 +235,8 @@ public class AuthController {
                 .build();
     }
 
-    private SesionResponse aSesion(AuthResponse response) {
-        return new SesionResponse(
+    private SessionResponse aSesion(AuthResponse response) {
+        return new SessionResponse(
                 response.nombre(),
                 response.email(),
                 response.rol(),

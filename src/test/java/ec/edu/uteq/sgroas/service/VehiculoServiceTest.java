@@ -1,10 +1,10 @@
 package ec.edu.uteq.sgroas.service;
 
-import ec.edu.uteq.sgroas.dto.VehiculoRequest;
-import ec.edu.uteq.sgroas.dto.VehiculoResponse;
-import ec.edu.uteq.sgroas.entity.EstadoVehiculo;
-import ec.edu.uteq.sgroas.entity.Vehiculo;
-import ec.edu.uteq.sgroas.repository.VehiculoRepository;
+import ec.edu.uteq.sgroas.dto.VehicleRequest;
+import ec.edu.uteq.sgroas.dto.VehicleResponse;
+import ec.edu.uteq.sgroas.entity.VehicleStatus;
+import ec.edu.uteq.sgroas.entity.Vehicle;
+import ec.edu.uteq.sgroas.repository.VehicleRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,13 +26,13 @@ import static org.mockito.Mockito.*;
 class VehiculoServiceTest {
 
     @Mock
-    private VehiculoRepository vehiculoRepository;
+    private VehicleRepository vehiculoRepository;
 
     @InjectMocks
-    private VehiculoService vehiculoService;
+    private VehicleService vehiculoService;
 
-    private Vehiculo vehiculoEjemplo() {
-        return Vehiculo.builder()
+    private Vehicle vehiculoEjemplo() {
+        return Vehicle.builder()
                 .id(1L)
                 .placa("GTU-001")
                 .marca("Toyota")
@@ -42,15 +42,15 @@ class VehiculoServiceTest {
                 .numeroMotor("MOT-123")
                 .numeroChasis("CHAS-123")
                 .color("Blanco")
-                .estado(EstadoVehiculo.ACTIVO)
+                .estado(VehicleStatus.ACTIVO)
                 .activo(true)
                 .creadoEn(Instant.now())
                 .actualizadoEn(Instant.now())
                 .build();
     }
 
-    private VehiculoRequest requestEjemplo() {
-        return new VehiculoRequest(
+    private VehicleRequest requestEjemplo() {
+        return new VehicleRequest(
                 "GTU-001", "Toyota", "Hiace", 2020, 14,
                 "MOT-123", "CHAS-123", "Blanco", "ACTIVO"
         );
@@ -59,11 +59,11 @@ class VehiculoServiceTest {
     @Test
     void listarDebeRetornarPagina() {
         PageRequest pageable = PageRequest.of(0, 10);
-        Vehiculo vehiculo = vehiculoEjemplo();
+        Vehicle vehiculo = vehiculoEjemplo();
         when(vehiculoRepository.findByActivoTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(vehiculo)));
 
-        Page<VehiculoResponse> pagina = vehiculoService.listar(pageable);
+        Page<VehicleResponse> pagina = vehiculoService.listar(pageable);
 
         assertEquals(1, pagina.getTotalElements());
         assertEquals("GTU-001", pagina.getContent().get(0).placa());
@@ -75,7 +75,7 @@ class VehiculoServiceTest {
         when(vehiculoRepository.findById(1L))
                 .thenReturn(Optional.of(vehiculoEjemplo()));
 
-        VehiculoResponse response = vehiculoService.buscarPorId(1L);
+        VehicleResponse response = vehiculoService.buscarPorId(1L);
 
         assertNotNull(response);
         assertEquals(1L, response.id());
@@ -93,14 +93,14 @@ class VehiculoServiceTest {
     @Test
     void crearDebeGuardarYRetornar() {
         when(vehiculoRepository.existsByPlaca("GTU-001")).thenReturn(false);
-        when(vehiculoRepository.save(any(Vehiculo.class)))
+        when(vehiculoRepository.save(any(Vehicle.class)))
                 .thenReturn(vehiculoEjemplo());
 
-        VehiculoResponse response = vehiculoService.crear(requestEjemplo());
+        VehicleResponse response = vehiculoService.crear(requestEjemplo());
 
         assertNotNull(response);
         assertEquals("GTU-001", response.placa());
-        verify(vehiculoRepository).save(any(Vehiculo.class));
+        verify(vehiculoRepository).save(any(Vehicle.class));
     }
 
     @Test
@@ -109,13 +109,13 @@ class VehiculoServiceTest {
 
         assertThrows(IllegalArgumentException.class,
                 () -> vehiculoService.crear(requestEjemplo()));
-        verify(vehiculoRepository, never()).save(any(Vehiculo.class));
+        verify(vehiculoRepository, never()).save(any(Vehicle.class));
     }
 
     @Test
     void crearConEstadoInvalidoDebeLanzarExcepcion() {
         when(vehiculoRepository.existsByPlaca("GTU-001")).thenReturn(false);
-        VehiculoRequest request = new VehiculoRequest(
+        VehicleRequest request = new VehicleRequest(
                 "GTU-001", "Toyota", "Hiace", 2020, 14,
                 "MOT-123", "CHAS-123", "Blanco", "INVALIDO"
         );
@@ -128,23 +128,23 @@ class VehiculoServiceTest {
     void actualizarDebeModificarYRetornar() {
         when(vehiculoRepository.findById(1L))
                 .thenReturn(Optional.of(vehiculoEjemplo()));
-        when(vehiculoRepository.save(any(Vehiculo.class)))
+        when(vehiculoRepository.save(any(Vehicle.class)))
                 .thenReturn(vehiculoEjemplo());
 
-        VehiculoResponse response = vehiculoService.actualizar(1L, requestEjemplo());
+        VehicleResponse response = vehiculoService.actualizar(1L, requestEjemplo());
 
         assertNotNull(response);
         assertEquals(1L, response.id());
-        verify(vehiculoRepository).save(any(Vehiculo.class));
+        verify(vehiculoRepository).save(any(Vehicle.class));
     }
 
     @Test
     void actualizarConPlacaDuplicadaDebeLanzarExcepcion() {
-        Vehiculo vehiculo = vehiculoEjemplo();
+        Vehicle vehiculo = vehiculoEjemplo();
         when(vehiculoRepository.findById(1L)).thenReturn(Optional.of(vehiculo));
         when(vehiculoRepository.existsByPlaca("GTU-999")).thenReturn(true);
 
-        VehiculoRequest request = new VehiculoRequest(
+        VehicleRequest request = new VehicleRequest(
                 "GTU-999", "Toyota", "Hiace", 2020, 14,
                 "MOT-123", "CHAS-123", "Blanco", "ACTIVO"
         );
@@ -161,6 +161,6 @@ class VehiculoServiceTest {
         vehiculoService.desactivar(1L);
 
         verify(vehiculoRepository).save(argThat(v ->
-                !v.getActivo() && v.getEstado() == EstadoVehiculo.FUERA_DE_SERVICIO));
+                !v.getActivo() && v.getEstado() == VehicleStatus.FUERA_DE_SERVICIO));
     }
 }

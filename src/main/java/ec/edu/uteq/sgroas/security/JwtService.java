@@ -1,6 +1,6 @@
 package ec.edu.uteq.sgroas.security;
 
-import ec.edu.uteq.sgroas.entity.Usuario;
+import ec.edu.uteq.sgroas.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -37,7 +37,7 @@ public class JwtService {
      * @param usuario entidad con correo, nombre y rol que se guardan en el token
      * @return token compacto listo para enviar en cabecera o cookie
      */
-    public String generarToken(Usuario usuario) {
+    public String generarToken(User usuario) {
         Date ahora = new Date();
         Date expiracion = new Date(ahora.getTime() + jwtExpirationMs);
         String jti = UUID.randomUUID().toString();

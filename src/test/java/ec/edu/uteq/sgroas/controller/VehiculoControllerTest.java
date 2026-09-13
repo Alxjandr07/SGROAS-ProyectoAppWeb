@@ -1,7 +1,7 @@
 package ec.edu.uteq.sgroas.controller;
 
-import ec.edu.uteq.sgroas.dto.VehiculoResponse;
-import ec.edu.uteq.sgroas.service.VehiculoService;
+import ec.edu.uteq.sgroas.dto.VehicleResponse;
+import ec.edu.uteq.sgroas.service.VehicleService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -29,10 +29,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class VehiculoControllerTest {
 
     @Mock
-    private VehiculoService vehiculoService;
+    private VehicleService vehiculoService;
 
     private MockMvc mockMvc() {
-        return MockMvcBuilders.standaloneSetup(new VehiculoController(vehiculoService))
+        return MockMvcBuilders.standaloneSetup(new VehicleController(vehiculoService))
                 .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .setMessageConverters(new MappingJackson2HttpMessageConverter(
                         Jackson2ObjectMapperBuilder.json()
@@ -42,8 +42,8 @@ class VehiculoControllerTest {
                 .build();
     }
 
-    private VehiculoResponse responseEjemplo() {
-        return new VehiculoResponse(
+    private VehicleResponse responseEjemplo() {
+        return new VehicleResponse(
                 1L, "GTU-001", "Toyota", "Hiace", 2020, 14,
                 "MOT-123", "CHAS-123", "Blanco", "ACTIVO", true,
                 Instant.now(), Instant.now()

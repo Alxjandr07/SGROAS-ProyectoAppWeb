@@ -1,7 +1,7 @@
 package ec.edu.uteq.sgroas.controller;
 
-import ec.edu.uteq.sgroas.dto.AsignacionRutaResponse;
-import ec.edu.uteq.sgroas.service.AsignacionRutaService;
+import ec.edu.uteq.sgroas.dto.RouteAssignmentResponse;
+import ec.edu.uteq.sgroas.service.RouteAssignmentService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -30,11 +30,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AsignacionRutaControllerTest {
 
     @Mock
-    private AsignacionRutaService asignacionRutaService;
+    private RouteAssignmentService asignacionRutaService;
 
     private MockMvc mockMvc() {
         return MockMvcBuilders.standaloneSetup(
-                new AsignacionRutaController(asignacionRutaService))
+                new RouteAssignmentController(asignacionRutaService))
                 .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .setMessageConverters(new MappingJackson2HttpMessageConverter(
                         Jackson2ObjectMapperBuilder.json()
@@ -44,8 +44,8 @@ class AsignacionRutaControllerTest {
                 .build();
     }
 
-    private AsignacionRutaResponse responseEjemplo() {
-        return new AsignacionRutaResponse(
+    private RouteAssignmentResponse responseEjemplo() {
+        return new RouteAssignmentResponse(
                 1L, 1L, "Carlos Mendoza", 1L, "GTU-001", 1L,
                 "Quito - Guayaquil", LocalDate.now(), LocalDate.now(),
                 LocalDate.now().plusDays(1), "ACTIVA", true,

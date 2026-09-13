@@ -1,8 +1,8 @@
 package ec.edu.uteq.sgroas.security;
 
-import ec.edu.uteq.sgroas.entity.Rol;
-import ec.edu.uteq.sgroas.entity.Usuario;
-import ec.edu.uteq.sgroas.repository.UsuarioRepository;
+import ec.edu.uteq.sgroas.entity.Role;
+import ec.edu.uteq.sgroas.entity.User;
+import ec.edu.uteq.sgroas.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,19 +22,19 @@ import static org.mockito.Mockito.when;
 class CustomUserDetailsServiceTest {
 
     @Mock
-    private UsuarioRepository usuarioRepository;
+    private UserRepository usuarioRepository;
 
     @InjectMocks
     private CustomUserDetailsService customUserDetailsService;
 
     @Test
     void loadUserByUsernameDebeRetornarUsuario() {
-        Usuario usuario = Usuario.builder()
+        User usuario = User.builder()
                 .id(1L)
                 .nombre("Administrador SGROAS")
                 .email("admin@sgroas.com")
                 .passwordHash("password-encriptado")
-                .rol(Rol.ROLE_ADMIN)
+                .rol(Role.ROLE_ADMIN)
                 .activo(true)
                 .creadoEn(Instant.now())
                 .actualizadoEn(Instant.now())
@@ -61,12 +61,12 @@ class CustomUserDetailsServiceTest {
 
     @Test
     void loadUserByUsernameConUsuarioInactivoDebeLanzarExcepcion() {
-        Usuario inactivo = Usuario.builder()
+        User inactivo = User.builder()
                 .id(1L)
                 .nombre("Administrador")
                 .email("admin@sgroas.com")
                 .passwordHash("hash")
-                .rol(Rol.ROLE_ADMIN)
+                .rol(Role.ROLE_ADMIN)
                 .activo(false)
                 .build();
         when(usuarioRepository.findByEmail("admin@sgroas.com"))

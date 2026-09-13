@@ -1,8 +1,8 @@
 package ec.edu.uteq.sgroas.abd.controller;
 
-import ec.edu.uteq.sgroas.abd.entity.Alerta;
-import ec.edu.uteq.sgroas.abd.entity.IncidenteAbd;
-import ec.edu.uteq.sgroas.abd.repository.AlertaRepository;
+import ec.edu.uteq.sgroas.abd.entity.Alert;
+import ec.edu.uteq.sgroas.abd.entity.AbdIncident;
+import ec.edu.uteq.sgroas.abd.repository.AlertRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -31,10 +31,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AlertaAbdControllerTest {
 
     @Mock
-    private AlertaRepository alertaRepository;
+    private AlertRepository alertaRepository;
 
     private MockMvc mockMvc() {
-        return MockMvcBuilders.standaloneSetup(new AlertaAbdController(alertaRepository))
+        return MockMvcBuilders.standaloneSetup(new AbdAlertController(alertaRepository))
                 .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .setMessageConverters(new MappingJackson2HttpMessageConverter(
                         Jackson2ObjectMapperBuilder.json()
@@ -46,9 +46,9 @@ class AlertaAbdControllerTest {
 
     @Test
     void listarConFechaEIncidenteMapeaTodo() throws Exception {
-        IncidenteAbd incidente = IncidenteAbd.builder()
+        AbdIncident incidente = AbdIncident.builder()
                 .idIncidente(7).tipo("Choque").build();
-        Alerta alerta = Alerta.builder().idAlerta(1).nivelRiesgo("ALTO")
+        Alert alerta = Alert.builder().idAlerta(1).nivelRiesgo("ALTO")
                 .descripcion("Riesgo alto").fecha(LocalDateTime.of(2026, 8, 1, 10, 0))
                 .incidente(incidente).build();
         when(alertaRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(alerta)));
@@ -61,7 +61,7 @@ class AlertaAbdControllerTest {
 
     @Test
     void listarConNulosMapeaNull() throws Exception {
-        Alerta alerta = Alerta.builder().idAlerta(2).nivelRiesgo("BAJO")
+        Alert alerta = Alert.builder().idAlerta(2).nivelRiesgo("BAJO")
                 .descripcion("Sin datos").build();
         when(alertaRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(alerta)));
 

@@ -1,10 +1,10 @@
 package ec.edu.uteq.sgroas.service;
 
-import ec.edu.uteq.sgroas.dto.UsuarioRequest;
-import ec.edu.uteq.sgroas.dto.UsuarioResponse;
-import ec.edu.uteq.sgroas.entity.Rol;
-import ec.edu.uteq.sgroas.entity.Usuario;
-import ec.edu.uteq.sgroas.repository.UsuarioRepository;
+import ec.edu.uteq.sgroas.dto.UserRequest;
+import ec.edu.uteq.sgroas.dto.UserResponse;
+import ec.edu.uteq.sgroas.entity.Role;
+import ec.edu.uteq.sgroas.entity.User;
+import ec.edu.uteq.sgroas.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,35 +28,35 @@ import static org.mockito.Mockito.*;
 class UsuarioServiceTest {
 
     @Mock
-    private UsuarioRepository usuarioRepository;
+    private UserRepository usuarioRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private CodigoVerificacionService codigoVerificacionService;
+    private VerificationCodeService codigoVerificacionService;
 
     @Mock
     private EmailService emailService;
 
     @InjectMocks
-    private UsuarioService usuarioService;
+    private UserService usuarioService;
 
-    private Usuario usuarioEjemplo() {
-        return Usuario.builder()
+    private User usuarioEjemplo() {
+        return User.builder()
                 .id(1L)
                 .nombre("Carlos Mendoza")
                 .email("carlos@sgroas.com")
                 .passwordHash("hash")
-                .rol(Rol.ROLE_ADMIN)
+                .rol(Role.ROLE_ADMIN)
                 .activo(true)
                 .creadoEn(Instant.now())
                 .actualizadoEn(Instant.now())
                 .build();
     }
 
-    private UsuarioRequest requestEjemplo() {
-        return new UsuarioRequest("Carlos Mendoza", "carlos@sgroas.com", "123456", "ROLE_ADMIN");
+    private UserRequest requestEjemplo() {
+        return new UserRequest("Carlos Mendoza", "carlos@sgroas.com", "123456", "ROLE_ADMIN");
     }
 
     @Test
@@ -65,7 +65,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.findByActivoTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(usuarioEjemplo())));
 
-        Page<UsuarioResponse> pagina = usuarioService.listar(null, pageable);
+        Page<UserResponse> pagina = usuarioService.listar(null, pageable);
 
         assertEquals(1, pagina.getTotalElements());
         assertEquals("ROLE_ADMIN", pagina.getContent().get(0).rol());
@@ -77,7 +77,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.buscarActivos("carlos", pageable))
                 .thenReturn(new PageImpl<>(List.of(usuarioEjemplo())));
 
-        Page<UsuarioResponse> pagina = usuarioService.listar("  Carlos  ", pageable);
+        Page<UserResponse> pagina = usuarioService.listar("  Carlos  ", pageable);
 
         assertEquals(1, pagina.getTotalElements());
         verify(usuarioRepository).buscarActivos("carlos", pageable);
@@ -90,7 +90,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.findByActivoTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(usuarioEjemplo())));
 
-        Page<UsuarioResponse> pagina = usuarioService.listar("   ", pageable);
+        Page<UserResponse> pagina = usuarioService.listar("   ", pageable);
 
         assertEquals(1, pagina.getTotalElements());
         verify(usuarioRepository).findByActivoTrue(pageable);
@@ -101,7 +101,7 @@ class UsuarioServiceTest {
     void buscarPorIdDebeRetornarUsuario() {
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioEjemplo()));
 
-        UsuarioResponse response = usuarioService.buscarPorId(1L);
+        UserResponse response = usuarioService.buscarPorId(1L);
 
         assertEquals(1L, response.id());
         assertEquals("carlos@sgroas.com", response.email());
@@ -119,15 +119,15 @@ class UsuarioServiceTest {
     void crearDebeGuardarSinVerificarYEnviarCodigoActivacion() {
         when(usuarioRepository.existsByEmail("carlos@sgroas.com")).thenReturn(false);
         when(passwordEncoder.encode("123456")).thenReturn("hash-encrypted");
-        when(usuarioRepository.save(any(Usuario.class))).thenAnswer(inv -> {
-            Usuario u = inv.getArgument(0);
+        when(usuarioRepository.save(any(User.class))).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
             u.setId(1L);
             return u;
         });
         when(codigoVerificacionService.generar("carlos@sgroas.com",
-                CodigoVerificacionService.Tipo.VERIFICACION)).thenReturn("123456");
+                VerificationCodeService.Tipo.VERIFICACION)).thenReturn("123456");
 
-        UsuarioResponse response = usuarioService.crear(requestEjemplo());
+        UserResponse response = usuarioService.crear(requestEjemplo());
 
         assertEquals("carlos@sgroas.com", response.email());
         verify(usuarioRepository).save(argThat(u ->
@@ -146,13 +146,13 @@ class UsuarioServiceTest {
 
     @Test
     void reenviarActivacionDebeEnviarNuevoCodigo() {
-        Usuario sinVerificar = usuarioEjemplo();
+        User sinVerificar = usuarioEjemplo();
         sinVerificar.setVerificado(false);
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(sinVerificar));
         when(codigoVerificacionService.puedeReenviar("carlos@sgroas.com",
-                CodigoVerificacionService.Tipo.VERIFICACION)).thenReturn(true);
+                VerificationCodeService.Tipo.VERIFICACION)).thenReturn(true);
         when(codigoVerificacionService.generar("carlos@sgroas.com",
-                CodigoVerificacionService.Tipo.VERIFICACION)).thenReturn("654321");
+                VerificationCodeService.Tipo.VERIFICACION)).thenReturn("654321");
 
         usuarioService.reenviarCodigoActivacion(1L);
 
@@ -170,11 +170,11 @@ class UsuarioServiceTest {
 
     @Test
     void reenviarActivacionDentroDeLaEsperaDebeLanzarExcepcion() {
-        Usuario sinVerificar = usuarioEjemplo();
+        User sinVerificar = usuarioEjemplo();
         sinVerificar.setVerificado(false);
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(sinVerificar));
         when(codigoVerificacionService.puedeReenviar("carlos@sgroas.com",
-                CodigoVerificacionService.Tipo.VERIFICACION)).thenReturn(false);
+                VerificationCodeService.Tipo.VERIFICACION)).thenReturn(false);
 
         assertThrows(IllegalArgumentException.class,
                 () -> usuarioService.reenviarCodigoActivacion(1L));
@@ -192,23 +192,23 @@ class UsuarioServiceTest {
     @Test
     void actualizarDebeModificarYRetornar() {
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioEjemplo()));
-        when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuarioEjemplo());
+        when(usuarioRepository.save(any(User.class))).thenReturn(usuarioEjemplo());
 
-        UsuarioResponse response = usuarioService.actualizar(1L, requestEjemplo());
+        UserResponse response = usuarioService.actualizar(1L, requestEjemplo());
 
         assertEquals(1L, response.id());
-        verify(usuarioRepository).save(any(Usuario.class));
+        verify(usuarioRepository).save(any(User.class));
     }
 
     @Test
     void actualizarSinPasswordDebeMantenerPasswordHash() {
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioEjemplo()));
-        when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuarioEjemplo());
+        when(usuarioRepository.save(any(User.class))).thenReturn(usuarioEjemplo());
 
-        UsuarioRequest request = new UsuarioRequest(
+        UserRequest request = new UserRequest(
                 "Carlos Mendoza", "carlos@sgroas.com", null, "ROLE_ADMIN");
 
-        UsuarioResponse response = usuarioService.actualizar(1L, request);
+        UserResponse response = usuarioService.actualizar(1L, request);
 
         assertEquals("Carlos Mendoza", response.nombre());
         verify(passwordEncoder, never()).encode(any());
@@ -217,12 +217,12 @@ class UsuarioServiceTest {
     @Test
     void actualizarConPasswordEnBlancoDebeMantenerPasswordHash() {
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioEjemplo()));
-        when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuarioEjemplo());
+        when(usuarioRepository.save(any(User.class))).thenReturn(usuarioEjemplo());
 
-        UsuarioRequest request = new UsuarioRequest(
+        UserRequest request = new UserRequest(
                 "Carlos Mendoza", "carlos@sgroas.com", "   ", "ROLE_ADMIN");
 
-        UsuarioResponse response = usuarioService.actualizar(1L, request);
+        UserResponse response = usuarioService.actualizar(1L, request);
 
         assertEquals("Carlos Mendoza", response.nombre());
         verify(passwordEncoder, never()).encode(any());

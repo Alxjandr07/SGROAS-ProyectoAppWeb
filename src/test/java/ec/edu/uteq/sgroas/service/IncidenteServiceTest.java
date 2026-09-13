@@ -1,10 +1,10 @@
 package ec.edu.uteq.sgroas.service;
 
-import ec.edu.uteq.sgroas.dto.IncidenteRequest;
-import ec.edu.uteq.sgroas.dto.IncidenteResponse;
+import ec.edu.uteq.sgroas.dto.IncidentRequest;
+import ec.edu.uteq.sgroas.dto.IncidentResponse;
 import ec.edu.uteq.sgroas.entity.*;
-import ec.edu.uteq.sgroas.repository.AsignacionRutaRepository;
-import ec.edu.uteq.sgroas.repository.IncidenteRepository;
+import ec.edu.uteq.sgroas.repository.RouteAssignmentRepository;
+import ec.edu.uteq.sgroas.repository.IncidentRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,63 +28,63 @@ import static org.mockito.Mockito.*;
 class IncidenteServiceTest {
 
     @Mock
-    private IncidenteRepository incidenteRepository;
+    private IncidentRepository incidenteRepository;
 
     @Mock
-    private AsignacionRutaRepository asignacionRutaRepository;
+    private RouteAssignmentRepository asignacionRutaRepository;
 
     @InjectMocks
-    private IncidenteService incidenteService;
+    private IncidentService incidenteService;
 
-    private AsignacionRuta asignacionEjemplo() {
-        Conductor conductor = Conductor.builder()
+    private RouteAssignment asignacionEjemplo() {
+        Driver conductor = Driver.builder()
                 .id(1L).nombres("Carlos").apellidos("Mendoza")
                 .cedula("1200000001").numeroLicencia("LIC-001")
                 .tipoLicencia("E").fechaVencimientoLicencia(LocalDate.now().plusDays(30))
                 .telefono("0988888888").email("carlos@sgroas.com")
-                .estado(EstadoConductor.ACTIVO).activo(true)
+                .estado(DriverStatus.ACTIVO).activo(true)
                 .creadoEn(Instant.now()).actualizadoEn(Instant.now())
                 .build();
-        Vehiculo vehiculo = Vehiculo.builder()
+        Vehicle vehiculo = Vehicle.builder()
                 .id(1L).placa("GTU-001").marca("Toyota").modelo("Hiace")
                 .anio(2020).capacidadPasajeros(14).numeroMotor("MOT")
                 .numeroChasis("CHAS").color("Blanco")
-                .estado(EstadoVehiculo.ACTIVO).activo(true)
+                .estado(VehicleStatus.ACTIVO).activo(true)
                 .creadoEn(Instant.now()).actualizadoEn(Instant.now())
                 .build();
-        Ruta ruta = Ruta.builder()
+        Route ruta = Route.builder()
                 .id(1L).codigo("R-001").nombre("Quito-Guayaquil")
                 .origen("Quito").destino("Guayaquil").distanciaKm(420.0)
-                .duracionEstimadaMin(480).estado(EstadoRuta.ACTIVA).activo(true)
+                .duracionEstimadaMin(480).estado(RouteStatus.ACTIVA).activo(true)
                 .creadoEn(Instant.now()).actualizadoEn(Instant.now())
                 .build();
-        return AsignacionRuta.builder()
+        return RouteAssignment.builder()
                 .id(1L).conductor(conductor).vehiculo(vehiculo).ruta(ruta)
                 .fechaAsignacion(LocalDate.now()).fechaInicio(LocalDate.now())
-                .fechaFin(LocalDate.now().plusDays(1)).estado(EstadoAsignacion.ACTIVA)
+                .fechaFin(LocalDate.now().plusDays(1)).estado(AssignmentStatus.ACTIVA)
                 .activo(true).creadoEn(Instant.now()).actualizadoEn(Instant.now())
                 .build();
     }
 
-    private Incidente incidenteEjemplo() {
-        return Incidente.builder()
+    private Incident incidenteEjemplo() {
+        return Incident.builder()
                 .id(1L)
                 .asignacion(asignacionEjemplo())
                 .reportadoPor("Carlos Mendoza")
-                .tipo(TipoIncidente.AVERIA_MECANICA)
+                .tipo(IncidentType.AVERIA_MECANICA)
                 .descripcion("Falla en el motor")
                 .fechaIncidente(LocalDateTime.now())
                 .ubicacion("Km 12 Via Quito")
-                .gravedad(GravedadIncidente.MEDIA)
-                .estado(EstadoIncidente.REPORTADO)
+                .gravedad(IncidentSeverity.MEDIA)
+                .estado(IncidentStatus.REPORTADO)
                 .activo(true)
                 .creadoEn(Instant.now())
                 .actualizadoEn(Instant.now())
                 .build();
     }
 
-    private IncidenteRequest requestEjemplo() {
-        return new IncidenteRequest(
+    private IncidentRequest requestEjemplo() {
+        return new IncidentRequest(
                 1L, "Carlos Mendoza", "AVERIA_MECANICA", "Falla en el motor",
                 LocalDateTime.now(), "Km 12 Via Quito", "MEDIA", "REPORTADO"
         );
@@ -96,7 +96,7 @@ class IncidenteServiceTest {
         when(incidenteRepository.findByActivoTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(incidenteEjemplo())));
 
-        Page<IncidenteResponse> pagina = incidenteService.listar(pageable);
+        Page<IncidentResponse> pagina = incidenteService.listar(pageable);
 
         assertEquals(1, pagina.getTotalElements());
         assertEquals("AVERIA_MECANICA", pagina.getContent().get(0).tipo());
@@ -106,7 +106,7 @@ class IncidenteServiceTest {
     void buscarPorIdDebeRetornarIncidente() {
         when(incidenteRepository.findById(1L)).thenReturn(Optional.of(incidenteEjemplo()));
 
-        IncidenteResponse response = incidenteService.buscarPorId(1L);
+        IncidentResponse response = incidenteService.buscarPorId(1L);
 
         assertEquals(1L, response.id());
         assertEquals(1L, response.asignacionId());
@@ -124,21 +124,21 @@ class IncidenteServiceTest {
     void crearDebeGuardarYRetornar() {
         when(asignacionRutaRepository.findById(1L))
                 .thenReturn(Optional.of(asignacionEjemplo()));
-        when(incidenteRepository.save(any(Incidente.class)))
+        when(incidenteRepository.save(any(Incident.class)))
                 .thenReturn(incidenteEjemplo());
 
-        IncidenteResponse response = incidenteService.crear(requestEjemplo());
+        IncidentResponse response = incidenteService.crear(requestEjemplo());
 
         assertNotNull(response);
         assertEquals("MEDIA", response.gravedad());
-        verify(incidenteRepository).save(any(Incidente.class));
+        verify(incidenteRepository).save(any(Incident.class));
     }
 
     @Test
     void crearConAsignacionInexistenteDebeLanzarExcepcion() {
         when(asignacionRutaRepository.findById(99L)).thenReturn(Optional.empty());
 
-        IncidenteRequest request = new IncidenteRequest(
+        IncidentRequest request = new IncidentRequest(
                 99L, "Carlos Mendoza", "AVERIA_MECANICA", "Falla",
                 LocalDateTime.now(), "Km 12", "MEDIA", "REPORTADO"
         );
@@ -152,7 +152,7 @@ class IncidenteServiceTest {
         when(asignacionRutaRepository.findById(1L))
                 .thenReturn(Optional.of(asignacionEjemplo()));
 
-        IncidenteRequest request = new IncidenteRequest(
+        IncidentRequest request = new IncidentRequest(
                 1L, "Carlos Mendoza", "TIPO_INVALIDO", "Falla",
                 LocalDateTime.now(), "Km 12", "MEDIA", "REPORTADO"
         );
@@ -166,7 +166,7 @@ class IncidenteServiceTest {
         when(asignacionRutaRepository.findById(1L))
                 .thenReturn(Optional.of(asignacionEjemplo()));
 
-        IncidenteRequest request = new IncidenteRequest(
+        IncidentRequest request = new IncidentRequest(
                 1L, "Carlos Mendoza", "AVERIA_MECANICA", "Falla",
                 LocalDateTime.now(), "Km 12", "INVALIDA", "REPORTADO"
         );
@@ -180,7 +180,7 @@ class IncidenteServiceTest {
         when(asignacionRutaRepository.findById(1L))
                 .thenReturn(Optional.of(asignacionEjemplo()));
 
-        IncidenteRequest request = new IncidenteRequest(
+        IncidentRequest request = new IncidentRequest(
                 1L, "Carlos Mendoza", "AVERIA_MECANICA", "Falla",
                 LocalDateTime.now(), "Km 12", "MEDIA", "INVALIDO"
         );
@@ -194,13 +194,13 @@ class IncidenteServiceTest {
         when(incidenteRepository.findById(1L)).thenReturn(Optional.of(incidenteEjemplo()));
         when(asignacionRutaRepository.findById(1L))
                 .thenReturn(Optional.of(asignacionEjemplo()));
-        when(incidenteRepository.save(any(Incidente.class)))
+        when(incidenteRepository.save(any(Incident.class)))
                 .thenReturn(incidenteEjemplo());
 
-        IncidenteResponse response = incidenteService.actualizar(1L, requestEjemplo());
+        IncidentResponse response = incidenteService.actualizar(1L, requestEjemplo());
 
         assertEquals(1L, response.id());
-        verify(incidenteRepository).save(any(Incidente.class));
+        verify(incidenteRepository).save(any(Incident.class));
     }
 
     @Test
@@ -210,6 +210,6 @@ class IncidenteServiceTest {
         incidenteService.desactivar(1L);
 
         verify(incidenteRepository).save(argThat(i ->
-                !i.getActivo() && i.getEstado() == EstadoIncidente.CERRADO));
+                !i.getActivo() && i.getEstado() == IncidentStatus.CERRADO));
     }
 }

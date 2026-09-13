@@ -1,8 +1,8 @@
 package ec.edu.uteq.sgroas.service;
 
-import ec.edu.uteq.sgroas.entity.CodigoVerificacion;
-import ec.edu.uteq.sgroas.repository.CodigoVerificacionRepository;
-import ec.edu.uteq.sgroas.service.CodigoVerificacionService.Tipo;
+import ec.edu.uteq.sgroas.entity.VerificationCode;
+import ec.edu.uteq.sgroas.repository.VerificationCodeRepository;
+import ec.edu.uteq.sgroas.service.VerificationCodeService.Tipo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,10 +24,10 @@ class CodigoVerificacionServiceTest {
     private static final String EMAIL = "carlos@sgroas.com";
 
     @Mock
-    private CodigoVerificacionRepository repository;
+    private VerificationCodeRepository repository;
 
     @InjectMocks
-    private CodigoVerificacionService service;
+    private VerificationCodeService service;
 
     private String sha256(String texto) {
         try {
@@ -44,8 +44,8 @@ class CodigoVerificacionServiceTest {
         }
     }
 
-    private CodigoVerificacion registro(String codigoClaro) {
-        return CodigoVerificacion.builder()
+    private VerificationCode registro(String codigoClaro) {
+        return VerificationCode.builder()
                 .id(1L)
                 .email(EMAIL)
                 .codigoHash(sha256(codigoClaro))
@@ -59,7 +59,7 @@ class CodigoVerificacionServiceTest {
 
     @Test
     void generarDebeInvalidarAnterioresYGuardarNuevo() {
-        when(repository.save(any(CodigoVerificacion.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(repository.save(any(VerificationCode.class))).thenAnswer(inv -> inv.getArgument(0));
 
         String codigo = service.generar(EMAIL, Tipo.VERIFICACION);
 
@@ -82,7 +82,7 @@ class CodigoVerificacionServiceTest {
 
     @Test
     void puedeReenviarConCodigoRecienteDebeSerFalse() {
-        CodigoVerificacion reciente = registro("123456");
+        VerificationCode reciente = registro("123456");
         reciente.setCreadoEn(Instant.now().minusSeconds(10));
         when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
                 EMAIL, Tipo.VERIFICACION.name())).thenReturn(Optional.of(reciente));
@@ -92,7 +92,7 @@ class CodigoVerificacionServiceTest {
 
     @Test
     void puedeReenviarConCodigoAntiguoDebeSerTrue() {
-        CodigoVerificacion antiguo = registro("123456");
+        VerificationCode antiguo = registro("123456");
         antiguo.setCreadoEn(Instant.now().minusSeconds(120));
         when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
                 EMAIL, Tipo.VERIFICACION.name())).thenReturn(Optional.of(antiguo));
@@ -107,12 +107,12 @@ class CodigoVerificacionServiceTest {
 
         service.validar(EMAIL, Tipo.VERIFICACION, "123456");
 
-        verify(repository).save(argThat(CodigoVerificacion::isUsado));
+        verify(repository).save(argThat(VerificationCode::isUsado));
     }
 
     @Test
     void validarCodigoIncorrectoDebeIncrementarIntentosYFallar() {
-        CodigoVerificacion reg = registro("123456");
+        VerificationCode reg = registro("123456");
         when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
                 EMAIL, Tipo.VERIFICACION.name())).thenReturn(Optional.of(reg));
 
@@ -132,7 +132,7 @@ class CodigoVerificacionServiceTest {
 
     @Test
     void validarCodigoYaUsadoDebeFallar() {
-        CodigoVerificacion usado = registro("123456");
+        VerificationCode usado = registro("123456");
         usado.setUsado(true);
         when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
                 EMAIL, Tipo.VERIFICACION.name())).thenReturn(Optional.of(usado));
@@ -143,7 +143,7 @@ class CodigoVerificacionServiceTest {
 
     @Test
     void validarCodigoExpiradoDebeFallar() {
-        CodigoVerificacion expirado = registro("123456");
+        VerificationCode expirado = registro("123456");
         expirado.setExpiraEn(Instant.now().minusSeconds(60));
         when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
                 EMAIL, Tipo.VERIFICACION.name())).thenReturn(Optional.of(expirado));
@@ -154,7 +154,7 @@ class CodigoVerificacionServiceTest {
 
     @Test
     void validarConIntentosAgotadosDebeFallar() {
-        CodigoVerificacion agotado = registro("123456");
+        VerificationCode agotado = registro("123456");
         agotado.setIntentos(5);
         when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
                 EMAIL, Tipo.VERIFICACION.name())).thenReturn(Optional.of(agotado));

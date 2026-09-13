@@ -1,8 +1,8 @@
 package ec.edu.uteq.sgroas.abd.service;
 
 import ec.edu.uteq.sgroas.abd.dto.AbdDtos;
-import ec.edu.uteq.sgroas.abd.entity.Unidad;
-import ec.edu.uteq.sgroas.abd.repository.UnidadRepository;
+import ec.edu.uteq.sgroas.abd.entity.Unit;
+import ec.edu.uteq.sgroas.abd.repository.UnitRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,13 +23,13 @@ import static org.mockito.Mockito.*;
 class UnidadAbdServiceTest {
 
     @Mock
-    private UnidadRepository unidadRepository;
+    private UnitRepository unidadRepository;
 
     @InjectMocks
-    private UnidadAbdService service;
+    private AbdUnitService service;
 
-    private Unidad unidadEjemplo() {
-        return Unidad.builder()
+    private Unit unidadEjemplo() {
+        return Unit.builder()
                 .idUnidad(1).placa("ABC-1234").numeroDisco("001")
                 .modelo("Hiace").capacidad(14).anioFabricacion(2020)
                 .estado("Activo").build();
@@ -86,12 +86,12 @@ class UnidadAbdServiceTest {
     void crearConEstadoNuloUsaActivoPorDefecto() {
         when(unidadRepository.existsByPlacaIgnoreCase("ABC-1234")).thenReturn(false);
         when(unidadRepository.existsByNumeroDiscoIgnoreCase("001")).thenReturn(false);
-        when(unidadRepository.save(any(Unidad.class))).thenReturn(unidadEjemplo());
+        when(unidadRepository.save(any(Unit.class))).thenReturn(unidadEjemplo());
 
         AbdDtos.UnidadResponse r = service.crear(requestEjemplo(null));
 
         assertNotNull(r);
-        verify(unidadRepository).save(any(Unidad.class));
+        verify(unidadRepository).save(any(Unit.class));
     }
 
     @Test
@@ -112,9 +112,9 @@ class UnidadAbdServiceTest {
 
     @Test
     void actualizarSinEstadoMantieneActual() {
-        Unidad actual = unidadEjemplo();
+        Unit actual = unidadEjemplo();
         when(unidadRepository.findById(1)).thenReturn(Optional.of(actual));
-        when(unidadRepository.save(any(Unidad.class))).thenReturn(actual);
+        when(unidadRepository.save(any(Unit.class))).thenReturn(actual);
 
         AbdDtos.UnidadResponse r = service.actualizar(1, requestEjemplo(null));
 
@@ -124,13 +124,13 @@ class UnidadAbdServiceTest {
 
     @Test
     void actualizarConEstadoLoCambia() {
-        Unidad actual = unidadEjemplo();
+        Unit actual = unidadEjemplo();
         actual.setPlaca("XYZ-9999");
         actual.setNumeroDisco("009");
         when(unidadRepository.findById(1)).thenReturn(Optional.of(actual));
         when(unidadRepository.existsByPlacaIgnoreCase("ABC-1234")).thenReturn(false);
         when(unidadRepository.existsByNumeroDiscoIgnoreCase("001")).thenReturn(false);
-        when(unidadRepository.save(any(Unidad.class))).thenAnswer(i -> i.getArgument(0));
+        when(unidadRepository.save(any(Unit.class))).thenAnswer(i -> i.getArgument(0));
 
         AbdDtos.UnidadResponse r = service.actualizar(1, requestEjemplo("Inactivo"));
 
@@ -139,7 +139,7 @@ class UnidadAbdServiceTest {
 
     @Test
     void actualizarPlacaDuplicadaFalla() {
-        Unidad actual = unidadEjemplo();
+        Unit actual = unidadEjemplo();
         actual.setPlaca("OTRA-0000");
         when(unidadRepository.findById(1)).thenReturn(Optional.of(actual));
         when(unidadRepository.existsByPlacaIgnoreCase("ABC-1234")).thenReturn(true);
@@ -149,7 +149,7 @@ class UnidadAbdServiceTest {
 
     @Test
     void actualizarDiscoDuplicadoFalla() {
-        Unidad actual = unidadEjemplo();
+        Unit actual = unidadEjemplo();
         actual.setNumeroDisco("009");
         when(unidadRepository.findById(1)).thenReturn(Optional.of(actual));
         when(unidadRepository.existsByNumeroDiscoIgnoreCase("001")).thenReturn(true);

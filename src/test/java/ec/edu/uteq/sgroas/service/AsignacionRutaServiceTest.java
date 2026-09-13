@@ -1,12 +1,12 @@
 package ec.edu.uteq.sgroas.service;
 
-import ec.edu.uteq.sgroas.dto.AsignacionRutaRequest;
-import ec.edu.uteq.sgroas.dto.AsignacionRutaResponse;
+import ec.edu.uteq.sgroas.dto.RouteAssignmentRequest;
+import ec.edu.uteq.sgroas.dto.RouteAssignmentResponse;
 import ec.edu.uteq.sgroas.entity.*;
-import ec.edu.uteq.sgroas.repository.AsignacionRutaRepository;
-import ec.edu.uteq.sgroas.repository.ConductorRepository;
-import ec.edu.uteq.sgroas.repository.RutaRepository;
-import ec.edu.uteq.sgroas.repository.VehiculoRepository;
+import ec.edu.uteq.sgroas.repository.RouteAssignmentRepository;
+import ec.edu.uteq.sgroas.repository.DriverRepository;
+import ec.edu.uteq.sgroas.repository.RouteRepository;
+import ec.edu.uteq.sgroas.repository.VehicleRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,62 +29,62 @@ import static org.mockito.Mockito.*;
 class AsignacionRutaServiceTest {
 
     @Mock
-    private AsignacionRutaRepository asignacionRutaRepository;
+    private RouteAssignmentRepository asignacionRutaRepository;
 
     @Mock
-    private ConductorRepository conductorRepository;
+    private DriverRepository conductorRepository;
 
     @Mock
-    private VehiculoRepository vehiculoRepository;
+    private VehicleRepository vehiculoRepository;
 
     @Mock
-    private RutaRepository rutaRepository;
+    private RouteRepository rutaRepository;
 
     @InjectMocks
-    private AsignacionRutaService asignacionRutaService;
+    private RouteAssignmentService asignacionRutaService;
 
-    private Conductor conductorEjemplo() {
-        return Conductor.builder()
+    private Driver conductorEjemplo() {
+        return Driver.builder()
                 .id(1L).nombres("Carlos").apellidos("Mendoza")
                 .cedula("1200000001").numeroLicencia("LIC-001")
                 .tipoLicencia("E").fechaVencimientoLicencia(LocalDate.now().plusDays(30))
                 .telefono("0988888888").email("carlos@sgroas.com")
-                .estado(EstadoConductor.ACTIVO).activo(true)
+                .estado(DriverStatus.ACTIVO).activo(true)
                 .creadoEn(Instant.now()).actualizadoEn(Instant.now())
                 .build();
     }
 
-    private Vehiculo vehiculoEjemplo() {
-        return Vehiculo.builder()
+    private Vehicle vehiculoEjemplo() {
+        return Vehicle.builder()
                 .id(1L).placa("GTU-001").marca("Toyota").modelo("Hiace")
                 .anio(2020).capacidadPasajeros(14).numeroMotor("MOT")
                 .numeroChasis("CHAS").color("Blanco")
-                .estado(EstadoVehiculo.ACTIVO).activo(true)
+                .estado(VehicleStatus.ACTIVO).activo(true)
                 .creadoEn(Instant.now()).actualizadoEn(Instant.now())
                 .build();
     }
 
-    private Ruta rutaEjemplo() {
-        return Ruta.builder()
+    private Route rutaEjemplo() {
+        return Route.builder()
                 .id(1L).codigo("R-001").nombre("Quito-Guayaquil")
                 .origen("Quito").destino("Guayaquil").distanciaKm(420.0)
-                .duracionEstimadaMin(480).estado(EstadoRuta.ACTIVA).activo(true)
+                .duracionEstimadaMin(480).estado(RouteStatus.ACTIVA).activo(true)
                 .creadoEn(Instant.now()).actualizadoEn(Instant.now())
                 .build();
     }
 
-    private AsignacionRuta asignacionEjemplo() {
-        return AsignacionRuta.builder()
+    private RouteAssignment asignacionEjemplo() {
+        return RouteAssignment.builder()
                 .id(1L).conductor(conductorEjemplo()).vehiculo(vehiculoEjemplo())
                 .ruta(rutaEjemplo()).fechaAsignacion(LocalDate.now())
                 .fechaInicio(LocalDate.now()).fechaFin(LocalDate.now().plusDays(1))
-                .estado(EstadoAsignacion.ACTIVA).activo(true)
+                .estado(AssignmentStatus.ACTIVA).activo(true)
                 .creadoEn(Instant.now()).actualizadoEn(Instant.now())
                 .build();
     }
 
-    private AsignacionRutaRequest requestEjemplo() {
-        return new AsignacionRutaRequest(
+    private RouteAssignmentRequest requestEjemplo() {
+        return new RouteAssignmentRequest(
                 1L, 1L, 1L, LocalDate.now(), LocalDate.now(),
                 LocalDate.now().plusDays(1), "ACTIVA"
         );
@@ -96,7 +96,7 @@ class AsignacionRutaServiceTest {
         when(asignacionRutaRepository.findByActivoTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(asignacionEjemplo())));
 
-        Page<AsignacionRutaResponse> pagina = asignacionRutaService.listar(pageable);
+        Page<RouteAssignmentResponse> pagina = asignacionRutaService.listar(pageable);
 
         assertEquals(1, pagina.getTotalElements());
         assertEquals("Carlos Mendoza", pagina.getContent().get(0).conductorNombre());
@@ -109,7 +109,7 @@ class AsignacionRutaServiceTest {
         when(asignacionRutaRepository.findWithDetalle(1L))
                 .thenReturn(Optional.of(asignacionEjemplo()));
 
-        AsignacionRutaResponse response = asignacionRutaService.buscarPorId(1L);
+        RouteAssignmentResponse response = asignacionRutaService.buscarPorId(1L);
 
         assertEquals(1L, response.id());
         assertEquals("ACTIVA", response.estado());
@@ -128,14 +128,14 @@ class AsignacionRutaServiceTest {
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductorEjemplo()));
         when(vehiculoRepository.findById(1L)).thenReturn(Optional.of(vehiculoEjemplo()));
         when(rutaRepository.findById(1L)).thenReturn(Optional.of(rutaEjemplo()));
-        when(asignacionRutaRepository.save(any(AsignacionRuta.class)))
+        when(asignacionRutaRepository.save(any(RouteAssignment.class)))
                 .thenReturn(asignacionEjemplo());
 
-        AsignacionRutaResponse response = asignacionRutaService.crear(requestEjemplo());
+        RouteAssignmentResponse response = asignacionRutaService.crear(requestEjemplo());
 
         assertNotNull(response);
         assertEquals(1L, response.id());
-        verify(asignacionRutaRepository).save(any(AsignacionRuta.class));
+        verify(asignacionRutaRepository).save(any(RouteAssignment.class));
     }
 
     @Test
@@ -171,7 +171,7 @@ class AsignacionRutaServiceTest {
         when(vehiculoRepository.findById(1L)).thenReturn(Optional.of(vehiculoEjemplo()));
         when(rutaRepository.findById(1L)).thenReturn(Optional.of(rutaEjemplo()));
 
-        AsignacionRutaRequest request = new AsignacionRutaRequest(
+        RouteAssignmentRequest request = new RouteAssignmentRequest(
                 1L, 1L, 1L, LocalDate.now(), LocalDate.now(),
                 LocalDate.now().plusDays(1), "INVALIDO"
         );
@@ -187,13 +187,13 @@ class AsignacionRutaServiceTest {
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductorEjemplo()));
         when(vehiculoRepository.findById(1L)).thenReturn(Optional.of(vehiculoEjemplo()));
         when(rutaRepository.findById(1L)).thenReturn(Optional.of(rutaEjemplo()));
-        when(asignacionRutaRepository.save(any(AsignacionRuta.class)))
+        when(asignacionRutaRepository.save(any(RouteAssignment.class)))
                 .thenReturn(asignacionEjemplo());
 
-        AsignacionRutaResponse response = asignacionRutaService.actualizar(1L, requestEjemplo());
+        RouteAssignmentResponse response = asignacionRutaService.actualizar(1L, requestEjemplo());
 
         assertEquals(1L, response.id());
-        verify(asignacionRutaRepository).save(any(AsignacionRuta.class));
+        verify(asignacionRutaRepository).save(any(RouteAssignment.class));
     }
 
     @Test
@@ -204,6 +204,6 @@ class AsignacionRutaServiceTest {
         asignacionRutaService.desactivar(1L);
 
         verify(asignacionRutaRepository).save(argThat(a ->
-                !a.getActivo() && a.getEstado() == EstadoAsignacion.CANCELADA));
+                !a.getActivo() && a.getEstado() == AssignmentStatus.CANCELADA));
     }
 }

@@ -1,10 +1,10 @@
 package ec.edu.uteq.sgroas.service;
 
-import ec.edu.uteq.sgroas.dto.ConductorRequest;
-import ec.edu.uteq.sgroas.dto.ConductorResponse;
-import ec.edu.uteq.sgroas.entity.Conductor;
-import ec.edu.uteq.sgroas.entity.EstadoConductor;
-import ec.edu.uteq.sgroas.repository.ConductorRepository;
+import ec.edu.uteq.sgroas.dto.DriverRequest;
+import ec.edu.uteq.sgroas.dto.DriverResponse;
+import ec.edu.uteq.sgroas.entity.Driver;
+import ec.edu.uteq.sgroas.entity.DriverStatus;
+import ec.edu.uteq.sgroas.repository.DriverRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,13 +23,13 @@ import static org.mockito.Mockito.*;
 class ConductorServiceTest {
 
     @Mock
-    private ConductorRepository conductorRepository;
+    private DriverRepository conductorRepository;
 
     @InjectMocks
-    private ConductorService conductorService;
+    private DriverService conductorService;
 
-    private Conductor conductorBase() {
-        return Conductor.builder()
+    private Driver conductorBase() {
+        return Driver.builder()
                 .id(1L)
                 .nombres("Carlos Alberto")
                 .apellidos("Mendoza Vera")
@@ -39,15 +39,15 @@ class ConductorServiceTest {
                 .fechaVencimientoLicencia(LocalDate.now().plusDays(20))
                 .telefono("0988888888")
                 .email("carlos.mendoza@sgroas.com")
-                .estado(EstadoConductor.ACTIVO)
+                .estado(DriverStatus.ACTIVO)
                 .activo(true)
                 .creadoEn(Instant.now())
                 .actualizadoEn(Instant.now())
                 .build();
     }
 
-    private ConductorRequest requestBase() {
-        return new ConductorRequest(
+    private DriverRequest requestBase() {
+        return new DriverRequest(
                 "Carlos Alberto",
                 "Mendoza Vera",
                 "1200000001",
@@ -62,7 +62,7 @@ class ConductorServiceTest {
 
     @Test
     void crearConductorCorrectamente() {
-        ConductorRequest request = new ConductorRequest(
+        DriverRequest request = new DriverRequest(
                 "Carlos Alberto",
                 "Mendoza Vera",
                 "1200000001",
@@ -74,7 +74,7 @@ class ConductorServiceTest {
                 "ACTIVO"
         );
 
-        Conductor conductorGuardado = Conductor.builder()
+        Driver conductorGuardado = Driver.builder()
                 .id(1L)
                 .nombres("Carlos Alberto")
                 .apellidos("Mendoza Vera")
@@ -84,7 +84,7 @@ class ConductorServiceTest {
                 .fechaVencimientoLicencia(LocalDate.of(2026, 7, 15))
                 .telefono("0988888888")
                 .email("carlos.mendoza@sgroas.com")
-                .estado(EstadoConductor.ACTIVO)
+                .estado(DriverStatus.ACTIVO)
                 .activo(true)
                 .creadoEn(Instant.now())
                 .actualizadoEn(Instant.now())
@@ -94,22 +94,22 @@ class ConductorServiceTest {
                 .thenReturn(false);
         when(conductorRepository.existsByNumeroLicencia("LIC-001-2026"))
                 .thenReturn(false);
-        when(conductorRepository.save(any(Conductor.class)))
+        when(conductorRepository.save(any(Driver.class)))
                 .thenReturn(conductorGuardado);
 
-        ConductorResponse response = conductorService.crear(request);
+        DriverResponse response = conductorService.crear(request);
 
         assertNotNull(response);
         assertEquals(1L, response.id());
         assertEquals("Carlos Alberto", response.nombres());
         assertEquals("1200000001", response.cedula());
         assertEquals("ACTIVO", response.estado());
-        verify(conductorRepository).save(any(Conductor.class));
+        verify(conductorRepository).save(any(Driver.class));
     }
 
     @Test
     void crearConductorConCedulaDuplicadaDebeLanzarExcepcion() {
-        ConductorRequest request = new ConductorRequest(
+        DriverRequest request = new DriverRequest(
                 "Carlos Alberto",
                 "Mendoza Vera",
                 "1200000001",
@@ -130,12 +130,12 @@ class ConductorServiceTest {
         );
 
         assertEquals("Ya existe un conductor con esa cedula", exception.getMessage());
-        verify(conductorRepository, never()).save(any(Conductor.class));
+        verify(conductorRepository, never()).save(any(Driver.class));
     }
 
     @Test
     void buscarConductorPorIdCorrectamente() {
-        Conductor conductor = Conductor.builder()
+        Driver conductor = Driver.builder()
                 .id(1L)
                 .nombres("Carlos Alberto")
                 .apellidos("Mendoza Vera")
@@ -145,7 +145,7 @@ class ConductorServiceTest {
                 .fechaVencimientoLicencia(LocalDate.now().plusDays(20))
                 .telefono("0988888888")
                 .email("carlos.mendoza@sgroas.com")
-                .estado(EstadoConductor.ACTIVO)
+                .estado(DriverStatus.ACTIVO)
                 .activo(true)
                 .creadoEn(Instant.now())
                 .actualizadoEn(Instant.now())
@@ -154,7 +154,7 @@ class ConductorServiceTest {
         when(conductorRepository.findById(1L))
                 .thenReturn(Optional.of(conductor));
 
-        ConductorResponse response = conductorService.buscarPorId(1L);
+        DriverResponse response = conductorService.buscarPorId(1L);
 
         assertNotNull(response);
         assertEquals(1L, response.id());
@@ -208,7 +208,7 @@ class ConductorServiceTest {
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductorBase()));
         when(conductorRepository.existsByCedula("0999999999")).thenReturn(true);
 
-        ConductorRequest request = new ConductorRequest(
+        DriverRequest request = new DriverRequest(
                 "Carlos Alberto", "Mendoza Vera", "0999999999", "LIC-001-2026",
                 "E", LocalDate.now().plusDays(20), "0988888888",
                 "carlos.mendoza@sgroas.com", "ACTIVO");
@@ -222,7 +222,7 @@ class ConductorServiceTest {
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductorBase()));
         when(conductorRepository.existsByNumeroLicencia("LIC-999-2026")).thenReturn(true);
 
-        ConductorRequest request = new ConductorRequest(
+        DriverRequest request = new DriverRequest(
                 "Carlos Alberto", "Mendoza Vera", "1200000001", "LIC-999-2026",
                 "E", LocalDate.now().plusDays(20), "0988888888",
                 "carlos.mendoza@sgroas.com", "ACTIVO");
@@ -234,13 +234,13 @@ class ConductorServiceTest {
     @Test
     void actualizarDebeModificarYGuardar() {
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductorBase()));
-        when(conductorRepository.save(any(Conductor.class))).thenReturn(conductorBase());
+        when(conductorRepository.save(any(Driver.class))).thenReturn(conductorBase());
 
-        ConductorResponse response = conductorService.actualizar(1L, requestBase());
+        DriverResponse response = conductorService.actualizar(1L, requestBase());
 
         assertEquals(1L, response.id());
         assertEquals("1200000001", response.cedula());
-        verify(conductorRepository).save(any(Conductor.class));
+        verify(conductorRepository).save(any(Driver.class));
         verify(conductorRepository, never()).existsByCedula(any());
         verify(conductorRepository, never()).existsByNumeroLicencia(any());
     }
@@ -252,27 +252,27 @@ class ConductorServiceTest {
         conductorService.desactivar(1L);
 
         verify(conductorRepository).save(argThat(c ->
-                !c.getActivo() && c.getEstado() == EstadoConductor.INACTIVO));
+                !c.getActivo() && c.getEstado() == DriverStatus.INACTIVO));
     }
 
     @Test
     void licenciaVencidaDebeMarcarLicenciaPorVencerFalse() {
-        Conductor vencido = conductorBase();
+        Driver vencido = conductorBase();
         vencido.setFechaVencimientoLicencia(LocalDate.now().minusDays(5));
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(vencido));
 
-        ConductorResponse response = conductorService.buscarPorId(1L);
+        DriverResponse response = conductorService.buscarPorId(1L);
 
         assertFalse(response.licenciaPorVencer());
     }
 
     @Test
     void licenciaLejanaDebeMarcarLicenciaPorVencerFalse() {
-        Conductor lejana = conductorBase();
+        Driver lejana = conductorBase();
         lejana.setFechaVencimientoLicencia(LocalDate.now().plusDays(60));
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(lejana));
 
-        ConductorResponse response = conductorService.buscarPorId(1L);
+        DriverResponse response = conductorService.buscarPorId(1L);
 
         assertFalse(response.licenciaPorVencer());
     }

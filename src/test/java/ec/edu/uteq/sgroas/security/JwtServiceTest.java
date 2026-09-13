@@ -1,7 +1,7 @@
 package ec.edu.uteq.sgroas.security;
 
-import ec.edu.uteq.sgroas.entity.Rol;
-import ec.edu.uteq.sgroas.entity.Usuario;
+import ec.edu.uteq.sgroas.entity.Role;
+import ec.edu.uteq.sgroas.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -26,13 +26,13 @@ class JwtServiceTest {
         ReflectionTestUtils.setField(jwtService, "jwtAudience", "sgroas-frontend");
     }
 
-    private Usuario usuarioEjemplo() {
-        return Usuario.builder()
+    private User usuarioEjemplo() {
+        return User.builder()
                 .id(1L)
                 .nombre("Administrador SGROAS")
                 .email("admin@sgroas.com")
                 .passwordHash("hash")
-                .rol(Rol.ROLE_ADMIN)
+                .rol(Role.ROLE_ADMIN)
                 .activo(true)
                 .build();
     }

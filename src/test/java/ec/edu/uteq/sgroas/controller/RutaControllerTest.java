@@ -1,7 +1,7 @@
 package ec.edu.uteq.sgroas.controller;
 
-import ec.edu.uteq.sgroas.dto.RutaResponse;
-import ec.edu.uteq.sgroas.service.RutaService;
+import ec.edu.uteq.sgroas.dto.RouteResponse;
+import ec.edu.uteq.sgroas.service.RouteService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -29,10 +29,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class RutaControllerTest {
 
     @Mock
-    private RutaService rutaService;
+    private RouteService rutaService;
 
     private MockMvc mockMvc() {
-        return MockMvcBuilders.standaloneSetup(new RutaController(rutaService))
+        return MockMvcBuilders.standaloneSetup(new RouteController(rutaService))
                 .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .setMessageConverters(new MappingJackson2HttpMessageConverter(
                         Jackson2ObjectMapperBuilder.json()
@@ -42,8 +42,8 @@ class RutaControllerTest {
                 .build();
     }
 
-    private RutaResponse responseEjemplo() {
-        return new RutaResponse(
+    private RouteResponse responseEjemplo() {
+        return new RouteResponse(
                 1L, "R-001", "Quito - Guayaquil", "Quito", "Guayaquil",
                 420.0, 480, "ACTIVA", true, Instant.now(), Instant.now()
         );
