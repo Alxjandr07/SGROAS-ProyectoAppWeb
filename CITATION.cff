@@ -23,8 +23,8 @@ affiliation: >-
   Ciencias de la Ingeniería — Carrera de Ingeniería de Software
 version: 1.0.1
 date-released: 2026-09-11
-doi: 10.5281/zenodo.22522109
-# DOI v1.0.0 (depositado). Tras el re-deposit con v1.0.1, reemplazar por el NUEVO DOI.
+doi: 10.5281/zenodo.22730816
+# DOI v1.0.1 (deposito actual). v1.0.0: 10.5281/zenodo.22522109. Concepto (todas): 10.5281/zenodo.22522108.
 # Commit del tag v1.0.0: 9ded2a69f1da35d09b6dfedb9d62e61e5c9ae48a
 # DOI software v0.9.0-rc (depósito previo): 10.5281/zenodo.21698129
 license: MIT
