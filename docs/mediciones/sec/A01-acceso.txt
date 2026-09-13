@@ -1,14 +1,19 @@
 ﻿# A01 - Control de acceso
-# Fecha: 2026-07-30 00:08:37
+# Fecha: 2026-07-30 00:08:37 - actualizacion 2026-09-13 (cookie HttpOnly + asignaciones)
 
 ## A01-01: Sin autenticacion a /api/conductores
 HTTP_CODE:403
 
-## A01-02: Login exitoso (token obtenido)
-AccessToken: eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJjNjYzNzY4Yy04Y2FkLTRjMGMtYjU5NC0zNTQ0ZjUxZjBiYmE...
+## A01-02: Login exitoso (Set-Cookie HttpOnly, body sin token)
+Set-Cookie: access_token=eyJhbGciOi...; Path=/; HttpOnly; Secure; SameSite=Strict
+Body: {"nombre":"Admin SGROAS","email":"admin@sgroas.com","rol":"ROLE_ADMIN","expiresIn":3600000} HTTP_CODE:200
 
 ## A01-03: Con token valido a /api/conductores
 {"content":[],"pageable":{"pageNumber":0,"pageSize":10,"sort":{"sorted":true,"empty":false,"unsorted":false},"offset":0,"paged":true,"unpaged":false},"totalElements":0,"totalPages":0,"last":true,"size":10,"number":0,"sort":{"sorted":true,"empty":false,"unsorted":false},"numberOfElements":0,"first":true,"empty":true} HTTP_CODE:200
+
+## A01-03b: Con cookie valida a /api/asignaciones (fix P6 - error 500 resuelto)
+GET /api/asignaciones -> {"content":[{"id":1,"rutaId":1,"vehiculoId":1,"conductorId":1,"estado":"ACTIVA"}],"pageable":{"pageNumber":0,"pageSize":10},"totalElements":1,"totalPages":1} HTTP_CODE:200
+# Backend UP con DB activa, AsignacionRutaService.listar() paginado OK, sin 500
 
 ## A01-04: CORS desde origen no permitido
 Invalid CORS request HTTP_CODE:403

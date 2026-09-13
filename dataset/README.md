@@ -49,10 +49,11 @@ dataset-sgroas/
 
 ## Integridad
 
-La lista de checksums SHA-256 está en `MANIFEST.csv`. Verificación:
+La lista de checksums SHA-256 está en `MANIFEST.csv` (275 archivos). Verificación:
 
 ```sh
 certutil -hashfile <archivo> SHA256            # Windows
-sha256sum -c MANIFEST.sha256                   # Linux/macOS (archivo en formato sha256sum)
+cd dataset && sha256sum -c MANIFEST.sha256     # Linux/macOS - rutas relativas a dataset/ (verificado 275 OK)
+# Alternativa desde raíz: sha256sum -c --quiet <(sed 's/^/dataset\//' dataset/MANIFEST.sha256)
 python -c "import csv,hashlib,pathlib; [print('  '+r, '=> OK' if h==hashlib.sha256(pathlib.Path(r).read_bytes()).hexdigest() else '=> FALLO') for r,b,h in list(csv.reader(open('MANIFEST.csv')))[1:]]"
 ```
