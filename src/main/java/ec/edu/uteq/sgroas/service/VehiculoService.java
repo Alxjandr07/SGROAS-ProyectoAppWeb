@@ -22,11 +22,21 @@ public class VehiculoService {
 
     private final VehiculoRepository vehiculoRepository;
 
+    /**
+     * Obtiene la pagina de vehiculos activos convertidos a formato de respuesta.
+     * @param pageable objeto con numero de pagina, tamanio y orden solicitados para la consulta
+     * @return pagina con los vehiculos activos encontrados
+     */
     public Page<VehiculoResponse> listar(Pageable pageable) {
         List<VehiculoResponse> contenido = listarCacheable(pageable);
         return new PageImpl<>(contenido, pageable, contenido.size());
     }
 
+    /**
+     * Obtiene desde la memoria cache la lista de vehiculos activos de la pagina solicitada.
+     * @param pageable objeto con numero de pagina y tamanio que identifican la entrada guardada en cache
+     * @return lista de vehiculos activos correspondientes a la pagina pedida
+     */
     @Cacheable(value = "vehiculos", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
     public List<VehiculoResponse> listarCacheable(Pageable pageable) {
         return vehiculoRepository.findByActivoTrue(pageable)
@@ -34,11 +44,23 @@ public class VehiculoService {
                 .getContent();
     }
 
+    /**
+     * Recupera el detalle de un vehiculo activo existente.
+     * @param id identificador del vehiculo que se desea consultar
+     * @return datos del vehiculo encontrado
+     * @throws IllegalArgumentException cuando no existe un vehiculo activo con ese identificador
+     */
     public VehiculoResponse buscarPorId(Long id) {
         Vehiculo vehiculo = obtenerVehiculoActivo(id);
         return mapearAResponse(vehiculo);
     }
 
+    /**
+     * Registra un nuevo vehiculo despues de validar que su placa no se repita.
+     * @param request datos del vehiculo con placa, marca, modelo, anio, capacidad, numeros de motor y chasis, color y estado
+     * @return datos del vehiculo recien guardado
+     * @throws IllegalArgumentException cuando ya existe otro vehiculo con la misma placa o el estado no es valido
+     */
     @CacheEvict(value = "vehiculos", allEntries = true)
     public VehiculoResponse crear(VehiculoRequest request) {
         if (vehiculoRepository.existsByPlaca(request.placa())) {
@@ -64,6 +86,13 @@ public class VehiculoService {
         return mapearAResponse(vehiculoGuardado);
     }
 
+    /**
+     * Reemplaza los datos de un vehiculo activo por los valores recibidos.
+     * @param id identificador del vehiculo que se desea modificar
+     * @param request nuevos datos del vehiculo con placa, marca, modelo, anio, capacidad, numeros de motor y chasis, color y estado
+     * @return datos del vehiculo ya actualizado
+     * @throws IllegalArgumentException cuando el vehiculo no existe, la placa choca con otro registro o el estado no es valido
+     */
     @CacheEvict(value = "vehiculos", allEntries = true)
     public VehiculoResponse actualizar(Long id, VehiculoRequest request) {
         Vehiculo vehiculo = obtenerVehiculoActivo(id);
@@ -88,6 +117,11 @@ public class VehiculoService {
         return mapearAResponse(vehiculoActualizado);
     }
 
+    /**
+     * Marca un vehiculo como inactivo y lo deja fuera de servicio.
+     * @param id identificador del vehiculo que se desea dar de baja
+     * @throws IllegalArgumentException cuando no existe un vehiculo activo con ese identificador
+     */
     @CacheEvict(value = "vehiculos", allEntries = true)
     public void desactivar(Long id) {
         Vehiculo vehiculo = obtenerVehiculoActivo(id);

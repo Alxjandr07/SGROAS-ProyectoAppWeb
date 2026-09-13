@@ -23,6 +23,11 @@ public class CacheConfig {
     @Value("${app.cache.default-ttl}")
     private long defaultTtl;
 
+    /**
+     * Crea el administrador de cache con serializacion JSON y tiempo de vida configurado.
+     * @param redisConnectionFactory fabrica con la conexion activa hacia el servidor Redis
+     * @return administrador que guarda los valores de cache en formato JSON
+     */
     @Bean
     public CacheManager cacheManager(LettuceConnectionFactory redisConnectionFactory) {
         ObjectMapper mapper = JsonMapper.builder()

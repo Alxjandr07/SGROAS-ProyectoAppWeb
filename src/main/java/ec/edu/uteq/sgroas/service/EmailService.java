@@ -37,10 +37,22 @@ public class EmailService {
     @Value("${app.mail.from:no-reply@sgroas.com}")
     private String from;
 
+    /**
+     * Indica si el envio de correos quedo configurado con un servidor SMTP valido.
+     * @return verdadero cuando existe un servidor configurado, falso cuando opera en modo consola
+     */
     public boolean configurado() {
         return host != null && !host.isBlank();
     }
 
+    /**
+     * Envia al usuario el correo con el codigo para activar su cuenta.
+     * En modo consola sin SMTP solo imprime el codigo en el registro de la aplicacion.
+     * @param para direccion de correo destino que recibira el mensaje
+     * @param nombre nombre del usuario usado en el saludo del mensaje
+     * @param codigo codigo de seis digitos que el usuario debera ingresar para activar su cuenta
+     * @throws IllegalStateException cuando el servidor SMTP configurado no logra entregar el mensaje
+     */
     public void enviarCodigoVerificacion(String para, String nombre, String codigo) {
         String html = plantillaCodigo(
                 "Confirma tu cuenta",
@@ -51,6 +63,13 @@ public class EmailService {
         enviar(para, "SGROAS · Codigo de verificacion de cuenta", html, codigo);
     }
 
+    /**
+     * Envia al usuario el correo con el codigo para restablecer su contrasena.
+     * En modo consola sin SMTP solo imprime el codigo en el registro de la aplicacion.
+     * @param para direccion de correo destino que recibira el mensaje
+     * @param codigo codigo de seis digitos de un solo uso para autorizar el cambio de contrasena
+     * @throws IllegalStateException cuando el servidor SMTP configurado no logra entregar el mensaje
+     */
     public void enviarCodigoRestablecimiento(String para, String codigo) {
         String html = plantillaCodigo(
                 "Restablece tu contrasena",

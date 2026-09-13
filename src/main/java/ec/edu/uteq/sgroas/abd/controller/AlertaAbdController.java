@@ -19,6 +19,11 @@ public class AlertaAbdController {
 
     private final AlertaRepository alertaRepository;
 
+    /**
+     * Atiende la peticion de consulta paginada de las alertas generadas por incidentes de riesgo alto.
+     * @param pageable configuracion de paginacion y orden enviada por el cliente.
+     * @return respuesta con la pagina de alertas encontradas y estado 200.
+     */
     @GetMapping
     public ResponseEntity<Page<AbdDtos.AlertaResponse>> listar(
             @PageableDefault(size = 50, sort = "idAlerta") Pageable pageable) {

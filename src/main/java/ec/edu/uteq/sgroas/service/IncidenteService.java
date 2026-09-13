@@ -23,11 +23,21 @@ public class IncidenteService {
     private final IncidenteRepository incidenteRepository;
     private final AsignacionRutaRepository asignacionRutaRepository;
 
+    /**
+     * Obtiene la pagina de incidentes activos convertidos a formato de respuesta.
+     * @param pageable objeto con numero de pagina, tamanio y orden solicitados para la consulta
+     * @return pagina con los incidentes activos encontrados
+     */
     public Page<IncidenteResponse> listar(Pageable pageable) {
         List<IncidenteResponse> contenido = listarCacheable(pageable);
         return new PageImpl<>(contenido, pageable, contenido.size());
     }
 
+    /**
+     * Obtiene desde la memoria cache la lista de incidentes activos de la pagina solicitada.
+     * @param pageable objeto con numero de pagina y tamanio que identifican la entrada guardada en cache
+     * @return lista de incidentes activos correspondientes a la pagina pedida
+     */
     @Cacheable(value = "incidentes", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
     public List<IncidenteResponse> listarCacheable(Pageable pageable) {
         return incidenteRepository.findByActivoTrue(pageable)
@@ -35,11 +45,23 @@ public class IncidenteService {
                 .getContent();
     }
 
+    /**
+     * Recupera el detalle de un incidente activo existente.
+     * @param id identificador del incidente que se desea consultar
+     * @return datos del incidente encontrado
+     * @throws IllegalArgumentException cuando no existe un incidente activo con ese identificador
+     */
     public IncidenteResponse buscarPorId(Long id) {
         Incidente incidente = obtenerIncidenteActivo(id);
         return mapearAResponse(incidente);
     }
 
+    /**
+     * Registra un nuevo incidente asociado a una asignacion de ruta vigente.
+     * @param request datos del incidente con asignacion, tipo, descripcion, fecha, ubicacion, gravedad y estado
+     * @return datos del incidente recien guardado
+     * @throws IllegalArgumentException cuando la asignacion no existe o esta inactiva, o tipo, gravedad o estado no son validos
+     */
     @CacheEvict(value = "incidentes", allEntries = true)
     public IncidenteResponse crear(IncidenteRequest request) {
         AsignacionRuta asignacion = asignacionRutaRepository.findById(request.asignacionId())
@@ -64,6 +86,13 @@ public class IncidenteService {
         return mapearAResponse(incidenteGuardado);
     }
 
+    /**
+     * Reemplaza los datos de un incidente activo por los valores recibidos.
+     * @param id identificador del incidente que se desea modificar
+     * @param request nuevos datos del incidente con asignacion, tipo, descripcion, fecha, ubicacion, gravedad y estado
+     * @return datos del incidente ya actualizado
+     * @throws IllegalArgumentException cuando el incidente o la asignacion no existe o esta inactivo, o tipo, gravedad o estado no son validos
+     */
     @CacheEvict(value = "incidentes", allEntries = true)
     public IncidenteResponse actualizar(Long id, IncidenteRequest request) {
         Incidente incidente = obtenerIncidenteActivo(id);
@@ -86,6 +115,11 @@ public class IncidenteService {
         return mapearAResponse(incidenteActualizado);
     }
 
+    /**
+     * Marca un incidente como inactivo y lo deja en estado cerrado.
+     * @param id identificador del incidente que se desea dar de baja
+     * @throws IllegalArgumentException cuando no existe un incidente activo con ese identificador
+     */
     @CacheEvict(value = "incidentes", allEntries = true)
     public void desactivar(Long id) {
         Incidente incidente = obtenerIncidenteActivo(id);

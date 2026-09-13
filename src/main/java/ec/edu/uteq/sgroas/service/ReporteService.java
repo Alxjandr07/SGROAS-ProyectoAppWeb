@@ -16,8 +16,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Servicio de reportes que invoca los stored procedures a traves de
- * @Procedure (estrategia hibrida CRUD-ORM + SP, ver ADR-006).
+ * Servicio de reportes que invoca los stored procedures mediante
+ * procedimientos almacenados (estrategia hibrida CRUD-ORM + SP, ver ADR-006).
  * Transaccional: los cursores REFCURSOR de PostgreSQL solo pueden leerse
  * dentro de la misma transaccion JDBC (ver CATALOGO-SP.md).
  */
@@ -32,6 +32,10 @@ public class ReporteService {
     private final RutaRepository rutaRepository;
     private final AsignacionRutaRepository asignacionRutaRepository;
 
+    /**
+     * Calcula los conteos globales de conductores, vehiculos, rutas, asignaciones e incidentes.
+     * @return lista de filas con los totales y los conteos de registros activos y abiertos
+     */
     public List<Map<String, Object>> estadisticasGenerales() {
         return incidenteRepository.estadisticasGenerales().stream()
                 .map(fila -> mapa(
@@ -48,6 +52,11 @@ public class ReporteService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Agrupa los incidentes por nivel de gravedad segun el filtro indicado.
+     * @param tipo criterio de gravedad enviado al procedimiento para filtrar el conteo
+     * @return lista de filas con cada gravedad, su total de incidentes y la fecha del ultimo caso
+     */
     public List<Map<String, Object>> incidentesPorGravedad(String tipo) {
         return incidenteRepository.incidentesPorGravedad(tipo).stream()
                 .map(fila -> mapa(
@@ -57,6 +66,12 @@ public class ReporteService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Recupera los incidentes ocurridos dentro del intervalo de fechas indicado.
+     * @param desde fecha y hora inicial del intervalo por consultar
+     * @param hasta fecha y hora final del intervalo por consultar
+     * @return lista de filas con el detalle de cada incidente y sus datos de conductor, vehiculo y ruta
+     */
     public List<Map<String, Object>> incidentesPorRango(Instant desde, Instant hasta) {
         return incidenteRepository.obtenerIncidentesPorRango(desde, hasta).stream()
                 .map(fila -> mapa(
@@ -73,6 +88,11 @@ public class ReporteService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Localiza los conductores cuya licencia vence dentro del plazo indicado.
+     * @param dias cantidad maxima de dias restantes para considerar una licencia proxima a vencer
+     * @return lista de filas con los datos del conductor, su licencia y su asignacion vigente
+     */
     public List<Map<String, Object>> licenciasPorVencer(Integer dias) {
         return conductorRepository.licenciasPorVencer(dias).stream()
                 .map(fila -> mapa(
@@ -86,6 +106,10 @@ public class ReporteService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Recupera los vehiculos marcados en mantenimiento con sus conteos asociados.
+     * @return lista de filas con los datos del vehiculo y sus totales de asignaciones e incidentes
+     */
     public List<Map<String, Object>> vehiculosEnMantenimiento() {
         return vehiculoRepository.vehiculosEnMantenimiento().stream()
                 .map(fila -> mapa(
@@ -99,6 +123,10 @@ public class ReporteService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Calcula el rendimiento de cada ruta con sus asignaciones e incidentes por gravedad.
+     * @return lista de filas con los totales de asignaciones e incidentes de cada ruta evaluada
+     */
     public List<Map<String, Object>> reporteRendimientoRutas() {
         return rutaRepository.reporteRendimientoRutas().stream()
                 .map(fila -> mapa(
@@ -115,6 +143,11 @@ public class ReporteService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Recupera las asignaciones activas vinculadas al conductor indicado.
+     * @param conductorId identificador del conductor cuyas asignaciones vigentes se desean consultar
+     * @return lista de filas con cada asignacion activa y los datos de su vehiculo y ruta
+     */
     public List<Map<String, Object>> asignacionesActivasPorConductor(Long conductorId) {
         return asignacionRutaRepository.asignacionesActivasPorConductor(conductorId).stream()
                 .map(fila -> mapa(

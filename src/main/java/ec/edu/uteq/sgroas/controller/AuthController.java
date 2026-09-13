@@ -44,6 +44,12 @@ public class AuthController {
     @Value("${app.jwt.refresh-expiration-ms:604800000}")
     private long refreshExpirationMs;
 
+    /**
+     * Recupera los datos de la sesión actual a partir del token vigente.
+     * @param accessTokenCookie valor de la galleta con el token de acceso si fue enviada.
+     * @param authorizationHeader cabecera de autorización con el token portador como alternativa.
+     * @return respuesta HTTP con el perfil de la sesión o estado no autorizado.
+     */
     @GetMapping("/me")
     public ResponseEntity<SesionResponse> me(
             @CookieValue(name = "access_token", required = false) String accessTokenCookie,
@@ -84,6 +90,12 @@ public class AuthController {
      * refresh_token). El cuerpo devuelve el perfil de sesion sin JWT.
      */
 
+    /**
+     * Valida las credenciales y genera las galletas de sesión para el usuario.
+     * @param request objeto con el correo y la contraseña enviados para ingresar.
+     * @param httpRequest petición HTTP usada para obtener la dirección del cliente.
+     * @return respuesta HTTP con el perfil de la sesión y las galletas de seguridad.
+     */
     @PostMapping("/login")
     public ResponseEntity<?> login(
             @Valid @RequestBody LoginRequest request,
@@ -109,6 +121,12 @@ public class AuthController {
         }
     }
 
+    /**
+     * Renueva la sesión generando nuevos tokens a partir del token de refresco.
+     * @param refreshCookie valor de la galleta con el token de refresco si fue enviada.
+     * @param body cuerpo opcional con el token de refresco como alternativa.
+     * @return respuesta HTTP con el perfil renovado y las nuevas galletas de seguridad.
+     */
     @PostMapping("/refresh")
     public ResponseEntity<SesionResponse> refresh(
             @CookieValue(name = "refresh_token", required = false) String refreshCookie,
@@ -128,7 +146,11 @@ public class AuthController {
                 .body(aSesion(response));
     }
 
-    /** Confirma el codigo enviado al correo y activa la cuenta (inicia sesion). */
+    /**
+     * Activa la cuenta al confirmar el código enviado al correo e inicia sesión.
+     * @param request objeto con el correo y el código de verificación recibido.
+     * @return respuesta HTTP con el perfil de la sesión recién activada.
+     */
     @PostMapping("/verify-email")
     public ResponseEntity<SesionResponse> verificarEmail(
             @Valid @RequestBody VerificarEmailRequest request
@@ -140,7 +162,11 @@ public class AuthController {
                 .body(aSesion(response));
     }
 
-    /** Reenvia el codigo de verificacion (respuesta generica para no revelar cuentas). */
+    /**
+     * Envía un nuevo código de verificación sin revelar si la cuenta existe.
+     * @param request objeto con el correo al que se reenvía el código de verificación.
+     * @return respuesta HTTP con un mensaje genérico de confirmación del envío.
+     */
     @PostMapping("/resend-code")
     public ResponseEntity<Map<String, String>> reenviarCodigo(
             @Valid @RequestBody EmailRequest request
@@ -152,7 +178,11 @@ public class AuthController {
         ));
     }
 
-    /** Solicita un codigo para restablecer la contrasena (respuesta generica). */
+    /**
+     * Genera y envía el código para restablecer la contraseña sin revelar cuentas.
+     * @param request objeto con el correo al que se envía el código de restablecimiento.
+     * @return respuesta HTTP con un mensaje genérico de confirmación del envío.
+     */
     @PostMapping("/forgot-password")
     public ResponseEntity<Map<String, String>> olvidarContrasena(
             @Valid @RequestBody EmailRequest request
@@ -164,7 +194,11 @@ public class AuthController {
         ));
     }
 
-    /** Restablece la contrasena con el codigo recibido por correo. */
+    /**
+     * Actualiza la contraseña usando el código recibido por correo.
+     * @param request objeto con el correo, el código y la nueva contraseña elegida.
+     * @return respuesta HTTP con el mensaje de confirmación del cambio realizado.
+     */
     @PostMapping("/reset-password")
     public ResponseEntity<Map<String, String>> restablecerContrasena(
             @Valid @RequestBody RestablecerContrasenaRequest request
@@ -175,6 +209,13 @@ public class AuthController {
         ));
     }
 
+    /**
+     * Cierra la sesión invalidando los tokens y eliminando las galletas de seguridad.
+     * @param accessTokenCookie valor de la galleta con el token de acceso a invalidar.
+     * @param refreshCookie valor de la galleta con el token de refresco a invalidar.
+     * @param body cuerpo opcional con el token de refresco como alternativa.
+     * @return respuesta HTTP sin contenido que confirma el cierre de la sesión.
+     */
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(
             @CookieValue(name = "access_token", required = false) String accessTokenCookie,

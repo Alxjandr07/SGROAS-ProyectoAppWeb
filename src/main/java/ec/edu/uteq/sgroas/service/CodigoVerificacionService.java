@@ -35,7 +35,13 @@ public class CodigoVerificacionService {
     private final CodigoVerificacionRepository repository;
     private final SecureRandom aleatorio = new SecureRandom();
 
-    /** Genera un codigo nuevo (invalida los anteriores del mismo tipo) y lo devuelve en claro para enviarlo por correo. */
+    /**
+     * Genera un codigo nuevo de seis digitos, invalida los anteriores del mismo tipo y lo devuelve en claro.
+     * Guarda solo el resumen cifrado y concede diez minutos de vigencia para su uso.
+     * @param email correo del usuario al que pertenece el codigo por generar
+     * @param tipo proposito del codigo, activacion de cuenta o restablecimiento de contrasena
+     * @return codigo de seis digitos en claro listo para enviarse por correo
+     */
     @Transactional
     public String generar(String email, Tipo tipo) {
         repository.deleteByEmailAndTipo(email, tipo.name());
@@ -53,14 +59,26 @@ public class CodigoVerificacionService {
         return codigo;
     }
 
-    /** Indica si ya paso la espera minima para generar otro codigo. */
+    /**
+     * Indica si ya transcurrio la espera minima de sesenta segundos para pedir otro codigo.
+     * @param email correo del usuario que desea saber si puede solicitar un reenvio
+     * @param tipo proposito del codigo, activacion de cuenta o restablecimiento de contrasena
+     * @return verdadero cuando puede generarse otro codigo, falso cuando aun debe esperar
+     */
     public boolean puedeReenviar(String email, Tipo tipo) {
         return repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(email, tipo.name())
                 .map(c -> c.getCreadoEn().isBefore(Instant.now().minus(ESPERA_REENVIO)))
                 .orElse(true);
     }
 
-    /** Valida el codigo recibido; si es correcto lo marca como usado. Lanza IllegalArgumentException si no. */
+    /**
+     * Valida el codigo recibido contra el ultimo emitido y lo marca como usado si coincide.
+     * Cuenta cada intento fallido y bloquea el codigo tras cinco errores o al vencer su vigencia.
+     * @param email correo del usuario propietario del codigo por validar
+     * @param tipo proposito del codigo, activacion de cuenta o restablecimiento de contrasena
+     * @param codigo codigo de seis digitos ingresado por el usuario para su comprobacion
+     * @throws IllegalArgumentException cuando no existe codigo, ya fue usado, expiro, supero los intentos o no coincide
+     */
     @Transactional
     public void validar(String email, Tipo tipo, String codigo) {
         CodigoVerificacion registro = repository

@@ -11,6 +11,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiConfig {
 
+    /**
+     * Expone la documentacion de la API con titulo, version y esquema de cookie.
+     * @return definicion abierta que describe los endpoints y su autenticacion
+     */
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI()

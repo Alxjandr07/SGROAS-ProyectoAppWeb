@@ -19,6 +19,11 @@ public class RutaController {
 
     private final RutaService rutaService;
 
+    /**
+     * Recupera la lista paginada de rutas registradas en el sistema.
+     * @param pageable configuración de paginación y ordenamiento solicitada por el cliente.
+     * @return respuesta HTTP con la página de rutas encontradas.
+     */
     @GetMapping
     public ResponseEntity<Page<RutaResponse>> listar(
             @PageableDefault(size = 10, sort = "id") Pageable pageable
@@ -26,11 +31,21 @@ public class RutaController {
         return ResponseEntity.ok(rutaService.listar(pageable));
     }
 
+    /**
+     * Obtiene el detalle de una ruta a partir de su identificador.
+     * @param id identificador único de la ruta que se desea consultar.
+     * @return respuesta HTTP con los datos de la ruta encontrada.
+     */
     @GetMapping("/{id}")
     public ResponseEntity<RutaResponse> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(rutaService.buscarPorId(id));
     }
 
+    /**
+     * Registra una nueva ruta con los datos recibidos en la solicitud.
+     * @param request objeto con el origen, destino y demás datos de la ruta.
+     * @return respuesta HTTP con estado creado y los datos de la ruta registrada.
+     */
     @PostMapping
     public ResponseEntity<RutaResponse> crear(
             @Valid @RequestBody RutaRequest request
@@ -39,6 +54,12 @@ public class RutaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    /**
+     * Modifica los datos de una ruta ya existente.
+     * @param id identificador único de la ruta que se desea modificar.
+     * @param request objeto con los nuevos valores para actualizar la ruta.
+     * @return respuesta HTTP con los datos actualizados de la ruta.
+     */
     @PutMapping("/{id}")
     public ResponseEntity<RutaResponse> actualizar(
             @PathVariable Long id,
@@ -47,6 +68,11 @@ public class RutaController {
         return ResponseEntity.ok(rutaService.actualizar(id, request));
     }
 
+    /**
+     * Desactiva lógicamente una ruta para que deje de estar disponible.
+     * @param id identificador único de la ruta que se desea desactivar.
+     * @return respuesta HTTP sin contenido que confirma la operación realizada.
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> desactivar(@PathVariable Long id) {
         rutaService.desactivar(id);

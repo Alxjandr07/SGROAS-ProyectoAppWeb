@@ -28,15 +28,29 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    /**
+     * Crea la configuracion de seguridad con el filtro encargado de validar tokens.
+     * @param jwtAuthenticationFilter filtro que autentica cada peticion con el token recibido
+     */
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
+    /**
+     * Expone el codificador usado para proteger y comparar las claves de acceso.
+     * @return codificador con algoritmo de resumen adaptativo para claves
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Arma el gestor que verifica las credenciales contra los usuarios registrados.
+     * @param userDetailsService servicio que carga los datos del usuario por su correo
+     * @param passwordEncoder codificador usado para comparar la clave ingresada
+     * @return gestor de autenticacion con proveedor basado en usuarios y claves
+     */
     @Bean
     public AuthenticationManager authenticationManager(
             UserDetailsService userDetailsService,
@@ -48,6 +62,12 @@ public class SecurityConfig {
         return new ProviderManager(authProvider);
     }
 
+    /**
+     * Define las reglas de acceso por rol, la sesion sin estado y las cabeceras seguras.
+     * @param http configurador donde se registran rutas, filtros y politicas de seguridad
+     * @return cadena de filtros con toda la proteccion de las peticiones HTTP
+     * @throws Exception cuando la construccion de la cadena de seguridad falla
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -109,6 +129,10 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Define los origenes y metodos permitidos para las peticiones entre dominios.
+     * @return fuente con la politica de acceso aplicada a todas las rutas
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();

@@ -28,6 +28,11 @@ public class AsignacionRutaService {
     private final VehiculoRepository vehiculoRepository;
     private final RutaRepository rutaRepository;
 
+    /**
+     * Obtiene la pagina de asignaciones activas convertidas a formato de respuesta.
+     * @param pageable objeto con numero de pagina, tamanio y orden solicitados para la consulta
+     * @return pagina con las asignaciones activas encontradas
+     */
     @Transactional(readOnly = true)
     public Page<AsignacionRutaResponse> listar(Pageable pageable) {
         Page<AsignacionRuta> page = asignacionRutaRepository.findByActivoTrue(pageable);
@@ -35,6 +40,11 @@ public class AsignacionRutaService {
         return new PageImpl<>(contenido, pageable, page.getTotalElements());
     }
 
+    /**
+     * Obtiene desde la memoria cache la lista de asignaciones activas de la pagina solicitada.
+     * @param pageable objeto con numero de pagina y tamanio que identifican la entrada guardada en cache
+     * @return lista de asignaciones activas correspondientes a la pagina pedida
+     */
     @Cacheable(value = "asignaciones", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
     @Transactional(readOnly = true)
     public List<AsignacionRutaResponse> listarCacheable(Pageable pageable) {
@@ -43,12 +53,24 @@ public class AsignacionRutaService {
                 .getContent();
     }
 
+    /**
+     * Recupera el detalle de una asignacion activa existente.
+     * @param id identificador de la asignacion que se desea consultar
+     * @return datos de la asignacion encontrada
+     * @throws IllegalArgumentException cuando no existe una asignacion activa con ese identificador
+     */
     @Transactional(readOnly = true)
     public AsignacionRutaResponse buscarPorId(Long id) {
         AsignacionRuta asignacion = obtenerAsignacionActiva(id);
         return mapearAResponse(asignacion);
     }
 
+    /**
+     * Registra una nueva asignacion vinculando un conductor, un vehiculo y una ruta vigentes.
+     * @param request datos de la asignacion con participantes, fechas y estado deseado
+     * @return datos de la asignacion recien guardada
+     * @throws IllegalArgumentException cuando algun participante no existe o esta inactivo, o el estado no es valido
+     */
     @CacheEvict(value = "asignaciones", allEntries = true)
     public AsignacionRutaResponse crear(AsignacionRutaRequest request) {
         Conductor conductor = conductorRepository.findById(request.conductorId())
@@ -80,6 +102,13 @@ public class AsignacionRutaService {
         return mapearAResponse(asignacionGuardada);
     }
 
+    /**
+     * Reemplaza los datos de una asignacion activa por los valores recibidos.
+     * @param id identificador de la asignacion que se desea modificar
+     * @param request nuevos datos de participantes, fechas y estado para la asignacion
+     * @return datos de la asignacion ya actualizada
+     * @throws IllegalArgumentException cuando la asignacion o algun participante no existe o esta inactivo, o el estado no es valido
+     */
     @CacheEvict(value = "asignaciones", allEntries = true)
     public AsignacionRutaResponse actualizar(Long id, AsignacionRutaRequest request) {
         AsignacionRuta asignacion = obtenerAsignacionActiva(id);
@@ -109,6 +138,11 @@ public class AsignacionRutaService {
         return mapearAResponse(asignacionActualizada);
     }
 
+    /**
+     * Marca una asignacion como inactiva y la deja en estado cancelada.
+     * @param id identificador de la asignacion que se desea dar de baja
+     * @throws IllegalArgumentException cuando no existe una asignacion activa con ese identificador
+     */
     @CacheEvict(value = "asignaciones", allEntries = true)
     public void desactivar(Long id) {
         AsignacionRuta asignacion = obtenerAsignacionActiva(id);

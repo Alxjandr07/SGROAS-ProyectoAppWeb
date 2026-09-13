@@ -23,6 +23,14 @@ public class IncidenteAbdService {
     private final AlertaRepository alertaRepository;
     private final UnidadRepository unidadRepository;
 
+    /**
+     * Recupera los incidentes registrados aplicando filtros opcionales de forma paginada.
+     * @param estado estado por el que se desea filtrar los incidentes, puede ser nulo para no filtrar.
+     * @param nivel nivel de riesgo sugerido por el que se desea filtrar, puede ser nulo para no filtrar.
+     * @param search texto para buscar coincidencias en los datos del incidente, puede ser nulo para no filtrar.
+     * @param pageable configuracion de paginacion y orden solicitada por el cliente.
+     * @return pagina con los datos resumidos de los incidentes encontrados.
+     */
     @Transactional(readOnly = true)
     public Page<AbdDtos.IncidenteAbdResponse> listar(String estado, String nivel, String search, Pageable pageable) {
         String estadoFiltro = (estado == null || estado.isBlank()) ? null : estado.trim().toLowerCase();
@@ -46,6 +54,12 @@ public class IncidenteAbdService {
         return page.map(this::aResponse);
     }
 
+    /**
+     * Registra un incidente asociado a una unidad y genera una alerta cuando el riesgo es alto.
+     * @param request datos del incidente reportado junto con la unidad involucrada.
+     * @return datos resumidos del incidente guardado.
+     * @throws IllegalArgumentException cuando la unidad indicada no existe en el sistema.
+     */
     public AbdDtos.IncidenteAbdResponse crear(AbdDtos.IncidenteAbdRequest request) {
         Unidad unidad = unidadRepository.findById(request.idUnidad())
                 .orElseThrow(() -> new IllegalArgumentException("Unidad no encontrada: " + request.idUnidad()));
@@ -65,6 +79,13 @@ public class IncidenteAbdService {
         return aResponse(incidente);
     }
 
+    /**
+     * Modifica los datos de un incidente existente y actualiza la unidad involucrada.
+     * @param idIncidente identificador del incidente que se desea modificar.
+     * @param request nuevos datos del incidente que reemplazaran a los actuales.
+     * @return datos resumidos del incidente actualizado.
+     * @throws IllegalArgumentException cuando el incidente o la unidad indicada no existen en el sistema.
+     */
     public AbdDtos.IncidenteAbdResponse actualizar(Integer idIncidente, AbdDtos.IncidenteAbdRequest request) {
         IncidenteAbd incidente = incidenteRepository.findById(idIncidente)
                 .orElseThrow(() -> new IllegalArgumentException("Incidente no encontrado: " + idIncidente));
@@ -83,6 +104,11 @@ public class IncidenteAbdService {
         return aResponse(incidenteRepository.save(incidente));
     }
 
+    /**
+     * Suprime del sistema el registro de un incidente existente.
+     * @param idIncidente identificador del incidente que se desea suprimir.
+     * @throws IllegalArgumentException cuando no existe un incidente con el identificador indicado.
+     */
     public void eliminar(Integer idIncidente) {
         if (!incidenteRepository.existsById(idIncidente)) {
             throw new IllegalArgumentException("Incidente no encontrado: " + idIncidente);

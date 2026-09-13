@@ -15,6 +15,12 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    /**
+     * Construye la respuesta de error cuando la validación de la solicitud falla.
+     * @param ex excepción con el resultado de la validación y los campos inválidos.
+     * @param request petición HTTP que originó el error de validación.
+     * @return detalle del problema con el mapa de errores por campo.
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail manejarErroresValidacion(
             MethodArgumentNotValidException ex,
@@ -35,6 +41,12 @@ public class GlobalExceptionHandler {
         return detail;
     }
 
+    /**
+     * Construye la respuesta de error cuando se recibe un argumento inválido.
+     * @param ex excepción con el mensaje que explica el argumento rechazado.
+     * @param request petición HTTP que originó el argumento inválido.
+     * @return detalle del problema con estado de solicitud inválida.
+     */
     @ExceptionHandler(IllegalArgumentException.class)
     public ProblemDetail manejarArgumentosInvalidos(
             IllegalArgumentException ex,
@@ -49,6 +61,12 @@ public class GlobalExceptionHandler {
         return detail;
     }
 
+    /**
+     * Construye la respuesta de error cuando las credenciales de acceso son incorrectas.
+     * @param ex excepción de autenticación lanzada por el proveedor de seguridad.
+     * @param request petición HTTP que originó el intento fallido de autenticación.
+     * @return detalle del problema con estado de no autorizado.
+     */
     @ExceptionHandler(BadCredentialsException.class)
     public ProblemDetail manejarCredencialesInvalidas(
             BadCredentialsException ex,
@@ -63,6 +81,12 @@ public class GlobalExceptionHandler {
         return detail;
     }
 
+    /**
+     * Construye la respuesta de error cuando la cuenta aún no verifica su correo.
+     * @param ex excepción que indica que falta la verificación del correo.
+     * @param request petición HTTP que originó el acceso con correo sin verificar.
+     * @return detalle del problema con estado de acceso prohibido.
+     */
     @ExceptionHandler(CorreoNoVerificadoException.class)
     public ProblemDetail manejarCorreoNoVerificado(
             CorreoNoVerificadoException ex,
@@ -77,7 +101,12 @@ public class GlobalExceptionHandler {
         return detail;
     }
 
-    /** Denegaciones de @PreAuthorize: 403, no 500 como hacia el catch-all. */
+    /**
+     * Construye la respuesta de error cuando el usuario no tiene los permisos requeridos.
+     * @param ex excepción de acceso denegado lanzada por la verificación de roles.
+     * @param request petición HTTP que originó el intento sin permisos suficientes.
+     * @return detalle del problema con estado de acceso prohibido.
+     */
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
     public ProblemDetail manejarAccesoDenegado(
             org.springframework.security.access.AccessDeniedException ex,
@@ -92,7 +121,12 @@ public class GlobalExceptionHandler {
         return detail;
     }
 
-    /** Rutas inexistentes (ej. el antiguo /api/auth/register): 404, no 500. */
+    /**
+     * Construye la respuesta de error cuando la ruta solicitada no existe.
+     * @param ex excepción que indica que no se encontró el recurso solicitado.
+     * @param request petición HTTP con la dirección inexistente que se intentó acceder.
+     * @return detalle del problema con estado de recurso no encontrado.
+     */
     @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
     public ProblemDetail manejarRutaInexistente(
             org.springframework.web.servlet.resource.NoResourceFoundException ex,
@@ -107,6 +141,12 @@ public class GlobalExceptionHandler {
         return detail;
     }
 
+    /**
+     * Construye la respuesta genérica cuando ocurre un error no controlado.
+     * @param ex excepción no prevista que provocó el error interno.
+     * @param request petición HTTP que originó el error interno del servidor.
+     * @return detalle del problema con estado de error interno del servidor.
+     */
     @ExceptionHandler(Exception.class)
     public ProblemDetail manejarErrorGeneral(
             Exception ex,

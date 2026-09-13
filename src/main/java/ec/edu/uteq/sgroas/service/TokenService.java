@@ -15,6 +15,12 @@ public class TokenService {
     private final StringRedisTemplate redisTemplate;
     private final JwtService jwtService;
 
+    /**
+     * Genera un token de refresco aleatorio y lo guarda asociado al correo indicado.
+     * @param email correo del usuario propietario de la nueva sesion de refresco
+     * @param refreshExpirationMs tiempo de vida del token expresado en milisegundos
+     * @return valor del token de refresco recien creado
+     */
     public String generarRefreshToken(String email, Long refreshExpirationMs) {
         String refreshToken = UUID.randomUUID().toString();
 
@@ -28,6 +34,12 @@ public class TokenService {
         return refreshToken;
     }
 
+    /**
+     * Recupera el correo guardado detras de un token de refresco vigente.
+     * @param refreshToken valor del token de refresco que se desea resolver
+     * @return correo del usuario asociado al token consultado
+     * @throws IllegalArgumentException cuando el token no existe o ya expiro
+     */
     public String obtenerEmailDesdeRefreshToken(String refreshToken) {
         String key = "refresh:" + refreshToken;
         String email = redisTemplate.opsForValue().get(key);
@@ -39,11 +51,20 @@ public class TokenService {
         return email;
     }
 
+    /**
+     * Elimina un token de refresco para impedir que vuelva a usarse.
+     * @param refreshToken valor del token de refresco que se desea borrar
+     */
     public void eliminarRefreshToken(String refreshToken) {
         String key = "refresh:" + refreshToken;
         redisTemplate.delete(key);
     }
 
+    /**
+     * Anula un token de acceso agregandolo a la lista negra hasta su vencimiento.
+     * Solo se registra cuando aun le queda tiempo de vida util.
+     * @param accessToken token de acceso vigente que se desea invalidar
+     */
     public void agregarAccessTokenABlacklist(String accessToken) {
         String jti = jwtService.extraerJti(accessToken);
         long tiempoRestante = jwtService.extraerExpiracion(accessToken).getTime()
@@ -59,6 +80,11 @@ public class TokenService {
         }
     }
 
+    /**
+     * Revisa si un token de acceso ya fue anulado y figura en lista negra.
+     * @param accessToken token de acceso que se desea verificar
+     * @return verdadero cuando el token esta anulado, falso en caso contrario
+     */
     public boolean accessTokenEnBlacklist(String accessToken) {
         String jti = jwtService.extraerJti(accessToken);
         String key = "blacklist:" + jti;

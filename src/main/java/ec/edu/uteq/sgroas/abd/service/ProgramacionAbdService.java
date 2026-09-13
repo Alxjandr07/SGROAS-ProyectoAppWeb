@@ -28,6 +28,16 @@ public class ProgramacionAbdService {
     private final UnidadRepository unidadRepository;
     private final ConductorAbdRepository conductorAbdRepository;
 
+    /**
+     * Recupera las programaciones de viajes aplicando filtros opcionales de forma paginada.
+     * @param estado estado por el que se desea filtrar las programaciones, puede ser nulo para no filtrar.
+     * @param idConductor identificador del conductor por el que se desea filtrar, puede ser nulo para no filtrar.
+     * @param idRuta identificador de la ruta por la que se desea filtrar, puede ser nulo para no filtrar.
+     * @param fechaDesde fecha inicial del rango por el que se desea filtrar, puede ser nula para no limitar.
+     * @param fechaHasta fecha final del rango por el que se desea filtrar, puede ser nula para no limitar.
+     * @param pageable configuracion de paginacion y orden solicitada por el cliente.
+     * @return pagina con los datos resumidos de las programaciones encontradas.
+     */
     @Transactional(readOnly = true)
     public Page<AbdDtos.ProgramacionResponse> listar(String estado, Integer idConductor, Integer idRuta,
                                                      LocalDate fechaDesde, LocalDate fechaHasta, Pageable pageable) {
@@ -43,6 +53,13 @@ public class ProgramacionAbdService {
                 .map(this::aResponse);
     }
 
+    /**
+     * Registra la programacion de un viaje validando horarios y disponibilidad de la unidad asignada.
+     * @param request datos de fecha, horarios, ruta, unidad y conductor del viaje que se desea programar.
+     * @return datos resumidos de la programacion guardada.
+     * @throws IllegalArgumentException cuando los horarios son invalidos o la ruta, la unidad o el conductor no existen.
+     * @throws IllegalStateException cuando la unidad asignada no se encuentra en estado activo.
+     */
     public AbdDtos.ProgramacionResponse crear(AbdDtos.ProgramacionRequest request) {
         validarHoras(request.horaSalida(), request.horaEstimadaLlegada());
         RutaAbd ruta = rutaAbdRepository.findById(request.idRuta())
@@ -66,6 +83,14 @@ public class ProgramacionAbdService {
         return aResponse(programacionRepository.save(programacion));
     }
 
+    /**
+     * Modifica los datos de una programacion de viaje existente con sus nuevas asignaciones.
+     * @param idProgramacion identificador de la programacion que se desea modificar.
+     * @param request nuevos datos de fecha, horarios, ruta, unidad y conductor que reemplazaran a los actuales.
+     * @return datos resumidos de la programacion actualizada.
+     * @throws IllegalArgumentException cuando la programacion no existe, los horarios son invalidos o alguna referencia no existe.
+     * @throws IllegalStateException cuando la unidad asignada no se encuentra en estado activo.
+     */
     public AbdDtos.ProgramacionResponse actualizar(Integer idProgramacion, AbdDtos.ProgramacionRequest request) {
         Programacion programacion = programacionRepository.findById(idProgramacion)
                 .orElseThrow(() -> new IllegalArgumentException("Programacion no encontrada: " + idProgramacion));
@@ -91,6 +116,11 @@ public class ProgramacionAbdService {
         return aResponse(programacionRepository.save(programacion));
     }
 
+    /**
+     * Suprime del sistema el registro de una programacion de viaje existente.
+     * @param idProgramacion identificador de la programacion que se desea suprimir.
+     * @throws IllegalArgumentException cuando no existe una programacion con el identificador indicado.
+     */
     public void eliminar(Integer idProgramacion) {
         if (!programacionRepository.existsById(idProgramacion)) {
             throw new IllegalArgumentException("Programacion no encontrada: " + idProgramacion);

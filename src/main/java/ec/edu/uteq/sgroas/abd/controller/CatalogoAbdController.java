@@ -15,6 +15,10 @@ public class CatalogoAbdController {
 
     private final CatalogoAbdService catalogoAbdService;
 
+    /**
+     * Atiende la peticion de consulta de los catalogos generales del sistema.
+     * @return respuesta con las listas de provincias, ciudades, terminales y roles y estado 200.
+     */
     @GetMapping
     public ResponseEntity<AbdDtos.CatalogosResponse> catalogos() {
         return ResponseEntity.ok(catalogoAbdService.obtenerCatalogos());

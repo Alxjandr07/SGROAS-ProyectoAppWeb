@@ -19,6 +19,12 @@ public class UsuarioController {
 
     private final UsuarioService usuarioService;
 
+    /**
+     * Recupera la lista paginada de usuarios con filtro opcional por texto.
+     * @param search criterio opcional para filtrar por nombre, correo u otros datos.
+     * @param pageable configuración de paginación y ordenamiento solicitada por el cliente.
+     * @return respuesta HTTP con la página de usuarios encontrados.
+     */
     @GetMapping
     public ResponseEntity<Page<UsuarioResponse>> listar(
             @RequestParam(required = false) String search,
@@ -27,24 +33,44 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.listar(search, pageable));
     }
 
+    /**
+     * Obtiene el detalle de un usuario a partir de su identificador.
+     * @param id identificador único del usuario que se desea consultar.
+     * @return respuesta HTTP con los datos del usuario encontrado.
+     */
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioResponse> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(usuarioService.buscarPorId(id));
     }
 
+    /**
+     * Registra un nuevo usuario y le envía el código de activación por correo.
+     * @param request objeto con los datos personales, credenciales y rol del usuario.
+     * @return respuesta HTTP con estado creado y los datos del usuario registrado.
+     */
     @PostMapping
     public ResponseEntity<UsuarioResponse> crear(@Valid @RequestBody UsuarioRequest request) {
         UsuarioResponse response = usuarioService.crear(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    /** Reenvia el codigo de activacion al correo de un usuario sin verificar. */
+    /**
+     * Reenvía el código de activación al correo de un usuario aún no verificado.
+     * @param id identificador único del usuario al que se reenvía el código.
+     * @return respuesta HTTP sin contenido que confirma el envío del código.
+     */
     @PostMapping("/{id}/reenviar-activacion")
     public ResponseEntity<Void> reenviarActivacion(@PathVariable Long id) {
         usuarioService.reenviarCodigoActivacion(id);
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Modifica los datos de un usuario ya existente.
+     * @param id identificador único del usuario que se desea modificar.
+     * @param request objeto con los nuevos valores para actualizar el usuario.
+     * @return respuesta HTTP con los datos actualizados del usuario.
+     */
     @PutMapping("/{id}")
     public ResponseEntity<UsuarioResponse> actualizar(
             @PathVariable Long id,
@@ -53,6 +79,11 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.actualizar(id, request));
     }
 
+    /**
+     * Desactiva lógicamente un usuario para impedir su acceso al sistema.
+     * @param id identificador único del usuario que se desea desactivar.
+     * @return respuesta HTTP sin contenido que confirma la operación realizada.
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> desactivar(@PathVariable Long id) {
         usuarioService.desactivar(id);

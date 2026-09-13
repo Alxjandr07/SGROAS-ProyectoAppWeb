@@ -18,6 +18,12 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final UsuarioRepository usuarioRepository;
 
+    /**
+     * Carga los datos de seguridad del usuario activo para el proceso de autenticacion.
+     * @param email correo con el que el usuario intenta identificarse
+     * @return datos con correo, clave y autoridad del rol para validar credenciales
+     * @throws UsernameNotFoundException cuando no existe el correo o el usuario esta inactivo
+     */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Usuario usuario = usuarioRepository.findByEmail(email)

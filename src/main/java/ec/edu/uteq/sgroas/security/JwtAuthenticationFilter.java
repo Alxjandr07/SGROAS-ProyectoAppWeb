@@ -27,6 +27,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final CustomUserDetailsService customUserDetailsService;
     private final TokenService tokenService;
 
+    /**
+     * Extrae el token de la cabecera o cookie y registra la autenticacion en el contexto.
+     * @param request peticion entrante de la que se obtiene el token enviado
+     * @param response respuesta donde se marca no autorizado si el token fue revocado
+     * @param filterChain cadena que continua con el siguiente filtro de la aplicacion
+     * @throws ServletException cuando ocurre un error interno al procesar el filtro
+     * @throws IOException cuando falla la lectura o escritura de la peticion o respuesta
+     */
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,

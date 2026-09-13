@@ -32,6 +32,11 @@ public class JwtService {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 
+    /**
+     * Crea un token firmado con los datos del usuario para autenticar sus peticiones.
+     * @param usuario entidad con correo, nombre y rol que se guardan en el token
+     * @return token compacto listo para enviar en cabecera o cookie
+     */
     public String generarToken(Usuario usuario) {
         Date ahora = new Date();
         Date expiracion = new Date(ahora.getTime() + jwtExpirationMs);
@@ -51,22 +56,47 @@ public class JwtService {
                 .compact();
     }
 
+    /**
+     * Recupera el correo del propietario a partir de un token firmado.
+     * @param token texto compacto previamente generado por este servicio
+     * @return correo guardado en el asunto del token
+     */
     public String extraerEmail(String token) {
         return extraerClaim(token, Claims::getSubject);
     }
 
+    /**
+     * Recupera el identificador unico del token para controlar revocaciones.
+     * @param token texto compacto previamente generado por este servicio
+     * @return identificador unico asignado al crear el token
+     */
     public String extraerJti(String token) {
         return extraerClaim(token, Claims::getId);
     }
 
+    /**
+     * Recupera la fecha de vencimiento contenida en un token firmado.
+     * @param token texto compacto previamente generado por este servicio
+     * @return fecha a partir de la cual el token deja de aceptarse
+     */
     public Date extraerExpiracion(String token) {
         return extraerClaim(token, Claims::getExpiration);
     }
 
+    /**
+     * Informa el tiempo de vida configurado para los tokens emitidos.
+     * @return duracion de vigencia en milisegundos definida en propiedades
+     */
     public Long getExpirationMs() {
         return jwtExpirationMs;
     }
 
+    /**
+     * Comprueba que un token pertenezca al usuario esperado y siga vigente.
+     * @param token texto compacto a validar con firma y fecha de expiracion
+     * @param email correo esperado del propietario para comparar con el asunto
+     * @return verdadero cuando el correo coincide y el token no ha expirado
+     */
     public boolean tokenValido(String token, String email) {
         String emailToken = extraerEmail(token);
         return emailToken.equals(email) && !tokenExpirado(token);

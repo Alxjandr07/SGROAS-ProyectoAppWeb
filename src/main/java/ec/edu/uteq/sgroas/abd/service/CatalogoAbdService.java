@@ -25,6 +25,10 @@ public class CatalogoAbdService {
     private final TerminalRepository terminalRepository;
     private final RolAbdRepository rolAbdRepository;
 
+    /**
+     * Reune las listas de provincias, ciudades, terminales y roles disponibles en el sistema.
+     * @return contenedor con los cuatro listados de catalogos para uso en formularios y filtros.
+     */
     public AbdDtos.CatalogosResponse obtenerCatalogos() {
         List<AbdDtos.ProvinciaResponse> provincias = provinciaRepository.findAll().stream()
                 .map(p -> new AbdDtos.ProvinciaResponse(p.getIdProvincia(), p.getNombre()))
@@ -41,6 +45,12 @@ public class CatalogoAbdService {
         return new AbdDtos.CatalogosResponse(provincias, ciudades, terminales, roles);
     }
 
+    /**
+     * Obtiene la entidad de un terminal existente para asociarla a una ruta.
+     * @param idTerminal identificador del terminal que se desea recuperar.
+     * @return entidad del terminal encontrado lista para su uso en otras operaciones.
+     * @throws IllegalArgumentException cuando no existe un terminal con el identificador indicado.
+     */
     public Terminal buscarTerminal(Integer idTerminal) {
         return terminalRepository.findById(idTerminal)
                 .orElseThrow(() -> new IllegalArgumentException("Terminal no encontrado: " + idTerminal));

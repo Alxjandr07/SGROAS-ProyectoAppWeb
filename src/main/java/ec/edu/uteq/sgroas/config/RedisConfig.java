@@ -16,6 +16,10 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private int redisPort;
 
+    /**
+     * Crea la fabrica de conexiones hacia el servidor Redis configurado en propiedades.
+     * @return fabrica con direccion y puerto listos para abrir conexiones
+     */
     @Bean
     public LettuceConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
@@ -25,6 +29,11 @@ public class RedisConfig {
         return new LettuceConnectionFactory(config);
     }
 
+    /**
+     * Expone la plantilla para leer y escribir cadenas de texto en Redis.
+     * @param redisConnectionFactory fabrica con la conexion activa hacia el servidor Redis
+     * @return plantilla preparada para operar con claves y valores de texto
+     */
     @Bean
     public StringRedisTemplate stringRedisTemplate(
             LettuceConnectionFactory redisConnectionFactory

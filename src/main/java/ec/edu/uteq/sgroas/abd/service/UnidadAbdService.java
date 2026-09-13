@@ -17,6 +17,13 @@ public class UnidadAbdService {
 
     private final UnidadRepository unidadRepository;
 
+    /**
+     * Recupera las unidades registradas aplicando filtros opcionales de forma paginada.
+     * @param estado estado por el que se desea filtrar las unidades, puede ser nulo para no filtrar.
+     * @param search texto para buscar coincidencias en placa, disco o modelo, puede ser nulo para no filtrar.
+     * @param pageable configuracion de paginacion y orden solicitada por el cliente.
+     * @return pagina con los datos resumidos de las unidades encontradas.
+     */
     @Transactional(readOnly = true)
     public Page<AbdDtos.UnidadResponse> listar(String estado, String search, Pageable pageable) {
         String estadoFiltro = (estado == null || estado.isBlank()) ? null : estado.trim().toLowerCase();
@@ -31,12 +38,24 @@ public class UnidadAbdService {
         return page.map(this::aResponse);
     }
 
+    /**
+     * Obtiene el detalle de una unidad existente a partir de su identificador.
+     * @param idUnidad identificador de la unidad que se desea consultar.
+     * @return datos resumidos de la unidad encontrada.
+     * @throws IllegalArgumentException cuando no existe una unidad con el identificador indicado.
+     */
     @Transactional(readOnly = true)
     public AbdDtos.UnidadResponse buscarPorId(Integer idUnidad) {
         return unidadRepository.findById(idUnidad).map(this::aResponse)
                 .orElseThrow(() -> new IllegalArgumentException("Unidad no encontrada: " + idUnidad));
     }
 
+    /**
+     * Registra una unidad nueva verificando que la placa y el disco no esten duplicados.
+     * @param request datos de la unidad que se desea registrar.
+     * @return datos resumidos de la unidad guardada.
+     * @throws IllegalArgumentException cuando la placa o el numero de disco ya estan registrados.
+     */
     public AbdDtos.UnidadResponse crear(AbdDtos.UnidadRequest request) {
         validarUnicidad(request.placa(), request.numeroDisco(), null);
         Unidad unidad = Unidad.builder()
@@ -50,6 +69,13 @@ public class UnidadAbdService {
         return aResponse(unidadRepository.save(unidad));
     }
 
+    /**
+     * Modifica los datos de una unidad existente verificando que no se dupliquen placa ni disco.
+     * @param idUnidad identificador de la unidad que se desea modificar.
+     * @param request nuevos datos que reemplazaran a los actuales de la unidad.
+     * @return datos resumidos de la unidad actualizada.
+     * @throws IllegalArgumentException cuando la unidad no existe o la placa o el disco ya pertenecen a otra unidad.
+     */
     public AbdDtos.UnidadResponse actualizar(Integer idUnidad, AbdDtos.UnidadRequest request) {
         Unidad unidad = unidadRepository.findById(idUnidad)
                 .orElseThrow(() -> new IllegalArgumentException("Unidad no encontrada: " + idUnidad));
@@ -65,6 +91,11 @@ public class UnidadAbdService {
         return aResponse(unidadRepository.save(unidad));
     }
 
+    /**
+     * Suprime del sistema el registro de una unidad existente.
+     * @param idUnidad identificador de la unidad que se desea suprimir.
+     * @throws IllegalArgumentException cuando no existe una unidad con el identificador indicado.
+     */
     public void eliminar(Integer idUnidad) {
         if (!unidadRepository.existsById(idUnidad)) {
             throw new IllegalArgumentException("Unidad no encontrada: " + idUnidad);

@@ -21,6 +21,12 @@ public class ConductorService {
 
     private final ConductorRepository conductorRepository;
 
+    /**
+     * Obtiene la pagina de conductores activos, con filtro opcional por texto de busqueda.
+     * @param search texto opcional para filtrar por nombres, cedula o licencia, nulo o vacio para traer todo
+     * @param pageable objeto con numero de pagina, tamanio y orden solicitados para la consulta
+     * @return pagina con los conductores activos encontrados
+     */
     public Page<ConductorResponse> listar(String search, Pageable pageable) {
         if (search == null || search.isBlank()) {
             return conductorRepository.findByActivoTrue(pageable).map(this::mapearAResponse);
@@ -29,11 +35,23 @@ public class ConductorService {
                 .map(this::mapearAResponse);
     }
 
+    /**
+     * Recupera el detalle de un conductor activo existente.
+     * @param id identificador del conductor que se desea consultar
+     * @return datos del conductor encontrado
+     * @throws IllegalArgumentException cuando no existe un conductor activo con ese identificador
+     */
     public ConductorResponse buscarPorId(Long id) {
         Conductor conductor = obtenerConductorActivo(id);
         return mapearAResponse(conductor);
     }
 
+    /**
+     * Registra un nuevo conductor despues de validar que cedula y licencia no se repitan.
+     * @param request datos personales, de licencia y de contacto del conductor por registrar
+     * @return datos del conductor recien guardado
+     * @throws IllegalArgumentException cuando la cedula o la licencia ya estan registradas, o el estado no es valido
+     */
     @CacheEvict(value = "conductores", allEntries = true)
     public ConductorResponse crear(ConductorRequest request) {
         validarCedulaDuplicada(request.cedula());
@@ -58,6 +76,13 @@ public class ConductorService {
         return mapearAResponse(conductorGuardado);
     }
 
+    /**
+     * Reemplaza los datos de un conductor activo por los valores recibidos.
+     * @param id identificador del conductor que se desea modificar
+     * @param request nuevos datos personales, de licencia y de contacto para el conductor
+     * @return datos del conductor ya actualizado
+     * @throws IllegalArgumentException cuando el conductor no existe, la cedula o licencia chocan con otro registro, o el estado no es valido
+     */
     @CacheEvict(value = "conductores", allEntries = true)
     public ConductorResponse actualizar(Long id, ConductorRequest request) {
         Conductor conductor = obtenerConductorActivo(id);
@@ -87,6 +112,11 @@ public class ConductorService {
         return mapearAResponse(conductorActualizado);
     }
 
+    /**
+     * Marca un conductor como inactivo y lo deja en estado inactivo.
+     * @param id identificador del conductor que se desea dar de baja
+     * @throws IllegalArgumentException cuando no existe un conductor activo con ese identificador
+     */
     @CacheEvict(value = "conductores", allEntries = true)
     public void desactivar(Long id) {
         Conductor conductor = obtenerConductorActivo(id);

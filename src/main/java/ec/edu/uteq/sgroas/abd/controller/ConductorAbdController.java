@@ -19,6 +19,12 @@ public class ConductorAbdController {
 
     private final ConductorAbdRepository conductorAbdRepository;
 
+    /**
+     * Atiende la peticion de consulta paginada de conductores con busqueda opcional.
+     * @param search texto para buscar coincidencias en los datos del conductor, puede ser nulo para traer todo.
+     * @param pageable configuracion de paginacion y orden enviada por el cliente.
+     * @return respuesta con la pagina de conductores encontrados y estado 200.
+     */
     @GetMapping
     public ResponseEntity<Page<ConductorAbd>> listar(
             @RequestParam(required = false) String search,
