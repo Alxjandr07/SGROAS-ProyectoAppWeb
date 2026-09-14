@@ -4,6 +4,11 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
+/**
+ * Peticion para verificar el correo electronico de una cuenta.
+ * @param email correo electronico a verificar
+ * @param codigo codigo de verificacion de seis digitos
+ */
 public record VerifyEmailRequest(
         @NotBlank(message = "El email es obligatorio")
         @Email(message = "Debe ser un email valido")

@@ -4,6 +4,16 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
+/**
+ * Peticion para crear o actualizar una asignacion de ruta.
+ * @param conductorId identificador del conductor asignado
+ * @param vehiculoId identificador del vehiculo asignado
+ * @param rutaId identificador de la ruta asignada
+ * @param fechaAsignacion fecha en que se registro la asignacion
+ * @param fechaInicio fecha en que inicia la vigencia
+ * @param fechaFin fecha en que finaliza la vigencia
+ * @param estado estado de la asignacion
+ */
 public record RouteAssignmentRequest(
 
         @NotNull(message = "El conductor es obligatorio")

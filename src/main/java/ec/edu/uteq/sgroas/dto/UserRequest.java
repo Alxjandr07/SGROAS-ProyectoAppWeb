@@ -4,6 +4,13 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+/**
+ * Peticion para crear o actualizar un usuario.
+ * @param nombre nombre del usuario
+ * @param email correo electronico del usuario
+ * @param password contrasena de acceso del usuario
+ * @param rol rol asignado al usuario
+ */
 public record UserRequest(
         @NotBlank(message = "El nombre es obligatorio")
         @Size(max = 100, message = "El nombre no puede superar los 100 caracteres")

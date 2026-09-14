@@ -6,6 +6,17 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 
+/**
+ * Peticion para crear o actualizar un incidente.
+ * @param asignacionId identificador de la asignacion relacionada
+ * @param reportadoPor persona que reporta el incidente
+ * @param tipo tipo de incidente ocurrido
+ * @param descripcion detalle del incidente
+ * @param fechaIncidente fecha y hora en que ocurrio
+ * @param ubicacion lugar del incidente
+ * @param gravedad nivel de gravedad del incidente
+ * @param estado estado del incidente
+ */
 public record IncidentRequest(
 
         @NotNull(message = "La asignacion es obligatoria")

@@ -5,6 +5,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+/**
+ * Peticion para restablecer la contrasena con un codigo de verificacion.
+ * @param email correo electronico de la cuenta
+ * @param codigo codigo de verificacion de seis digitos
+ * @param nuevaPassword nueva contrasena de la cuenta
+ */
 public record ResetPasswordRequest(
         @NotBlank(message = "El email es obligatorio")
         @Email(message = "Debe ser un email valido")

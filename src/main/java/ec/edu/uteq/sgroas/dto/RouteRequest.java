@@ -2,6 +2,16 @@ package ec.edu.uteq.sgroas.dto;
 
 import jakarta.validation.constraints.*;
 
+/**
+ * Peticion para crear o actualizar una ruta.
+ * @param codigo codigo unico de la ruta
+ * @param nombre nombre de la ruta
+ * @param origen lugar de partida de la ruta
+ * @param destino lugar de llegada de la ruta
+ * @param distanciaKm distancia de la ruta en kilometros
+ * @param duracionEstimadaMin duracion estimada del viaje en minutos
+ * @param estado estado de la ruta
+ */
 public record RouteRequest(
 
         @NotBlank(message = "El codigo es obligatorio")

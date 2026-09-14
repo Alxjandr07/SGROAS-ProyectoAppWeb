@@ -2,6 +2,18 @@ package ec.edu.uteq.sgroas.dto;
 
 import jakarta.validation.constraints.*;
 
+/**
+ * Peticion para crear o actualizar un vehiculo.
+ * @param placa placa unica del vehiculo
+ * @param marca marca del vehiculo
+ * @param modelo modelo del vehiculo
+ * @param anio anio de fabricacion del vehiculo
+ * @param capacidadPasajeros cantidad maxima de pasajeros
+ * @param numeroMotor numero de motor del vehiculo
+ * @param numeroChasis numero de chasis del vehiculo
+ * @param color color del vehiculo
+ * @param estado estado del vehiculo
+ */
 public record VehicleRequest(
 
         @NotBlank(message = "La placa es obligatoria")

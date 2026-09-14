@@ -8,6 +8,18 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
+/**
+ * Peticion para crear o actualizar un conductor.
+ * @param nombres nombres del conductor
+ * @param apellidos apellidos del conductor
+ * @param cedula cedula unica del conductor
+ * @param numeroLicencia numero de licencia del conductor
+ * @param tipoLicencia tipo de licencia del conductor
+ * @param fechaVencimientoLicencia fecha de vencimiento de la licencia
+ * @param telefono telefono de contacto del conductor
+ * @param email correo electronico del conductor
+ * @param estado estado operativo del conductor
+ */
 public record DriverRequest(
 
         @NotBlank(message = "Los nombres son obligatorios")
