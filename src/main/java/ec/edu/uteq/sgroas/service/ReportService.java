@@ -57,8 +57,8 @@ public class ReportService {
      * @param tipo criterio de gravedad enviado al procedimiento para filtrar el conteo
      * @return lista de filas con cada gravedad, su total de incidentes y la fecha del ultimo caso
      */
-    public List<Map<String, Object>> incidentesPorGravedad(String tipo) {
-        return incidenteRepository.incidentesPorGravedad(tipo).stream()
+    public List<Map<String, Object>> incidentsBySeverity(String tipo) {
+        return incidenteRepository.incidentsBySeverity(tipo).stream()
                 .map(fila -> mapa(
                         "gravedad", fila[0],
                         "total_incidentes", fila[1],
@@ -72,8 +72,8 @@ public class ReportService {
      * @param hasta fecha y hora final del intervalo por consultar
      * @return lista de filas con el detalle de cada incidente y sus datos de conductor, vehiculo y ruta
      */
-    public List<Map<String, Object>> incidentesPorRango(Instant desde, Instant hasta) {
-        return incidenteRepository.obtenerIncidentesPorRango(desde, hasta).stream()
+    public List<Map<String, Object>> incidentsByRange(Instant desde, Instant hasta) {
+        return incidenteRepository.getIncidentsByRange(desde, hasta).stream()
                 .map(fila -> mapa(
                         "incidente_id", fila[0],
                         "tipo", fila[1],
@@ -93,8 +93,8 @@ public class ReportService {
      * @param dias cantidad maxima de dias restantes para considerar una licencia proxima a vencer
      * @return lista de filas con los datos del conductor, su licencia y su asignacion vigente
      */
-    public List<Map<String, Object>> licenciasPorVencer(Integer dias) {
-        return conductorRepository.licenciasPorVencer(dias).stream()
+    public List<Map<String, Object>> licensesExpiring(Integer dias) {
+        return conductorRepository.licensesExpiring(dias).stream()
                 .map(fila -> mapa(
                         "conductor_id", fila[0],
                         "nombre_completo", fila[1],
@@ -110,8 +110,8 @@ public class ReportService {
      * Recupera los vehiculos marcados en mantenimiento con sus conteos asociados.
      * @return lista de filas con los datos del vehiculo y sus totales de asignaciones e incidentes
      */
-    public List<Map<String, Object>> vehiculosEnMantenimiento() {
-        return vehiculoRepository.vehiculosEnMantenimiento().stream()
+    public List<Map<String, Object>> vehiclesInMaintenance() {
+        return vehiculoRepository.vehiclesInMaintenance().stream()
                 .map(fila -> mapa(
                         "vehiculo_id", fila[0],
                         "placa", fila[1],
@@ -127,8 +127,8 @@ public class ReportService {
      * Calcula el rendimiento de cada ruta con sus asignaciones e incidentes por gravedad.
      * @return lista de filas con los totales de asignaciones e incidentes de cada ruta evaluada
      */
-    public List<Map<String, Object>> reporteRendimientoRutas() {
-        return rutaRepository.reporteRendimientoRutas().stream()
+    public List<Map<String, Object>> routePerformanceReport() {
+        return rutaRepository.routePerformanceReport().stream()
                 .map(fila -> mapa(
                         "ruta_id", fila[0],
                         "ruta_codigo", fila[1],
@@ -148,8 +148,8 @@ public class ReportService {
      * @param conductorId identificador del conductor cuyas asignaciones vigentes se desean consultar
      * @return lista de filas con cada asignacion activa y los datos de su vehiculo y ruta
      */
-    public List<Map<String, Object>> asignacionesActivasPorConductor(Long conductorId) {
-        return asignacionRutaRepository.asignacionesActivasPorConductor(conductorId).stream()
+    public List<Map<String, Object>> activeAssignmentsByDriver(Long conductorId) {
+        return asignacionRutaRepository.activeAssignmentsByDriver(conductorId).stream()
                 .map(fila -> mapa(
                         "asignacion_id", fila[0],
                         "vehiculo_placa", fila[1],

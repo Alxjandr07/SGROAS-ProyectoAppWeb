@@ -32,7 +32,7 @@ public class AbdIncidentService {
      * @return pagina con los datos resumidos de los incidentes encontrados.
      */
     @Transactional(readOnly = true)
-    public Page<AbdDtos.IncidenteAbdResponse> listar(String estado, String nivel, String search, Pageable pageable) {
+    public Page<AbdDtos.AbdIncidentResponse> list(String estado, String nivel, String search, Pageable pageable) {
         String estadoFiltro = (estado == null || estado.isBlank()) ? null : estado.trim().toLowerCase();
         String nivelFiltro = (nivel == null || nivel.isBlank()) ? null : nivel.trim().toLowerCase();
         String searchFiltro = (search == null || search.isBlank()) ? null : search.trim().toLowerCase();
@@ -41,7 +41,7 @@ public class AbdIncidentService {
         }
         if (searchFiltro != null) {
             return incidenteRepository
-                    .buscarConFiltros(estadoFiltro, nivelFiltro, searchFiltro,
+                    .searchWithFilters(estadoFiltro, nivelFiltro, searchFiltro,
                             PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()))
                     .map(this::aResponse);
         }
@@ -60,7 +60,7 @@ public class AbdIncidentService {
      * @return datos resumidos del incidente guardado.
      * @throws IllegalArgumentException cuando la unidad indicada no existe en el sistema.
      */
-    public AbdDtos.IncidenteAbdResponse crear(AbdDtos.IncidenteAbdRequest request) {
+    public AbdDtos.AbdIncidentResponse create(AbdDtos.AbdIncidentRequest request) {
         Unit unidad = unidadRepository.findById(request.idUnidad())
                 .orElseThrow(() -> new IllegalArgumentException("Unit no encontrada: " + request.idUnidad()));
         AbdIncident incidente = AbdIncident.builder()
@@ -74,7 +74,7 @@ public class AbdIncidentService {
         incidente = incidenteRepository.save(incidente);
 
         if ("ALTO".equalsIgnoreCase(incidente.getNivelSugerido())) {
-            generarAlerta(incidente);
+            generateAlert(incidente);
         }
         return aResponse(incidente);
     }
@@ -86,7 +86,7 @@ public class AbdIncidentService {
      * @return datos resumidos del incidente actualizado.
      * @throws IllegalArgumentException cuando el incidente o la unidad indicada no existen en el sistema.
      */
-    public AbdDtos.IncidenteAbdResponse actualizar(Integer idIncidente, AbdDtos.IncidenteAbdRequest request) {
+    public AbdDtos.AbdIncidentResponse update(Integer idIncidente, AbdDtos.AbdIncidentRequest request) {
         AbdIncident incidente = incidenteRepository.findById(idIncidente)
                 .orElseThrow(() -> new IllegalArgumentException("Incident no encontrado: " + idIncidente));
         Unit unidad = unidadRepository.findById(request.idUnidad())
@@ -109,14 +109,14 @@ public class AbdIncidentService {
      * @param idIncidente identificador del incidente que se desea suprimir.
      * @throws IllegalArgumentException cuando no existe un incidente con el identificador indicado.
      */
-    public void eliminar(Integer idIncidente) {
+    public void delete(Integer idIncidente) {
         if (!incidenteRepository.existsById(idIncidente)) {
             throw new IllegalArgumentException("Incident no encontrado: " + idIncidente);
         }
         incidenteRepository.deleteById(idIncidente);
     }
 
-    private void generarAlerta(AbdIncident incidente) {
+    private void generateAlert(AbdIncident incidente) {
         Alert alerta = Alert.builder()
                 .nivelRiesgo("ALTO")
                 .descripcion(incidente.getDescripcion())
@@ -125,8 +125,8 @@ public class AbdIncidentService {
         alertaRepository.save(alerta);
     }
 
-    private AbdDtos.IncidenteAbdResponse aResponse(AbdIncident i) {
-        return new AbdDtos.IncidenteAbdResponse(
+    private AbdDtos.AbdIncidentResponse aResponse(AbdIncident i) {
+        return new AbdDtos.AbdIncidentResponse(
                 i.getIdIncidente(), i.getTipo(), i.getDescripcion(),
                 i.getNivelSugerido(), i.getFechaIncidente().toString(), i.getEvidencia(),
                 i.getEstado(), i.getUnidad().getIdUnidad(), i.getUnidad().getPlaca()

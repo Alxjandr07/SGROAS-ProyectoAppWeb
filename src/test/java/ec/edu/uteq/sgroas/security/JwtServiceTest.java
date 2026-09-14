@@ -39,7 +39,7 @@ class JwtServiceTest {
 
     @Test
     void generarTokenDebePermitirExtraerDatos() {
-        String token = jwtService.generarToken(usuarioEjemplo());
+        String token = jwtService.generateToken(usuarioEjemplo());
 
         assertNotNull(token);
         assertNotNull(jwtService.extraerJti(token));
@@ -51,7 +51,7 @@ class JwtServiceTest {
 
     @Test
     void tokenConEmailDistintoDebeSerInvalido() {
-        String token = jwtService.generarToken(usuarioEjemplo());
+        String token = jwtService.generateToken(usuarioEjemplo());
 
         assertFalse(jwtService.tokenValido(token, "otro@sgroas.com"));
     }
@@ -60,7 +60,7 @@ class JwtServiceTest {
     void tokenExpiradoDebeSerRechazado() {
         ReflectionTestUtils.setField(jwtService, "jwtExpirationMs", -1000L);
 
-        String token = jwtService.generarToken(usuarioEjemplo());
+        String token = jwtService.generateToken(usuarioEjemplo());
 
         assertThrows(io.jsonwebtoken.ExpiredJwtException.class,
                 () -> jwtService.tokenValido(token, "admin@sgroas.com"));
@@ -68,7 +68,7 @@ class JwtServiceTest {
 
     @Test
     void extraerExpiracionDebeSerFutura() {
-        String token = jwtService.generarToken(usuarioEjemplo());
+        String token = jwtService.generateToken(usuarioEjemplo());
 
         assertTrue(jwtService.extraerExpiracion(token).after(new Date()));
     }

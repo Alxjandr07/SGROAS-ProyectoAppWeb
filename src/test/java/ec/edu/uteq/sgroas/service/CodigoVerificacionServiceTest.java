@@ -61,7 +61,7 @@ class CodigoVerificacionServiceTest {
     void generarDebeInvalidarAnterioresYGuardarNuevo() {
         when(repository.save(any(VerificationCode.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        String codigo = service.generar(EMAIL, Tipo.VERIFICACION);
+        String codigo = service.generate(EMAIL, Tipo.VERIFICACION);
 
         verify(repository).deleteByEmailAndTipo(EMAIL, Tipo.VERIFICACION.name());
         verify(repository).save(argThat(reg ->
@@ -77,7 +77,7 @@ class CodigoVerificacionServiceTest {
         when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
                 EMAIL, Tipo.VERIFICACION.name())).thenReturn(Optional.empty());
 
-        assertTrue(service.puedeReenviar(EMAIL, Tipo.VERIFICACION));
+        assertTrue(service.canResend(EMAIL, Tipo.VERIFICACION));
     }
 
     @Test
@@ -87,7 +87,7 @@ class CodigoVerificacionServiceTest {
         when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
                 EMAIL, Tipo.VERIFICACION.name())).thenReturn(Optional.of(reciente));
 
-        assertFalse(service.puedeReenviar(EMAIL, Tipo.VERIFICACION));
+        assertFalse(service.canResend(EMAIL, Tipo.VERIFICACION));
     }
 
     @Test
@@ -97,7 +97,7 @@ class CodigoVerificacionServiceTest {
         when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
                 EMAIL, Tipo.VERIFICACION.name())).thenReturn(Optional.of(antiguo));
 
-        assertTrue(service.puedeReenviar(EMAIL, Tipo.VERIFICACION));
+        assertTrue(service.canResend(EMAIL, Tipo.VERIFICACION));
     }
 
     @Test
@@ -105,7 +105,7 @@ class CodigoVerificacionServiceTest {
         when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
                 EMAIL, Tipo.VERIFICACION.name())).thenReturn(Optional.of(registro("123456")));
 
-        service.validar(EMAIL, Tipo.VERIFICACION, "123456");
+        service.validate(EMAIL, Tipo.VERIFICACION, "123456");
 
         verify(repository).save(argThat(VerificationCode::isUsado));
     }
@@ -117,7 +117,7 @@ class CodigoVerificacionServiceTest {
                 EMAIL, Tipo.VERIFICACION.name())).thenReturn(Optional.of(reg));
 
         assertThrows(IllegalArgumentException.class,
-                () -> service.validar(EMAIL, Tipo.VERIFICACION, "999999"));
+                () -> service.validate(EMAIL, Tipo.VERIFICACION, "999999"));
         verify(repository).save(argThat(c -> c.getIntentos() == 1 && !c.isUsado()));
     }
 
@@ -127,7 +127,7 @@ class CodigoVerificacionServiceTest {
                 EMAIL, Tipo.VERIFICACION.name())).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class,
-                () -> service.validar(EMAIL, Tipo.VERIFICACION, "123456"));
+                () -> service.validate(EMAIL, Tipo.VERIFICACION, "123456"));
     }
 
     @Test
@@ -138,7 +138,7 @@ class CodigoVerificacionServiceTest {
                 EMAIL, Tipo.VERIFICACION.name())).thenReturn(Optional.of(usado));
 
         assertThrows(IllegalArgumentException.class,
-                () -> service.validar(EMAIL, Tipo.VERIFICACION, "123456"));
+                () -> service.validate(EMAIL, Tipo.VERIFICACION, "123456"));
     }
 
     @Test
@@ -149,7 +149,7 @@ class CodigoVerificacionServiceTest {
                 EMAIL, Tipo.VERIFICACION.name())).thenReturn(Optional.of(expirado));
 
         assertThrows(IllegalArgumentException.class,
-                () -> service.validar(EMAIL, Tipo.VERIFICACION, "123456"));
+                () -> service.validate(EMAIL, Tipo.VERIFICACION, "123456"));
     }
 
     @Test
@@ -160,6 +160,6 @@ class CodigoVerificacionServiceTest {
                 EMAIL, Tipo.VERIFICACION.name())).thenReturn(Optional.of(agotado));
 
         assertThrows(IllegalArgumentException.class,
-                () -> service.validar(EMAIL, Tipo.VERIFICACION, "123456"));
+                () -> service.validate(EMAIL, Tipo.VERIFICACION, "123456"));
     }
 }

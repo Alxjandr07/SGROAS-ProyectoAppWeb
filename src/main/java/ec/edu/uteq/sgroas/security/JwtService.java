@@ -37,7 +37,7 @@ public class JwtService {
      * @param usuario entidad con correo, nombre y rol que se guardan en el token
      * @return token compacto listo para enviar en cabecera o cookie
      */
-    public String generarToken(User usuario) {
+    public String generateToken(User usuario) {
         Date ahora = new Date();
         Date expiracion = new Date(ahora.getTime() + jwtExpirationMs);
         String jti = UUID.randomUUID().toString();
@@ -107,11 +107,11 @@ public class JwtService {
     }
 
     private <T> T extraerClaim(String token, Function<Claims, T> claimsResolver) {
-        Claims claims = extraerTodosLosClaims(token);
+        Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
-    private Claims extraerTodosLosClaims(String token) {
+    private Claims extractAllClaims(String token) {
         return Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()

@@ -25,10 +25,10 @@ public class RouteController {
      * @return respuesta HTTP con la página de rutas encontradas.
      */
     @GetMapping
-    public ResponseEntity<Page<RouteResponse>> listar(
+    public ResponseEntity<Page<RouteResponse>> list(
             @PageableDefault(size = 10, sort = "id") Pageable pageable
     ) {
-        return ResponseEntity.ok(rutaService.listar(pageable));
+        return ResponseEntity.ok(rutaService.list(pageable));
     }
 
     /**
@@ -37,8 +37,8 @@ public class RouteController {
      * @return respuesta HTTP con los datos de la ruta encontrada.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<RouteResponse> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(rutaService.buscarPorId(id));
+    public ResponseEntity<RouteResponse> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(rutaService.findById(id));
     }
 
     /**
@@ -47,10 +47,10 @@ public class RouteController {
      * @return respuesta HTTP con estado creado y los datos de la ruta registrada.
      */
     @PostMapping
-    public ResponseEntity<RouteResponse> crear(
+    public ResponseEntity<RouteResponse> create(
             @Valid @RequestBody RouteRequest request
     ) {
-        RouteResponse response = rutaService.crear(request);
+        RouteResponse response = rutaService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -61,11 +61,11 @@ public class RouteController {
      * @return respuesta HTTP con los datos actualizados de la ruta.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<RouteResponse> actualizar(
+    public ResponseEntity<RouteResponse> update(
             @PathVariable Long id,
             @Valid @RequestBody RouteRequest request
     ) {
-        return ResponseEntity.ok(rutaService.actualizar(id, request));
+        return ResponseEntity.ok(rutaService.update(id, request));
     }
 
     /**

@@ -29,5 +29,5 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
      * @return filas del procedimiento con los vehiculos en mantenimiento.
      */
     @Procedure(name = "Vehicle.vehiculosEnMantenimiento")
-    List<Object[]> vehiculosEnMantenimiento();
+    List<Object[]> vehiclesInMaintenance();
 }

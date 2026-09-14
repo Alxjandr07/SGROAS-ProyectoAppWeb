@@ -69,12 +69,12 @@ class ConductorAbdControllerTest {
 
     @Test
     void listarConSearchUsaBuscar() throws Exception {
-        when(conductorAbdRepository.buscar(eq("carlos"), any(Pageable.class)))
+        when(conductorAbdRepository.search(eq("carlos"), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(conductor())));
 
         mockMvc().perform(get("/api/abd/conductores").param("search", " Carlos "))
                 .andExpect(status().isOk());
 
-        verify(conductorAbdRepository).buscar(eq("carlos"), any(Pageable.class));
+        verify(conductorAbdRepository).search(eq("carlos"), any(Pageable.class));
     }
 }

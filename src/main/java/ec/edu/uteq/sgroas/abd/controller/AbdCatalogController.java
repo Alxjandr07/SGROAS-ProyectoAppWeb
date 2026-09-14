@@ -20,7 +20,7 @@ public class AbdCatalogController {
      * @return respuesta con las listas de provincias, ciudades, terminales y roles y estado 200.
      */
     @GetMapping
-    public ResponseEntity<AbdDtos.CatalogosResponse> catalogos() {
-        return ResponseEntity.ok(catalogoAbdService.obtenerCatalogos());
+    public ResponseEntity<AbdDtos.CatalogsResponse> getCatalogs() {
+        return ResponseEntity.ok(catalogoAbdService.getCatalogs());
     }
 }

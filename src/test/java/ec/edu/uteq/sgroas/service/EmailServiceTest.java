@@ -19,30 +19,30 @@ class EmailServiceTest {
     void configuradoSinHostDebeSerFalse() {
         ReflectionTestUtils.setField(service, "host", null);
 
-        assertFalse(service.configurado());
+        assertFalse(service.isConfigured());
     }
 
     @Test
     void configuradoConHostEnBlancoDebeSerFalse() {
         ReflectionTestUtils.setField(service, "host", "   ");
 
-        assertFalse(service.configurado());
+        assertFalse(service.isConfigured());
     }
 
     @Test
     void configuradoConHostDebeSerTrue() {
         ReflectionTestUtils.setField(service, "host", "smtp.sgroas.com");
 
-        assertTrue(service.configurado());
+        assertTrue(service.isConfigured());
     }
 
     @Test
     void modoConsolaNoDebeLanzarAlEnviarCodigos() {
         ReflectionTestUtils.setField(service, "host", "");
 
-        assertDoesNotThrow(() -> service.enviarCodigoVerificacion(
+        assertDoesNotThrow(() -> service.sendVerificationCode(
                 "carlos@sgroas.com", "Carlos Mendoza", "123456"));
-        assertDoesNotThrow(() -> service.enviarCodigoRestablecimiento(
+        assertDoesNotThrow(() -> service.sendResetCode(
                 "carlos@sgroas.com", "654321"));
     }
 
@@ -54,7 +54,7 @@ class EmailServiceTest {
         ReflectionTestUtils.setField(service, "password", "");
 
         assertThrows(IllegalStateException.class,
-                () -> service.enviarCodigoVerificacion(
+                () -> service.sendVerificationCode(
                         "carlos@sgroas.com", "Carlos Mendoza", "123456"));
     }
 
@@ -66,7 +66,7 @@ class EmailServiceTest {
         ReflectionTestUtils.setField(service, "password", "smtp-pass");
 
         assertThrows(IllegalStateException.class,
-                () -> service.enviarCodigoRestablecimiento(
+                () -> service.sendResetCode(
                         "carlos@sgroas.com", "654321"));
     }
 }

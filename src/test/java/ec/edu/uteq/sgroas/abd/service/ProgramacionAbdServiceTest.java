@@ -66,8 +66,8 @@ class ProgramacionAbdServiceTest {
                 .estado("Programado").ruta(ruta()).unidad(unidad("Activo")).conductor(conductor()).build();
     }
 
-    private AbdDtos.ProgramacionRequest request(String estado) {
-        return new AbdDtos.ProgramacionRequest(LocalDate.now(),
+    private AbdDtos.ScheduleRequest request(String estado) {
+        return new AbdDtos.ScheduleRequest(LocalDate.now(),
                 LocalTime.of(8, 0), LocalTime.of(10, 0), estado, 1, 1, 1);
     }
 
@@ -76,7 +76,7 @@ class ProgramacionAbdServiceTest {
         PageRequest pageable = PageRequest.of(0, 10);
         when(programacionRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(programacion())));
 
-        assertEquals(1, service.listar(null, null, null, null, null, pageable).getTotalElements());
+        assertEquals(1, service.list(null, null, null, null, null, pageable).getTotalElements());
         verify(programacionRepository).findAll(pageable);
     }
 
@@ -85,7 +85,7 @@ class ProgramacionAbdServiceTest {
         PageRequest pageable = PageRequest.of(0, 10);
         when(programacionRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of()));
 
-        service.listar("  ", 0, -1, null, null, pageable);
+        service.list("  ", 0, -1, null, null, pageable);
 
         verify(programacionRepository).findAll(pageable);
     }
@@ -93,10 +93,10 @@ class ProgramacionAbdServiceTest {
     @Test
     void listarConFiltrosUsaBuscar() {
         PageRequest pageable = PageRequest.of(0, 10);
-        when(programacionRepository.buscarConFiltros(any(), any(), any(), any(), any(), any()))
+        when(programacionRepository.searchWithFilters(any(), any(), any(), any(), any(), any()))
                 .thenReturn(new PageImpl<>(List.of(programacion())));
 
-        assertEquals(1, service.listar("Programado", 1, 1,
+        assertEquals(1, service.list("Programado", 1, 1,
                 LocalDate.now().minusDays(1), LocalDate.now(), pageable).getTotalElements());
     }
 
@@ -107,30 +107,30 @@ class ProgramacionAbdServiceTest {
         when(conductorAbdRepository.findById(1)).thenReturn(Optional.of(conductor()));
         when(programacionRepository.save(any(Schedule.class))).thenReturn(programacion());
 
-        assertNotNull(service.crear(request(null)));
+        assertNotNull(service.create(request(null)));
     }
 
     @Test
     void crearHoraInvalidaFalla() {
-        AbdDtos.ProgramacionRequest bad = new AbdDtos.ProgramacionRequest(LocalDate.now(),
+        AbdDtos.ScheduleRequest bad = new AbdDtos.ScheduleRequest(LocalDate.now(),
                 LocalTime.of(10, 0), LocalTime.of(8, 0), null, 1, 1, 1);
 
-        assertThrows(IllegalArgumentException.class, () -> service.crear(bad));
+        assertThrows(IllegalArgumentException.class, () -> service.create(bad));
         verify(programacionRepository, never()).save(any());
     }
 
     @Test
     void crearSinRutaUnidadOConductorFalla() {
         when(rutaAbdRepository.findById(1)).thenReturn(Optional.empty());
-        assertThrows(IllegalArgumentException.class, () -> service.crear(request(null)));
+        assertThrows(IllegalArgumentException.class, () -> service.create(request(null)));
 
         when(rutaAbdRepository.findById(1)).thenReturn(Optional.of(ruta()));
         when(unidadRepository.findById(1)).thenReturn(Optional.empty());
-        assertThrows(IllegalArgumentException.class, () -> service.crear(request(null)));
+        assertThrows(IllegalArgumentException.class, () -> service.create(request(null)));
 
         when(unidadRepository.findById(1)).thenReturn(Optional.of(unidad("Activo")));
         when(conductorAbdRepository.findById(1)).thenReturn(Optional.empty());
-        assertThrows(IllegalArgumentException.class, () -> service.crear(request(null)));
+        assertThrows(IllegalArgumentException.class, () -> service.create(request(null)));
     }
 
     @Test
@@ -139,7 +139,7 @@ class ProgramacionAbdServiceTest {
         when(unidadRepository.findById(1)).thenReturn(Optional.of(unidad("Inactivo")));
         when(conductorAbdRepository.findById(1)).thenReturn(Optional.of(conductor()));
 
-        assertThrows(IllegalStateException.class, () -> service.crear(request(null)));
+        assertThrows(IllegalStateException.class, () -> service.create(request(null)));
     }
 
     @Test
@@ -151,29 +151,29 @@ class ProgramacionAbdServiceTest {
         when(conductorAbdRepository.findById(1)).thenReturn(Optional.of(conductor()));
         when(programacionRepository.save(any(Schedule.class))).thenAnswer(i -> i.getArgument(0));
 
-        assertEquals("Programado", service.actualizar(1, request(null)).estado());
-        assertEquals("Completado", service.actualizar(1, request("Completado")).estado());
+        assertEquals("Programado", service.update(1, request(null)).estado());
+        assertEquals("Completado", service.update(1, request("Completado")).estado());
     }
 
     @Test
     void actualizarInexistenteYUnidadInactivaFallan() {
         when(programacionRepository.findById(99)).thenReturn(Optional.empty());
-        assertThrows(IllegalArgumentException.class, () -> service.actualizar(99, request(null)));
+        assertThrows(IllegalArgumentException.class, () -> service.update(99, request(null)));
 
         when(programacionRepository.findById(1)).thenReturn(Optional.of(programacion()));
         when(rutaAbdRepository.findById(1)).thenReturn(Optional.of(ruta()));
         when(unidadRepository.findById(1)).thenReturn(Optional.of(unidad("En Mantenimiento")));
         when(conductorAbdRepository.findById(1)).thenReturn(Optional.of(conductor()));
-        assertThrows(IllegalStateException.class, () -> service.actualizar(1, request(null)));
+        assertThrows(IllegalStateException.class, () -> service.update(1, request(null)));
     }
 
     @Test
     void eliminarOkYNoExiste() {
         when(programacionRepository.existsById(1)).thenReturn(true);
-        service.eliminar(1);
+        service.delete(1);
         verify(programacionRepository).deleteById(1);
 
         when(programacionRepository.existsById(99)).thenReturn(false);
-        assertThrows(IllegalArgumentException.class, () -> service.eliminar(99));
+        assertThrows(IllegalArgumentException.class, () -> service.delete(99));
     }
 }

@@ -59,7 +59,7 @@ public class AuthService {
             throw new BadCredentialsException("Credenciales invalidas");
         }
 
-        return generarRespuestaAutenticacion(usuario);
+        return buildAuthResponse(usuario);
     }
 
     /**
@@ -70,18 +70,18 @@ public class AuthService {
      * @return respuesta con los tokens generados y los datos basicos de la sesion
      * @throws IllegalArgumentException cuando no existe una cuenta con ese correo o el codigo es invalido o expiro
      */
-    public AuthResponse verificarEmail(String email, String codigo) {
+    public AuthResponse verifyEmail(String email, String codigo) {
         User usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("No existe una cuenta con ese email"));
 
-        codigoVerificacionService.validar(email, VerificationCodeService.Tipo.VERIFICACION, codigo);
+        codigoVerificacionService.validate(email, VerificationCodeService.Tipo.VERIFICACION, codigo);
 
         usuario.setVerificado(true);
         usuario.setActivo(true);
         usuario.setActualizadoEn(Instant.now());
         usuarioRepository.save(usuario);
 
-        return generarRespuestaAutenticacion(usuario);
+        return buildAuthResponse(usuario);
     }
 
     /**
@@ -89,12 +89,12 @@ public class AuthService {
      * Si la cuenta ya esta verificada o se pidio un codigo hace poco, no se envia nada nuevo.
      * @param email correo de la cuenta pendiente de verificacion que solicita otro codigo
      */
-    public void reenviarCodigoVerificacion(String email) {
+    public void resendVerificationCode(String email) {
         usuarioRepository.findByEmail(email)
                 .filter(u -> Boolean.FALSE.equals(u.getVerificado()))
-                .filter(u -> codigoVerificacionService.puedeReenviar(email,
+                .filter(u -> codigoVerificacionService.canResend(email,
                         VerificationCodeService.Tipo.VERIFICACION))
-                .ifPresent(this::enviarCodigoActivacion);
+                .ifPresent(this::sendActivationCode);
     }
 
     /**
@@ -105,12 +105,12 @@ public class AuthService {
     public void solicitarRestablecimiento(String email) {
         usuarioRepository.findByEmail(email)
                 .filter(User::getActivo)
-                .filter(u -> codigoVerificacionService.puedeReenviar(email,
+                .filter(u -> codigoVerificacionService.canResend(email,
                         VerificationCodeService.Tipo.RESET_PASSWORD))
                 .ifPresent(u -> {
-                    String codigo = codigoVerificacionService.generar(email,
+                    String codigo = codigoVerificacionService.generate(email,
                             VerificationCodeService.Tipo.RESET_PASSWORD);
-                    emailService.enviarCodigoRestablecimiento(email, codigo);
+                    emailService.sendResetCode(email, codigo);
                 });
     }
 
@@ -122,11 +122,11 @@ public class AuthService {
      * @param nuevaPassword contrasenia nueva en claro que sera cifrada antes de guardarse
      * @throws IllegalArgumentException cuando no existe una cuenta con ese correo o el codigo es invalido o expiro
      */
-    public void restablecerContrasena(String email, String codigo, String nuevaPassword) {
+    public void resetPassword(String email, String codigo, String nuevaPassword) {
         User usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("No existe una cuenta con ese email"));
 
-        codigoVerificacionService.validar(email, VerificationCodeService.Tipo.RESET_PASSWORD, codigo);
+        codigoVerificacionService.validate(email, VerificationCodeService.Tipo.RESET_PASSWORD, codigo);
 
         usuario.setPasswordHash(passwordEncoder.encode(nuevaPassword));
         usuario.setActivo(true);
@@ -135,10 +135,10 @@ public class AuthService {
         usuarioRepository.save(usuario);
     }
 
-    private void enviarCodigoActivacion(User usuario) {
-        String codigo = codigoVerificacionService.generar(usuario.getEmail(),
+    private void sendActivationCode(User usuario) {
+        String codigo = codigoVerificacionService.generate(usuario.getEmail(),
                 VerificationCodeService.Tipo.VERIFICACION);
-        emailService.enviarCodigoVerificacion(usuario.getEmail(), usuario.getNombre(), codigo);
+        emailService.sendVerificationCode(usuario.getEmail(), usuario.getNombre(), codigo);
     }
 
     /**
@@ -150,15 +150,15 @@ public class AuthService {
      * @throws BadCredentialsException cuando el usuario asociado ya no esta activo
      */
     public AuthResponse refresh(RefreshTokenRequest request) {
-        String email = tokenService.obtenerEmailDesdeRefreshToken(request.refreshToken());
+        String email = tokenService.getEmailFromRefreshToken(request.refreshToken());
 
         User usuario = usuarioRepository.findByEmail(email)
                 .filter(User::getActivo)
                 .orElseThrow(() -> new BadCredentialsException("User no valido"));
 
-        tokenService.eliminarRefreshToken(request.refreshToken());
+        tokenService.deleteRefreshToken(request.refreshToken());
 
-        return generarRespuestaAutenticacion(usuario);
+        return buildAuthResponse(usuario);
     }
 
     /**
@@ -169,12 +169,12 @@ public class AuthService {
      */
     public void logout(String accessToken, RefreshTokenRequest request) {
         tokenService.agregarAccessTokenABlacklist(accessToken);
-        tokenService.eliminarRefreshToken(request.refreshToken());
+        tokenService.deleteRefreshToken(request.refreshToken());
     }
 
-    private AuthResponse generarRespuestaAutenticacion(User usuario) {
-        String accessToken = jwtService.generarToken(usuario);
-        String refreshToken = tokenService.generarRefreshToken(
+    private AuthResponse buildAuthResponse(User usuario) {
+        String accessToken = jwtService.generateToken(usuario);
+        String refreshToken = tokenService.createRefreshToken(
                 usuario.getEmail(),
                 refreshExpirationMs
         );

@@ -34,7 +34,7 @@ public class RouteAssignmentService {
      * @return pagina con las asignaciones activas encontradas
      */
     @Transactional(readOnly = true)
-    public Page<RouteAssignmentResponse> listar(Pageable pageable) {
+    public Page<RouteAssignmentResponse> list(Pageable pageable) {
         Page<RouteAssignment> page = asignacionRutaRepository.findByActivoTrue(pageable);
         List<RouteAssignmentResponse> contenido = page.map(this::mapearAResponse).getContent();
         return new PageImpl<>(contenido, pageable, page.getTotalElements());
@@ -47,7 +47,7 @@ public class RouteAssignmentService {
      */
     @Cacheable(value = "asignaciones", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
     @Transactional(readOnly = true)
-    public List<RouteAssignmentResponse> listarCacheable(Pageable pageable) {
+    public List<RouteAssignmentResponse> listCached(Pageable pageable) {
         return asignacionRutaRepository.findByActivoTrue(pageable)
                 .map(this::mapearAResponse)
                 .getContent();
@@ -60,8 +60,8 @@ public class RouteAssignmentService {
      * @throws IllegalArgumentException cuando no existe una asignacion activa con ese identificador
      */
     @Transactional(readOnly = true)
-    public RouteAssignmentResponse buscarPorId(Long id) {
-        RouteAssignment asignacion = obtenerAsignacionActiva(id);
+    public RouteAssignmentResponse findById(Long id) {
+        RouteAssignment asignacion = getActiveAssignment(id);
         return mapearAResponse(asignacion);
     }
 
@@ -72,7 +72,7 @@ public class RouteAssignmentService {
      * @throws IllegalArgumentException cuando algun participante no existe o esta inactivo, o el estado no es valido
      */
     @CacheEvict(value = "asignaciones", allEntries = true)
-    public RouteAssignmentResponse crear(RouteAssignmentRequest request) {
+    public RouteAssignmentResponse create(RouteAssignmentRequest request) {
         Driver conductor = conductorRepository.findById(request.conductorId())
                 .filter(Driver::getActivo)
                 .orElseThrow(() -> new IllegalArgumentException("Driver no encontrado"));
@@ -92,7 +92,7 @@ public class RouteAssignmentService {
                 .fechaAsignacion(request.fechaAsignacion())
                 .fechaInicio(request.fechaInicio())
                 .fechaFin(request.fechaFin())
-                .estado(convertirEstado(request.estado()))
+                .estado(toStatus(request.estado()))
                 .activo(true)
                 .creadoEn(Instant.now())
                 .actualizadoEn(Instant.now())
@@ -110,8 +110,8 @@ public class RouteAssignmentService {
      * @throws IllegalArgumentException cuando la asignacion o algun participante no existe o esta inactivo, o el estado no es valido
      */
     @CacheEvict(value = "asignaciones", allEntries = true)
-    public RouteAssignmentResponse actualizar(Long id, RouteAssignmentRequest request) {
-        RouteAssignment asignacion = obtenerAsignacionActiva(id);
+    public RouteAssignmentResponse update(Long id, RouteAssignmentRequest request) {
+        RouteAssignment asignacion = getActiveAssignment(id);
 
         Driver conductor = conductorRepository.findById(request.conductorId())
                 .filter(Driver::getActivo)
@@ -131,7 +131,7 @@ public class RouteAssignmentService {
         asignacion.setFechaAsignacion(request.fechaAsignacion());
         asignacion.setFechaInicio(request.fechaInicio());
         asignacion.setFechaFin(request.fechaFin());
-        asignacion.setEstado(convertirEstado(request.estado()));
+        asignacion.setEstado(toStatus(request.estado()));
         asignacion.setActualizadoEn(Instant.now());
 
         RouteAssignment asignacionActualizada = asignacionRutaRepository.save(asignacion);
@@ -145,20 +145,20 @@ public class RouteAssignmentService {
      */
     @CacheEvict(value = "asignaciones", allEntries = true)
     public void desactivar(Long id) {
-        RouteAssignment asignacion = obtenerAsignacionActiva(id);
+        RouteAssignment asignacion = getActiveAssignment(id);
         asignacion.setActivo(false);
         asignacion.setEstado(AssignmentStatus.CANCELADA);
         asignacion.setActualizadoEn(Instant.now());
         asignacionRutaRepository.save(asignacion);
     }
 
-    private RouteAssignment obtenerAsignacionActiva(Long id) {
+    private RouteAssignment getActiveAssignment(Long id) {
         return asignacionRutaRepository.findWithDetalle(id)
                 .filter(RouteAssignment::getActivo)
                 .orElseThrow(() -> new IllegalArgumentException("Asignacion no encontrada"));
     }
 
-    private AssignmentStatus convertirEstado(String estado) {
+    private AssignmentStatus toStatus(String estado) {
         try {
             return AssignmentStatus.valueOf(estado.toUpperCase());
         } catch (IllegalArgumentException e) {

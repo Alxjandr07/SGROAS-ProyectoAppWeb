@@ -29,11 +29,11 @@ public class UserService {
      * @param pageable objeto con numero de pagina, tamanio y orden solicitados para la consulta
      * @return pagina con los usuarios activos encontrados
      */
-    public Page<UserResponse> listar(String search, Pageable pageable) {
+    public Page<UserResponse> list(String search, Pageable pageable) {
         if (search == null || search.isBlank()) {
             return usuarioRepository.findByActivoTrue(pageable).map(this::toResponse);
         }
-        return usuarioRepository.buscarActivos(search.trim().toLowerCase(), pageable)
+        return usuarioRepository.searchActive(search.trim().toLowerCase(), pageable)
                 .map(this::toResponse);
     }
 
@@ -43,7 +43,7 @@ public class UserService {
      * @return datos del usuario encontrado
      * @throws EntityNotFoundException cuando no existe un usuario con ese identificador
      */
-    public UserResponse buscarPorId(Long id) {
+    public UserResponse findById(Long id) {
         return usuarioRepository.findById(id)
                 .map(this::toResponse)
                 .orElseThrow(() -> new EntityNotFoundException("User no encontrado con id: " + id));
@@ -56,7 +56,7 @@ public class UserService {
      * @return datos del usuario recien guardado
      * @throws IllegalArgumentException cuando ya existe otro usuario con el mismo correo
      */
-    public UserResponse crear(UserRequest request) {
+    public UserResponse create(UserRequest request) {
         if (usuarioRepository.existsByEmail(request.email())) {
             throw new IllegalArgumentException("Ya existe un usuario con ese email");
         }
@@ -73,7 +73,7 @@ public class UserService {
                 .build();
 
         User guardado = usuarioRepository.save(usuario);
-        enviarCodigoActivacion(guardado);
+        sendActivationCode(guardado);
 
         return toResponse(guardado);
     }
@@ -85,25 +85,25 @@ public class UserService {
      * @throws EntityNotFoundException cuando no existe un usuario con ese identificador
      * @throws IllegalArgumentException cuando la cuenta ya verifico su correo o se pidio un codigo hace menos de un minuto
      */
-    public void reenviarCodigoActivacion(Long id) {
+    public void resendActivationCode(Long id) {
         User usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User no encontrado con id: " + id));
 
         if (Boolean.TRUE.equals(usuario.getVerificado())) {
             throw new IllegalArgumentException("Ese usuario ya verifico su correo");
         }
-        if (!codigoVerificacionService.puedeReenviar(usuario.getEmail(),
+        if (!codigoVerificacionService.canResend(usuario.getEmail(),
                 VerificationCodeService.Tipo.VERIFICACION)) {
             throw new IllegalArgumentException(
                     "El codigo se envio hace menos de un minuto. Espera antes de reenviar.");
         }
-        enviarCodigoActivacion(usuario);
+        sendActivationCode(usuario);
     }
 
-    private void enviarCodigoActivacion(User usuario) {
-        String codigo = codigoVerificacionService.generar(usuario.getEmail(),
+    private void sendActivationCode(User usuario) {
+        String codigo = codigoVerificacionService.generate(usuario.getEmail(),
                 VerificationCodeService.Tipo.VERIFICACION);
-        emailService.enviarCodigoVerificacion(usuario.getEmail(), usuario.getNombre(), codigo);
+        emailService.sendVerificationCode(usuario.getEmail(), usuario.getNombre(), codigo);
     }
 
     /**
@@ -114,7 +114,7 @@ public class UserService {
      * @return datos del usuario ya actualizado
      * @throws EntityNotFoundException cuando no existe un usuario con ese identificador
      */
-    public UserResponse actualizar(Long id, UserRequest request) {
+    public UserResponse update(Long id, UserRequest request) {
         User usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User no encontrado con id: " + id));
 

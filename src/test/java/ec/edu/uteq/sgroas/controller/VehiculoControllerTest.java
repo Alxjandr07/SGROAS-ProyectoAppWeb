@@ -52,7 +52,7 @@ class VehiculoControllerTest {
 
     @Test
     void listarDebeRetornar200() throws Exception {
-        when(vehiculoService.listar(any()))
+        when(vehiculoService.list(any()))
                 .thenReturn(new PageImpl<>(List.of(responseEjemplo())));
 
         mockMvc().perform(get("/api/vehiculos"))
@@ -61,7 +61,7 @@ class VehiculoControllerTest {
 
     @Test
     void buscarPorIdDebeRetornar200() throws Exception {
-        when(vehiculoService.buscarPorId(1L)).thenReturn(responseEjemplo());
+        when(vehiculoService.findById(1L)).thenReturn(responseEjemplo());
 
         mockMvc().perform(get("/api/vehiculos/1"))
                 .andExpect(status().isOk())
@@ -70,7 +70,7 @@ class VehiculoControllerTest {
 
     @Test
     void crearDebeRetornar201() throws Exception {
-        when(vehiculoService.crear(any())).thenReturn(responseEjemplo());
+        when(vehiculoService.create(any())).thenReturn(responseEjemplo());
 
         mockMvc().perform(post("/api/vehiculos")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -93,7 +93,7 @@ class VehiculoControllerTest {
 
     @Test
     void actualizarDebeRetornar200() throws Exception {
-        when(vehiculoService.actualizar(any(), any())).thenReturn(responseEjemplo());
+        when(vehiculoService.update(any(), any())).thenReturn(responseEjemplo());
 
         mockMvc().perform(put("/api/vehiculos/1")
                         .contentType(MediaType.APPLICATION_JSON)

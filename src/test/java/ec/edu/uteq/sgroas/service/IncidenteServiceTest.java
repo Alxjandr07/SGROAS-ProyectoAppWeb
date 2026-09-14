@@ -96,7 +96,7 @@ class IncidenteServiceTest {
         when(incidenteRepository.findByActivoTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(incidenteEjemplo())));
 
-        Page<IncidentResponse> pagina = incidenteService.listar(pageable);
+        Page<IncidentResponse> pagina = incidenteService.list(pageable);
 
         assertEquals(1, pagina.getTotalElements());
         assertEquals("AVERIA_MECANICA", pagina.getContent().get(0).tipo());
@@ -106,7 +106,7 @@ class IncidenteServiceTest {
     void buscarPorIdDebeRetornarIncidente() {
         when(incidenteRepository.findById(1L)).thenReturn(Optional.of(incidenteEjemplo()));
 
-        IncidentResponse response = incidenteService.buscarPorId(1L);
+        IncidentResponse response = incidenteService.findById(1L);
 
         assertEquals(1L, response.id());
         assertEquals(1L, response.asignacionId());
@@ -117,7 +117,7 @@ class IncidenteServiceTest {
         when(incidenteRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class,
-                () -> incidenteService.buscarPorId(99L));
+                () -> incidenteService.findById(99L));
     }
 
     @Test
@@ -127,7 +127,7 @@ class IncidenteServiceTest {
         when(incidenteRepository.save(any(Incident.class)))
                 .thenReturn(incidenteEjemplo());
 
-        IncidentResponse response = incidenteService.crear(requestEjemplo());
+        IncidentResponse response = incidenteService.create(requestEjemplo());
 
         assertNotNull(response);
         assertEquals("MEDIA", response.gravedad());
@@ -144,7 +144,7 @@ class IncidenteServiceTest {
         );
 
         assertThrows(IllegalArgumentException.class,
-                () -> incidenteService.crear(request));
+                () -> incidenteService.create(request));
     }
 
     @Test
@@ -158,7 +158,7 @@ class IncidenteServiceTest {
         );
 
         assertThrows(IllegalArgumentException.class,
-                () -> incidenteService.crear(request));
+                () -> incidenteService.create(request));
     }
 
     @Test
@@ -172,7 +172,7 @@ class IncidenteServiceTest {
         );
 
         assertThrows(IllegalArgumentException.class,
-                () -> incidenteService.crear(request));
+                () -> incidenteService.create(request));
     }
 
     @Test
@@ -186,7 +186,7 @@ class IncidenteServiceTest {
         );
 
         assertThrows(IllegalArgumentException.class,
-                () -> incidenteService.crear(request));
+                () -> incidenteService.create(request));
     }
 
     @Test
@@ -197,7 +197,7 @@ class IncidenteServiceTest {
         when(incidenteRepository.save(any(Incident.class)))
                 .thenReturn(incidenteEjemplo());
 
-        IncidentResponse response = incidenteService.actualizar(1L, requestEjemplo());
+        IncidentResponse response = incidenteService.update(1L, requestEjemplo());
 
         assertEquals(1L, response.id());
         verify(incidenteRepository).save(any(Incident.class));

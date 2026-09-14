@@ -32,7 +32,7 @@ public interface IncidentRepository extends JpaRepository<Incident, Long> {
      * @return filas del procedimiento con el conteo por gravedad.
      */
     @Procedure(name = "Incident.incidentesPorGravedad")
-    List<Object[]> incidentesPorGravedad(@Param("p_tipo") String tipo);
+    List<Object[]> incidentsBySeverity(@Param("p_tipo") String tipo);
 
     /**
      * Consulta los incidentes dentro de un rango de fechas mediante procedimiento almacenado.
@@ -41,7 +41,7 @@ public interface IncidentRepository extends JpaRepository<Incident, Long> {
      * @return filas del procedimiento con los incidentes del rango.
      */
     @Procedure(name = "Incident.obtenerIncidentesPorRango")
-    List<Object[]> obtenerIncidentesPorRango(@Param("p_fecha_desde") Instant fechaDesde,
+    List<Object[]> getIncidentsByRange(@Param("p_fecha_desde") Instant fechaDesde,
                                              @Param("p_fecha_hasta") Instant fechaHasta);
 
     /**

@@ -47,8 +47,8 @@ class IncidenteAbdServiceTest {
                 .estado("Reportado").unidad(unidad()).build();
     }
 
-    private AbdDtos.IncidenteAbdRequest request(String nivel, String evidencia, String estado) {
-        return new AbdDtos.IncidenteAbdRequest("Choque", "Choque leve", nivel, evidencia, estado, 1);
+    private AbdDtos.AbdIncidentRequest request(String nivel, String evidencia, String estado) {
+        return new AbdDtos.AbdIncidentRequest("Choque", "Choque leve", nivel, evidencia, estado, 1);
     }
 
     @Test
@@ -56,16 +56,16 @@ class IncidenteAbdServiceTest {
         PageRequest pageable = PageRequest.of(0, 10);
         when(incidenteRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(incidente("BAJO"))));
 
-        assertEquals(1, service.listar(null, "  ", null, pageable).getTotalElements());
+        assertEquals(1, service.list(null, "  ", null, pageable).getTotalElements());
     }
 
     @Test
     void listarConSearchUsaBuscar() {
         PageRequest pageable = PageRequest.of(0, 10);
-        when(incidenteRepository.buscarConFiltros(any(), any(), any(), any()))
+        when(incidenteRepository.searchWithFilters(any(), any(), any(), any()))
                 .thenReturn(new PageImpl<>(List.of(incidente("MEDIO"))));
 
-        assertEquals(1, service.listar("Reportado", "MEDIO", "choque", pageable).getTotalElements());
+        assertEquals(1, service.list("Reportado", "MEDIO", "choque", pageable).getTotalElements());
     }
 
     @Test
@@ -74,7 +74,7 @@ class IncidenteAbdServiceTest {
         when(incidenteRepository.findByEstadoIgnoreCase(eq("reportado"), eq(pageable)))
                 .thenReturn(new PageImpl<>(List.of(incidente("BAJO"))));
 
-        assertEquals(1, service.listar("Reportado", null, null, pageable).getTotalElements());
+        assertEquals(1, service.list("Reportado", null, null, pageable).getTotalElements());
     }
 
     @Test
@@ -83,7 +83,7 @@ class IncidenteAbdServiceTest {
         when(incidenteRepository.findByNivelSugeridoIgnoreCase(eq("alto"), eq(pageable)))
                 .thenReturn(new PageImpl<>(List.of(incidente("ALTO"))));
 
-        assertEquals(1, service.listar(null, "ALTO", null, pageable).getTotalElements());
+        assertEquals(1, service.list(null, "ALTO", null, pageable).getTotalElements());
     }
 
     @Test
@@ -91,7 +91,7 @@ class IncidenteAbdServiceTest {
         when(unidadRepository.findById(1)).thenReturn(Optional.of(unidad()));
         when(incidenteRepository.save(any(AbdIncident.class))).thenReturn(incidente("ALTO"));
 
-        assertNotNull(service.crear(request("ALTO", "foto.jpg", null)));
+        assertNotNull(service.create(request("ALTO", "foto.jpg", null)));
         verify(alertaRepository).save(any());
     }
 
@@ -100,7 +100,7 @@ class IncidenteAbdServiceTest {
         when(unidadRepository.findById(1)).thenReturn(Optional.of(unidad()));
         when(incidenteRepository.save(any(AbdIncident.class))).thenReturn(incidente("BAJO"));
 
-        assertNotNull(service.crear(request("BAJO", null, "Reportado")));
+        assertNotNull(service.create(request("BAJO", null, "Reportado")));
         verify(alertaRepository, never()).save(any());
     }
 
@@ -108,7 +108,7 @@ class IncidenteAbdServiceTest {
     void crearSinUnidadFalla() {
         when(unidadRepository.findById(1)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> service.crear(request("BAJO", null, null)));
+        assertThrows(IllegalArgumentException.class, () -> service.create(request("BAJO", null, null)));
     }
 
     @Test
@@ -118,7 +118,7 @@ class IncidenteAbdServiceTest {
         when(unidadRepository.findById(1)).thenReturn(Optional.of(unidad()));
         when(incidenteRepository.save(any(AbdIncident.class))).thenAnswer(a -> a.getArgument(0));
 
-        AbdDtos.IncidenteAbdResponse r = service.actualizar(1, request("MEDIO", "nueva.jpg", "Cerrado"));
+        AbdDtos.AbdIncidentResponse r = service.update(1, request("MEDIO", "nueva.jpg", "Cerrado"));
 
         assertEquals("nueva.jpg", r.evidencia());
         assertEquals("Cerrado", r.estado());
@@ -131,7 +131,7 @@ class IncidenteAbdServiceTest {
         when(unidadRepository.findById(1)).thenReturn(Optional.of(unidad()));
         when(incidenteRepository.save(any(AbdIncident.class))).thenAnswer(a -> a.getArgument(0));
 
-        AbdDtos.IncidenteAbdResponse r = service.actualizar(1, request("MEDIO", null, null));
+        AbdDtos.AbdIncidentResponse r = service.update(1, request("MEDIO", null, null));
 
         assertEquals("foto.jpg", r.evidencia());
         assertEquals("Reportado", r.estado());
@@ -141,21 +141,21 @@ class IncidenteAbdServiceTest {
     void actualizarInexistenteOSinUnidadFalla() {
         when(incidenteRepository.findById(99)).thenReturn(Optional.empty());
         assertThrows(IllegalArgumentException.class,
-                () -> service.actualizar(99, request("BAJO", null, null)));
+                () -> service.update(99, request("BAJO", null, null)));
 
         when(incidenteRepository.findById(1)).thenReturn(Optional.of(incidente("BAJO")));
         when(unidadRepository.findById(1)).thenReturn(Optional.empty());
         assertThrows(IllegalArgumentException.class,
-                () -> service.actualizar(1, request("BAJO", null, null)));
+                () -> service.update(1, request("BAJO", null, null)));
     }
 
     @Test
     void eliminarOkYNoExiste() {
         when(incidenteRepository.existsById(1)).thenReturn(true);
-        service.eliminar(1);
+        service.delete(1);
         verify(incidenteRepository).deleteById(1);
 
         when(incidenteRepository.existsById(99)).thenReturn(false);
-        assertThrows(IllegalArgumentException.class, () -> service.eliminar(99));
+        assertThrows(IllegalArgumentException.class, () -> service.delete(99));
     }
 }

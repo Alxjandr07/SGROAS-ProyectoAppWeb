@@ -38,7 +38,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
               AND (:search IS NULL OR LOWER(u.nombre) LIKE LOWER(CONCAT('%', :search, '%'))
                        OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%')))
             """)
-    Page<User> buscarActivos(@Param("search") String search, Pageable pageable);
+    Page<User> searchActive(@Param("search") String search, Pageable pageable);
 
     /**
      * Consulta si existe un usuario con el correo dado.

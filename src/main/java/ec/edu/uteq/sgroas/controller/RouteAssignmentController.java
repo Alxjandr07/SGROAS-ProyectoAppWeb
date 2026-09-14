@@ -25,10 +25,10 @@ public class RouteAssignmentController {
      * @return respuesta HTTP con la página de asignaciones encontradas.
      */
     @GetMapping
-    public ResponseEntity<Page<RouteAssignmentResponse>> listar(
+    public ResponseEntity<Page<RouteAssignmentResponse>> list(
             @PageableDefault(size = 10, sort = "id") Pageable pageable
     ) {
-        return ResponseEntity.ok(asignacionRutaService.listar(pageable));
+        return ResponseEntity.ok(asignacionRutaService.list(pageable));
     }
 
     /**
@@ -37,8 +37,8 @@ public class RouteAssignmentController {
      * @return respuesta HTTP con los datos de la asignación encontrada.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<RouteAssignmentResponse> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(asignacionRutaService.buscarPorId(id));
+    public ResponseEntity<RouteAssignmentResponse> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(asignacionRutaService.findById(id));
     }
 
     /**
@@ -47,10 +47,10 @@ public class RouteAssignmentController {
      * @return respuesta HTTP con estado creado y los datos de la asignación registrada.
      */
     @PostMapping
-    public ResponseEntity<RouteAssignmentResponse> crear(
+    public ResponseEntity<RouteAssignmentResponse> create(
             @Valid @RequestBody RouteAssignmentRequest request
     ) {
-        RouteAssignmentResponse response = asignacionRutaService.crear(request);
+        RouteAssignmentResponse response = asignacionRutaService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -61,11 +61,11 @@ public class RouteAssignmentController {
      * @return respuesta HTTP con los datos actualizados de la asignación.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<RouteAssignmentResponse> actualizar(
+    public ResponseEntity<RouteAssignmentResponse> update(
             @PathVariable Long id,
             @Valid @RequestBody RouteAssignmentRequest request
     ) {
-        return ResponseEntity.ok(asignacionRutaService.actualizar(id, request));
+        return ResponseEntity.ok(asignacionRutaService.update(id, request));
     }
 
     /**

@@ -39,7 +39,7 @@ public class AbdScheduleService {
      * @return pagina con los datos resumidos de las programaciones encontradas.
      */
     @Transactional(readOnly = true)
-    public Page<AbdDtos.ProgramacionResponse> listar(String estado, Integer idConductor, Integer idRuta,
+    public Page<AbdDtos.ScheduleResponse> list(String estado, Integer idConductor, Integer idRuta,
                                                      LocalDate fechaDesde, LocalDate fechaHasta, Pageable pageable) {
         String estadoFiltro = (estado == null || estado.isBlank()) ? null : estado.trim().toLowerCase();
         Integer conductorFiltro = (idConductor != null && idConductor > 0) ? idConductor : null;
@@ -48,7 +48,7 @@ public class AbdScheduleService {
                 && fechaDesde == null && fechaHasta == null) {
             return programacionRepository.findAll(pageable).map(this::aResponse);
         }
-        return programacionRepository.buscarConFiltros(estadoFiltro, conductorFiltro, rutaFiltro,
+        return programacionRepository.searchWithFilters(estadoFiltro, conductorFiltro, rutaFiltro,
                 fechaDesde, fechaHasta, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()))
                 .map(this::aResponse);
     }
@@ -60,8 +60,8 @@ public class AbdScheduleService {
      * @throws IllegalArgumentException cuando los horarios son invalidos o la ruta, la unidad o el conductor no existen.
      * @throws IllegalStateException cuando la unidad asignada no se encuentra en estado activo.
      */
-    public AbdDtos.ProgramacionResponse crear(AbdDtos.ProgramacionRequest request) {
-        validarHoras(request.horaSalida(), request.horaEstimadaLlegada());
+    public AbdDtos.ScheduleResponse create(AbdDtos.ScheduleRequest request) {
+        validateHours(request.horaSalida(), request.horaEstimadaLlegada());
         AbdRoute ruta = rutaAbdRepository.findById(request.idRuta())
                 .orElseThrow(() -> new IllegalArgumentException("Route no encontrada: " + request.idRuta()));
         Unit unidad = unidadRepository.findById(request.idUnidad())
@@ -91,10 +91,10 @@ public class AbdScheduleService {
      * @throws IllegalArgumentException cuando la programacion no existe, los horarios son invalidos o alguna referencia no existe.
      * @throws IllegalStateException cuando la unidad asignada no se encuentra en estado activo.
      */
-    public AbdDtos.ProgramacionResponse actualizar(Integer idProgramacion, AbdDtos.ProgramacionRequest request) {
+    public AbdDtos.ScheduleResponse update(Integer idProgramacion, AbdDtos.ScheduleRequest request) {
         Schedule programacion = programacionRepository.findById(idProgramacion)
                 .orElseThrow(() -> new IllegalArgumentException("Schedule no encontrada: " + idProgramacion));
-        validarHoras(request.horaSalida(), request.horaEstimadaLlegada());
+        validateHours(request.horaSalida(), request.horaEstimadaLlegada());
         AbdRoute ruta = rutaAbdRepository.findById(request.idRuta())
                 .orElseThrow(() -> new IllegalArgumentException("Route no encontrada: " + request.idRuta()));
         Unit unidad = unidadRepository.findById(request.idUnidad())
@@ -121,21 +121,21 @@ public class AbdScheduleService {
      * @param idProgramacion identificador de la programacion que se desea suprimir.
      * @throws IllegalArgumentException cuando no existe una programacion con el identificador indicado.
      */
-    public void eliminar(Integer idProgramacion) {
+    public void delete(Integer idProgramacion) {
         if (!programacionRepository.existsById(idProgramacion)) {
             throw new IllegalArgumentException("Schedule no encontrada: " + idProgramacion);
         }
         programacionRepository.deleteById(idProgramacion);
     }
 
-    private void validarHoras(java.time.LocalTime salida, java.time.LocalTime llegada) {
+    private void validateHours(java.time.LocalTime salida, java.time.LocalTime llegada) {
         if (!llegada.isAfter(salida)) {
             throw new IllegalArgumentException("La hora de llegada debe ser posterior a la hora de salida");
         }
     }
 
-    private AbdDtos.ProgramacionResponse aResponse(Schedule p) {
-        return new AbdDtos.ProgramacionResponse(
+    private AbdDtos.ScheduleResponse aResponse(Schedule p) {
+        return new AbdDtos.ScheduleResponse(
                 p.getIdProgramacion(), p.getFecha(), p.getHoraSalida(), p.getHoraEstimadaLlegada(), p.getEstado(),
                 p.getRuta().getIdRuta(), p.getRuta().getTerminalOrigen().getNombre() + " -> " + p.getRuta().getTerminalDestino().getNombre(),
                 p.getUnidad().getIdUnidad(), p.getUnidad().getPlaca(),

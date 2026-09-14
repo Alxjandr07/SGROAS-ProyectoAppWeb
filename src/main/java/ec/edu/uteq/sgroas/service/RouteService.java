@@ -27,8 +27,8 @@ public class RouteService {
      * @param pageable objeto con numero de pagina, tamanio y orden solicitados para la consulta
      * @return pagina con las rutas activas encontradas
      */
-    public Page<RouteResponse> listar(Pageable pageable) {
-        List<RouteResponse> contenido = listarCacheable(pageable);
+    public Page<RouteResponse> list(Pageable pageable) {
+        List<RouteResponse> contenido = listCached(pageable);
         return new PageImpl<>(contenido, pageable, contenido.size());
     }
 
@@ -38,7 +38,7 @@ public class RouteService {
      * @return lista de rutas activas correspondientes a la pagina pedida
      */
     @Cacheable(value = "rutas", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
-    public List<RouteResponse> listarCacheable(Pageable pageable) {
+    public List<RouteResponse> listCached(Pageable pageable) {
         return rutaRepository.findByActivoTrue(pageable)
                 .map(this::mapearAResponse)
                 .getContent();
@@ -50,8 +50,8 @@ public class RouteService {
      * @return datos de la ruta encontrada
      * @throws IllegalArgumentException cuando no existe una ruta activa con ese identificador
      */
-    public RouteResponse buscarPorId(Long id) {
-        Route ruta = obtenerRutaActiva(id);
+    public RouteResponse findById(Long id) {
+        Route ruta = getActiveRoute(id);
         return mapearAResponse(ruta);
     }
 
@@ -62,7 +62,7 @@ public class RouteService {
      * @throws IllegalArgumentException cuando ya existe otra ruta con el mismo codigo o el estado no es valido
      */
     @CacheEvict(value = "rutas", allEntries = true)
-    public RouteResponse crear(RouteRequest request) {
+    public RouteResponse create(RouteRequest request) {
         if (rutaRepository.existsByCodigo(request.codigo())) {
             throw new IllegalArgumentException("Ya existe una ruta con ese codigo");
         }
@@ -74,7 +74,7 @@ public class RouteService {
                 .destino(request.destino())
                 .distanciaKm(request.distanciaKm())
                 .duracionEstimadaMin(request.duracionEstimadaMin())
-                .estado(convertirEstado(request.estado()))
+                .estado(toStatus(request.estado()))
                 .activo(true)
                 .creadoEn(Instant.now())
                 .actualizadoEn(Instant.now())
@@ -92,8 +92,8 @@ public class RouteService {
      * @throws IllegalArgumentException cuando la ruta no existe, el codigo choca con otra ruta o el estado no es valido
      */
     @CacheEvict(value = "rutas", allEntries = true)
-    public RouteResponse actualizar(Long id, RouteRequest request) {
-        Route ruta = obtenerRutaActiva(id);
+    public RouteResponse update(Long id, RouteRequest request) {
+        Route ruta = getActiveRoute(id);
 
         if (!ruta.getCodigo().equals(request.codigo())
                 && rutaRepository.existsByCodigo(request.codigo())) {
@@ -106,7 +106,7 @@ public class RouteService {
         ruta.setDestino(request.destino());
         ruta.setDistanciaKm(request.distanciaKm());
         ruta.setDuracionEstimadaMin(request.duracionEstimadaMin());
-        ruta.setEstado(convertirEstado(request.estado()));
+        ruta.setEstado(toStatus(request.estado()));
         ruta.setActualizadoEn(Instant.now());
 
         Route rutaActualizada = rutaRepository.save(ruta);
@@ -120,20 +120,20 @@ public class RouteService {
      */
     @CacheEvict(value = "rutas", allEntries = true)
     public void desactivar(Long id) {
-        Route ruta = obtenerRutaActiva(id);
+        Route ruta = getActiveRoute(id);
         ruta.setActivo(false);
         ruta.setEstado(RouteStatus.INACTIVA);
         ruta.setActualizadoEn(Instant.now());
         rutaRepository.save(ruta);
     }
 
-    private Route obtenerRutaActiva(Long id) {
+    private Route getActiveRoute(Long id) {
         return rutaRepository.findById(id)
                 .filter(Route::getActivo)
                 .orElseThrow(() -> new IllegalArgumentException("Route no encontrada"));
     }
 
-    private RouteStatus convertirEstado(String estado) {
+    private RouteStatus toStatus(String estado) {
         try {
             return RouteStatus.valueOf(estado.toUpperCase());
         } catch (IllegalArgumentException e) {

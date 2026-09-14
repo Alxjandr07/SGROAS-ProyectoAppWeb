@@ -26,11 +26,11 @@ public class DriverController {
      * @return respuesta HTTP con la página de conductores encontrados.
      */
     @GetMapping
-    public ResponseEntity<Page<DriverResponse>> listar(
+    public ResponseEntity<Page<DriverResponse>> list(
             @RequestParam(required = false) String search,
             @PageableDefault(size = 10, sort = "id") Pageable pageable
     ) {
-        return ResponseEntity.ok(conductorService.listar(search, pageable));
+        return ResponseEntity.ok(conductorService.list(search, pageable));
     }
 
     /**
@@ -39,8 +39,8 @@ public class DriverController {
      * @return respuesta HTTP con los datos del conductor encontrado.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<DriverResponse> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(conductorService.buscarPorId(id));
+    public ResponseEntity<DriverResponse> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(conductorService.findById(id));
     }
 
     /**
@@ -49,10 +49,10 @@ public class DriverController {
      * @return respuesta HTTP con estado creado y los datos del conductor registrado.
      */
     @PostMapping
-    public ResponseEntity<DriverResponse> crear(
+    public ResponseEntity<DriverResponse> create(
             @Valid @RequestBody DriverRequest request
     ) {
-        DriverResponse response = conductorService.crear(request);
+        DriverResponse response = conductorService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -63,11 +63,11 @@ public class DriverController {
      * @return respuesta HTTP con los datos actualizados del conductor.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<DriverResponse> actualizar(
+    public ResponseEntity<DriverResponse> update(
             @PathVariable Long id,
             @Valid @RequestBody DriverRequest request
     ) {
-        return ResponseEntity.ok(conductorService.actualizar(id, request));
+        return ResponseEntity.ok(conductorService.update(id, request));
     }
 
     /**

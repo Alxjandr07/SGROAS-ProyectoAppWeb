@@ -35,8 +35,8 @@ class UnidadAbdServiceTest {
                 .estado("Activo").build();
     }
 
-    private AbdDtos.UnidadRequest requestEjemplo(String estado) {
-        return new AbdDtos.UnidadRequest("ABC-1234", "001", "Hiace", 14, 2020, estado);
+    private AbdDtos.UnitRequest requestEjemplo(String estado) {
+        return new AbdDtos.UnitRequest("ABC-1234", "001", "Hiace", 14, 2020, estado);
     }
 
     @Test
@@ -44,11 +44,11 @@ class UnidadAbdServiceTest {
         PageRequest pageable = PageRequest.of(0, 10);
         when(unidadRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(unidadEjemplo())));
 
-        Page<AbdDtos.UnidadResponse> page = service.listar(null, null, pageable);
+        Page<AbdDtos.UnitResponse> page = service.list(null, null, pageable);
 
         assertEquals(1, page.getTotalElements());
         verify(unidadRepository).findAll(pageable);
-        verify(unidadRepository, never()).buscarConFiltros(any(), any(), any());
+        verify(unidadRepository, never()).searchWithFilters(any(), any(), any());
     }
 
     @Test
@@ -56,7 +56,7 @@ class UnidadAbdServiceTest {
         PageRequest pageable = PageRequest.of(0, 10);
         when(unidadRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of()));
 
-        service.listar("   ", "  ", pageable);
+        service.list("   ", "  ", pageable);
 
         verify(unidadRepository).findAll(pageable);
     }
@@ -64,22 +64,22 @@ class UnidadAbdServiceTest {
     @Test
     void listarConFiltrosUsaBuscar() {
         PageRequest pageable = PageRequest.of(0, 10);
-        when(unidadRepository.buscarConFiltros(eq("activo"), eq("abc"), any()))
+        when(unidadRepository.searchWithFilters(eq("activo"), eq("abc"), any()))
                 .thenReturn(new PageImpl<>(List.of(unidadEjemplo())));
 
-        Page<AbdDtos.UnidadResponse> page = service.listar("  Activo ", " ABC ", pageable);
+        Page<AbdDtos.UnitResponse> page = service.list("  Activo ", " ABC ", pageable);
 
         assertEquals(1, page.getTotalElements());
-        verify(unidadRepository).buscarConFiltros(eq("activo"), eq("abc"), any());
+        verify(unidadRepository).searchWithFilters(eq("activo"), eq("abc"), any());
     }
 
     @Test
     void buscarPorIdOkYNoEncontrado() {
         when(unidadRepository.findById(1)).thenReturn(Optional.of(unidadEjemplo()));
-        assertEquals("ABC-1234", service.buscarPorId(1).placa());
+        assertEquals("ABC-1234", service.findById(1).placa());
 
         when(unidadRepository.findById(99)).thenReturn(Optional.empty());
-        assertThrows(IllegalArgumentException.class, () -> service.buscarPorId(99));
+        assertThrows(IllegalArgumentException.class, () -> service.findById(99));
     }
 
     @Test
@@ -88,7 +88,7 @@ class UnidadAbdServiceTest {
         when(unidadRepository.existsByNumeroDiscoIgnoreCase("001")).thenReturn(false);
         when(unidadRepository.save(any(Unit.class))).thenReturn(unidadEjemplo());
 
-        AbdDtos.UnidadResponse r = service.crear(requestEjemplo(null));
+        AbdDtos.UnitResponse r = service.create(requestEjemplo(null));
 
         assertNotNull(r);
         verify(unidadRepository).save(any(Unit.class));
@@ -98,7 +98,7 @@ class UnidadAbdServiceTest {
     void crearConPlacaDuplicadaFalla() {
         when(unidadRepository.existsByPlacaIgnoreCase("ABC-1234")).thenReturn(true);
 
-        assertThrows(IllegalArgumentException.class, () -> service.crear(requestEjemplo("Activo")));
+        assertThrows(IllegalArgumentException.class, () -> service.create(requestEjemplo("Activo")));
         verify(unidadRepository, never()).save(any());
     }
 
@@ -107,7 +107,7 @@ class UnidadAbdServiceTest {
         when(unidadRepository.existsByPlacaIgnoreCase("ABC-1234")).thenReturn(false);
         when(unidadRepository.existsByNumeroDiscoIgnoreCase("001")).thenReturn(true);
 
-        assertThrows(IllegalArgumentException.class, () -> service.crear(requestEjemplo("Activo")));
+        assertThrows(IllegalArgumentException.class, () -> service.create(requestEjemplo("Activo")));
     }
 
     @Test
@@ -116,7 +116,7 @@ class UnidadAbdServiceTest {
         when(unidadRepository.findById(1)).thenReturn(Optional.of(actual));
         when(unidadRepository.save(any(Unit.class))).thenReturn(actual);
 
-        AbdDtos.UnidadResponse r = service.actualizar(1, requestEjemplo(null));
+        AbdDtos.UnitResponse r = service.update(1, requestEjemplo(null));
 
         assertEquals("Activo", r.estado());
         verify(unidadRepository, never()).existsByPlacaIgnoreCase(any());
@@ -132,7 +132,7 @@ class UnidadAbdServiceTest {
         when(unidadRepository.existsByNumeroDiscoIgnoreCase("001")).thenReturn(false);
         when(unidadRepository.save(any(Unit.class))).thenAnswer(i -> i.getArgument(0));
 
-        AbdDtos.UnidadResponse r = service.actualizar(1, requestEjemplo("Inactivo"));
+        AbdDtos.UnitResponse r = service.update(1, requestEjemplo("Inactivo"));
 
         assertEquals("Inactivo", r.estado());
     }
@@ -144,7 +144,7 @@ class UnidadAbdServiceTest {
         when(unidadRepository.findById(1)).thenReturn(Optional.of(actual));
         when(unidadRepository.existsByPlacaIgnoreCase("ABC-1234")).thenReturn(true);
 
-        assertThrows(IllegalArgumentException.class, () -> service.actualizar(1, requestEjemplo("Activo")));
+        assertThrows(IllegalArgumentException.class, () -> service.update(1, requestEjemplo("Activo")));
     }
 
     @Test
@@ -154,23 +154,23 @@ class UnidadAbdServiceTest {
         when(unidadRepository.findById(1)).thenReturn(Optional.of(actual));
         when(unidadRepository.existsByNumeroDiscoIgnoreCase("001")).thenReturn(true);
 
-        assertThrows(IllegalArgumentException.class, () -> service.actualizar(1, requestEjemplo("Activo")));
+        assertThrows(IllegalArgumentException.class, () -> service.update(1, requestEjemplo("Activo")));
     }
 
     @Test
     void actualizarInexistenteFalla() {
         when(unidadRepository.findById(99)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> service.actualizar(99, requestEjemplo("Activo")));
+        assertThrows(IllegalArgumentException.class, () -> service.update(99, requestEjemplo("Activo")));
     }
 
     @Test
     void eliminarOkYNoExiste() {
         when(unidadRepository.existsById(1)).thenReturn(true);
-        service.eliminar(1);
+        service.delete(1);
         verify(unidadRepository).deleteById(1);
 
         when(unidadRepository.existsById(99)).thenReturn(false);
-        assertThrows(IllegalArgumentException.class, () -> service.eliminar(99));
+        assertThrows(IllegalArgumentException.class, () -> service.delete(99));
     }
 }

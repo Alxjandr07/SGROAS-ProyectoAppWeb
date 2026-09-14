@@ -96,7 +96,7 @@ class AsignacionRutaServiceTest {
         when(asignacionRutaRepository.findByActivoTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(asignacionEjemplo())));
 
-        Page<RouteAssignmentResponse> pagina = asignacionRutaService.listar(pageable);
+        Page<RouteAssignmentResponse> pagina = asignacionRutaService.list(pageable);
 
         assertEquals(1, pagina.getTotalElements());
         assertEquals("Carlos Mendoza", pagina.getContent().get(0).conductorNombre());
@@ -109,7 +109,7 @@ class AsignacionRutaServiceTest {
         when(asignacionRutaRepository.findWithDetalle(1L))
                 .thenReturn(Optional.of(asignacionEjemplo()));
 
-        RouteAssignmentResponse response = asignacionRutaService.buscarPorId(1L);
+        RouteAssignmentResponse response = asignacionRutaService.findById(1L);
 
         assertEquals(1L, response.id());
         assertEquals("ACTIVA", response.estado());
@@ -120,7 +120,7 @@ class AsignacionRutaServiceTest {
         when(asignacionRutaRepository.findWithDetalle(99L)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class,
-                () -> asignacionRutaService.buscarPorId(99L));
+                () -> asignacionRutaService.findById(99L));
     }
 
     @Test
@@ -131,7 +131,7 @@ class AsignacionRutaServiceTest {
         when(asignacionRutaRepository.save(any(RouteAssignment.class)))
                 .thenReturn(asignacionEjemplo());
 
-        RouteAssignmentResponse response = asignacionRutaService.crear(requestEjemplo());
+        RouteAssignmentResponse response = asignacionRutaService.create(requestEjemplo());
 
         assertNotNull(response);
         assertEquals(1L, response.id());
@@ -143,7 +143,7 @@ class AsignacionRutaServiceTest {
         when(conductorRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class,
-                () -> asignacionRutaService.crear(requestEjemplo()));
+                () -> asignacionRutaService.create(requestEjemplo()));
     }
 
     @Test
@@ -152,7 +152,7 @@ class AsignacionRutaServiceTest {
         when(vehiculoRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class,
-                () -> asignacionRutaService.crear(requestEjemplo()));
+                () -> asignacionRutaService.create(requestEjemplo()));
     }
 
     @Test
@@ -162,7 +162,7 @@ class AsignacionRutaServiceTest {
         when(rutaRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class,
-                () -> asignacionRutaService.crear(requestEjemplo()));
+                () -> asignacionRutaService.create(requestEjemplo()));
     }
 
     @Test
@@ -177,7 +177,7 @@ class AsignacionRutaServiceTest {
         );
 
         assertThrows(IllegalArgumentException.class,
-                () -> asignacionRutaService.crear(request));
+                () -> asignacionRutaService.create(request));
     }
 
     @Test
@@ -190,7 +190,7 @@ class AsignacionRutaServiceTest {
         when(asignacionRutaRepository.save(any(RouteAssignment.class)))
                 .thenReturn(asignacionEjemplo());
 
-        RouteAssignmentResponse response = asignacionRutaService.actualizar(1L, requestEjemplo());
+        RouteAssignmentResponse response = asignacionRutaService.update(1L, requestEjemplo());
 
         assertEquals(1L, response.id());
         verify(asignacionRutaRepository).save(any(RouteAssignment.class));

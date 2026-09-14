@@ -20,5 +20,5 @@ public interface AbdDriverRepository extends JpaRepository<AbdDriver, Integer> {
             WHERE (:search IS NULL OR LOWER(c.nombres) LIKE LOWER(CONCAT('%', :search, '%'))
                        OR LOWER(c.cedula) LIKE LOWER(CONCAT('%', :search, '%')))
             """)
-    Page<AbdDriver> buscar(@Param("search") String search, Pageable pageable);
+    Page<AbdDriver> search(@Param("search") String search, Pageable pageable);
 }

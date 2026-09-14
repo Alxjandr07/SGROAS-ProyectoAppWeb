@@ -64,7 +64,7 @@ class ConductorServiceExtraTest {
         when(conductorRepository.findByActivoTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(conductorEjemplo())));
 
-        Page<DriverResponse> pagina = conductorService.listar(null, pageable);
+        Page<DriverResponse> pagina = conductorService.list(null, pageable);
 
         assertEquals(1, pagina.getTotalElements());
         assertEquals("Carlos Alberto", pagina.getContent().get(0).nombres());
@@ -75,7 +75,7 @@ class ConductorServiceExtraTest {
         when(conductorRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class,
-                () -> conductorService.buscarPorId(99L));
+                () -> conductorService.findById(99L));
     }
 
     @Test
@@ -85,7 +85,7 @@ class ConductorServiceExtraTest {
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(inactivo));
 
         assertThrows(IllegalArgumentException.class,
-                () -> conductorService.buscarPorId(1L));
+                () -> conductorService.findById(1L));
     }
 
     @Test
@@ -94,7 +94,7 @@ class ConductorServiceExtraTest {
         when(conductorRepository.existsByNumeroLicencia("LIC-001-2026")).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class,
-                () -> conductorService.crear(requestEjemplo()));
+                () -> conductorService.create(requestEjemplo()));
     }
 
     @Test
@@ -109,7 +109,7 @@ class ConductorServiceExtraTest {
         );
 
         assertThrows(IllegalArgumentException.class,
-                () -> conductorService.crear(request));
+                () -> conductorService.create(request));
     }
 
     @Test
@@ -117,7 +117,7 @@ class ConductorServiceExtraTest {
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductorEjemplo()));
         when(conductorRepository.save(any(Driver.class))).thenReturn(conductorEjemplo());
 
-        DriverResponse response = conductorService.actualizar(1L, requestEjemplo());
+        DriverResponse response = conductorService.update(1L, requestEjemplo());
 
         assertEquals(1L, response.id());
         verify(conductorRepository).save(any(Driver.class));
@@ -135,7 +135,7 @@ class ConductorServiceExtraTest {
         );
 
         assertThrows(IllegalArgumentException.class,
-                () -> conductorService.actualizar(1L, request));
+                () -> conductorService.update(1L, request));
     }
 
     @Test
@@ -150,7 +150,7 @@ class ConductorServiceExtraTest {
         );
 
         assertThrows(IllegalArgumentException.class,
-                () -> conductorService.actualizar(1L, request));
+                () -> conductorService.update(1L, request));
     }
 
     @Test
@@ -169,8 +169,8 @@ class ConductorServiceExtraTest {
         conductor.setFechaVencimientoLicencia(LocalDate.now().minusDays(5));
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductor));
 
-        DriverResponse response = conductorService.buscarPorId(1L);
+        DriverResponse response = conductorService.findById(1L);
 
-        assertFalse(response.licenciaPorVencer());
+        assertFalse(response.licenseExpiring());
     }
 }

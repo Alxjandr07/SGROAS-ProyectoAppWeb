@@ -54,7 +54,7 @@ class ConductorControllerTest {
 
     @Test
     void listarDebeRetornar200() throws Exception {
-        when(conductorService.listar(any(), any()))
+        when(conductorService.list(any(), any()))
                 .thenReturn(new PageImpl<>(List.of(responseEjemplo())));
 
         mockMvc().perform(get("/api/conductores"))
@@ -63,7 +63,7 @@ class ConductorControllerTest {
 
     @Test
     void buscarPorIdDebeRetornar200() throws Exception {
-        when(conductorService.buscarPorId(1L)).thenReturn(responseEjemplo());
+        when(conductorService.findById(1L)).thenReturn(responseEjemplo());
 
         mockMvc().perform(get("/api/conductores/1"))
                 .andExpect(status().isOk())
@@ -72,7 +72,7 @@ class ConductorControllerTest {
 
     @Test
     void crearDebeRetornar201() throws Exception {
-        when(conductorService.crear(any())).thenReturn(responseEjemplo());
+        when(conductorService.create(any())).thenReturn(responseEjemplo());
 
         mockMvc().perform(post("/api/conductores")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -95,7 +95,7 @@ class ConductorControllerTest {
 
     @Test
     void actualizarDebeRetornar200() throws Exception {
-        when(conductorService.actualizar(any(), any())).thenReturn(responseEjemplo());
+        when(conductorService.update(any(), any())).thenReturn(responseEjemplo());
 
         mockMvc().perform(put("/api/conductores/1")
                         .contentType(MediaType.APPLICATION_JSON)

@@ -112,11 +112,11 @@ public class AuthController {
             AuthResponse response = authService.login(request);
             loginRateLimiter.resetear(ip);
             return ResponseEntity.ok()
-                    .header(HttpHeaders.SET_COOKIE, crearCookieAccessToken(response.accessToken()))
-                    .header(HttpHeaders.SET_COOKIE, crearCookieRefreshToken(response.refreshToken()))
+                    .header(HttpHeaders.SET_COOKIE, buildAccessTokenCookie(response.accessToken()))
+                    .header(HttpHeaders.SET_COOKIE, buildRefreshTokenCookie(response.refreshToken()))
                     .body(aSesion(response));
         } catch (Exception e) {
-            loginRateLimiter.registrarIntentoFallido(ip);
+            loginRateLimiter.recordFailedAttempt(ip);
             throw e;
         }
     }
@@ -141,8 +141,8 @@ public class AuthController {
         }
         AuthResponse response = authService.refresh(new RefreshTokenRequest(refreshToken));
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, crearCookieAccessToken(response.accessToken()))
-                .header(HttpHeaders.SET_COOKIE, crearCookieRefreshToken(response.refreshToken()))
+                .header(HttpHeaders.SET_COOKIE, buildAccessTokenCookie(response.accessToken()))
+                .header(HttpHeaders.SET_COOKIE, buildRefreshTokenCookie(response.refreshToken()))
                 .body(aSesion(response));
     }
 
@@ -152,13 +152,13 @@ public class AuthController {
      * @return respuesta HTTP con el perfil de la sesión recién activada.
      */
     @PostMapping("/verify-email")
-    public ResponseEntity<SessionResponse> verificarEmail(
+    public ResponseEntity<SessionResponse> verifyEmail(
             @Valid @RequestBody VerifyEmailRequest request
     ) {
-        AuthResponse response = authService.verificarEmail(request.email(), request.codigo());
+        AuthResponse response = authService.verifyEmail(request.email(), request.codigo());
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, crearCookieAccessToken(response.accessToken()))
-                .header(HttpHeaders.SET_COOKIE, crearCookieRefreshToken(response.refreshToken()))
+                .header(HttpHeaders.SET_COOKIE, buildAccessTokenCookie(response.accessToken()))
+                .header(HttpHeaders.SET_COOKIE, buildRefreshTokenCookie(response.refreshToken()))
                 .body(aSesion(response));
     }
 
@@ -168,10 +168,10 @@ public class AuthController {
      * @return respuesta HTTP con un mensaje genérico de confirmación del envío.
      */
     @PostMapping("/resend-code")
-    public ResponseEntity<Map<String, String>> reenviarCodigo(
+    public ResponseEntity<Map<String, String>> resendCode(
             @Valid @RequestBody EmailRequest request
     ) {
-        authService.reenviarCodigoVerificacion(request.email());
+        authService.resendVerificationCode(request.email());
         return ResponseEntity.ok(Map.of(
                 "mensaje",
                 "Si el correo corresponde a una cuenta pendiente, enviamos un nuevo codigo. Revisa tambien tu carpeta de spam."
@@ -184,7 +184,7 @@ public class AuthController {
      * @return respuesta HTTP con un mensaje genérico de confirmación del envío.
      */
     @PostMapping("/forgot-password")
-    public ResponseEntity<Map<String, String>> olvidarContrasena(
+    public ResponseEntity<Map<String, String>> forgotPassword(
             @Valid @RequestBody EmailRequest request
     ) {
         authService.solicitarRestablecimiento(request.email());
@@ -200,10 +200,10 @@ public class AuthController {
      * @return respuesta HTTP con el mensaje de confirmación del cambio realizado.
      */
     @PostMapping("/reset-password")
-    public ResponseEntity<Map<String, String>> restablecerContrasena(
+    public ResponseEntity<Map<String, String>> resetPassword(
             @Valid @RequestBody ResetPasswordRequest request
     ) {
-        authService.restablecerContrasena(request.email(), request.codigo(), request.nuevaPassword());
+        authService.resetPassword(request.email(), request.codigo(), request.nuevaPassword());
         return ResponseEntity.ok(Map.of(
                 "mensaje", "Contrasena actualizada correctamente. Ya puedes iniciar sesion."
         ));
@@ -230,8 +230,8 @@ public class AuthController {
         authService.logout(accessToken,
                 new RefreshTokenRequest(refreshToken == null ? "" : refreshToken));
         return ResponseEntity.noContent()
-                .header(HttpHeaders.SET_COOKIE, eliminarCookieAccessToken())
-                .header(HttpHeaders.SET_COOKIE, eliminarCookieRefreshToken())
+                .header(HttpHeaders.SET_COOKIE, removeAccessTokenCookie())
+                .header(HttpHeaders.SET_COOKIE, removeRefreshTokenCookie())
                 .build();
     }
 
@@ -244,7 +244,7 @@ public class AuthController {
         );
     }
 
-    private String crearCookieAccessToken(String token) {
+    private String buildAccessTokenCookie(String token) {
         return ResponseCookie.from("access_token", token)
                 .httpOnly(true)
                 .secure(cookieSecure)
@@ -255,7 +255,7 @@ public class AuthController {
                 .toString();
     }
 
-    private String crearCookieRefreshToken(String token) {
+    private String buildRefreshTokenCookie(String token) {
         return ResponseCookie.from("refresh_token", token)
                 .httpOnly(true)
                 .secure(cookieSecure)
@@ -266,7 +266,7 @@ public class AuthController {
                 .toString();
     }
 
-    private String eliminarCookieAccessToken() {
+    private String removeAccessTokenCookie() {
         return ResponseCookie.from("access_token", "")
                 .httpOnly(true)
                 .secure(cookieSecure)
@@ -277,7 +277,7 @@ public class AuthController {
                 .toString();
     }
 
-    private String eliminarCookieRefreshToken() {
+    private String removeRefreshTokenCookie() {
         return ResponseCookie.from("refresh_token", "")
                 .httpOnly(true)
                 .secure(cookieSecure)

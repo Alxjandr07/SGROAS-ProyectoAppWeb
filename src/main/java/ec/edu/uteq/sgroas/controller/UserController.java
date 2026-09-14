@@ -26,11 +26,11 @@ public class UserController {
      * @return respuesta HTTP con la página de usuarios encontrados.
      */
     @GetMapping
-    public ResponseEntity<Page<UserResponse>> listar(
+    public ResponseEntity<Page<UserResponse>> list(
             @RequestParam(required = false) String search,
             @PageableDefault(size = 10, sort = "id") Pageable pageable
     ) {
-        return ResponseEntity.ok(usuarioService.listar(search, pageable));
+        return ResponseEntity.ok(usuarioService.list(search, pageable));
     }
 
     /**
@@ -39,8 +39,8 @@ public class UserController {
      * @return respuesta HTTP con los datos del usuario encontrado.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(usuarioService.buscarPorId(id));
+    public ResponseEntity<UserResponse> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(usuarioService.findById(id));
     }
 
     /**
@@ -49,8 +49,8 @@ public class UserController {
      * @return respuesta HTTP con estado creado y los datos del usuario registrado.
      */
     @PostMapping
-    public ResponseEntity<UserResponse> crear(@Valid @RequestBody UserRequest request) {
-        UserResponse response = usuarioService.crear(request);
+    public ResponseEntity<UserResponse> create(@Valid @RequestBody UserRequest request) {
+        UserResponse response = usuarioService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -60,8 +60,8 @@ public class UserController {
      * @return respuesta HTTP sin contenido que confirma el envío del código.
      */
     @PostMapping("/{id}/reenviar-activacion")
-    public ResponseEntity<Void> reenviarActivacion(@PathVariable Long id) {
-        usuarioService.reenviarCodigoActivacion(id);
+    public ResponseEntity<Void> resendActivation(@PathVariable Long id) {
+        usuarioService.resendActivationCode(id);
         return ResponseEntity.noContent().build();
     }
 
@@ -72,11 +72,11 @@ public class UserController {
      * @return respuesta HTTP con los datos actualizados del usuario.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> actualizar(
+    public ResponseEntity<UserResponse> update(
             @PathVariable Long id,
             @Valid @RequestBody UserRequest request
     ) {
-        return ResponseEntity.ok(usuarioService.actualizar(id, request));
+        return ResponseEntity.ok(usuarioService.update(id, request));
     }
 
     /**

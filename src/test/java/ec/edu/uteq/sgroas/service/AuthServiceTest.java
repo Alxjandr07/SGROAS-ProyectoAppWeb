@@ -55,11 +55,11 @@ class AuthServiceTest {
                 .thenReturn(Optional.of(usuario));
         when(passwordEncoder.matches("123456", "password-encriptado"))
                 .thenReturn(true);
-        when(jwtService.generarToken(usuario))
+        when(jwtService.generateToken(usuario))
                 .thenReturn("access-token-prueba");
         when(jwtService.getExpirationMs())
                 .thenReturn(3600000L);
-        when(tokenService.generarRefreshToken(eq("admin@sgroas.com"), any()))
+        when(tokenService.createRefreshToken(eq("admin@sgroas.com"), any()))
                 .thenReturn("refresh-token-prueba");
 
         AuthResponse response = authService.login(

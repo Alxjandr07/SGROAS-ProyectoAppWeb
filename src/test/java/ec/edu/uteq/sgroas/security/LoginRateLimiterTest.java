@@ -17,7 +17,7 @@ class LoginRateLimiterTest {
     void menosDeSeisIntentosNoBloquea() {
         LoginRateLimiter limiter = new LoginRateLimiter();
         for (int i = 0; i < 5; i++) {
-            limiter.registrarIntentoFallido("192.168.1.1");
+            limiter.recordFailedAttempt("192.168.1.1");
         }
 
         assertFalse(limiter.estaBloqueado("192.168.1.1"));
@@ -27,7 +27,7 @@ class LoginRateLimiterTest {
     void seisIntentosFallidosBloquean() {
         LoginRateLimiter limiter = new LoginRateLimiter();
         for (int i = 0; i < 6; i++) {
-            limiter.registrarIntentoFallido("192.168.1.1");
+            limiter.recordFailedAttempt("192.168.1.1");
         }
 
         assertTrue(limiter.estaBloqueado("192.168.1.1"));
@@ -37,7 +37,7 @@ class LoginRateLimiterTest {
     void resetearDebeDesbloquearIp() {
         LoginRateLimiter limiter = new LoginRateLimiter();
         for (int i = 0; i < 6; i++) {
-            limiter.registrarIntentoFallido("192.168.1.1");
+            limiter.recordFailedAttempt("192.168.1.1");
         }
         assertTrue(limiter.estaBloqueado("192.168.1.1"));
 
@@ -50,7 +50,7 @@ class LoginRateLimiterTest {
     void bloqueoExpiradoDebeDesbloquear() throws InterruptedException {
         LoginRateLimiter limiter = new LoginRateLimiter();
         for (int i = 0; i < 6; i++) {
-            limiter.registrarIntentoFallido("192.168.1.1");
+            limiter.recordFailedAttempt("192.168.1.1");
         }
         assertTrue(limiter.estaBloqueado("192.168.1.1"));
 

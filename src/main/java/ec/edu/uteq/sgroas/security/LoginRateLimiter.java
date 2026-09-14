@@ -30,7 +30,7 @@ public class LoginRateLimiter {
      * Suma un fallo de acceso al conteo de la direccion dentro de la ventana actual.
      * @param ip direccion del cliente que realizo el intento de acceso fallido
      */
-    public void registrarIntentoFallido(String ip) {
+    public void recordFailedAttempt(String ip) {
         intentos.compute(ip, (k, v) -> {
             if (v == null) return new long[]{1, System.currentTimeMillis()};
             if (System.currentTimeMillis() - v[1] > VENTANA_MS) return new long[]{1, System.currentTimeMillis()};

@@ -35,10 +35,10 @@ public class ReportController {
      */
     @GetMapping("/incidentes-por-gravedad")
     @PreAuthorize("hasAnyRole('ADMIN', 'SEGURIDAD')")
-    public ResponseEntity<List<Map<String, Object>>> incidentesPorGravedad(
+    public ResponseEntity<List<Map<String, Object>>> incidentsBySeverity(
             @RequestParam(required = false) String tipo
     ) {
-        return ResponseEntity.ok(reporteService.incidentesPorGravedad(tipo));
+        return ResponseEntity.ok(reporteService.incidentsBySeverity(tipo));
     }
 
     /**
@@ -49,11 +49,11 @@ public class ReportController {
      */
     @GetMapping("/incidentes-por-rango")
     @PreAuthorize("hasAnyRole('ADMIN', 'SEGURIDAD')")
-    public ResponseEntity<List<Map<String, Object>>> incidentesPorRango(
+    public ResponseEntity<List<Map<String, Object>>> incidentsByRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant desde,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant hasta
     ) {
-        return ResponseEntity.ok(reporteService.incidentesPorRango(desde, hasta));
+        return ResponseEntity.ok(reporteService.incidentsByRange(desde, hasta));
     }
 
     /**
@@ -63,10 +63,10 @@ public class ReportController {
      */
     @GetMapping("/licencias-por-vencer")
     @PreAuthorize("hasAnyRole('ADMIN', 'COORDINADOR')")
-    public ResponseEntity<List<Map<String, Object>>> licenciasPorVencer(
+    public ResponseEntity<List<Map<String, Object>>> licensesExpiring(
             @RequestParam(defaultValue = "30") Integer dias
     ) {
-        return ResponseEntity.ok(reporteService.licenciasPorVencer(dias));
+        return ResponseEntity.ok(reporteService.licensesExpiring(dias));
     }
 
     /**
@@ -75,8 +75,8 @@ public class ReportController {
      */
     @GetMapping("/vehiculos-en-mantenimiento")
     @PreAuthorize("hasAnyRole('ADMIN', 'COORDINADOR')")
-    public ResponseEntity<List<Map<String, Object>>> vehiculosEnMantenimiento() {
-        return ResponseEntity.ok(reporteService.vehiculosEnMantenimiento());
+    public ResponseEntity<List<Map<String, Object>>> vehiclesInMaintenance() {
+        return ResponseEntity.ok(reporteService.vehiclesInMaintenance());
     }
 
     /**
@@ -85,8 +85,8 @@ public class ReportController {
      */
     @GetMapping("/rendimiento-rutas")
     @PreAuthorize("hasAnyRole('ADMIN', 'COORDINADOR')")
-    public ResponseEntity<List<Map<String, Object>>> rendimientoRutas() {
-        return ResponseEntity.ok(reporteService.reporteRendimientoRutas());
+    public ResponseEntity<List<Map<String, Object>>> routePerformance() {
+        return ResponseEntity.ok(reporteService.routePerformanceReport());
     }
 
     /**
@@ -96,9 +96,9 @@ public class ReportController {
      */
     @GetMapping("/asignaciones-activas/{conductorId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'COORDINADOR')")
-    public ResponseEntity<List<Map<String, Object>>> asignacionesActivas(
+    public ResponseEntity<List<Map<String, Object>>> activeAssignments(
             @PathVariable Long conductorId
     ) {
-        return ResponseEntity.ok(reporteService.asignacionesActivasPorConductor(conductorId));
+        return ResponseEntity.ok(reporteService.activeAssignmentsByDriver(conductorId));
     }
 }

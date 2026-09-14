@@ -29,20 +29,20 @@ public class AbdCatalogService {
      * Reune las listas de provincias, ciudades, terminales y roles disponibles en el sistema.
      * @return contenedor con los cuatro listados de catalogos para uso en formularios y filtros.
      */
-    public AbdDtos.CatalogosResponse obtenerCatalogos() {
-        List<AbdDtos.ProvinciaResponse> provincias = provinciaRepository.findAll().stream()
-                .map(p -> new AbdDtos.ProvinciaResponse(p.getIdProvincia(), p.getNombre()))
+    public AbdDtos.CatalogsResponse getCatalogs() {
+        List<AbdDtos.ProvinceResponse> provincias = provinciaRepository.findAll().stream()
+                .map(p -> new AbdDtos.ProvinceResponse(p.getIdProvincia(), p.getNombre()))
                 .toList();
-        List<AbdDtos.CiudadResponse> ciudades = ciudadRepository.findAll().stream()
-                .map(this::aCiudadResponse)
+        List<AbdDtos.CityResponse> ciudades = ciudadRepository.findAll().stream()
+                .map(this::toCityResponse)
                 .toList();
         List<AbdDtos.TerminalResponse> terminales = terminalRepository.findAll().stream()
-                .map(this::aTerminalResponse)
+                .map(this::toTerminalResponse)
                 .toList();
         List<AbdDtos.RolResponse> roles = rolAbdRepository.findAll().stream()
                 .map(r -> new AbdDtos.RolResponse(r.getIdRol(), r.getNombre(), r.getDescripcion()))
                 .toList();
-        return new AbdDtos.CatalogosResponse(provincias, ciudades, terminales, roles);
+        return new AbdDtos.CatalogsResponse(provincias, ciudades, terminales, roles);
     }
 
     /**
@@ -51,17 +51,17 @@ public class AbdCatalogService {
      * @return entidad del terminal encontrado lista para su uso en otras operaciones.
      * @throws IllegalArgumentException cuando no existe un terminal con el identificador indicado.
      */
-    public Terminal buscarTerminal(Integer idTerminal) {
+    public Terminal findTerminal(Integer idTerminal) {
         return terminalRepository.findById(idTerminal)
                 .orElseThrow(() -> new IllegalArgumentException("Terminal no encontrado: " + idTerminal));
     }
 
-    private AbdDtos.CiudadResponse aCiudadResponse(City c) {
+    private AbdDtos.CityResponse toCityResponse(City c) {
         Province p = c.getProvincia();
-        return new AbdDtos.CiudadResponse(c.getIdCiudad(), c.getNombre(), p.getIdProvincia(), p.getNombre());
+        return new AbdDtos.CityResponse(c.getIdCiudad(), c.getNombre(), p.getIdProvincia(), p.getNombre());
     }
 
-    private AbdDtos.TerminalResponse aTerminalResponse(Terminal t) {
+    private AbdDtos.TerminalResponse toTerminalResponse(Terminal t) {
         City c = t.getCiudad();
         return new AbdDtos.TerminalResponse(t.getIdTerminal(), t.getNombre(), c.getIdCiudad(), c.getNombre());
     }

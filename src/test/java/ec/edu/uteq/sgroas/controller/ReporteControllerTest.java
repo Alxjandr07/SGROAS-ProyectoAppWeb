@@ -49,7 +49,7 @@ class ReporteControllerTest {
 
     @Test
     void incidentesPorGravedadFiltraPorTipo() throws Exception {
-        when(reporteService.incidentesPorGravedad("ROBO")).thenReturn(
+        when(reporteService.incidentsBySeverity("ROBO")).thenReturn(
                 List.of(Map.of("gravedad", "ALTA", "total_incidentes", 2L)));
 
         mockMvc().perform(get("/api/reportes/incidentes-por-gravedad").param("tipo", "ROBO"))
@@ -59,7 +59,7 @@ class ReporteControllerTest {
 
     @Test
     void incidentesPorRangoConFechas() throws Exception {
-        when(reporteService.incidentesPorRango(any(Instant.class), any(Instant.class)))
+        when(reporteService.incidentsByRange(any(Instant.class), any(Instant.class)))
                 .thenReturn(List.of(Map.of("incidente_id", 1L, "tipo", "ACCIDENTE")));
 
         mockMvc().perform(get("/api/reportes/incidentes-por-rango")
@@ -71,7 +71,7 @@ class ReporteControllerTest {
 
     @Test
     void licenciasPorVencerUsaDefaultDe30Dias() throws Exception {
-        when(reporteService.licenciasPorVencer(anyInt()))
+        when(reporteService.licensesExpiring(anyInt()))
                 .thenReturn(List.of(Map.of("conductor_id", 1L, "cedula", "1234567890")));
 
         mockMvc().perform(get("/api/reportes/licencias-por-vencer"))
@@ -81,7 +81,7 @@ class ReporteControllerTest {
 
     @Test
     void vehiculosEnMantenimientoDevuelveLista() throws Exception {
-        when(reporteService.vehiculosEnMantenimiento())
+        when(reporteService.vehiclesInMaintenance())
                 .thenReturn(List.of(Map.of("placa", "PCH-1234")));
 
         mockMvc().perform(get("/api/reportes/vehiculos-en-mantenimiento"))
@@ -91,7 +91,7 @@ class ReporteControllerTest {
 
     @Test
     void rendimientoRutasDevuelveReporte() throws Exception {
-        when(reporteService.reporteRendimientoRutas())
+        when(reporteService.routePerformanceReport())
                 .thenReturn(List.of(Map.of("ruta_codigo", "R-01", "total_incidentes", 5L)));
 
         mockMvc().perform(get("/api/reportes/rendimiento-rutas"))
@@ -101,7 +101,7 @@ class ReporteControllerTest {
 
     @Test
     void asignacionesActivasDevuelveAsignaciones() throws Exception {
-        when(reporteService.asignacionesActivasPorConductor(anyLong()))
+        when(reporteService.activeAssignmentsByDriver(anyLong()))
                 .thenReturn(List.of(Map.of("vehiculo_placa", "PCH-5678")));
 
         mockMvc().perform(get("/api/reportes/asignaciones-activas/1"))
@@ -111,7 +111,7 @@ class ReporteControllerTest {
 
     @Test
     void incidentesPorGravedadSinParametroNoFalla() throws Exception {
-        when(reporteService.incidentesPorGravedad(nullable(String.class)))
+        when(reporteService.incidentsBySeverity(nullable(String.class)))
                 .thenReturn(List.of(Map.of("gravedad", "BAJA", "total_incidentes", 0L)));
 
         mockMvc().perform(get("/api/reportes/incidentes-por-gravedad"))

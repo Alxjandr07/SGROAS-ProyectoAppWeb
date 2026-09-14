@@ -16,7 +16,7 @@ import java.time.LocalDate;
  * @param email correo electronico del conductor
  * @param estado estado operativo del conductor
  * @param activo indica si el conductor esta activo
- * @param licenciaPorVencer indica si la licencia esta proxima a vencer
+ * @param licenseExpiring indica si la licencia esta proxima a vencer
  * @param creadoEn fecha de creacion del registro
  * @param actualizadoEn fecha de la ultima actualizacion
  */
@@ -32,7 +32,7 @@ public record DriverResponse(
         String email,
         String estado,
         Boolean activo,
-        Boolean licenciaPorVencer,
+        Boolean licenseExpiring,
         Instant creadoEn,
         Instant actualizadoEn
 ) {

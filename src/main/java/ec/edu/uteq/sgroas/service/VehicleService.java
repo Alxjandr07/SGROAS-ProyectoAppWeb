@@ -27,8 +27,8 @@ public class VehicleService {
      * @param pageable objeto con numero de pagina, tamanio y orden solicitados para la consulta
      * @return pagina con los vehiculos activos encontrados
      */
-    public Page<VehicleResponse> listar(Pageable pageable) {
-        List<VehicleResponse> contenido = listarCacheable(pageable);
+    public Page<VehicleResponse> list(Pageable pageable) {
+        List<VehicleResponse> contenido = listCached(pageable);
         return new PageImpl<>(contenido, pageable, contenido.size());
     }
 
@@ -38,7 +38,7 @@ public class VehicleService {
      * @return lista de vehiculos activos correspondientes a la pagina pedida
      */
     @Cacheable(value = "vehiculos", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
-    public List<VehicleResponse> listarCacheable(Pageable pageable) {
+    public List<VehicleResponse> listCached(Pageable pageable) {
         return vehiculoRepository.findByActivoTrue(pageable)
                 .map(this::mapearAResponse)
                 .getContent();
@@ -50,8 +50,8 @@ public class VehicleService {
      * @return datos del vehiculo encontrado
      * @throws IllegalArgumentException cuando no existe un vehiculo activo con ese identificador
      */
-    public VehicleResponse buscarPorId(Long id) {
-        Vehicle vehiculo = obtenerVehiculoActivo(id);
+    public VehicleResponse findById(Long id) {
+        Vehicle vehiculo = getActiveVehicle(id);
         return mapearAResponse(vehiculo);
     }
 
@@ -62,7 +62,7 @@ public class VehicleService {
      * @throws IllegalArgumentException cuando ya existe otro vehiculo con la misma placa o el estado no es valido
      */
     @CacheEvict(value = "vehiculos", allEntries = true)
-    public VehicleResponse crear(VehicleRequest request) {
+    public VehicleResponse create(VehicleRequest request) {
         if (vehiculoRepository.existsByPlaca(request.placa())) {
             throw new IllegalArgumentException("Ya existe un vehiculo con esa placa");
         }
@@ -76,7 +76,7 @@ public class VehicleService {
                 .numeroMotor(request.numeroMotor())
                 .numeroChasis(request.numeroChasis())
                 .color(request.color())
-                .estado(convertirEstado(request.estado()))
+                .estado(toStatus(request.estado()))
                 .activo(true)
                 .creadoEn(Instant.now())
                 .actualizadoEn(Instant.now())
@@ -94,8 +94,8 @@ public class VehicleService {
      * @throws IllegalArgumentException cuando el vehiculo no existe, la placa choca con otro registro o el estado no es valido
      */
     @CacheEvict(value = "vehiculos", allEntries = true)
-    public VehicleResponse actualizar(Long id, VehicleRequest request) {
-        Vehicle vehiculo = obtenerVehiculoActivo(id);
+    public VehicleResponse update(Long id, VehicleRequest request) {
+        Vehicle vehiculo = getActiveVehicle(id);
 
         if (!vehiculo.getPlaca().equals(request.placa())
                 && vehiculoRepository.existsByPlaca(request.placa())) {
@@ -110,7 +110,7 @@ public class VehicleService {
         vehiculo.setNumeroMotor(request.numeroMotor());
         vehiculo.setNumeroChasis(request.numeroChasis());
         vehiculo.setColor(request.color());
-        vehiculo.setEstado(convertirEstado(request.estado()));
+        vehiculo.setEstado(toStatus(request.estado()));
         vehiculo.setActualizadoEn(Instant.now());
 
         Vehicle vehiculoActualizado = vehiculoRepository.save(vehiculo);
@@ -124,20 +124,20 @@ public class VehicleService {
      */
     @CacheEvict(value = "vehiculos", allEntries = true)
     public void desactivar(Long id) {
-        Vehicle vehiculo = obtenerVehiculoActivo(id);
+        Vehicle vehiculo = getActiveVehicle(id);
         vehiculo.setActivo(false);
         vehiculo.setEstado(VehicleStatus.FUERA_DE_SERVICIO);
         vehiculo.setActualizadoEn(Instant.now());
         vehiculoRepository.save(vehiculo);
     }
 
-    private Vehicle obtenerVehiculoActivo(Long id) {
+    private Vehicle getActiveVehicle(Long id) {
         return vehiculoRepository.findById(id)
                 .filter(Vehicle::getActivo)
                 .orElseThrow(() -> new IllegalArgumentException("Vehicle no encontrado"));
     }
 
-    private VehicleStatus convertirEstado(String estado) {
+    private VehicleStatus toStatus(String estado) {
         try {
             return VehicleStatus.valueOf(estado.toUpperCase());
         } catch (IllegalArgumentException e) {

@@ -33,7 +33,7 @@ public interface DriverRepository extends JpaRepository<Driver, Long> {
                        OR c.cedula LIKE CONCAT('%', :search, '%')
                        OR LOWER(c.numeroLicencia) LIKE LOWER(CONCAT('%', :search, '%')))
             """)
-    Page<Driver> buscarActivos(@Param("search") String search, Pageable pageable);
+    Page<Driver> searchActive(@Param("search") String search, Pageable pageable);
 
     /**
      * Consulta si existe un conductor con la cedula dada.
@@ -55,5 +55,5 @@ public interface DriverRepository extends JpaRepository<Driver, Long> {
      * @return filas del procedimiento con las licencias por vencer.
      */
     @Procedure(name = "Driver.licenciasPorVencer")
-    List<Object[]> licenciasPorVencer(@Param("p_dias_umbral") Integer diasUmbral);
+    List<Object[]> licensesExpiring(@Param("p_dias_umbral") Integer diasUmbral);
 }

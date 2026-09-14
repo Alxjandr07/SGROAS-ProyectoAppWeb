@@ -25,10 +25,10 @@ public class AbdRouteController {
      * @return respuesta con la pagina de rutas encontradas y estado 200.
      */
     @GetMapping
-    public ResponseEntity<Page<AbdDtos.RutaAbdResponse>> listar(
+    public ResponseEntity<Page<AbdDtos.AbdRouteResponse>> list(
             @RequestParam(required = false) String search,
             @PageableDefault(size = 50, sort = "idRuta") Pageable pageable) {
-        return ResponseEntity.ok(rutaAbdService.listar(search, pageable));
+        return ResponseEntity.ok(rutaAbdService.list(search, pageable));
     }
 
     /**
@@ -37,8 +37,8 @@ public class AbdRouteController {
      * @return respuesta con los datos de la ruta encontrada y estado 200.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<AbdDtos.RutaAbdResponse> buscarPorId(@PathVariable Integer id) {
-        return ResponseEntity.ok(rutaAbdService.buscarPorId(id));
+    public ResponseEntity<AbdDtos.AbdRouteResponse> findById(@PathVariable Integer id) {
+        return ResponseEntity.ok(rutaAbdService.findById(id));
     }
 
     /**
@@ -47,8 +47,8 @@ public class AbdRouteController {
      * @return respuesta con los datos de la ruta guardada y estado 201.
      */
     @PostMapping
-    public ResponseEntity<AbdDtos.RutaAbdResponse> crear(@Valid @RequestBody AbdDtos.RutaAbdRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(rutaAbdService.crear(request));
+    public ResponseEntity<AbdDtos.AbdRouteResponse> create(@Valid @RequestBody AbdDtos.AbdRouteRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(rutaAbdService.create(request));
     }
 
     /**
@@ -58,9 +58,9 @@ public class AbdRouteController {
      * @return respuesta con los datos de la ruta actualizada y estado 200.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<AbdDtos.RutaAbdResponse> actualizar(@PathVariable Integer id,
-                                                              @Valid @RequestBody AbdDtos.RutaAbdRequest request) {
-        return ResponseEntity.ok(rutaAbdService.actualizar(id, request));
+    public ResponseEntity<AbdDtos.AbdRouteResponse> update(@PathVariable Integer id,
+                                                              @Valid @RequestBody AbdDtos.AbdRouteRequest request) {
+        return ResponseEntity.ok(rutaAbdService.update(id, request));
     }
 
     /**
@@ -69,8 +69,8 @@ public class AbdRouteController {
      * @return respuesta sin contenido y estado 204 cuando la supresion termina con exito.
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
-        rutaAbdService.eliminar(id);
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+        rutaAbdService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

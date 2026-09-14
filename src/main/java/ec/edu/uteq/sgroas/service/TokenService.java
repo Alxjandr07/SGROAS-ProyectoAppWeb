@@ -21,7 +21,7 @@ public class TokenService {
      * @param refreshExpirationMs tiempo de vida del token expresado en milisegundos
      * @return valor del token de refresco recien creado
      */
-    public String generarRefreshToken(String email, Long refreshExpirationMs) {
+    public String createRefreshToken(String email, Long refreshExpirationMs) {
         String refreshToken = UUID.randomUUID().toString();
 
         String key = "refresh:" + refreshToken;
@@ -40,7 +40,7 @@ public class TokenService {
      * @return correo del usuario asociado al token consultado
      * @throws IllegalArgumentException cuando el token no existe o ya expiro
      */
-    public String obtenerEmailDesdeRefreshToken(String refreshToken) {
+    public String getEmailFromRefreshToken(String refreshToken) {
         String key = "refresh:" + refreshToken;
         String email = redisTemplate.opsForValue().get(key);
 
@@ -55,7 +55,7 @@ public class TokenService {
      * Elimina un token de refresco para impedir que vuelva a usarse.
      * @param refreshToken valor del token de refresco que se desea borrar
      */
-    public void eliminarRefreshToken(String refreshToken) {
+    public void deleteRefreshToken(String refreshToken) {
         String key = "refresh:" + refreshToken;
         redisTemplate.delete(key);
     }

@@ -27,12 +27,12 @@ public class AbdIncidentController {
      * @return respuesta con la pagina de incidentes encontrados y estado 200.
      */
     @GetMapping
-    public ResponseEntity<Page<AbdDtos.IncidenteAbdResponse>> listar(
+    public ResponseEntity<Page<AbdDtos.AbdIncidentResponse>> list(
             @RequestParam(required = false) String estado,
             @RequestParam(required = false) String nivel,
             @RequestParam(required = false) String search,
             @PageableDefault(size = 50, sort = "idIncidente") Pageable pageable) {
-        return ResponseEntity.ok(incidenteAbdService.listar(estado, nivel, search, pageable));
+        return ResponseEntity.ok(incidenteAbdService.list(estado, nivel, search, pageable));
     }
 
     /**
@@ -41,8 +41,8 @@ public class AbdIncidentController {
      * @return respuesta con los datos del incidente guardado y estado 201.
      */
     @PostMapping
-    public ResponseEntity<AbdDtos.IncidenteAbdResponse> crear(@Valid @RequestBody AbdDtos.IncidenteAbdRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(incidenteAbdService.crear(request));
+    public ResponseEntity<AbdDtos.AbdIncidentResponse> create(@Valid @RequestBody AbdDtos.AbdIncidentRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(incidenteAbdService.create(request));
     }
 
     /**
@@ -52,9 +52,9 @@ public class AbdIncidentController {
      * @return respuesta con los datos del incidente actualizado y estado 200.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<AbdDtos.IncidenteAbdResponse> actualizar(@PathVariable Integer id,
-                                                                  @Valid @RequestBody AbdDtos.IncidenteAbdRequest request) {
-        return ResponseEntity.ok(incidenteAbdService.actualizar(id, request));
+    public ResponseEntity<AbdDtos.AbdIncidentResponse> update(@PathVariable Integer id,
+                                                                  @Valid @RequestBody AbdDtos.AbdIncidentRequest request) {
+        return ResponseEntity.ok(incidenteAbdService.update(id, request));
     }
 
     /**
@@ -63,8 +63,8 @@ public class AbdIncidentController {
      * @return respuesta sin contenido y estado 204 cuando la supresion termina con exito.
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
-        incidenteAbdService.eliminar(id);
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+        incidenteAbdService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

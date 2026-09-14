@@ -25,10 +25,10 @@ public class IncidentController {
      * @return respuesta HTTP con la página de incidentes encontrados.
      */
     @GetMapping
-    public ResponseEntity<Page<IncidentResponse>> listar(
+    public ResponseEntity<Page<IncidentResponse>> list(
             @PageableDefault(size = 10, sort = "id") Pageable pageable
     ) {
-        return ResponseEntity.ok(incidenteService.listar(pageable));
+        return ResponseEntity.ok(incidenteService.list(pageable));
     }
 
     /**
@@ -37,8 +37,8 @@ public class IncidentController {
      * @return respuesta HTTP con los datos del incidente encontrado.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<IncidentResponse> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(incidenteService.buscarPorId(id));
+    public ResponseEntity<IncidentResponse> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(incidenteService.findById(id));
     }
 
     /**
@@ -47,10 +47,10 @@ public class IncidentController {
      * @return respuesta HTTP con estado creado y los datos del incidente registrado.
      */
     @PostMapping
-    public ResponseEntity<IncidentResponse> crear(
+    public ResponseEntity<IncidentResponse> create(
             @Valid @RequestBody IncidentRequest request
     ) {
-        IncidentResponse response = incidenteService.crear(request);
+        IncidentResponse response = incidenteService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -61,11 +61,11 @@ public class IncidentController {
      * @return respuesta HTTP con los datos actualizados del incidente.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<IncidentResponse> actualizar(
+    public ResponseEntity<IncidentResponse> update(
             @PathVariable Long id,
             @Valid @RequestBody IncidentRequest request
     ) {
-        return ResponseEntity.ok(incidenteService.actualizar(id, request));
+        return ResponseEntity.ok(incidenteService.update(id, request));
     }
 
     /**

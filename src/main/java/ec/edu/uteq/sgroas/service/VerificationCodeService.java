@@ -43,7 +43,7 @@ public class VerificationCodeService {
      * @return codigo de seis digitos en claro listo para enviarse por correo
      */
     @Transactional
-    public String generar(String email, Tipo tipo) {
+    public String generate(String email, Tipo tipo) {
         repository.deleteByEmailAndTipo(email, tipo.name());
 
         String codigo = String.format("%06d", aleatorio.nextInt(1_000_000));
@@ -65,7 +65,7 @@ public class VerificationCodeService {
      * @param tipo proposito del codigo, activacion de cuenta o restablecimiento de contrasena
      * @return verdadero cuando puede generarse otro codigo, falso cuando aun debe esperar
      */
-    public boolean puedeReenviar(String email, Tipo tipo) {
+    public boolean canResend(String email, Tipo tipo) {
         return repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(email, tipo.name())
                 .map(c -> c.getCreadoEn().isBefore(Instant.now().minus(ESPERA_REENVIO)))
                 .orElse(true);
@@ -80,7 +80,7 @@ public class VerificationCodeService {
      * @throws IllegalArgumentException cuando no existe codigo, ya fue usado, expiro, supero los intentos o no coincide
      */
     @Transactional
-    public void validar(String email, Tipo tipo, String codigo) {
+    public void validate(String email, Tipo tipo, String codigo) {
         VerificationCode registro = repository
                 .findFirstByEmailAndTipoOrderByCreadoEnDesc(email, tipo.name())
                 .orElseThrow(() -> new IllegalArgumentException(CODIGO_INVALIDO));

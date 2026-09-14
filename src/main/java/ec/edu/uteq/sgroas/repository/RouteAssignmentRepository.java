@@ -57,5 +57,5 @@ public interface RouteAssignmentRepository extends JpaRepository<RouteAssignment
      * @return filas del procedimiento con las asignaciones activas.
      */
     @Procedure(name = "RouteAssignment.asignacionesActivasPorConductor")
-    List<Object[]> asignacionesActivasPorConductor(@Param("p_conductor_id") Long conductorId);
+    List<Object[]> activeAssignmentsByDriver(@Param("p_conductor_id") Long conductorId);
 }

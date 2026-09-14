@@ -50,45 +50,45 @@ class StoredProcedureIntegrationTest {
 
     @Test
     @DisplayName("sp_incidentes_por_gravedad via @Procedure")
-    void incidentesPorGravedad() {
-        List<Object[]> filas = incidenteRepository.incidentesPorGravedad(null);
+    void incidentsBySeverity() {
+        List<Object[]> filas = incidenteRepository.incidentsBySeverity(null);
         assertNotNull(filas);
     }
 
     @Test
     @DisplayName("sp_obtener_incidentes_por_rango via @Procedure")
-    void incidentesPorRango() {
+    void incidentsByRange() {
         Instant desde = Instant.now().minus(365, ChronoUnit.DAYS);
         Instant hasta = Instant.now().plus(1, ChronoUnit.DAYS);
-        List<Object[]> filas = incidenteRepository.obtenerIncidentesPorRango(desde, hasta);
+        List<Object[]> filas = incidenteRepository.getIncidentsByRange(desde, hasta);
         assertNotNull(filas);
     }
 
     @Test
     @DisplayName("fn_licencias_por_vencer via @Procedure")
-    void licenciasPorVencer() {
-        List<Object[]> filas = conductorRepository.licenciasPorVencer(30);
+    void licensesExpiring() {
+        List<Object[]> filas = conductorRepository.licensesExpiring(30);
         assertNotNull(filas);
     }
 
     @Test
     @DisplayName("sp_vehiculos_en_mantenimiento via @Procedure")
-    void vehiculosEnMantenimiento() {
-        List<Object[]> filas = vehiculoRepository.vehiculosEnMantenimiento();
+    void vehiclesInMaintenance() {
+        List<Object[]> filas = vehiculoRepository.vehiclesInMaintenance();
         assertNotNull(filas);
     }
 
     @Test
     @DisplayName("sp_reporte_rendimiento_rutas via @Procedure")
-    void rendimientoRutas() {
-        List<Object[]> filas = rutaRepository.reporteRendimientoRutas();
+    void routePerformance() {
+        List<Object[]> filas = rutaRepository.routePerformanceReport();
         assertNotNull(filas);
     }
 
     @Test
     @DisplayName("sp_asignaciones_activas_por_conductor via @Procedure")
-    void asignacionesActivas() {
-        List<Object[]> filas = asignacionRutaRepository.asignacionesActivasPorConductor(1L);
+    void activeAssignments() {
+        List<Object[]> filas = asignacionRutaRepository.activeAssignmentsByDriver(1L);
         assertNotNull(filas);
     }
 }

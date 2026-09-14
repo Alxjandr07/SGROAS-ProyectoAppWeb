@@ -41,7 +41,7 @@ public class EmailService {
      * Indica si el envio de correos quedo configurado con un servidor SMTP valido.
      * @return verdadero cuando existe un servidor configurado, falso cuando opera en modo consola
      */
-    public boolean configurado() {
+    public boolean isConfigured() {
         return host != null && !host.isBlank();
     }
 
@@ -53,14 +53,14 @@ public class EmailService {
      * @param codigo codigo de seis digitos que el usuario debera ingresar para activar su cuenta
      * @throws IllegalStateException cuando el servidor SMTP configurado no logra entregar el mensaje
      */
-    public void enviarCodigoVerificacion(String para, String nombre, String codigo) {
-        String html = plantillaCodigo(
+    public void sendVerificationCode(String para, String nombre, String codigo) {
+        String html = codeTemplate(
                 "Confirma tu cuenta",
                 "Hola " + nombre + ", usa este codigo para activar tu cuenta en SGROAS:",
                 codigo,
                 "El codigo expira en 10 minutos. Si no creaste esta cuenta, ignora este mensaje."
         );
-        enviar(para, "SGROAS · Codigo de verificacion de cuenta", html, codigo);
+        send(para, "SGROAS · Codigo de verificacion de cuenta", html, codigo);
     }
 
     /**
@@ -70,23 +70,23 @@ public class EmailService {
      * @param codigo codigo de seis digitos de un solo uso para autorizar el cambio de contrasena
      * @throws IllegalStateException cuando el servidor SMTP configurado no logra entregar el mensaje
      */
-    public void enviarCodigoRestablecimiento(String para, String codigo) {
-        String html = plantillaCodigo(
+    public void sendResetCode(String para, String codigo) {
+        String html = codeTemplate(
                 "Restablece tu contrasena",
                 "Recibimos una solicitud para restablecer tu contrasena de SGROAS. Usa este codigo:",
                 codigo,
                 "El codigo expira en 10 minutos y solo puede usarse una vez. Si no fuiste tu, ignora este mensaje."
         );
-        enviar(para, "SGROAS · Codigo para restablecer contrasena", html, codigo);
+        send(para, "SGROAS · Codigo para restablecer contrasena", html, codigo);
     }
 
-    private void enviar(String para, String asunto, String html, String codigo) {
-        if (!configurado()) {
+    private void send(String para, String asunto, String html, String codigo) {
+        if (!isConfigured()) {
             log.warn("[MODO CONSOLA] SMTP sin configurar. Codigo para {} ({}): {}", para, asunto, codigo);
             return;
         }
         try {
-            JavaMailSender sender = crearSender();
+            JavaMailSender sender = buildSender();
             MimeMessage mensaje = sender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mensaje, false, StandardCharsets.UTF_8.name());
             helper.setFrom(from);
@@ -102,7 +102,7 @@ public class EmailService {
         }
     }
 
-    private JavaMailSender crearSender() {
+    private JavaMailSender buildSender() {
         JavaMailSenderImpl sender = new JavaMailSenderImpl();
         sender.setHost(host);
         sender.setPort(port);
@@ -120,7 +120,7 @@ public class EmailService {
         return sender;
     }
 
-    private String plantillaCodigo(String titulo, String intro, String codigo, String pie) {
+    private String codeTemplate(String titulo, String intro, String codigo, String pie) {
         return """
                 <!doctype html>
                 <html lang="es">

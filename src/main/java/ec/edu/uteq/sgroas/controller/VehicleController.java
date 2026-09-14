@@ -25,10 +25,10 @@ public class VehicleController {
      * @return respuesta HTTP con la página de vehículos encontrados.
      */
     @GetMapping
-    public ResponseEntity<Page<VehicleResponse>> listar(
+    public ResponseEntity<Page<VehicleResponse>> list(
             @PageableDefault(size = 10, sort = "id") Pageable pageable
     ) {
-        return ResponseEntity.ok(vehiculoService.listar(pageable));
+        return ResponseEntity.ok(vehiculoService.list(pageable));
     }
 
     /**
@@ -37,8 +37,8 @@ public class VehicleController {
      * @return respuesta HTTP con los datos del vehículo encontrado.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<VehicleResponse> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(vehiculoService.buscarPorId(id));
+    public ResponseEntity<VehicleResponse> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(vehiculoService.findById(id));
     }
 
     /**
@@ -47,10 +47,10 @@ public class VehicleController {
      * @return respuesta HTTP con estado creado y los datos del vehículo registrado.
      */
     @PostMapping
-    public ResponseEntity<VehicleResponse> crear(
+    public ResponseEntity<VehicleResponse> create(
             @Valid @RequestBody VehicleRequest request
     ) {
-        VehicleResponse response = vehiculoService.crear(request);
+        VehicleResponse response = vehiculoService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -61,11 +61,11 @@ public class VehicleController {
      * @return respuesta HTTP con los datos actualizados del vehículo.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<VehicleResponse> actualizar(
+    public ResponseEntity<VehicleResponse> update(
             @PathVariable Long id,
             @Valid @RequestBody VehicleRequest request
     ) {
-        return ResponseEntity.ok(vehiculoService.actualizar(id, request));
+        return ResponseEntity.ok(vehiculoService.update(id, request));
     }
 
     /**

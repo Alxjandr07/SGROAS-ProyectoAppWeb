@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
      * @return detalle del problema con el mapa de errores por campo.
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ProblemDetail manejarErroresValidacion(
+    public ProblemDetail handleValidationErrors(
             MethodArgumentNotValidException ex,
             HttpServletRequest request
     ) {
@@ -68,7 +68,7 @@ public class GlobalExceptionHandler {
      * @return detalle del problema con estado de no autorizado.
      */
     @ExceptionHandler(BadCredentialsException.class)
-    public ProblemDetail manejarCredencialesInvalidas(
+    public ProblemDetail handleInvalidCredentials(
             BadCredentialsException ex,
             HttpServletRequest request
     ) {
@@ -128,7 +128,7 @@ public class GlobalExceptionHandler {
      * @return detalle del problema con estado de recurso no encontrado.
      */
     @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
-    public ProblemDetail manejarRutaInexistente(
+    public ProblemDetail handleNotFound(
             org.springframework.web.servlet.resource.NoResourceFoundException ex,
             HttpServletRequest request
     ) {

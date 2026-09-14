@@ -97,7 +97,7 @@ class ConductorServiceTest {
         when(conductorRepository.save(any(Driver.class)))
                 .thenReturn(conductorGuardado);
 
-        DriverResponse response = conductorService.crear(request);
+        DriverResponse response = conductorService.create(request);
 
         assertNotNull(response);
         assertEquals(1L, response.id());
@@ -126,7 +126,7 @@ class ConductorServiceTest {
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> conductorService.crear(request)
+                () -> conductorService.create(request)
         );
 
         assertEquals("Ya existe un conductor con esa cedula", exception.getMessage());
@@ -154,12 +154,12 @@ class ConductorServiceTest {
         when(conductorRepository.findById(1L))
                 .thenReturn(Optional.of(conductor));
 
-        DriverResponse response = conductorService.buscarPorId(1L);
+        DriverResponse response = conductorService.findById(1L);
 
         assertNotNull(response);
         assertEquals(1L, response.id());
         assertEquals("Carlos Alberto", response.nombres());
-        assertTrue(response.licenciaPorVencer());
+        assertTrue(response.licenseExpiring());
     }
 
     @Test
@@ -169,11 +169,11 @@ class ConductorServiceTest {
         when(conductorRepository.findByActivoTrue(pageable))
                 .thenReturn(new org.springframework.data.domain.PageImpl<>(List.of(conductorBase())));
 
-        var pagina = conductorService.listar(null, pageable);
+        var pagina = conductorService.list(null, pageable);
 
         assertEquals(1, pagina.getTotalElements());
         verify(conductorRepository).findByActivoTrue(pageable);
-        verify(conductorRepository, never()).buscarActivos(any(), any());
+        verify(conductorRepository, never()).searchActive(any(), any());
     }
 
     @Test
@@ -183,7 +183,7 @@ class ConductorServiceTest {
         when(conductorRepository.findByActivoTrue(pageable))
                 .thenReturn(new org.springframework.data.domain.PageImpl<>(List.of(conductorBase())));
 
-        var pagina = conductorService.listar("   ", pageable);
+        var pagina = conductorService.list("   ", pageable);
 
         assertEquals(1, pagina.getTotalElements());
         verify(conductorRepository).findByActivoTrue(pageable);
@@ -193,13 +193,13 @@ class ConductorServiceTest {
     void listarConBusquedaDebeUsarBuscarActivos() {
         org.springframework.data.domain.PageRequest pageable =
                 org.springframework.data.domain.PageRequest.of(0, 10);
-        when(conductorRepository.buscarActivos("carlos", pageable))
+        when(conductorRepository.searchActive("carlos", pageable))
                 .thenReturn(new org.springframework.data.domain.PageImpl<>(List.of(conductorBase())));
 
-        var pagina = conductorService.listar("  Carlos ", pageable);
+        var pagina = conductorService.list("  Carlos ", pageable);
 
         assertEquals(1, pagina.getTotalElements());
-        verify(conductorRepository).buscarActivos("carlos", pageable);
+        verify(conductorRepository).searchActive("carlos", pageable);
         verify(conductorRepository, never()).findByActivoTrue(pageable);
     }
 
@@ -214,7 +214,7 @@ class ConductorServiceTest {
                 "carlos.mendoza@sgroas.com", "ACTIVO");
 
         assertThrows(IllegalArgumentException.class,
-                () -> conductorService.actualizar(1L, request));
+                () -> conductorService.update(1L, request));
     }
 
     @Test
@@ -228,7 +228,7 @@ class ConductorServiceTest {
                 "carlos.mendoza@sgroas.com", "ACTIVO");
 
         assertThrows(IllegalArgumentException.class,
-                () -> conductorService.actualizar(1L, request));
+                () -> conductorService.update(1L, request));
     }
 
     @Test
@@ -236,7 +236,7 @@ class ConductorServiceTest {
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductorBase()));
         when(conductorRepository.save(any(Driver.class))).thenReturn(conductorBase());
 
-        DriverResponse response = conductorService.actualizar(1L, requestBase());
+        DriverResponse response = conductorService.update(1L, requestBase());
 
         assertEquals(1L, response.id());
         assertEquals("1200000001", response.cedula());
@@ -261,9 +261,9 @@ class ConductorServiceTest {
         vencido.setFechaVencimientoLicencia(LocalDate.now().minusDays(5));
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(vencido));
 
-        DriverResponse response = conductorService.buscarPorId(1L);
+        DriverResponse response = conductorService.findById(1L);
 
-        assertFalse(response.licenciaPorVencer());
+        assertFalse(response.licenseExpiring());
     }
 
     @Test
@@ -272,8 +272,8 @@ class ConductorServiceTest {
         lejana.setFechaVencimientoLicencia(LocalDate.now().plusDays(60));
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(lejana));
 
-        DriverResponse response = conductorService.buscarPorId(1L);
+        DriverResponse response = conductorService.findById(1L);
 
-        assertFalse(response.licenciaPorVencer());
+        assertFalse(response.licenseExpiring());
     }
 }

@@ -39,7 +39,7 @@ class TokenServiceTest {
 
     @Test
     void generarRefreshTokenDebeGuardarEnRedis() {
-        String refreshToken = tokenService.generarRefreshToken("admin@sgroas.com", 604800000L);
+        String refreshToken = tokenService.createRefreshToken("admin@sgroas.com", 604800000L);
 
         assertNotNull(refreshToken);
         verify(valueOperations).set(
@@ -53,7 +53,7 @@ class TokenServiceTest {
     void obtenerEmailDebeRetornarEmail() {
         when(valueOperations.get("refresh:token-valido")).thenReturn("admin@sgroas.com");
 
-        String email = tokenService.obtenerEmailDesdeRefreshToken("token-valido");
+        String email = tokenService.getEmailFromRefreshToken("token-valido");
 
         assertEquals("admin@sgroas.com", email);
     }
@@ -63,14 +63,14 @@ class TokenServiceTest {
         when(valueOperations.get("refresh:token-inexistente")).thenReturn(null);
 
         assertThrows(IllegalArgumentException.class,
-                () -> tokenService.obtenerEmailDesdeRefreshToken("token-inexistente"));
+                () -> tokenService.getEmailFromRefreshToken("token-inexistente"));
     }
 
     @Test
     void eliminarRefreshTokenDebeBorrarDeRedis() {
         when(redisTemplate.delete("refresh:token-viejo")).thenReturn(true);
 
-        tokenService.eliminarRefreshToken("token-viejo");
+        tokenService.deleteRefreshToken("token-viejo");
 
         verify(redisTemplate).delete("refresh:token-viejo");
     }

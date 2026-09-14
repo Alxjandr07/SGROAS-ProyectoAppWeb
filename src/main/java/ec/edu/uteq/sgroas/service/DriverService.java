@@ -27,11 +27,11 @@ public class DriverService {
      * @param pageable objeto con numero de pagina, tamanio y orden solicitados para la consulta
      * @return pagina con los conductores activos encontrados
      */
-    public Page<DriverResponse> listar(String search, Pageable pageable) {
+    public Page<DriverResponse> list(String search, Pageable pageable) {
         if (search == null || search.isBlank()) {
             return conductorRepository.findByActivoTrue(pageable).map(this::mapearAResponse);
         }
-        return conductorRepository.buscarActivos(search.trim().toLowerCase(), pageable)
+        return conductorRepository.searchActive(search.trim().toLowerCase(), pageable)
                 .map(this::mapearAResponse);
     }
 
@@ -41,8 +41,8 @@ public class DriverService {
      * @return datos del conductor encontrado
      * @throws IllegalArgumentException cuando no existe un conductor activo con ese identificador
      */
-    public DriverResponse buscarPorId(Long id) {
-        Driver conductor = obtenerConductorActivo(id);
+    public DriverResponse findById(Long id) {
+        Driver conductor = getActiveDriver(id);
         return mapearAResponse(conductor);
     }
 
@@ -53,9 +53,9 @@ public class DriverService {
      * @throws IllegalArgumentException cuando la cedula o la licencia ya estan registradas, o el estado no es valido
      */
     @CacheEvict(value = "conductores", allEntries = true)
-    public DriverResponse crear(DriverRequest request) {
-        validarCedulaDuplicada(request.cedula());
-        validarLicenciaDuplicada(request.numeroLicencia());
+    public DriverResponse create(DriverRequest request) {
+        validateUniqueCedula(request.cedula());
+        validateUniqueLicense(request.numeroLicencia());
 
         Driver conductor = Driver.builder()
                 .nombres(request.nombres())
@@ -66,7 +66,7 @@ public class DriverService {
                 .fechaVencimientoLicencia(request.fechaVencimientoLicencia())
                 .telefono(request.telefono())
                 .email(request.email())
-                .estado(convertirEstado(request.estado()))
+                .estado(toStatus(request.estado()))
                 .activo(true)
                 .creadoEn(Instant.now())
                 .actualizadoEn(Instant.now())
@@ -84,8 +84,8 @@ public class DriverService {
      * @throws IllegalArgumentException cuando el conductor no existe, la cedula o licencia chocan con otro registro, o el estado no es valido
      */
     @CacheEvict(value = "conductores", allEntries = true)
-    public DriverResponse actualizar(Long id, DriverRequest request) {
-        Driver conductor = obtenerConductorActivo(id);
+    public DriverResponse update(Long id, DriverRequest request) {
+        Driver conductor = getActiveDriver(id);
 
         if (!conductor.getCedula().equals(request.cedula())
                 && conductorRepository.existsByCedula(request.cedula())) {
@@ -105,7 +105,7 @@ public class DriverService {
         conductor.setFechaVencimientoLicencia(request.fechaVencimientoLicencia());
         conductor.setTelefono(request.telefono());
         conductor.setEmail(request.email());
-        conductor.setEstado(convertirEstado(request.estado()));
+        conductor.setEstado(toStatus(request.estado()));
         conductor.setActualizadoEn(Instant.now());
 
         Driver conductorActualizado = conductorRepository.save(conductor);
@@ -119,32 +119,32 @@ public class DriverService {
      */
     @CacheEvict(value = "conductores", allEntries = true)
     public void desactivar(Long id) {
-        Driver conductor = obtenerConductorActivo(id);
+        Driver conductor = getActiveDriver(id);
         conductor.setActivo(false);
         conductor.setEstado(DriverStatus.INACTIVO);
         conductor.setActualizadoEn(Instant.now());
         conductorRepository.save(conductor);
     }
 
-    private Driver obtenerConductorActivo(Long id) {
+    private Driver getActiveDriver(Long id) {
         return conductorRepository.findById(id)
                 .filter(Driver::getActivo)
                 .orElseThrow(() -> new IllegalArgumentException("Driver no encontrado"));
     }
 
-    private void validarCedulaDuplicada(String cedula) {
+    private void validateUniqueCedula(String cedula) {
         if (conductorRepository.existsByCedula(cedula)) {
             throw new IllegalArgumentException("Ya existe un conductor con esa cedula");
         }
     }
 
-    private void validarLicenciaDuplicada(String numeroLicencia) {
+    private void validateUniqueLicense(String numeroLicencia) {
         if (conductorRepository.existsByNumeroLicencia(numeroLicencia)) {
             throw new IllegalArgumentException("Ya existe un conductor con ese numero de licencia");
         }
     }
 
-    private DriverStatus convertirEstado(String estado) {
+    private DriverStatus toStatus(String estado) {
         try {
             return DriverStatus.valueOf(estado.toUpperCase());
         } catch (IllegalArgumentException e) {
@@ -152,7 +152,7 @@ public class DriverService {
         }
     }
 
-    private Boolean licenciaPorVencer(LocalDate fechaVencimiento) {
+    private Boolean licenseExpiring(LocalDate fechaVencimiento) {
         LocalDate hoy = LocalDate.now();
         LocalDate limite = hoy.plusDays(30);
 
@@ -172,7 +172,7 @@ public class DriverService {
                 conductor.getEmail(),
                 conductor.getEstado().name(),
                 conductor.getActivo(),
-                licenciaPorVencer(conductor.getFechaVencimientoLicencia()),
+                licenseExpiring(conductor.getFechaVencimientoLicencia()),
                 conductor.getCreadoEn(),
                 conductor.getActualizadoEn()
         );

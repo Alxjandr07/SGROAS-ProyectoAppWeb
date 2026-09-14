@@ -29,5 +29,5 @@ public interface RouteRepository extends JpaRepository<Route, Long> {
      * @return filas del procedimiento con el rendimiento de las rutas.
      */
     @Procedure(name = "Route.reporteRendimientoRutas")
-    List<Object[]> reporteRendimientoRutas();
+    List<Object[]> routePerformanceReport();
 }

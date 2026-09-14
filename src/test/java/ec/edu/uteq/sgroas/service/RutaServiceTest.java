@@ -60,7 +60,7 @@ class RutaServiceTest {
         when(rutaRepository.findByActivoTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(rutaEjemplo())));
 
-        Page<RouteResponse> pagina = rutaService.listar(pageable);
+        Page<RouteResponse> pagina = rutaService.list(pageable);
 
         assertEquals(1, pagina.getTotalElements());
         assertEquals("R-001", pagina.getContent().get(0).codigo());
@@ -70,7 +70,7 @@ class RutaServiceTest {
     void buscarPorIdDebeRetornarRuta() {
         when(rutaRepository.findById(1L)).thenReturn(Optional.of(rutaEjemplo()));
 
-        RouteResponse response = rutaService.buscarPorId(1L);
+        RouteResponse response = rutaService.findById(1L);
 
         assertEquals(1L, response.id());
         assertEquals("Quito", response.origen());
@@ -81,7 +81,7 @@ class RutaServiceTest {
         when(rutaRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class,
-                () -> rutaService.buscarPorId(99L));
+                () -> rutaService.findById(99L));
     }
 
     @Test
@@ -89,7 +89,7 @@ class RutaServiceTest {
         when(rutaRepository.existsByCodigo("R-001")).thenReturn(false);
         when(rutaRepository.save(any(Route.class))).thenReturn(rutaEjemplo());
 
-        RouteResponse response = rutaService.crear(requestEjemplo());
+        RouteResponse response = rutaService.create(requestEjemplo());
 
         assertEquals("R-001", response.codigo());
         verify(rutaRepository).save(any(Route.class));
@@ -100,7 +100,7 @@ class RutaServiceTest {
         when(rutaRepository.existsByCodigo("R-001")).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class,
-                () -> rutaService.crear(requestEjemplo()));
+                () -> rutaService.create(requestEjemplo()));
     }
 
     @Test
@@ -112,7 +112,7 @@ class RutaServiceTest {
         );
 
         assertThrows(IllegalArgumentException.class,
-                () -> rutaService.crear(request));
+                () -> rutaService.create(request));
     }
 
     @Test
@@ -120,7 +120,7 @@ class RutaServiceTest {
         when(rutaRepository.findById(1L)).thenReturn(Optional.of(rutaEjemplo()));
         when(rutaRepository.save(any(Route.class))).thenReturn(rutaEjemplo());
 
-        RouteResponse response = rutaService.actualizar(1L, requestEjemplo());
+        RouteResponse response = rutaService.update(1L, requestEjemplo());
 
         assertEquals(1L, response.id());
     }
@@ -136,7 +136,7 @@ class RutaServiceTest {
         );
 
         assertThrows(IllegalArgumentException.class,
-                () -> rutaService.actualizar(1L, request));
+                () -> rutaService.update(1L, request));
     }
 
     @Test

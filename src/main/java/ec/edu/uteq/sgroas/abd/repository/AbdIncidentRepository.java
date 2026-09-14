@@ -44,7 +44,7 @@ public interface AbdIncidentRepository extends JpaRepository<AbdIncident, Intege
                        OR LOWER((SELECT placa FROM unidad WHERE id_unidad = i.id_unidad)) LIKE '%' || CAST(:search AS text) || '%')
             ORDER BY i.id_incidente
             """, nativeQuery = true)
-    Page<AbdIncident> buscarConFiltros(@Param("estado") String estado,
+    Page<AbdIncident> searchWithFilters(@Param("estado") String estado,
                                         @Param("nivel") String nivel,
                                         @Param("search") String search,
                                         Pageable pageable);
@@ -59,7 +59,7 @@ public interface AbdIncidentRepository extends JpaRepository<AbdIncident, Intege
             group by i.nivelSugerido
             order by total desc
             """)
-    List<ConteoPorNivel> contarPorNivel();
+    List<ConteoPorNivel> countByLevel();
 
     /**
      * Consulta el conteo de incidentes agrupados por estado.
@@ -70,7 +70,7 @@ public interface AbdIncidentRepository extends JpaRepository<AbdIncident, Intege
             from AbdIncident i
             group by i.estado
             """)
-    List<ConteoPorEstado> contarPorEstado();
+    List<ConteoPorEstado> countByStatus();
 
     /**
      * Proyeccion con el conteo de incidentes por nivel sugerido.

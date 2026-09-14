@@ -55,7 +55,7 @@ class AsignacionRutaControllerTest {
 
     @Test
     void listarDebeRetornar200() throws Exception {
-        when(asignacionRutaService.listar(any()))
+        when(asignacionRutaService.list(any()))
                 .thenReturn(new PageImpl<>(List.of(responseEjemplo())));
 
         mockMvc().perform(get("/api/asignaciones"))
@@ -64,7 +64,7 @@ class AsignacionRutaControllerTest {
 
     @Test
     void buscarPorIdDebeRetornar200() throws Exception {
-        when(asignacionRutaService.buscarPorId(1L)).thenReturn(responseEjemplo());
+        when(asignacionRutaService.findById(1L)).thenReturn(responseEjemplo());
 
         mockMvc().perform(get("/api/asignaciones/1"))
                 .andExpect(status().isOk())
@@ -73,7 +73,7 @@ class AsignacionRutaControllerTest {
 
     @Test
     void crearDebeRetornar201() throws Exception {
-        when(asignacionRutaService.crear(any())).thenReturn(responseEjemplo());
+        when(asignacionRutaService.create(any())).thenReturn(responseEjemplo());
 
         mockMvc().perform(post("/api/asignaciones")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -94,7 +94,7 @@ class AsignacionRutaControllerTest {
 
     @Test
     void actualizarDebeRetornar200() throws Exception {
-        when(asignacionRutaService.actualizar(any(), any())).thenReturn(responseEjemplo());
+        when(asignacionRutaService.update(any(), any())).thenReturn(responseEjemplo());
 
         mockMvc().perform(put("/api/asignaciones/1")
                         .contentType(MediaType.APPLICATION_JSON)

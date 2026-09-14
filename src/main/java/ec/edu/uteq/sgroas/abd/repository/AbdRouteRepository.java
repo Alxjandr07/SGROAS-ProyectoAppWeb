@@ -27,7 +27,7 @@ public interface AbdRouteRepository extends JpaRepository<AbdRoute, Integer> {
     @Query("""
             SELECT COUNT(p) FROM Schedule p WHERE p.ruta.idRuta = :idRuta
             """)
-    long contarProgramaciones(@Param("idRuta") Integer idRuta);
+    long countSchedules(@Param("idRuta") Integer idRuta);
 
     /**
      * Consulta las rutas que coinciden con un texto de busqueda por terminales o ciudades.
@@ -43,7 +43,7 @@ public interface AbdRouteRepository extends JpaRepository<AbdRoute, Integer> {
                        OR LOWER(r.terminalOrigen.ciudad.nombre) LIKE LOWER(CONCAT('%', :search, '%'))
                        OR LOWER(r.terminalDestino.ciudad.nombre) LIKE LOWER(CONCAT('%', :search, '%')))
             """)
-    Page<AbdRoute> buscar(@Param("search") String search, Pageable pageable);
+    Page<AbdRoute> search(@Param("search") String search, Pageable pageable);
 
     /**
      * Consulta las 5 rutas con mayor numero de programaciones.
@@ -61,5 +61,5 @@ public interface AbdRouteRepository extends JpaRepository<AbdRoute, Integer> {
             ORDER BY total DESC
             LIMIT 5
             """, nativeQuery = true)
-    List<TopRouteProjection> topRutas();
+    List<TopRouteProjection> topRoutes();
 }

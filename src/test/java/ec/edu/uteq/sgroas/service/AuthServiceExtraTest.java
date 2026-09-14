@@ -69,8 +69,8 @@ class AuthServiceExtraTest {
     }
 
     private void simularGeneracionTokens(User usuario) {
-        when(jwtService.generarToken(usuario)).thenReturn("access-token-prueba");
-        when(tokenService.generarRefreshToken(eq("admin@sgroas.com"), eq(604800000L)))
+        when(jwtService.generateToken(usuario)).thenReturn("access-token-prueba");
+        when(tokenService.createRefreshToken(eq("admin@sgroas.com"), eq(604800000L)))
                 .thenReturn("refresh-token-prueba");
         when(jwtService.getExpirationMs()).thenReturn(3600000L);
     }
@@ -84,10 +84,10 @@ class AuthServiceExtraTest {
                 .thenReturn(Optional.of(usuario));
         simularGeneracionTokens(usuario);
 
-        AuthResponse response = authService.verificarEmail("admin@sgroas.com", "654321");
+        AuthResponse response = authService.verifyEmail("admin@sgroas.com", "654321");
 
         assertEquals("access-token-prueba", response.accessToken());
-        verify(codigoVerificacionService).validar("admin@sgroas.com",
+        verify(codigoVerificacionService).validate("admin@sgroas.com",
                 VerificationCodeService.Tipo.VERIFICACION, "654321");
         verify(usuarioRepository).save(argThat(u ->
                 Boolean.TRUE.equals(u.getActivo()) && Boolean.TRUE.equals(u.getVerificado())));
@@ -113,9 +113,9 @@ class AuthServiceExtraTest {
                 .thenReturn(Optional.of(usuario));
         when(passwordEncoder.encode("nueva-clave-1")).thenReturn("hash-nuevo");
 
-        authService.restablecerContrasena("admin@sgroas.com", "111222", "nueva-clave-1");
+        authService.resetPassword("admin@sgroas.com", "111222", "nueva-clave-1");
 
-        verify(codigoVerificacionService).validar("admin@sgroas.com",
+        verify(codigoVerificacionService).validate("admin@sgroas.com",
                 VerificationCodeService.Tipo.RESET_PASSWORD, "111222");
         verify(usuarioRepository).save(argThat(u -> "hash-nuevo".equals(u.getPasswordHash())));
     }
@@ -126,14 +126,14 @@ class AuthServiceExtraTest {
         sinVerificar.setVerificado(false);
         when(usuarioRepository.findByEmail("admin@sgroas.com"))
                 .thenReturn(Optional.of(sinVerificar));
-        when(codigoVerificacionService.puedeReenviar("admin@sgroas.com",
+        when(codigoVerificacionService.canResend("admin@sgroas.com",
                 VerificationCodeService.Tipo.VERIFICACION)).thenReturn(true);
-        when(codigoVerificacionService.generar("admin@sgroas.com",
+        when(codigoVerificacionService.generate("admin@sgroas.com",
                 VerificationCodeService.Tipo.VERIFICACION)).thenReturn("999888");
 
-        authService.reenviarCodigoVerificacion("admin@sgroas.com");
+        authService.resendVerificationCode("admin@sgroas.com");
 
-        verify(emailService).enviarCodigoVerificacion(
+        verify(emailService).sendVerificationCode(
                 "admin@sgroas.com", "Administrador SGROAS", "999888");
     }
 
@@ -144,7 +144,7 @@ class AuthServiceExtraTest {
         when(usuarioRepository.findByEmail("admin@sgroas.com"))
                 .thenReturn(Optional.of(verificado));
 
-        authService.reenviarCodigoVerificacion("admin@sgroas.com");
+        authService.resendVerificationCode("admin@sgroas.com");
 
         verifyNoInteractions(emailService);
     }
@@ -154,20 +154,20 @@ class AuthServiceExtraTest {
         User usuario = usuarioEjemplo();
         when(usuarioRepository.findByEmail("admin@sgroas.com"))
                 .thenReturn(Optional.of(usuario));
-        when(codigoVerificacionService.puedeReenviar("admin@sgroas.com",
+        when(codigoVerificacionService.canResend("admin@sgroas.com",
                 VerificationCodeService.Tipo.RESET_PASSWORD)).thenReturn(true);
-        when(codigoVerificacionService.generar("admin@sgroas.com",
+        when(codigoVerificacionService.generate("admin@sgroas.com",
                 VerificationCodeService.Tipo.RESET_PASSWORD)).thenReturn("112233");
 
         authService.solicitarRestablecimiento("admin@sgroas.com");
 
-        verify(emailService).enviarCodigoRestablecimiento("admin@sgroas.com", "112233");
+        verify(emailService).sendResetCode("admin@sgroas.com", "112233");
     }
 
     @Test
     void refreshDebeRotarToken() {
         User usuario = usuarioEjemplo();
-        when(tokenService.obtenerEmailDesdeRefreshToken("refresh-token-prueba"))
+        when(tokenService.getEmailFromRefreshToken("refresh-token-prueba"))
                 .thenReturn("admin@sgroas.com");
         when(usuarioRepository.findByEmail("admin@sgroas.com"))
                 .thenReturn(Optional.of(usuario));
@@ -179,14 +179,14 @@ class AuthServiceExtraTest {
 
         assertNotNull(response);
         assertEquals("access-token-prueba", response.accessToken());
-        verify(tokenService).eliminarRefreshToken("refresh-token-prueba");
+        verify(tokenService).deleteRefreshToken("refresh-token-prueba");
     }
 
     @Test
     void refreshConUsuarioInactivoDebeLanzarExcepcion() {
         User inactivo = usuarioEjemplo();
         inactivo.setActivo(false);
-        when(tokenService.obtenerEmailDesdeRefreshToken("refresh-token-prueba"))
+        when(tokenService.getEmailFromRefreshToken("refresh-token-prueba"))
                 .thenReturn("admin@sgroas.com");
         when(usuarioRepository.findByEmail("admin@sgroas.com"))
                 .thenReturn(Optional.of(inactivo));
@@ -197,7 +197,7 @@ class AuthServiceExtraTest {
 
     @Test
     void refreshConEmailInexistenteDebeLanzarExcepcion() {
-        when(tokenService.obtenerEmailDesdeRefreshToken("refresh-token-prueba"))
+        when(tokenService.getEmailFromRefreshToken("refresh-token-prueba"))
                 .thenReturn("desconocido@sgroas.com");
         when(usuarioRepository.findByEmail("desconocido@sgroas.com"))
                 .thenReturn(Optional.empty());
@@ -212,6 +212,6 @@ class AuthServiceExtraTest {
                 new RefreshTokenRequest("refresh-token-prueba"));
 
         verify(tokenService).agregarAccessTokenABlacklist("access-token-prueba");
-        verify(tokenService).eliminarRefreshToken("refresh-token-prueba");
+        verify(tokenService).deleteRefreshToken("refresh-token-prueba");
     }
 }

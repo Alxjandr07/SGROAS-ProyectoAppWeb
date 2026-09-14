@@ -48,7 +48,7 @@ public interface UnitRepository extends JpaRepository<Unit, Integer> {
                        OR LOWER(u.modelo) LIKE '%' || CAST(:search AS text) || '%')
             ORDER BY u.id_unidad
             """, nativeQuery = true)
-    Page<Unit> buscarConFiltros(@Param("estado") String estado,
+    Page<Unit> searchWithFilters(@Param("estado") String estado,
                                   @Param("search") String search,
                                   Pageable pageable);
 
@@ -58,5 +58,5 @@ public interface UnitRepository extends JpaRepository<Unit, Integer> {
      */
     @Query(value = "SELECT estado AS clave, COUNT(*) AS total FROM unidad GROUP BY estado ORDER BY total DESC",
            nativeQuery = true)
-    List<CountProjection> contarPorEstado();
+    List<CountProjection> countByStatus();
 }

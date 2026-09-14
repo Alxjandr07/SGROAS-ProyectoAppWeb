@@ -65,7 +65,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.findByActivoTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(usuarioEjemplo())));
 
-        Page<UserResponse> pagina = usuarioService.listar(null, pageable);
+        Page<UserResponse> pagina = usuarioService.list(null, pageable);
 
         assertEquals(1, pagina.getTotalElements());
         assertEquals("ROLE_ADMIN", pagina.getContent().get(0).rol());
@@ -74,13 +74,13 @@ class UsuarioServiceTest {
     @Test
     void listarConBusquedaDebeUsarBuscarActivos() {
         PageRequest pageable = PageRequest.of(0, 10);
-        when(usuarioRepository.buscarActivos("carlos", pageable))
+        when(usuarioRepository.searchActive("carlos", pageable))
                 .thenReturn(new PageImpl<>(List.of(usuarioEjemplo())));
 
-        Page<UserResponse> pagina = usuarioService.listar("  Carlos  ", pageable);
+        Page<UserResponse> pagina = usuarioService.list("  Carlos  ", pageable);
 
         assertEquals(1, pagina.getTotalElements());
-        verify(usuarioRepository).buscarActivos("carlos", pageable);
+        verify(usuarioRepository).searchActive("carlos", pageable);
         verify(usuarioRepository, never()).findByActivoTrue(pageable);
     }
 
@@ -90,18 +90,18 @@ class UsuarioServiceTest {
         when(usuarioRepository.findByActivoTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(usuarioEjemplo())));
 
-        Page<UserResponse> pagina = usuarioService.listar("   ", pageable);
+        Page<UserResponse> pagina = usuarioService.list("   ", pageable);
 
         assertEquals(1, pagina.getTotalElements());
         verify(usuarioRepository).findByActivoTrue(pageable);
-        verify(usuarioRepository, never()).buscarActivos(any(), any());
+        verify(usuarioRepository, never()).searchActive(any(), any());
     }
 
     @Test
     void buscarPorIdDebeRetornarUsuario() {
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioEjemplo()));
 
-        UserResponse response = usuarioService.buscarPorId(1L);
+        UserResponse response = usuarioService.findById(1L);
 
         assertEquals(1L, response.id());
         assertEquals("carlos@sgroas.com", response.email());
@@ -112,7 +112,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class,
-                () -> usuarioService.buscarPorId(99L));
+                () -> usuarioService.findById(99L));
     }
 
     @Test
@@ -124,15 +124,15 @@ class UsuarioServiceTest {
             u.setId(1L);
             return u;
         });
-        when(codigoVerificacionService.generar("carlos@sgroas.com",
+        when(codigoVerificacionService.generate("carlos@sgroas.com",
                 VerificationCodeService.Tipo.VERIFICACION)).thenReturn("123456");
 
-        UserResponse response = usuarioService.crear(requestEjemplo());
+        UserResponse response = usuarioService.create(requestEjemplo());
 
         assertEquals("carlos@sgroas.com", response.email());
         verify(usuarioRepository).save(argThat(u ->
                 Boolean.FALSE.equals(u.getVerificado()) && Boolean.TRUE.equals(u.getActivo())));
-        verify(emailService).enviarCodigoVerificacion(
+        verify(emailService).sendVerificationCode(
                 "carlos@sgroas.com", "Carlos Mendoza", "123456");
     }
 
@@ -141,7 +141,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.existsByEmail("carlos@sgroas.com")).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class,
-                () -> usuarioService.crear(requestEjemplo()));
+                () -> usuarioService.create(requestEjemplo()));
     }
 
     @Test
@@ -149,14 +149,14 @@ class UsuarioServiceTest {
         User sinVerificar = usuarioEjemplo();
         sinVerificar.setVerificado(false);
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(sinVerificar));
-        when(codigoVerificacionService.puedeReenviar("carlos@sgroas.com",
+        when(codigoVerificacionService.canResend("carlos@sgroas.com",
                 VerificationCodeService.Tipo.VERIFICACION)).thenReturn(true);
-        when(codigoVerificacionService.generar("carlos@sgroas.com",
+        when(codigoVerificacionService.generate("carlos@sgroas.com",
                 VerificationCodeService.Tipo.VERIFICACION)).thenReturn("654321");
 
-        usuarioService.reenviarCodigoActivacion(1L);
+        usuarioService.resendActivationCode(1L);
 
-        verify(emailService).enviarCodigoVerificacion(
+        verify(emailService).sendVerificationCode(
                 "carlos@sgroas.com", "Carlos Mendoza", "654321");
     }
 
@@ -165,7 +165,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioEjemplo()));
 
         assertThrows(IllegalArgumentException.class,
-                () -> usuarioService.reenviarCodigoActivacion(1L));
+                () -> usuarioService.resendActivationCode(1L));
     }
 
     @Test
@@ -173,12 +173,12 @@ class UsuarioServiceTest {
         User sinVerificar = usuarioEjemplo();
         sinVerificar.setVerificado(false);
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(sinVerificar));
-        when(codigoVerificacionService.puedeReenviar("carlos@sgroas.com",
+        when(codigoVerificacionService.canResend("carlos@sgroas.com",
                 VerificationCodeService.Tipo.VERIFICACION)).thenReturn(false);
 
         assertThrows(IllegalArgumentException.class,
-                () -> usuarioService.reenviarCodigoActivacion(1L));
-        verify(emailService, never()).enviarCodigoVerificacion(any(), any(), any());
+                () -> usuarioService.resendActivationCode(1L));
+        verify(emailService, never()).sendVerificationCode(any(), any(), any());
     }
 
     @Test
@@ -186,7 +186,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class,
-                () -> usuarioService.reenviarCodigoActivacion(99L));
+                () -> usuarioService.resendActivationCode(99L));
     }
 
     @Test
@@ -194,7 +194,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioEjemplo()));
         when(usuarioRepository.save(any(User.class))).thenReturn(usuarioEjemplo());
 
-        UserResponse response = usuarioService.actualizar(1L, requestEjemplo());
+        UserResponse response = usuarioService.update(1L, requestEjemplo());
 
         assertEquals(1L, response.id());
         verify(usuarioRepository).save(any(User.class));
@@ -208,7 +208,7 @@ class UsuarioServiceTest {
         UserRequest request = new UserRequest(
                 "Carlos Mendoza", "carlos@sgroas.com", null, "ROLE_ADMIN");
 
-        UserResponse response = usuarioService.actualizar(1L, request);
+        UserResponse response = usuarioService.update(1L, request);
 
         assertEquals("Carlos Mendoza", response.nombre());
         verify(passwordEncoder, never()).encode(any());
@@ -222,7 +222,7 @@ class UsuarioServiceTest {
         UserRequest request = new UserRequest(
                 "Carlos Mendoza", "carlos@sgroas.com", "   ", "ROLE_ADMIN");
 
-        UserResponse response = usuarioService.actualizar(1L, request);
+        UserResponse response = usuarioService.update(1L, request);
 
         assertEquals("Carlos Mendoza", response.nombre());
         verify(passwordEncoder, never()).encode(any());
@@ -233,7 +233,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class,
-                () -> usuarioService.actualizar(99L, requestEjemplo()));
+                () -> usuarioService.update(99L, requestEjemplo()));
     }
 
     @Test

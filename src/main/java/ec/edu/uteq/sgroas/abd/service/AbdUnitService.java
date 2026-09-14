@@ -25,14 +25,14 @@ public class AbdUnitService {
      * @return pagina con los datos resumidos de las unidades encontradas.
      */
     @Transactional(readOnly = true)
-    public Page<AbdDtos.UnidadResponse> listar(String estado, String search, Pageable pageable) {
+    public Page<AbdDtos.UnitResponse> list(String estado, String search, Pageable pageable) {
         String estadoFiltro = (estado == null || estado.isBlank()) ? null : estado.trim().toLowerCase();
         String searchFiltro = (search == null || search.isBlank()) ? null : search.trim().toLowerCase();
         Page<Unit> page;
         if (estadoFiltro == null && searchFiltro == null) {
             page = unidadRepository.findAll(pageable);
         } else {
-            page = unidadRepository.buscarConFiltros(estadoFiltro, searchFiltro,
+            page = unidadRepository.searchWithFilters(estadoFiltro, searchFiltro,
                     PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()));
         }
         return page.map(this::aResponse);
@@ -45,7 +45,7 @@ public class AbdUnitService {
      * @throws IllegalArgumentException cuando no existe una unidad con el identificador indicado.
      */
     @Transactional(readOnly = true)
-    public AbdDtos.UnidadResponse buscarPorId(Integer idUnidad) {
+    public AbdDtos.UnitResponse findById(Integer idUnidad) {
         return unidadRepository.findById(idUnidad).map(this::aResponse)
                 .orElseThrow(() -> new IllegalArgumentException("Unit no encontrada: " + idUnidad));
     }
@@ -56,8 +56,8 @@ public class AbdUnitService {
      * @return datos resumidos de la unidad guardada.
      * @throws IllegalArgumentException cuando la placa o el numero de disco ya estan registrados.
      */
-    public AbdDtos.UnidadResponse crear(AbdDtos.UnidadRequest request) {
-        validarUnicidad(request.placa(), request.numeroDisco(), null);
+    public AbdDtos.UnitResponse create(AbdDtos.UnitRequest request) {
+        validateUniqueness(request.placa(), request.numeroDisco(), null);
         Unit unidad = Unit.builder()
                 .placa(request.placa())
                 .numeroDisco(request.numeroDisco())
@@ -76,10 +76,10 @@ public class AbdUnitService {
      * @return datos resumidos de la unidad actualizada.
      * @throws IllegalArgumentException cuando la unidad no existe o la placa o el disco ya pertenecen a otra unidad.
      */
-    public AbdDtos.UnidadResponse actualizar(Integer idUnidad, AbdDtos.UnidadRequest request) {
+    public AbdDtos.UnitResponse update(Integer idUnidad, AbdDtos.UnitRequest request) {
         Unit unidad = unidadRepository.findById(idUnidad)
                 .orElseThrow(() -> new IllegalArgumentException("Unit no encontrada: " + idUnidad));
-        validarUnicidad(request.placa(), request.numeroDisco(), idUnidad);
+        validateUniqueness(request.placa(), request.numeroDisco(), idUnidad);
         unidad.setPlaca(request.placa());
         unidad.setNumeroDisco(request.numeroDisco());
         unidad.setModelo(request.modelo());
@@ -96,14 +96,14 @@ public class AbdUnitService {
      * @param idUnidad identificador de la unidad que se desea suprimir.
      * @throws IllegalArgumentException cuando no existe una unidad con el identificador indicado.
      */
-    public void eliminar(Integer idUnidad) {
+    public void delete(Integer idUnidad) {
         if (!unidadRepository.existsById(idUnidad)) {
             throw new IllegalArgumentException("Unit no encontrada: " + idUnidad);
         }
         unidadRepository.deleteById(idUnidad);
     }
 
-    private void validarUnicidad(String placa, String numeroDisco, Integer idExcluir) {
+    private void validateUniqueness(String placa, String numeroDisco, Integer idExcluir) {
         if (idExcluir == null) {
             if (unidadRepository.existsByPlacaIgnoreCase(placa)) {
                 throw new IllegalArgumentException("Ya existe una unidad con la placa " + placa);
@@ -125,8 +125,8 @@ public class AbdUnitService {
         }
     }
 
-    private AbdDtos.UnidadResponse aResponse(Unit u) {
-        return new AbdDtos.UnidadResponse(u.getIdUnidad(), u.getPlaca(), u.getNumeroDisco(),
+    private AbdDtos.UnitResponse aResponse(Unit u) {
+        return new AbdDtos.UnitResponse(u.getIdUnidad(), u.getPlaca(), u.getNumeroDisco(),
                 u.getModelo(), u.getCapacidad(), u.getAnioFabricacion(), u.getEstado());
     }
 }

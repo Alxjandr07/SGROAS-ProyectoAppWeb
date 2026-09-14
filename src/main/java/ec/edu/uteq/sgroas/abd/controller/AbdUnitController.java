@@ -26,11 +26,11 @@ public class AbdUnitController {
      * @return respuesta con la pagina de unidades encontradas y estado 200.
      */
     @GetMapping
-    public ResponseEntity<Page<AbdDtos.UnidadResponse>> listar(
+    public ResponseEntity<Page<AbdDtos.UnitResponse>> list(
             @RequestParam(required = false) String estado,
             @RequestParam(required = false) String search,
             @PageableDefault(size = 50, sort = "idUnidad") Pageable pageable) {
-        return ResponseEntity.ok(unidadAbdService.listar(estado, search, pageable));
+        return ResponseEntity.ok(unidadAbdService.list(estado, search, pageable));
     }
 
     /**
@@ -39,8 +39,8 @@ public class AbdUnitController {
      * @return respuesta con los datos de la unidad encontrada y estado 200.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<AbdDtos.UnidadResponse> buscarPorId(@PathVariable Integer id) {
-        return ResponseEntity.ok(unidadAbdService.buscarPorId(id));
+    public ResponseEntity<AbdDtos.UnitResponse> findById(@PathVariable Integer id) {
+        return ResponseEntity.ok(unidadAbdService.findById(id));
     }
 
     /**
@@ -49,8 +49,8 @@ public class AbdUnitController {
      * @return respuesta con los datos de la unidad guardada y estado 201.
      */
     @PostMapping
-    public ResponseEntity<AbdDtos.UnidadResponse> crear(@Valid @RequestBody AbdDtos.UnidadRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(unidadAbdService.crear(request));
+    public ResponseEntity<AbdDtos.UnitResponse> create(@Valid @RequestBody AbdDtos.UnitRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(unidadAbdService.create(request));
     }
 
     /**
@@ -60,9 +60,9 @@ public class AbdUnitController {
      * @return respuesta con los datos de la unidad actualizada y estado 200.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<AbdDtos.UnidadResponse> actualizar(@PathVariable Integer id,
-                                                             @Valid @RequestBody AbdDtos.UnidadRequest request) {
-        return ResponseEntity.ok(unidadAbdService.actualizar(id, request));
+    public ResponseEntity<AbdDtos.UnitResponse> update(@PathVariable Integer id,
+                                                             @Valid @RequestBody AbdDtos.UnitRequest request) {
+        return ResponseEntity.ok(unidadAbdService.update(id, request));
     }
 
     /**
@@ -71,8 +71,8 @@ public class AbdUnitController {
      * @return respuesta sin contenido y estado 204 cuando la supresion termina con exito.
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
-        unidadAbdService.eliminar(id);
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+        unidadAbdService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

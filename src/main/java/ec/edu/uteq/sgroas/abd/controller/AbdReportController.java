@@ -22,8 +22,8 @@ public class AbdReportController {
      * @return respuesta con los conteos generales de programaciones, incidentes, alertas, unidades y rutas y estado 200.
      */
     @GetMapping("/resumen")
-    public ResponseEntity<AbdDtos.ResumenResponse> resumen() {
-        return ResponseEntity.ok(reporteAbdService.resumen());
+    public ResponseEntity<AbdDtos.SummaryResponse> summary() {
+        return ResponseEntity.ok(reporteAbdService.summary());
     }
 
     /**
@@ -31,8 +31,8 @@ public class AbdReportController {
      * @return respuesta con la lista de niveles y sus totales y estado 200.
      */
     @GetMapping("/incidentes-por-nivel")
-    public ResponseEntity<List<AbdDtos.ConteoResponse>> incidentesPorNivel() {
-        return ResponseEntity.ok(reporteAbdService.incidentesPorNivel());
+    public ResponseEntity<List<AbdDtos.CountResponse>> incidentsByLevel() {
+        return ResponseEntity.ok(reporteAbdService.incidentsByLevel());
     }
 
     /**
@@ -40,8 +40,8 @@ public class AbdReportController {
      * @return respuesta con la lista de estados y sus totales y estado 200.
      */
     @GetMapping("/incidentes-por-estado")
-    public ResponseEntity<List<AbdDtos.ConteoResponse>> incidentesPorEstado() {
-        return ResponseEntity.ok(reporteAbdService.incidentesPorEstado());
+    public ResponseEntity<List<AbdDtos.CountResponse>> incidentsByStatus() {
+        return ResponseEntity.ok(reporteAbdService.incidentsByStatus());
     }
 
     /**
@@ -49,8 +49,8 @@ public class AbdReportController {
      * @return respuesta con la lista de estados y sus totales y estado 200.
      */
     @GetMapping("/unidades-por-estado")
-    public ResponseEntity<List<AbdDtos.ConteoResponse>> unidadesPorEstado() {
-        return ResponseEntity.ok(reporteAbdService.unidadesPorEstado());
+    public ResponseEntity<List<AbdDtos.CountResponse>> unitsByStatus() {
+        return ResponseEntity.ok(reporteAbdService.unitsByStatus());
     }
 
     /**
@@ -58,8 +58,8 @@ public class AbdReportController {
      * @return respuesta con la lista de estados y sus totales y estado 200.
      */
     @GetMapping("/programaciones-por-estado")
-    public ResponseEntity<List<AbdDtos.ConteoResponse>> programacionesPorEstado() {
-        return ResponseEntity.ok(reporteAbdService.programacionesPorEstado());
+    public ResponseEntity<List<AbdDtos.CountResponse>> schedulesByStatus() {
+        return ResponseEntity.ok(reporteAbdService.schedulesByStatus());
     }
 
     /**
@@ -67,8 +67,8 @@ public class AbdReportController {
      * @return respuesta con la lista de meses y sus totales y estado 200.
      */
     @GetMapping("/programaciones-por-mes")
-    public ResponseEntity<List<AbdDtos.ConteoResponse>> programacionesPorMes() {
-        return ResponseEntity.ok(reporteAbdService.programacionesPorMes());
+    public ResponseEntity<List<AbdDtos.CountResponse>> schedulesByMonth() {
+        return ResponseEntity.ok(reporteAbdService.schedulesByMonth());
     }
 
     /**
@@ -76,7 +76,7 @@ public class AbdReportController {
      * @return respuesta con la lista de rutas mas utilizadas y sus totales y estado 200.
      */
     @GetMapping("/top-rutas")
-    public ResponseEntity<List<AbdDtos.TopRutaResponse>> topRutas() {
-        return ResponseEntity.ok(reporteAbdService.topRutas());
+    public ResponseEntity<List<AbdDtos.TopRouteResponse>> topRoutes() {
+        return ResponseEntity.ok(reporteAbdService.topRoutes());
     }
 }

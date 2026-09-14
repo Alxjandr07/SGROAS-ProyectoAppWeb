@@ -25,11 +25,11 @@ public class AbdRouteService {
      * @return pagina con los datos resumidos de las rutas encontradas.
      */
     @Transactional(readOnly = true)
-    public Page<AbdDtos.RutaAbdResponse> listar(String search, Pageable pageable) {
+    public Page<AbdDtos.AbdRouteResponse> list(String search, Pageable pageable) {
         String filtro = (search == null || search.isBlank()) ? null : search.trim().toLowerCase();
         Page<AbdRoute> page = filtro == null
                 ? rutaAbdRepository.findAll(pageable)
-                : rutaAbdRepository.buscar(filtro, pageable);
+                : rutaAbdRepository.search(filtro, pageable);
         return page.map(this::aResponse);
     }
 
@@ -40,7 +40,7 @@ public class AbdRouteService {
      * @throws IllegalArgumentException cuando no existe una ruta con el identificador indicado.
      */
     @Transactional(readOnly = true)
-    public AbdDtos.RutaAbdResponse buscarPorId(Integer idRuta) {
+    public AbdDtos.AbdRouteResponse findById(Integer idRuta) {
         return rutaAbdRepository.findById(idRuta).map(this::aResponse)
                 .orElseThrow(() -> new IllegalArgumentException("Route no encontrada: " + idRuta));
     }
@@ -51,13 +51,13 @@ public class AbdRouteService {
      * @return datos resumidos de la ruta guardada.
      * @throws IllegalArgumentException cuando el origen y el destino son el mismo terminal o un terminal no existe.
      */
-    public AbdDtos.RutaAbdResponse crear(AbdDtos.RutaAbdRequest request) {
+    public AbdDtos.AbdRouteResponse create(AbdDtos.AbdRouteRequest request) {
         if (request.idTerminalOrigen().equals(request.idTerminalDestino())) {
             throw new IllegalArgumentException("El origen y el destino no pueden ser el mismo terminal");
         }
         AbdRoute ruta = AbdRoute.builder()
-                .terminalOrigen(catalogoAbdService.buscarTerminal(request.idTerminalOrigen()))
-                .terminalDestino(catalogoAbdService.buscarTerminal(request.idTerminalDestino()))
+                .terminalOrigen(catalogoAbdService.findTerminal(request.idTerminalOrigen()))
+                .terminalDestino(catalogoAbdService.findTerminal(request.idTerminalDestino()))
                 .precioPasaje(request.precioPasaje())
                 .build();
         return aResponse(rutaAbdRepository.save(ruta));
@@ -70,14 +70,14 @@ public class AbdRouteService {
      * @return datos resumidos de la ruta actualizada.
      * @throws IllegalArgumentException cuando la ruta no existe, un terminal no existe o el origen y el destino coinciden.
      */
-    public AbdDtos.RutaAbdResponse actualizar(Integer idRuta, AbdDtos.RutaAbdRequest request) {
+    public AbdDtos.AbdRouteResponse update(Integer idRuta, AbdDtos.AbdRouteRequest request) {
         if (request.idTerminalOrigen().equals(request.idTerminalDestino())) {
             throw new IllegalArgumentException("El origen y el destino no pueden ser el mismo terminal");
         }
         AbdRoute ruta = rutaAbdRepository.findById(idRuta)
                 .orElseThrow(() -> new IllegalArgumentException("Route no encontrada: " + idRuta));
-        ruta.setTerminalOrigen(catalogoAbdService.buscarTerminal(request.idTerminalOrigen()));
-        ruta.setTerminalDestino(catalogoAbdService.buscarTerminal(request.idTerminalDestino()));
+        ruta.setTerminalOrigen(catalogoAbdService.findTerminal(request.idTerminalOrigen()));
+        ruta.setTerminalDestino(catalogoAbdService.findTerminal(request.idTerminalDestino()));
         ruta.setPrecioPasaje(request.precioPasaje());
         return aResponse(rutaAbdRepository.save(ruta));
     }
@@ -87,22 +87,22 @@ public class AbdRouteService {
      * @param idRuta identificador de la ruta que se desea suprimir.
      * @throws IllegalArgumentException cuando no existe una ruta con el identificador indicado.
      */
-    public void eliminar(Integer idRuta) {
+    public void delete(Integer idRuta) {
         if (!rutaAbdRepository.existsById(idRuta)) {
             throw new IllegalArgumentException("Route no encontrada: " + idRuta);
         }
         rutaAbdRepository.deleteById(idRuta);
     }
 
-    private AbdDtos.RutaAbdResponse aResponse(AbdRoute r) {
-        return new AbdDtos.RutaAbdResponse(
+    private AbdDtos.AbdRouteResponse aResponse(AbdRoute r) {
+        return new AbdDtos.AbdRouteResponse(
                 r.getIdRuta(),
                 r.getTerminalOrigen().getIdTerminal(),
                 r.getTerminalOrigen().getNombre() + " (" + r.getTerminalOrigen().getCiudad().getNombre() + ")",
                 r.getTerminalDestino().getIdTerminal(),
                 r.getTerminalDestino().getNombre() + " (" + r.getTerminalDestino().getCiudad().getNombre() + ")",
                 r.getPrecioPasaje(),
-                rutaAbdRepository.contarProgramaciones(r.getIdRuta())
+                rutaAbdRepository.countSchedules(r.getIdRuta())
         );
     }
 }

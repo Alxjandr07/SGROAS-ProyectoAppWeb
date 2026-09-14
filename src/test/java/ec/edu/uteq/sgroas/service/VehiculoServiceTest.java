@@ -63,7 +63,7 @@ class VehiculoServiceTest {
         when(vehiculoRepository.findByActivoTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(vehiculo)));
 
-        Page<VehicleResponse> pagina = vehiculoService.listar(pageable);
+        Page<VehicleResponse> pagina = vehiculoService.list(pageable);
 
         assertEquals(1, pagina.getTotalElements());
         assertEquals("GTU-001", pagina.getContent().get(0).placa());
@@ -75,7 +75,7 @@ class VehiculoServiceTest {
         when(vehiculoRepository.findById(1L))
                 .thenReturn(Optional.of(vehiculoEjemplo()));
 
-        VehicleResponse response = vehiculoService.buscarPorId(1L);
+        VehicleResponse response = vehiculoService.findById(1L);
 
         assertNotNull(response);
         assertEquals(1L, response.id());
@@ -87,7 +87,7 @@ class VehiculoServiceTest {
         when(vehiculoRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class,
-                () -> vehiculoService.buscarPorId(99L));
+                () -> vehiculoService.findById(99L));
     }
 
     @Test
@@ -96,7 +96,7 @@ class VehiculoServiceTest {
         when(vehiculoRepository.save(any(Vehicle.class)))
                 .thenReturn(vehiculoEjemplo());
 
-        VehicleResponse response = vehiculoService.crear(requestEjemplo());
+        VehicleResponse response = vehiculoService.create(requestEjemplo());
 
         assertNotNull(response);
         assertEquals("GTU-001", response.placa());
@@ -108,7 +108,7 @@ class VehiculoServiceTest {
         when(vehiculoRepository.existsByPlaca("GTU-001")).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class,
-                () -> vehiculoService.crear(requestEjemplo()));
+                () -> vehiculoService.create(requestEjemplo()));
         verify(vehiculoRepository, never()).save(any(Vehicle.class));
     }
 
@@ -121,7 +121,7 @@ class VehiculoServiceTest {
         );
 
         assertThrows(IllegalArgumentException.class,
-                () -> vehiculoService.crear(request));
+                () -> vehiculoService.create(request));
     }
 
     @Test
@@ -131,7 +131,7 @@ class VehiculoServiceTest {
         when(vehiculoRepository.save(any(Vehicle.class)))
                 .thenReturn(vehiculoEjemplo());
 
-        VehicleResponse response = vehiculoService.actualizar(1L, requestEjemplo());
+        VehicleResponse response = vehiculoService.update(1L, requestEjemplo());
 
         assertNotNull(response);
         assertEquals(1L, response.id());
@@ -150,7 +150,7 @@ class VehiculoServiceTest {
         );
 
         assertThrows(IllegalArgumentException.class,
-                () -> vehiculoService.actualizar(1L, request));
+                () -> vehiculoService.update(1L, request));
     }
 
     @Test

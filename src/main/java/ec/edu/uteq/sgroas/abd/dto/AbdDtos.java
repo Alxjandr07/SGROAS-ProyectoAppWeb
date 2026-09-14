@@ -22,7 +22,7 @@ public final class AbdDtos {
      * @param idProvincia identificador de la provincia.
      * @param nombre nombre de la provincia.
      */
-    public record ProvinciaResponse(Integer idProvincia, String nombre) {
+    public record ProvinceResponse(Integer idProvincia, String nombre) {
     }
 
     /**
@@ -32,7 +32,7 @@ public final class AbdDtos {
      * @param idProvincia identificador de la provincia.
      * @param nombreProvincia nombre de la provincia.
      */
-    public record CiudadResponse(Integer idCiudad, String nombre, Integer idProvincia, String nombreProvincia) {
+    public record CityResponse(Integer idCiudad, String nombre, Integer idProvincia, String nombreProvincia) {
     }
 
     /**
@@ -61,8 +61,8 @@ public final class AbdDtos {
      * @param terminales lista de terminales.
      * @param roles lista de roles.
      */
-    public record CatalogosResponse(List<ProvinciaResponse> provincias,
-                                    List<CiudadResponse> ciudades,
+    public record CatalogsResponse(List<ProvinceResponse> provincias,
+                                    List<CityResponse> ciudades,
                                     List<TerminalResponse> terminales,
                                     List<RolResponse> roles) {
     }
@@ -75,7 +75,7 @@ public final class AbdDtos {
      * @param idTerminalDestino identificador del terminal de destino.
      * @param precioPasaje precio del pasaje de la ruta.
      */
-    public record RutaAbdRequest(
+    public record AbdRouteRequest(
             @NotNull(message = "El terminal de origen es obligatorio") Integer idTerminalOrigen,
             @NotNull(message = "El terminal de destino es obligatorio") Integer idTerminalDestino,
             @NotNull @DecimalMin(value = "0.01", message = "El precio debe ser mayor a 0")
@@ -93,7 +93,7 @@ public final class AbdDtos {
      * @param precioPasaje precio del pasaje.
      * @param totalProgramaciones total de programaciones de la ruta.
      */
-    public record RutaAbdResponse(Integer idRuta, Integer idTerminalOrigen, String terminalOrigen,
+    public record AbdRouteResponse(Integer idRuta, Integer idTerminalOrigen, String terminalOrigen,
                                   Integer idTerminalDestino, String terminalDestino,
                                   BigDecimal precioPasaje, long totalProgramaciones) {
     }
@@ -109,7 +109,7 @@ public final class AbdDtos {
      * @param anioFabricacion anio de fabricacion de la unidad.
      * @param estado estado de la unidad.
      */
-    public record UnidadRequest(
+    public record UnitRequest(
             @NotBlank @Size(max = 15) String placa,
             @NotBlank @Size(max = 10) String numeroDisco,
             @NotBlank @Size(max = 50) String modelo,
@@ -129,7 +129,7 @@ public final class AbdDtos {
      * @param anioFabricacion anio de fabricacion.
      * @param estado estado de la unidad.
      */
-    public record UnidadResponse(Integer idUnidad, String placa, String numeroDisco, String modelo,
+    public record UnitResponse(Integer idUnidad, String placa, String numeroDisco, String modelo,
                                  Integer capacidad, Integer anioFabricacion, String estado) {
     }
 
@@ -145,7 +145,7 @@ public final class AbdDtos {
      * @param idUnidad identificador de la unidad.
      * @param idConductor identificador del conductor.
      */
-    public record ProgramacionRequest(
+    public record ScheduleRequest(
             @NotNull LocalDate fecha,
             @NotNull LocalTime horaSalida,
             @NotNull LocalTime horaEstimadaLlegada,
@@ -170,7 +170,7 @@ public final class AbdDtos {
      * @param idConductor identificador del conductor.
      * @param conductorNombres nombres del conductor.
      */
-    public record ProgramacionResponse(Integer idProgramacion, LocalDate fecha, LocalTime horaSalida,
+    public record ScheduleResponse(Integer idProgramacion, LocalDate fecha, LocalTime horaSalida,
                                        LocalTime horaEstimadaLlegada, String estado,
                                        Integer idRuta, String rutaDescripcion,
                                        Integer idUnidad, String unidadPlaca,
@@ -188,7 +188,7 @@ public final class AbdDtos {
      * @param estado estado del incidente.
      * @param idUnidad identificador de la unidad involucrada.
      */
-    public record IncidenteAbdRequest(
+    public record AbdIncidentRequest(
             @NotBlank @Size(max = 50) String tipo,
             @NotBlank String descripcion,
             @NotBlank @Pattern(regexp = "BAJO|MEDIO|ALTO", message = "Nivel sugerido debe ser BAJO, MEDIO o ALTO") String nivelSugerido,
@@ -210,7 +210,7 @@ public final class AbdDtos {
      * @param idUnidad identificador de la unidad.
      * @param unidadPlaca placa de la unidad.
      */
-    public record IncidenteAbdResponse(Integer idIncidente, String tipo, String descripcion,
+    public record AbdIncidentResponse(Integer idIncidente, String tipo, String descripcion,
                                        String nivelSugerido, String fechaIncidente, String evidencia,
                                        String estado, Integer idUnidad, String unidadPlaca) {
     }
@@ -224,7 +224,7 @@ public final class AbdDtos {
      * @param idIncidente identificador del incidente asociado.
      * @param incidenteTipo tipo del incidente asociado.
      */
-    public record AlertaResponse(Integer idAlerta, String nivelRiesgo, String descripcion,
+    public record AlertResponse(Integer idAlerta, String nivelRiesgo, String descripcion,
                                  String fecha, Integer idIncidente, String incidenteTipo) {
     }
 
@@ -235,7 +235,7 @@ public final class AbdDtos {
      * @param clave clave del grupo contado.
      * @param total total de elementos del grupo.
      */
-    public record ConteoResponse(String clave, long total) {
+    public record CountResponse(String clave, long total) {
     }
 
     /**
@@ -244,7 +244,7 @@ public final class AbdDtos {
      * @param descripcion descripcion de la ruta.
      * @param totalProgramaciones total de programaciones de la ruta.
      */
-    public record TopRutaResponse(Integer idRuta, String descripcion, long totalProgramaciones) {
+    public record TopRouteResponse(Integer idRuta, String descripcion, long totalProgramaciones) {
     }
 
     /**
@@ -258,7 +258,7 @@ public final class AbdDtos {
      * @param unidadesEnMantenimiento total de unidades en mantenimiento.
      * @param totalRutas total de rutas.
      */
-    public record ResumenResponse(long totalProgramaciones, long programacionesActivas,
+    public record SummaryResponse(long totalProgramaciones, long programacionesActivas,
                                   long totalIncidentes, long incidentesAltoNivel,
                                   long totalAlertas, long totalUnidades, long unidadesEnMantenimiento,
                                   long totalRutas) {

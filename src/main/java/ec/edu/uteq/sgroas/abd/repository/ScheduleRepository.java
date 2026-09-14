@@ -39,7 +39,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
               AND (CAST(:fechaHasta AS date) IS NULL OR p.fecha <= CAST(:fechaHasta AS date))
             ORDER BY p.id_programacion
             """, nativeQuery = true)
-    Page<Schedule> buscarConFiltros(@Param("estado") String estado,
+    Page<Schedule> searchWithFilters(@Param("estado") String estado,
                                         @Param("idConductor") Integer idConductor,
                                         @Param("idRuta") Integer idRuta,
                                         @Param("fechaDesde") LocalDate fechaDesde,
@@ -52,7 +52,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
      */
     @Query(value = "SELECT estado AS clave, COUNT(*) AS total FROM programacion GROUP BY estado ORDER BY total DESC",
            nativeQuery = true)
-    List<CountProjection> contarPorEstado();
+    List<CountProjection> countByStatus();
 
     /**
      * Consulta el conteo de programaciones por mes de los ultimos 180 dias.
@@ -66,5 +66,5 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
             ORDER BY clave
             """,
            nativeQuery = true)
-    List<CountProjection> contarPorMes();
+    List<CountProjection> countByMonth();
 }

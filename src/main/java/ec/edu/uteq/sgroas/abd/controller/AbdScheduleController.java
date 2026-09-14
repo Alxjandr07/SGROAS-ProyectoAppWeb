@@ -29,14 +29,14 @@ public class AbdScheduleController {
      * @return respuesta con la pagina de programaciones encontradas y estado 200.
      */
     @GetMapping
-    public ResponseEntity<Page<AbdDtos.ProgramacionResponse>> listar(
+    public ResponseEntity<Page<AbdDtos.ScheduleResponse>> list(
             @RequestParam(required = false) String estado,
             @RequestParam(required = false) Integer idConductor,
             @RequestParam(required = false) Integer idRuta,
             @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate fechaDesde,
             @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate fechaHasta,
             @PageableDefault(size = 50, sort = "idProgramacion") Pageable pageable) {
-        return ResponseEntity.ok(programacionAbdService.listar(estado, idConductor, idRuta, fechaDesde, fechaHasta, pageable));
+        return ResponseEntity.ok(programacionAbdService.list(estado, idConductor, idRuta, fechaDesde, fechaHasta, pageable));
     }
 
     /**
@@ -45,8 +45,8 @@ public class AbdScheduleController {
      * @return respuesta con los datos de la programacion guardada y estado 201.
      */
     @PostMapping
-    public ResponseEntity<AbdDtos.ProgramacionResponse> crear(@Valid @RequestBody AbdDtos.ProgramacionRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(programacionAbdService.crear(request));
+    public ResponseEntity<AbdDtos.ScheduleResponse> create(@Valid @RequestBody AbdDtos.ScheduleRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(programacionAbdService.create(request));
     }
 
     /**
@@ -56,9 +56,9 @@ public class AbdScheduleController {
      * @return respuesta con los datos de la programacion actualizada y estado 200.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<AbdDtos.ProgramacionResponse> actualizar(@PathVariable Integer id,
-                                                                   @Valid @RequestBody AbdDtos.ProgramacionRequest request) {
-        return ResponseEntity.ok(programacionAbdService.actualizar(id, request));
+    public ResponseEntity<AbdDtos.ScheduleResponse> update(@PathVariable Integer id,
+                                                                   @Valid @RequestBody AbdDtos.ScheduleRequest request) {
+        return ResponseEntity.ok(programacionAbdService.update(id, request));
     }
 
     /**
@@ -67,8 +67,8 @@ public class AbdScheduleController {
      * @return respuesta sin contenido y estado 204 cuando la supresion termina con exito.
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
-        programacionAbdService.eliminar(id);
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+        programacionAbdService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

@@ -26,13 +26,13 @@ public class AbdDriverController {
      * @return respuesta con la pagina de conductores encontrados y estado 200.
      */
     @GetMapping
-    public ResponseEntity<Page<AbdDriver>> listar(
+    public ResponseEntity<Page<AbdDriver>> list(
             @RequestParam(required = false) String search,
             @PageableDefault(size = 50, sort = "idConductor") Pageable pageable) {
         String filtro = (search == null || search.isBlank()) ? null : search.trim().toLowerCase();
         Page<AbdDriver> page = filtro == null
                 ? conductorAbdRepository.findAll(pageable)
-                : conductorAbdRepository.buscar(filtro, pageable);
+                : conductorAbdRepository.search(filtro, pageable);
         return ResponseEntity.ok(page);
     }
 }

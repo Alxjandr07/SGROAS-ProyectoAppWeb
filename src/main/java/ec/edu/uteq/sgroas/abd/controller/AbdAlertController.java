@@ -25,10 +25,10 @@ public class AbdAlertController {
      * @return respuesta con la pagina de alertas encontradas y estado 200.
      */
     @GetMapping
-    public ResponseEntity<Page<AbdDtos.AlertaResponse>> listar(
+    public ResponseEntity<Page<AbdDtos.AlertResponse>> list(
             @PageableDefault(size = 50, sort = "idAlerta") Pageable pageable) {
         Page<Alert> page = alertaRepository.findAll(pageable);
-        return ResponseEntity.ok(page.map(a -> new AbdDtos.AlertaResponse(
+        return ResponseEntity.ok(page.map(a -> new AbdDtos.AlertResponse(
                 a.getIdAlerta(), a.getNivelRiesgo(), a.getDescripcion(),
                 a.getFecha() != null ? a.getFecha().toString() : null,
                 a.getIncidente() != null ? a.getIncidente().getIdIncidente() : null,

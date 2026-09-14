@@ -37,7 +37,7 @@ class GlobalExceptionHandlerTest {
                 org.mockito.Mockito.mock(MethodArgumentNotValidException.class);
         when(ex.getBindingResult()).thenReturn(bindingResult);
 
-        ProblemDetail detail = handler.manejarErroresValidacion(ex, request);
+        ProblemDetail detail = handler.handleValidationErrors(ex, request);
 
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), detail.getStatus());
         assertEquals("Error de validacion", detail.getTitle());
@@ -61,7 +61,7 @@ class GlobalExceptionHandlerTest {
     void credencialesInvalidasDebenRetornarNoAutorizado() {
         when(request.getRequestURI()).thenReturn("/api/auth/login");
 
-        ProblemDetail detail = handler.manejarCredencialesInvalidas(
+        ProblemDetail detail = handler.handleInvalidCredentials(
                 new BadCredentialsException("Credenciales invalidas"), request);
 
         assertEquals(HttpStatus.UNAUTHORIZED.value(), detail.getStatus());
@@ -72,7 +72,7 @@ class GlobalExceptionHandlerTest {
     void rutaInexistenteDebeRetornarNoEncontrado() {
         when(request.getRequestURI()).thenReturn("/api/auth/register");
 
-        ProblemDetail detail = handler.manejarRutaInexistente(
+        ProblemDetail detail = handler.handleNotFound(
                 new org.springframework.web.servlet.resource.NoResourceFoundException(
                         null, "api/auth/register"),
                 request);
