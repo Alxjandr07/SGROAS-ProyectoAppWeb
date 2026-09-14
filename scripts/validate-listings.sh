@@ -8,10 +8,10 @@
 set -euo pipefail
 
 LISTINGS=(
-  "lst:conductor-repo|ConductorRepository|src/main/java"
+  "lst:conductor-repo|DriverRepository|src/main/java"
   "lst:incidente-sp|@NamedStoredProcedureQuery|src/main/java/ec/edu/uteq/sgroas/entity"
-  "lst:incidente-repo|IncidenteRepository|src/main/java"
-  "lst:fn-programaciones|ProgramacionRepository|src/main/java"
+  "lst:incidente-repo|IncidentRepository|src/main/java"
+  "lst:fn-programaciones|ScheduleRepository|src/main/java"
 )
 
 ERRS=0

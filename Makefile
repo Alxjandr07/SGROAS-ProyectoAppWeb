@@ -53,6 +53,8 @@ audit:
 	scripts/validate-traceability.sh
 	@echo "Auditoria: listados LaTeX vs codigo..."
 	scripts/validate-listings.sh
+	@echo "Auditoria: self-test de exit codes (P11)..."
+	scripts/test-validators.sh
 	@echo "Auditorias completas (exit 0 = OK)."
 
 jacoco:

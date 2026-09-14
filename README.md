@@ -71,6 +71,26 @@ pdflatex -interaction=nonstopmode main.tex
 
 También se puede compilar desde la raíz del repositorio con `make pdf`.
 
+### Auditoría y validadores (exit codes reproducibles)
+
+`make audit` ejecuta cuatro guardas, todas con código de salida verificable
+(`exit 0` = evidencia válida, `exit != 0` = evidencia rota):
+
+| Guarda | Qué valida | Exit | Documentado en |
+|---|---|---|---|
+| `scripts/audit-sql-dynamic.sh` | No hay SQL dinámico (`EXECUTE IMMEDIATE`, `sp_executesql`, concatenación en `createNativeQuery`) | 0/1 | `docs/mediciones/sec/static-analysis/REPORT.md` |
+| `scripts/validate-traceability.sh` | Matriz 88 REQ vs SRS (identificadores, estados, trazabilidad mínima) | 0/1 | `docs/trazabilidad/` |
+| `scripts/validate-listings.sh` | Los 4 Listings de cap. 7 existen en el código | 0/1 | `docs/informe-final/cap7-implementacion.tex` |
+| `scripts/test-validators.sh` | Self-test: valida que las guardas anteriores **fallan** con exit 1 ante evidencia rota | 0 | este README |
+
+El self-test es la evidencia de hechos de los exit codes (casos A: matriz válida
+→ 0; B: matriz rota → 1; C: listings OK → 0; D: listing roto → 1):
+
+```bash
+make audit          # pasa si y solo si las 4 guardas responden exit 0
+scripts/test-validators.sh   # imprime PASS/FAIL por caso de exit code
+```
+
 ### Credenciales por defecto
 
 | Usuario | Rol | Contraseña |

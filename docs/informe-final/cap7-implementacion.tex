@@ -55,14 +55,12 @@ La estrategia híbrida documentada en ADR-006 (Sección~\ref{sec:adr006}) se imp
 Las operaciones CRUD elementales utilizan repositorios que extienden \texttt{JpaRepository}. El siguiente listado muestra el repositorio de conductores con consultas derivadas de nombres de métodos:
 
 \begin{lstlisting}[language=Java, caption={Repositorio de conductores con consultas derivadas.}, label={lst:conductor-repo}]
-@Repository
-public interface ConductorRepository
-        extends JpaRepository<Conductor, Long> {
+public interface DriverRepository extends JpaRepository<Driver, Long> {
 
-    Page<Conductor> findByActivoTrue(Pageable pageable);
+    Page<Driver> findByActivoTrue(Pageable pageable);
 
     @Query("""
-            SELECT c FROM Conductor c
+            SELECT c FROM Driver c
             WHERE c.activo = true
               AND (:search IS NULL
                    OR LOWER(c.nombres) LIKE LOWER(CONCAT('%', :search, '%'))
@@ -70,12 +68,12 @@ public interface ConductorRepository
                    OR c.cedula LIKE CONCAT('%', :search, '%')
                    OR LOWER(c.numeroLicencia) LIKE LOWER(CONCAT('%', :search, '%')))
             """)
-    Page<Conductor> buscarActivos(@Param("search") String search,
-                                  Pageable pageable);
+    Page<Driver> searchActive(@Param("search") String search,
+                              Pageable pageable);
 }
 \end{lstlisting}
 
-Los métodos \texttt{findByActivoTrue} y \texttt{buscar} utilizan consultas derivadas y JPQL estática respectivamente, sin concatenación de SQL dinámico.
+Los métodos \texttt{findByActivoTrue} y \texttt{searchActive} utilizan consultas derivadas y JPQL estática respectivamente, sin concatenación de SQL dinámico.
 
 \subsection{Stored procedures con @NamedStoredProcedureQuery}
 
@@ -83,7 +81,7 @@ Las operaciones de reportes y agregaciones se encapsulan en stored procedures de
 
 \begin{lstlisting}[language=Java, caption={Declaración @NamedStoredProcedureQuery en Incidente.}, label={lst:incidente-sp}]
 @NamedStoredProcedureQuery(
-    name = "Incidente.incidentesPorGravedad",
+    name = "Incident.incidentesPorGravedad",
     procedureName = "sp_incidentes_por_gravedad",
     parameters = {
         @StoredProcedureParameter(
@@ -93,36 +91,34 @@ Las operaciones de reportes y agregaciones se encapsulan en stored procedures de
             mode = ParameterMode.REF_CURSOR,
             name = "cur", type = Class.class)
     })
-public class Incidente { ... }
+public class Incident { ... }
 \end{lstlisting}
 
 \begin{lstlisting}[language=Java, caption={Invocación del SP desde el repositorio.}, label={lst:incidente-repo}]
-@Repository
-public interface IncidenteRepository
-        extends JpaRepository<Incidente, Long> {
+public interface IncidentRepository
+        extends JpaRepository<Incident, Long> {
 
-    @Procedure(name = "Incidente.incidentesPorGravedad")
-    List<Object[]> incidentesPorGravedad(
+    @Procedure(name = "Incident.incidentesPorGravedad")
+    List<Object[]> incidentsBySeverity(
             @Param("p_tipo") String tipo);
 }
 \end{lstlisting}
 
-El cursor REFCURSOR se lee dentro de la misma transacción JDBC, por lo que \texttt{ReporteService} está anotado con \texttt{@Transactional}.
+El cursor REFCURSOR se lee dentro de la misma transacción JDBC, por lo que \texttt{ReportService} está anotado con \texttt{@Transactional}.
 
 \subsection{Funciones SQL}
 
 Las funciones SQL se invocan con \texttt{SELECT}. El siguiente listado muestra la función \texttt{fn\_total\_programaciones}:
 
-\begin{lstlisting}[language=Java, caption={Consultas nativas en ProgramacionRepository.}, label={lst:fn-programaciones}]
-@Repository
-public interface ProgramacionRepository
-        extends JpaRepository<Programacion, Integer> {
+\begin{lstlisting}[language=Java, caption={Consultas nativas en ScheduleRepository.}, label={lst:fn-programaciones}]
+public interface ScheduleRepository
+        extends JpaRepository<Schedule, Integer> {
 
     @Query(value = "SELECT estado AS clave, COUNT(*) AS total "
                  + "FROM programacion GROUP BY estado "
                  + "ORDER BY total DESC",
            nativeQuery = true)
-    List<ConteoProjection> contarPorEstado();
+    List<CountProjection> countByStatus();
 
     @Query(value = """
             SELECT TO_CHAR(fecha, 'YYYY-MM') AS clave, COUNT(*) AS total
@@ -131,7 +127,7 @@ public interface ProgramacionRepository
             GROUP BY TO_CHAR(fecha, 'YYYY-MM')
             ORDER BY clave
             """, nativeQuery = true)
-    List<ConteoProjection> contarPorMes();
+    List<CountProjection> countByMonth();
 }
 \end{lstlisting}
 
