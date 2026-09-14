@@ -15,7 +15,7 @@ public class LoginRateLimiter {
      * @param ip direccion del cliente cuyo historial de intentos se revisa
      * @return verdadero cuando se alcanzo el maximo y el bloqueo sigue vigente
      */
-    public boolean estaBloqueado(String ip) {
+    public boolean isBlocked(String ip) {
         long[] datos = intentos.get(ip);
         if (datos == null) return false;
         long ahora = System.currentTimeMillis();
@@ -43,7 +43,7 @@ public class LoginRateLimiter {
      * Borra el historial de fallos de una direccion tras un acceso exitoso.
      * @param ip direccion del cliente cuyo conteo de intentos se elimina
      */
-    public void resetear(String ip) {
+    public void reset(String ip) {
         intentos.remove(ip);
     }
 }

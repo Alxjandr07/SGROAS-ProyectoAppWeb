@@ -205,7 +205,7 @@ class AuthControllerTest {
 
     @Test
     void loginCorrectoDebeRetornar200YCookieSinTokenEnBody() throws Exception {
-        when(loginRateLimiter.estaBloqueado("127.0.0.1")).thenReturn(false);
+        when(loginRateLimiter.isBlocked("127.0.0.1")).thenReturn(false);
         when(authService.login(any())).thenReturn(authResponse());
 
         mockMvc().perform(post("/api/auth/login")
@@ -225,7 +225,7 @@ class AuthControllerTest {
 
     @Test
     void loginConIpBloqueadaDebeRetornar429() throws Exception {
-        when(loginRateLimiter.estaBloqueado("127.0.0.1")).thenReturn(true);
+        when(loginRateLimiter.isBlocked("127.0.0.1")).thenReturn(true);
 
         mockMvc().perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -241,7 +241,7 @@ class AuthControllerTest {
 
     @Test
     void loginConCredencialesInvalidasDebeRetornar401() throws Exception {
-        when(loginRateLimiter.estaBloqueado("127.0.0.1")).thenReturn(false);
+        when(loginRateLimiter.isBlocked("127.0.0.1")).thenReturn(false);
         when(authService.login(any()))
                 .thenThrow(new BadCredentialsException("Credenciales invalidas"));
 

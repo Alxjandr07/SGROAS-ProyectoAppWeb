@@ -36,8 +36,8 @@ public class ReportService {
      * Calcula los conteos globales de conductores, vehiculos, rutas, asignaciones e incidentes.
      * @return lista de filas con los totales y los conteos de registros activos y abiertos
      */
-    public List<Map<String, Object>> estadisticasGenerales() {
-        return incidenteRepository.estadisticasGenerales().stream()
+    public List<Map<String, Object>> generalStatistics() {
+        return incidenteRepository.generalStatistics().stream()
                 .map(fila -> mapa(
                         "total_conductores", fila[0],
                         "conductores_activos", fila[1],

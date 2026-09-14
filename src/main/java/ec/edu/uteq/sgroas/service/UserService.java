@@ -93,7 +93,7 @@ public class UserService {
             throw new IllegalArgumentException("Ese usuario ya verifico su correo");
         }
         if (!codigoVerificacionService.canResend(usuario.getEmail(),
-                VerificationCodeService.Tipo.VERIFICACION)) {
+                VerificationCodeService.Type.VERIFICACION)) {
             throw new IllegalArgumentException(
                     "El codigo se envio hace menos de un minuto. Espera antes de reenviar.");
         }
@@ -102,7 +102,7 @@ public class UserService {
 
     private void sendActivationCode(User usuario) {
         String codigo = codigoVerificacionService.generate(usuario.getEmail(),
-                VerificationCodeService.Tipo.VERIFICACION);
+                VerificationCodeService.Type.VERIFICACION);
         emailService.sendVerificationCode(usuario.getEmail(), usuario.getNombre(), codigo);
     }
 

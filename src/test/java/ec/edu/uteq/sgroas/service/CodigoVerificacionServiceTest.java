@@ -2,7 +2,7 @@ package ec.edu.uteq.sgroas.service;
 
 import ec.edu.uteq.sgroas.entity.VerificationCode;
 import ec.edu.uteq.sgroas.repository.VerificationCodeRepository;
-import ec.edu.uteq.sgroas.service.VerificationCodeService.Tipo;
+import ec.edu.uteq.sgroas.service.VerificationCodeService.Type;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -49,7 +49,7 @@ class CodigoVerificacionServiceTest {
                 .id(1L)
                 .email(EMAIL)
                 .codigoHash(sha256(codigoClaro))
-                .tipo(Tipo.VERIFICACION.name())
+                .tipo(Type.VERIFICACION.name())
                 .expiraEn(Instant.now().plusSeconds(600))
                 .intentos(0)
                 .usado(false)
@@ -61,13 +61,13 @@ class CodigoVerificacionServiceTest {
     void generarDebeInvalidarAnterioresYGuardarNuevo() {
         when(repository.save(any(VerificationCode.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        String codigo = service.generate(EMAIL, Tipo.VERIFICACION);
+        String codigo = service.generate(EMAIL, Type.VERIFICACION);
 
-        verify(repository).deleteByEmailAndTipo(EMAIL, Tipo.VERIFICACION.name());
+        verify(repository).deleteByEmailAndTipo(EMAIL, Type.VERIFICACION.name());
         verify(repository).save(argThat(reg ->
                 reg.getCodigoHash().equals(sha256(codigo))
                         && reg.getEmail().equals(EMAIL)
-                        && reg.getTipo().equals(Tipo.VERIFICACION.name())
+                        && reg.getTipo().equals(Type.VERIFICACION.name())
                         && !reg.isUsado()));
         assertTrue(codigo.matches("\\d{6}"));
     }
@@ -75,9 +75,9 @@ class CodigoVerificacionServiceTest {
     @Test
     void puedeReenviarSinRegistroDebeSerTrue() {
         when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
-                EMAIL, Tipo.VERIFICACION.name())).thenReturn(Optional.empty());
+                EMAIL, Type.VERIFICACION.name())).thenReturn(Optional.empty());
 
-        assertTrue(service.canResend(EMAIL, Tipo.VERIFICACION));
+        assertTrue(service.canResend(EMAIL, Type.VERIFICACION));
     }
 
     @Test
@@ -85,9 +85,9 @@ class CodigoVerificacionServiceTest {
         VerificationCode reciente = registro("123456");
         reciente.setCreadoEn(Instant.now().minusSeconds(10));
         when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
-                EMAIL, Tipo.VERIFICACION.name())).thenReturn(Optional.of(reciente));
+                EMAIL, Type.VERIFICACION.name())).thenReturn(Optional.of(reciente));
 
-        assertFalse(service.canResend(EMAIL, Tipo.VERIFICACION));
+        assertFalse(service.canResend(EMAIL, Type.VERIFICACION));
     }
 
     @Test
@@ -95,17 +95,17 @@ class CodigoVerificacionServiceTest {
         VerificationCode antiguo = registro("123456");
         antiguo.setCreadoEn(Instant.now().minusSeconds(120));
         when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
-                EMAIL, Tipo.VERIFICACION.name())).thenReturn(Optional.of(antiguo));
+                EMAIL, Type.VERIFICACION.name())).thenReturn(Optional.of(antiguo));
 
-        assertTrue(service.canResend(EMAIL, Tipo.VERIFICACION));
+        assertTrue(service.canResend(EMAIL, Type.VERIFICACION));
     }
 
     @Test
     void validarCodigoCorrectoDebeMarcarloUsado() {
         when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
-                EMAIL, Tipo.VERIFICACION.name())).thenReturn(Optional.of(registro("123456")));
+                EMAIL, Type.VERIFICACION.name())).thenReturn(Optional.of(registro("123456")));
 
-        service.validate(EMAIL, Tipo.VERIFICACION, "123456");
+        service.validate(EMAIL, Type.VERIFICACION, "123456");
 
         verify(repository).save(argThat(VerificationCode::isUsado));
     }
@@ -114,20 +114,20 @@ class CodigoVerificacionServiceTest {
     void validarCodigoIncorrectoDebeIncrementarIntentosYFallar() {
         VerificationCode reg = registro("123456");
         when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
-                EMAIL, Tipo.VERIFICACION.name())).thenReturn(Optional.of(reg));
+                EMAIL, Type.VERIFICACION.name())).thenReturn(Optional.of(reg));
 
         assertThrows(IllegalArgumentException.class,
-                () -> service.validate(EMAIL, Tipo.VERIFICACION, "999999"));
+                () -> service.validate(EMAIL, Type.VERIFICACION, "999999"));
         verify(repository).save(argThat(c -> c.getIntentos() == 1 && !c.isUsado()));
     }
 
     @Test
     void validarSinRegistroDebeFallar() {
         when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
-                EMAIL, Tipo.VERIFICACION.name())).thenReturn(Optional.empty());
+                EMAIL, Type.VERIFICACION.name())).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class,
-                () -> service.validate(EMAIL, Tipo.VERIFICACION, "123456"));
+                () -> service.validate(EMAIL, Type.VERIFICACION, "123456"));
     }
 
     @Test
@@ -135,10 +135,10 @@ class CodigoVerificacionServiceTest {
         VerificationCode usado = registro("123456");
         usado.setUsado(true);
         when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
-                EMAIL, Tipo.VERIFICACION.name())).thenReturn(Optional.of(usado));
+                EMAIL, Type.VERIFICACION.name())).thenReturn(Optional.of(usado));
 
         assertThrows(IllegalArgumentException.class,
-                () -> service.validate(EMAIL, Tipo.VERIFICACION, "123456"));
+                () -> service.validate(EMAIL, Type.VERIFICACION, "123456"));
     }
 
     @Test
@@ -146,10 +146,10 @@ class CodigoVerificacionServiceTest {
         VerificationCode expirado = registro("123456");
         expirado.setExpiraEn(Instant.now().minusSeconds(60));
         when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
-                EMAIL, Tipo.VERIFICACION.name())).thenReturn(Optional.of(expirado));
+                EMAIL, Type.VERIFICACION.name())).thenReturn(Optional.of(expirado));
 
         assertThrows(IllegalArgumentException.class,
-                () -> service.validate(EMAIL, Tipo.VERIFICACION, "123456"));
+                () -> service.validate(EMAIL, Type.VERIFICACION, "123456"));
     }
 
     @Test
@@ -157,9 +157,9 @@ class CodigoVerificacionServiceTest {
         VerificationCode agotado = registro("123456");
         agotado.setIntentos(5);
         when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
-                EMAIL, Tipo.VERIFICACION.name())).thenReturn(Optional.of(agotado));
+                EMAIL, Type.VERIFICACION.name())).thenReturn(Optional.of(agotado));
 
         assertThrows(IllegalArgumentException.class,
-                () -> service.validate(EMAIL, Tipo.VERIFICACION, "123456"));
+                () -> service.validate(EMAIL, Type.VERIFICACION, "123456"));
     }
 }

@@ -88,7 +88,7 @@ class AuthServiceExtraTest {
 
         assertEquals("access-token-prueba", response.accessToken());
         verify(codigoVerificacionService).validate("admin@sgroas.com",
-                VerificationCodeService.Tipo.VERIFICACION, "654321");
+                VerificationCodeService.Type.VERIFICACION, "654321");
         verify(usuarioRepository).save(argThat(u ->
                 Boolean.TRUE.equals(u.getActivo()) && Boolean.TRUE.equals(u.getVerificado())));
     }
@@ -116,7 +116,7 @@ class AuthServiceExtraTest {
         authService.resetPassword("admin@sgroas.com", "111222", "nueva-clave-1");
 
         verify(codigoVerificacionService).validate("admin@sgroas.com",
-                VerificationCodeService.Tipo.RESET_PASSWORD, "111222");
+                VerificationCodeService.Type.RESET_PASSWORD, "111222");
         verify(usuarioRepository).save(argThat(u -> "hash-nuevo".equals(u.getPasswordHash())));
     }
 
@@ -127,9 +127,9 @@ class AuthServiceExtraTest {
         when(usuarioRepository.findByEmail("admin@sgroas.com"))
                 .thenReturn(Optional.of(sinVerificar));
         when(codigoVerificacionService.canResend("admin@sgroas.com",
-                VerificationCodeService.Tipo.VERIFICACION)).thenReturn(true);
+                VerificationCodeService.Type.VERIFICACION)).thenReturn(true);
         when(codigoVerificacionService.generate("admin@sgroas.com",
-                VerificationCodeService.Tipo.VERIFICACION)).thenReturn("999888");
+                VerificationCodeService.Type.VERIFICACION)).thenReturn("999888");
 
         authService.resendVerificationCode("admin@sgroas.com");
 
@@ -155,11 +155,11 @@ class AuthServiceExtraTest {
         when(usuarioRepository.findByEmail("admin@sgroas.com"))
                 .thenReturn(Optional.of(usuario));
         when(codigoVerificacionService.canResend("admin@sgroas.com",
-                VerificationCodeService.Tipo.RESET_PASSWORD)).thenReturn(true);
+                VerificationCodeService.Type.RESET_PASSWORD)).thenReturn(true);
         when(codigoVerificacionService.generate("admin@sgroas.com",
-                VerificationCodeService.Tipo.RESET_PASSWORD)).thenReturn("112233");
+                VerificationCodeService.Type.RESET_PASSWORD)).thenReturn("112233");
 
-        authService.solicitarRestablecimiento("admin@sgroas.com");
+        authService.requestPasswordReset("admin@sgroas.com");
 
         verify(emailService).sendResetCode("admin@sgroas.com", "112233");
     }
@@ -211,7 +211,7 @@ class AuthServiceExtraTest {
         authService.logout("access-token-prueba",
                 new RefreshTokenRequest("refresh-token-prueba"));
 
-        verify(tokenService).agregarAccessTokenABlacklist("access-token-prueba");
+        verify(tokenService).addAccessTokenToBlacklist("access-token-prueba");
         verify(tokenService).deleteRefreshToken("refresh-token-prueba");
     }
 }

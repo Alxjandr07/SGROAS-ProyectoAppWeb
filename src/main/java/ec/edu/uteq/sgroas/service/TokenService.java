@@ -65,7 +65,7 @@ public class TokenService {
      * Solo se registra cuando aun le queda tiempo de vida util.
      * @param accessToken token de acceso vigente que se desea invalidar
      */
-    public void agregarAccessTokenABlacklist(String accessToken) {
+    public void addAccessTokenToBlacklist(String accessToken) {
         String jti = jwtService.extraerJti(accessToken);
         long tiempoRestante = jwtService.extraerExpiracion(accessToken).getTime()
                 - System.currentTimeMillis();

@@ -36,7 +36,7 @@ class ReporteControllerTest {
 
     @Test
     void estadisticasGeneralesDevuelveDatos() throws Exception {
-        when(reporteService.estadisticasGenerales())
+        when(reporteService.generalStatistics())
                 .thenReturn(List.of(Map.of(
                         "total_conductores", 10L,
                         "total_incidentes", 3L)));

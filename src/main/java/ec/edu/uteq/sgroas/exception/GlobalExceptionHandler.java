@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
      * @return detalle del problema con estado de solicitud inválida.
      */
     @ExceptionHandler(IllegalArgumentException.class)
-    public ProblemDetail manejarArgumentosInvalidos(
+    public ProblemDetail handleInvalidArguments(
             IllegalArgumentException ex,
             HttpServletRequest request
     ) {
@@ -88,7 +88,7 @@ public class GlobalExceptionHandler {
      * @return detalle del problema con estado de acceso prohibido.
      */
     @ExceptionHandler(UnverifiedEmailException.class)
-    public ProblemDetail manejarCorreoNoVerificado(
+    public ProblemDetail handleUnverifiedEmail(
             UnverifiedEmailException ex,
             HttpServletRequest request
     ) {
@@ -108,7 +108,7 @@ public class GlobalExceptionHandler {
      * @return detalle del problema con estado de acceso prohibido.
      */
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
-    public ProblemDetail manejarAccesoDenegado(
+    public ProblemDetail handleAccessDenied(
             org.springframework.security.access.AccessDeniedException ex,
             HttpServletRequest request
     ) {
@@ -148,7 +148,7 @@ public class GlobalExceptionHandler {
      * @return detalle del problema con estado de error interno del servidor.
      */
     @ExceptionHandler(Exception.class)
-    public ProblemDetail manejarErrorGeneral(
+    public ProblemDetail handleGeneralError(
             Exception ex,
             HttpServletRequest request
     ) {

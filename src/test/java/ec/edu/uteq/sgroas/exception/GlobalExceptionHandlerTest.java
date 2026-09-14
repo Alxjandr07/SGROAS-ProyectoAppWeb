@@ -50,7 +50,7 @@ class GlobalExceptionHandlerTest {
     void argumentosInvalidosDebenRetornarBadRequest() {
         when(request.getRequestURI()).thenReturn("/api/conductores");
 
-        ProblemDetail detail = handler.manejarArgumentosInvalidos(
+        ProblemDetail detail = handler.handleInvalidArguments(
                 new IllegalArgumentException("Driver no encontrado"), request);
 
         assertEquals(HttpStatus.BAD_REQUEST.value(), detail.getStatus());
@@ -85,7 +85,7 @@ class GlobalExceptionHandlerTest {
     void errorGeneralDebeRetornarInternalServerError() {
         when(request.getRequestURI()).thenReturn("/api/conductores");
 
-        ProblemDetail detail = handler.manejarErrorGeneral(
+        ProblemDetail detail = handler.handleGeneralError(
                 new RuntimeException("Falla inesperada"), request);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), detail.getStatus());

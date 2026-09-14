@@ -49,5 +49,5 @@ public interface IncidentRepository extends JpaRepository<Incident, Long> {
      * @return filas del procedimiento con las estadisticas generales.
      */
     @Procedure(name = "Incident.estadisticasGenerales")
-    List<Object[]> estadisticasGenerales();
+    List<Object[]> generalStatistics();
 }

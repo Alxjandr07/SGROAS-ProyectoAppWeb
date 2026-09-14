@@ -81,7 +81,7 @@ class TokenServiceTest {
         when(jwtService.extraerExpiracion("access-token"))
                 .thenReturn(new Date(System.currentTimeMillis() + 3600000L));
 
-        tokenService.agregarAccessTokenABlacklist("access-token");
+        tokenService.addAccessTokenToBlacklist("access-token");
 
         verify(valueOperations).set(
                 eq("blacklist:jti-123"),
@@ -96,7 +96,7 @@ class TokenServiceTest {
         when(jwtService.extraerExpiracion("access-token"))
                 .thenReturn(new Date(System.currentTimeMillis() - 1000L));
 
-        tokenService.agregarAccessTokenABlacklist("access-token");
+        tokenService.addAccessTokenToBlacklist("access-token");
 
         verify(valueOperations, never()).set(any(String.class), any(String.class), any(Duration.class));
     }

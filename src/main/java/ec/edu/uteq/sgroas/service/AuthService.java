@@ -74,7 +74,7 @@ public class AuthService {
         User usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("No existe una cuenta con ese email"));
 
-        codigoVerificacionService.validate(email, VerificationCodeService.Tipo.VERIFICACION, codigo);
+        codigoVerificacionService.validate(email, VerificationCodeService.Type.VERIFICACION, codigo);
 
         usuario.setVerificado(true);
         usuario.setActivo(true);
@@ -93,7 +93,7 @@ public class AuthService {
         usuarioRepository.findByEmail(email)
                 .filter(u -> Boolean.FALSE.equals(u.getVerificado()))
                 .filter(u -> codigoVerificacionService.canResend(email,
-                        VerificationCodeService.Tipo.VERIFICACION))
+                        VerificationCodeService.Type.VERIFICACION))
                 .ifPresent(this::sendActivationCode);
     }
 
@@ -102,14 +102,14 @@ public class AuthService {
      * Solo genera codigo cuando la cuenta existe, esta activa y respeto la espera minima de reenvio.
      * @param email correo de la cuenta que solicita recuperar su contrasenia
      */
-    public void solicitarRestablecimiento(String email) {
+    public void requestPasswordReset(String email) {
         usuarioRepository.findByEmail(email)
                 .filter(User::getActivo)
                 .filter(u -> codigoVerificacionService.canResend(email,
-                        VerificationCodeService.Tipo.RESET_PASSWORD))
+                        VerificationCodeService.Type.RESET_PASSWORD))
                 .ifPresent(u -> {
                     String codigo = codigoVerificacionService.generate(email,
-                            VerificationCodeService.Tipo.RESET_PASSWORD);
+                            VerificationCodeService.Type.RESET_PASSWORD);
                     emailService.sendResetCode(email, codigo);
                 });
     }
@@ -126,7 +126,7 @@ public class AuthService {
         User usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("No existe una cuenta con ese email"));
 
-        codigoVerificacionService.validate(email, VerificationCodeService.Tipo.RESET_PASSWORD, codigo);
+        codigoVerificacionService.validate(email, VerificationCodeService.Type.RESET_PASSWORD, codigo);
 
         usuario.setPasswordHash(passwordEncoder.encode(nuevaPassword));
         usuario.setActivo(true);
@@ -137,7 +137,7 @@ public class AuthService {
 
     private void sendActivationCode(User usuario) {
         String codigo = codigoVerificacionService.generate(usuario.getEmail(),
-                VerificationCodeService.Tipo.VERIFICACION);
+                VerificationCodeService.Type.VERIFICACION);
         emailService.sendVerificationCode(usuario.getEmail(), usuario.getNombre(), codigo);
     }
 
@@ -168,7 +168,7 @@ public class AuthService {
      * @param request datos con el token de refresco asociado a la misma sesion
      */
     public void logout(String accessToken, RefreshTokenRequest request) {
-        tokenService.agregarAccessTokenABlacklist(accessToken);
+        tokenService.addAccessTokenToBlacklist(accessToken);
         tokenService.deleteRefreshToken(request.refreshToken());
     }
 

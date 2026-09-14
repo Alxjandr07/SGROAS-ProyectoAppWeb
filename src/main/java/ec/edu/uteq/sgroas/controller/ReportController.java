@@ -24,8 +24,8 @@ public class ReportController {
      */
     @GetMapping("/estadisticas-generales")
     @PreAuthorize("hasAnyRole('ADMIN', 'COORDINADOR', 'SEGURIDAD')")
-    public ResponseEntity<List<Map<String, Object>>> estadisticasGenerales() {
-        return ResponseEntity.ok(reporteService.estadisticasGenerales());
+    public ResponseEntity<List<Map<String, Object>>> generalStatistics() {
+        return ResponseEntity.ok(reporteService.generalStatistics());
     }
 
     /**

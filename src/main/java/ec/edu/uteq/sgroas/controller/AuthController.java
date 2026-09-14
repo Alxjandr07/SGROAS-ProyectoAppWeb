@@ -102,7 +102,7 @@ public class AuthController {
             HttpServletRequest httpRequest
     ) {
         String ip = httpRequest.getRemoteAddr();
-        if (loginRateLimiter.estaBloqueado(ip)) {
+        if (loginRateLimiter.isBlocked(ip)) {
             ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.TOO_MANY_REQUESTS);
             detail.setTitle("Demasiadas solicitudes");
             detail.setDetail("Has superado el limite de intentos de inicio de sesion. Espera 60 segundos.");
@@ -110,7 +110,7 @@ public class AuthController {
         }
         try {
             AuthResponse response = authService.login(request);
-            loginRateLimiter.resetear(ip);
+            loginRateLimiter.reset(ip);
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, buildAccessTokenCookie(response.accessToken()))
                     .header(HttpHeaders.SET_COOKIE, buildRefreshTokenCookie(response.refreshToken()))
@@ -187,7 +187,7 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> forgotPassword(
             @Valid @RequestBody EmailRequest request
     ) {
-        authService.solicitarRestablecimiento(request.email());
+        authService.requestPasswordReset(request.email());
         return ResponseEntity.ok(Map.of(
                 "mensaje",
                 "Si el correo esta registrado, enviamos un codigo para restablecer la contrasena."

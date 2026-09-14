@@ -59,7 +59,7 @@ public interface AbdIncidentRepository extends JpaRepository<AbdIncident, Intege
             group by i.nivelSugerido
             order by total desc
             """)
-    List<ConteoPorNivel> countByLevel();
+    List<CountByLevel> countByLevel();
 
     /**
      * Consulta el conteo de incidentes agrupados por estado.
@@ -70,12 +70,12 @@ public interface AbdIncidentRepository extends JpaRepository<AbdIncident, Intege
             from AbdIncident i
             group by i.estado
             """)
-    List<ConteoPorEstado> countByStatus();
+    List<CountByStatus> countByStatus();
 
     /**
      * Proyeccion con el conteo de incidentes por nivel sugerido.
      */
-    interface ConteoPorNivel {
+    interface CountByLevel {
         /**
          * Obtiene el nivel sugerido del grupo.
          * @return nivel sugerido.
@@ -92,7 +92,7 @@ public interface AbdIncidentRepository extends JpaRepository<AbdIncident, Intege
     /**
      * Proyeccion con el conteo de incidentes por estado.
      */
-    interface ConteoPorEstado {
+    interface CountByStatus {
         /**
          * Obtiene el estado del grupo.
          * @return estado de los incidentes.

@@ -10,7 +10,7 @@ class LoginRateLimiterTest {
     void ipSinIntentosNoDebeEstarBloqueada() {
         LoginRateLimiter limiter = new LoginRateLimiter();
 
-        assertFalse(limiter.estaBloqueado("192.168.1.1"));
+        assertFalse(limiter.isBlocked("192.168.1.1"));
     }
 
     @Test
@@ -20,7 +20,7 @@ class LoginRateLimiterTest {
             limiter.recordFailedAttempt("192.168.1.1");
         }
 
-        assertFalse(limiter.estaBloqueado("192.168.1.1"));
+        assertFalse(limiter.isBlocked("192.168.1.1"));
     }
 
     @Test
@@ -30,7 +30,7 @@ class LoginRateLimiterTest {
             limiter.recordFailedAttempt("192.168.1.1");
         }
 
-        assertTrue(limiter.estaBloqueado("192.168.1.1"));
+        assertTrue(limiter.isBlocked("192.168.1.1"));
     }
 
     @Test
@@ -39,11 +39,11 @@ class LoginRateLimiterTest {
         for (int i = 0; i < 6; i++) {
             limiter.recordFailedAttempt("192.168.1.1");
         }
-        assertTrue(limiter.estaBloqueado("192.168.1.1"));
+        assertTrue(limiter.isBlocked("192.168.1.1"));
 
-        limiter.resetear("192.168.1.1");
+        limiter.reset("192.168.1.1");
 
-        assertFalse(limiter.estaBloqueado("192.168.1.1"));
+        assertFalse(limiter.isBlocked("192.168.1.1"));
     }
 
     @Test
@@ -52,10 +52,10 @@ class LoginRateLimiterTest {
         for (int i = 0; i < 6; i++) {
             limiter.recordFailedAttempt("192.168.1.1");
         }
-        assertTrue(limiter.estaBloqueado("192.168.1.1"));
+        assertTrue(limiter.isBlocked("192.168.1.1"));
 
         Thread.sleep(61_000);
 
-        assertFalse(limiter.estaBloqueado("192.168.1.1"));
+        assertFalse(limiter.isBlocked("192.168.1.1"));
     }
 }

@@ -125,7 +125,7 @@ class UsuarioServiceTest {
             return u;
         });
         when(codigoVerificacionService.generate("carlos@sgroas.com",
-                VerificationCodeService.Tipo.VERIFICACION)).thenReturn("123456");
+                VerificationCodeService.Type.VERIFICACION)).thenReturn("123456");
 
         UserResponse response = usuarioService.create(requestEjemplo());
 
@@ -150,9 +150,9 @@ class UsuarioServiceTest {
         sinVerificar.setVerificado(false);
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(sinVerificar));
         when(codigoVerificacionService.canResend("carlos@sgroas.com",
-                VerificationCodeService.Tipo.VERIFICACION)).thenReturn(true);
+                VerificationCodeService.Type.VERIFICACION)).thenReturn(true);
         when(codigoVerificacionService.generate("carlos@sgroas.com",
-                VerificationCodeService.Tipo.VERIFICACION)).thenReturn("654321");
+                VerificationCodeService.Type.VERIFICACION)).thenReturn("654321");
 
         usuarioService.resendActivationCode(1L);
 
@@ -174,7 +174,7 @@ class UsuarioServiceTest {
         sinVerificar.setVerificado(false);
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(sinVerificar));
         when(codigoVerificacionService.canResend("carlos@sgroas.com",
-                VerificationCodeService.Tipo.VERIFICACION)).thenReturn(false);
+                VerificationCodeService.Type.VERIFICACION)).thenReturn(false);
 
         assertThrows(IllegalArgumentException.class,
                 () -> usuarioService.resendActivationCode(1L));
