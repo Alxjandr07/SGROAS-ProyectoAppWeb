@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RouteAssignmentResponse.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">ec.edu.uteq.sgroas.dto</a> &gt; <span class="el_source">RouteAssignmentResponse.java</span></div><h1>RouteAssignmentResponse.java</h1><pre class="source lang-java linenums">package ec.edu.uteq.sgroas.dto;
+
+import java.time.Instant;
+import java.time.LocalDate;
+
+/**
+ * Respuesta con los datos completos de una asignacion de ruta.
+ * @param id identificador unico de la asignacion
+ * @param conductorId identificador del conductor asignado
+ * @param conductorNombre nombre del conductor asignado
+ * @param vehiculoId identificador del vehiculo asignado
+ * @param vehiculoPlaca placa del vehiculo asignado
+ * @param rutaId identificador de la ruta asignada
+ * @param rutaNombre nombre de la ruta asignada
+ * @param fechaAsignacion fecha en que se registro la asignacion
+ * @param fechaInicio fecha en que inicia la vigencia
+ * @param fechaFin fecha en que finaliza la vigencia
+ * @param estado estado de la asignacion
+ * @param activo indica si la asignacion esta activa
+ * @param creadoEn fecha de creacion del registro
+ * @param actualizadoEn fecha de la ultima actualizacion
+ */
+<span class="fc" id="L23">public record RouteAssignmentResponse(</span>
+        Long id,
+        Long conductorId,
+        String conductorNombre,
+        Long vehiculoId,
+        String vehiculoPlaca,
+        Long rutaId,
+        String rutaNombre,
+        LocalDate fechaAsignacion,
+        LocalDate fechaInicio,
+        LocalDate fechaFin,
+        String estado,
+        Boolean activo,
+        Instant creadoEn,
+        Instant actualizadoEn
+) {
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

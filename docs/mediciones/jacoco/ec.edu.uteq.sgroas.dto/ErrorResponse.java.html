@@ -3,7 +3,16 @@
 import java.time.Instant;
 import java.util.Map;
 
-<span class="fc" id="L6">public record ErrorResponse(</span>
+/**
+ * Respuesta estandar para errores de la API.
+ * @param timestamp fecha y hora en que ocurrio el error
+ * @param status codigo de estado HTTP del error
+ * @param error categoria tecnica del error
+ * @param message mensaje legible para el usuario
+ * @param path ruta del recurso que genero el error
+ * @param details detalles adicionales de validacion por campo
+ */
+<span class="fc" id="L15">public record ErrorResponse(</span>
         Instant timestamp,
         Integer status,
         String error,

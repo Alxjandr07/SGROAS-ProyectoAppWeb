@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CacheConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">ec.edu.uteq.sgroas.config</a> &gt; <span class="el_source">CacheConfig.java</span></div><h1>CacheConfig.java</h1><pre class="source lang-java linenums">package ec.edu.uteq.sgroas.config;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CacheConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">ec.edu.uteq.sgroas.config</a> &gt; <span class="el_source">CacheConfig.java</span></div><h1>CacheConfig.java</h1><pre class="source lang-java linenums">package ec.edu.uteq.sgroas.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -18,31 +18,36 @@ import java.time.Duration;
 
 @Configuration
 @EnableCaching
-<span class="fc" id="L21">public class CacheConfig {</span>
+<span class="nc" id="L21">public class CacheConfig {</span>
 
     @Value(&quot;${app.cache.default-ttl}&quot;)
     private long defaultTtl;
 
+    /**
+     * Crea el administrador de cache con serializacion JSON y tiempo de vida configurado.
+     * @param redisConnectionFactory fabrica con la conexion activa hacia el servidor Redis
+     * @return administrador que guarda los valores de cache en formato JSON
+     */
     @Bean
     public CacheManager cacheManager(LettuceConnectionFactory redisConnectionFactory) {
-<span class="fc" id="L28">        ObjectMapper mapper = JsonMapper.builder()</span>
-<span class="fc" id="L29">                .addModule(new JavaTimeModule())</span>
-<span class="fc" id="L30">                .findAndAddModules()</span>
-<span class="fc" id="L31">                .build();</span>
+<span class="nc" id="L33">        ObjectMapper mapper = JsonMapper.builder()</span>
+<span class="nc" id="L34">                .addModule(new JavaTimeModule())</span>
+<span class="nc" id="L35">                .findAndAddModules()</span>
+<span class="nc" id="L36">                .build();</span>
 
-<span class="fc" id="L33">        Jackson2JsonRedisSerializer&lt;Object&gt; serializer =</span>
+<span class="nc" id="L38">        Jackson2JsonRedisSerializer&lt;Object&gt; serializer =</span>
                 new Jackson2JsonRedisSerializer&lt;&gt;(mapper, Object.class);
 
-<span class="fc" id="L36">        RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()</span>
-<span class="fc" id="L37">                .entryTtl(Duration.ofSeconds(defaultTtl))</span>
-<span class="fc" id="L38">                .disableCachingNullValues()</span>
-<span class="fc" id="L39">                .serializeValuesWith(</span>
-<span class="fc" id="L40">                        RedisSerializationContext.SerializationPair.fromSerializer(serializer)</span>
+<span class="nc" id="L41">        RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()</span>
+<span class="nc" id="L42">                .entryTtl(Duration.ofSeconds(defaultTtl))</span>
+<span class="nc" id="L43">                .disableCachingNullValues()</span>
+<span class="nc" id="L44">                .serializeValuesWith(</span>
+<span class="nc" id="L45">                        RedisSerializationContext.SerializationPair.fromSerializer(serializer)</span>
                 );
 
-<span class="fc" id="L43">        return RedisCacheManager.builder(redisConnectionFactory)</span>
-<span class="fc" id="L44">                .cacheDefaults(config)</span>
-<span class="fc" id="L45">                .build();</span>
+<span class="nc" id="L48">        return RedisCacheManager.builder(redisConnectionFactory)</span>
+<span class="nc" id="L49">                .cacheDefaults(config)</span>
+<span class="nc" id="L50">                .build();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

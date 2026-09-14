@@ -15,112 +15,152 @@ import java.util.Map;
 @RestControllerAdvice
 <span class="fc" id="L16">public class GlobalExceptionHandler {</span>
 
+    /**
+     * Construye la respuesta de error cuando la validación de la solicitud falla.
+     * @param ex excepción con el resultado de la validación y los campos inválidos.
+     * @param request petición HTTP que originó el error de validación.
+     * @return detalle del problema con el mapa de errores por campo.
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ProblemDetail manejarErroresValidacion(
+    public ProblemDetail handleValidationErrors(
             MethodArgumentNotValidException ex,
             HttpServletRequest request
     ) {
-<span class="fc" id="L23">        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_ENTITY);</span>
-<span class="fc" id="L24">        detail.setType(URI.create(&quot;https://sgroas.uteq.edu.ec/errors/validation&quot;));</span>
-<span class="fc" id="L25">        detail.setTitle(&quot;Error de validacion&quot;);</span>
-<span class="fc" id="L26">        detail.setDetail(&quot;Existen campos invalidos en la solicitud&quot;);</span>
-<span class="fc" id="L27">        detail.setInstance(URI.create(request.getRequestURI()));</span>
+<span class="fc" id="L29">        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_ENTITY);</span>
+<span class="fc" id="L30">        detail.setType(URI.create(&quot;https://sgroas.uteq.edu.ec/errors/validation&quot;));</span>
+<span class="fc" id="L31">        detail.setTitle(&quot;Error de validacion&quot;);</span>
+<span class="fc" id="L32">        detail.setDetail(&quot;Existen campos invalidos en la solicitud&quot;);</span>
+<span class="fc" id="L33">        detail.setInstance(URI.create(request.getRequestURI()));</span>
 
-<span class="fc" id="L29">        Map&lt;String, String&gt; errores = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L30">        ex.getBindingResult().getFieldErrors().forEach(error -&gt;</span>
-<span class="fc" id="L31">                errores.put(error.getField(), error.getDefaultMessage())</span>
+<span class="fc" id="L35">        Map&lt;String, String&gt; errores = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L36">        ex.getBindingResult().getFieldErrors().forEach(error -&gt;</span>
+<span class="fc" id="L37">                errores.put(error.getField(), error.getDefaultMessage())</span>
         );
-<span class="fc" id="L33">        detail.setProperty(&quot;errors&quot;, errores);</span>
+<span class="fc" id="L39">        detail.setProperty(&quot;errors&quot;, errores);</span>
 
-<span class="fc" id="L35">        return detail;</span>
+<span class="fc" id="L41">        return detail;</span>
     }
 
+    /**
+     * Construye la respuesta de error cuando se recibe un argumento inválido.
+     * @param ex excepción con el mensaje que explica el argumento rechazado.
+     * @param request petición HTTP que originó el argumento inválido.
+     * @return detalle del problema con estado de solicitud inválida.
+     */
     @ExceptionHandler(IllegalArgumentException.class)
-    public ProblemDetail manejarArgumentosInvalidos(
+    public ProblemDetail handleInvalidArguments(
             IllegalArgumentException ex,
             HttpServletRequest request
     ) {
-<span class="fc" id="L43">        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);</span>
-<span class="fc" id="L44">        detail.setType(URI.create(&quot;https://sgroas.uteq.edu.ec/errors/bad-request&quot;));</span>
-<span class="fc" id="L45">        detail.setTitle(&quot;Solicitud invalida&quot;);</span>
-<span class="fc" id="L46">        detail.setDetail(ex.getMessage());</span>
-<span class="fc" id="L47">        detail.setInstance(URI.create(request.getRequestURI()));</span>
+<span class="fc" id="L55">        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);</span>
+<span class="fc" id="L56">        detail.setType(URI.create(&quot;https://sgroas.uteq.edu.ec/errors/bad-request&quot;));</span>
+<span class="fc" id="L57">        detail.setTitle(&quot;Solicitud invalida&quot;);</span>
+<span class="fc" id="L58">        detail.setDetail(ex.getMessage());</span>
+<span class="fc" id="L59">        detail.setInstance(URI.create(request.getRequestURI()));</span>
 
-<span class="fc" id="L49">        return detail;</span>
+<span class="fc" id="L61">        return detail;</span>
     }
 
+    /**
+     * Construye la respuesta de error cuando las credenciales de acceso son incorrectas.
+     * @param ex excepción de autenticación lanzada por el proveedor de seguridad.
+     * @param request petición HTTP que originó el intento fallido de autenticación.
+     * @return detalle del problema con estado de no autorizado.
+     */
     @ExceptionHandler(BadCredentialsException.class)
-    public ProblemDetail manejarCredencialesInvalidas(
+    public ProblemDetail handleInvalidCredentials(
             BadCredentialsException ex,
             HttpServletRequest request
     ) {
-<span class="fc" id="L57">        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);</span>
-<span class="fc" id="L58">        detail.setType(URI.create(&quot;https://sgroas.uteq.edu.ec/errors/unauthorized&quot;));</span>
-<span class="fc" id="L59">        detail.setTitle(&quot;Credenciales invalidas&quot;);</span>
-<span class="fc" id="L60">        detail.setDetail(&quot;El email o la contrasena son incorrectos&quot;);</span>
-<span class="fc" id="L61">        detail.setInstance(URI.create(request.getRequestURI()));</span>
+<span class="fc" id="L75">        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);</span>
+<span class="fc" id="L76">        detail.setType(URI.create(&quot;https://sgroas.uteq.edu.ec/errors/unauthorized&quot;));</span>
+<span class="fc" id="L77">        detail.setTitle(&quot;Credenciales invalidas&quot;);</span>
+<span class="fc" id="L78">        detail.setDetail(&quot;El email o la contrasena son incorrectos&quot;);</span>
+<span class="fc" id="L79">        detail.setInstance(URI.create(request.getRequestURI()));</span>
 
-<span class="fc" id="L63">        return detail;</span>
+<span class="fc" id="L81">        return detail;</span>
     }
 
-    @ExceptionHandler(CorreoNoVerificadoException.class)
-    public ProblemDetail manejarCorreoNoVerificado(
-            CorreoNoVerificadoException ex,
+    /**
+     * Construye la respuesta de error cuando la cuenta aún no verifica su correo.
+     * @param ex excepción que indica que falta la verificación del correo.
+     * @param request petición HTTP que originó el acceso con correo sin verificar.
+     * @return detalle del problema con estado de acceso prohibido.
+     */
+    @ExceptionHandler(UnverifiedEmailException.class)
+    public ProblemDetail handleUnverifiedEmail(
+            UnverifiedEmailException ex,
             HttpServletRequest request
     ) {
-<span class="nc" id="L71">        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.FORBIDDEN);</span>
-<span class="nc" id="L72">        detail.setType(URI.create(&quot;https://sgroas.uteq.edu.ec/errors/email-not-verified&quot;));</span>
-<span class="nc" id="L73">        detail.setTitle(&quot;Correo sin verificar&quot;);</span>
-<span class="nc" id="L74">        detail.setDetail(ex.getMessage());</span>
-<span class="nc" id="L75">        detail.setInstance(URI.create(request.getRequestURI()));</span>
+<span class="nc" id="L95">        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.FORBIDDEN);</span>
+<span class="nc" id="L96">        detail.setType(URI.create(&quot;https://sgroas.uteq.edu.ec/errors/email-not-verified&quot;));</span>
+<span class="nc" id="L97">        detail.setTitle(&quot;Correo sin verificar&quot;);</span>
+<span class="nc" id="L98">        detail.setDetail(ex.getMessage());</span>
+<span class="nc" id="L99">        detail.setInstance(URI.create(request.getRequestURI()));</span>
 
-<span class="nc" id="L77">        return detail;</span>
+<span class="nc" id="L101">        return detail;</span>
     }
 
-    /** Denegaciones de @PreAuthorize: 403, no 500 como hacia el catch-all. */
+    /**
+     * Construye la respuesta de error cuando el usuario no tiene los permisos requeridos.
+     * @param ex excepción de acceso denegado lanzada por la verificación de roles.
+     * @param request petición HTTP que originó el intento sin permisos suficientes.
+     * @return detalle del problema con estado de acceso prohibido.
+     */
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
-    public ProblemDetail manejarAccesoDenegado(
+    public ProblemDetail handleAccessDenied(
             org.springframework.security.access.AccessDeniedException ex,
             HttpServletRequest request
     ) {
-<span class="fc" id="L86">        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.FORBIDDEN);</span>
-<span class="fc" id="L87">        detail.setType(URI.create(&quot;https://sgroas.uteq.edu.ec/errors/forbidden&quot;));</span>
-<span class="fc" id="L88">        detail.setTitle(&quot;Acceso denegado&quot;);</span>
-<span class="fc" id="L89">        detail.setDetail(&quot;No tiene permisos para realizar esta operacion&quot;);</span>
-<span class="fc" id="L90">        detail.setInstance(URI.create(request.getRequestURI()));</span>
+<span class="nc" id="L115">        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.FORBIDDEN);</span>
+<span class="nc" id="L116">        detail.setType(URI.create(&quot;https://sgroas.uteq.edu.ec/errors/forbidden&quot;));</span>
+<span class="nc" id="L117">        detail.setTitle(&quot;Acceso denegado&quot;);</span>
+<span class="nc" id="L118">        detail.setDetail(&quot;No tiene permisos para realizar esta operacion&quot;);</span>
+<span class="nc" id="L119">        detail.setInstance(URI.create(request.getRequestURI()));</span>
 
-<span class="fc" id="L92">        return detail;</span>
+<span class="nc" id="L121">        return detail;</span>
     }
 
-    /** Rutas inexistentes (ej. el antiguo /api/auth/register): 404, no 500. */
+    /**
+     * Construye la respuesta de error cuando la ruta solicitada no existe.
+     * @param ex excepción que indica que no se encontró el recurso solicitado.
+     * @param request petición HTTP con la dirección inexistente que se intentó acceder.
+     * @return detalle del problema con estado de recurso no encontrado.
+     */
     @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
-    public ProblemDetail manejarRutaInexistente(
+    public ProblemDetail handleNotFound(
             org.springframework.web.servlet.resource.NoResourceFoundException ex,
             HttpServletRequest request
     ) {
-<span class="fc" id="L101">        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);</span>
-<span class="fc" id="L102">        detail.setType(URI.create(&quot;https://sgroas.uteq.edu.ec/errors/not-found&quot;));</span>
-<span class="fc" id="L103">        detail.setTitle(&quot;Recurso no encontrado&quot;);</span>
-<span class="fc" id="L104">        detail.setDetail(&quot;La ruta solicitada no existe&quot;);</span>
-<span class="fc" id="L105">        detail.setInstance(URI.create(request.getRequestURI()));</span>
+<span class="fc" id="L135">        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);</span>
+<span class="fc" id="L136">        detail.setType(URI.create(&quot;https://sgroas.uteq.edu.ec/errors/not-found&quot;));</span>
+<span class="fc" id="L137">        detail.setTitle(&quot;Recurso no encontrado&quot;);</span>
+<span class="fc" id="L138">        detail.setDetail(&quot;La ruta solicitada no existe&quot;);</span>
+<span class="fc" id="L139">        detail.setInstance(URI.create(request.getRequestURI()));</span>
 
-<span class="fc" id="L107">        return detail;</span>
+<span class="fc" id="L141">        return detail;</span>
     }
 
+    /**
+     * Construye la respuesta genérica cuando ocurre un error no controlado.
+     * @param ex excepción no prevista que provocó el error interno.
+     * @param request petición HTTP que originó el error interno del servidor.
+     * @return detalle del problema con estado de error interno del servidor.
+     */
     @ExceptionHandler(Exception.class)
-    public ProblemDetail manejarErrorGeneral(
+    public ProblemDetail handleGeneralError(
             Exception ex,
             HttpServletRequest request
     ) {
-<span class="fc" id="L115">        ex.printStackTrace();</span>
+<span class="fc" id="L155">        ex.printStackTrace();</span>
 
-<span class="fc" id="L117">        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);</span>
-<span class="fc" id="L118">        detail.setType(URI.create(&quot;https://sgroas.uteq.edu.ec/errors/internal&quot;));</span>
-<span class="fc" id="L119">        detail.setTitle(&quot;Error interno del servidor&quot;);</span>
-<span class="fc" id="L120">        detail.setDetail(ex.getClass().getSimpleName() + &quot;: &quot; + ex.getMessage());</span>
-<span class="fc" id="L121">        detail.setInstance(URI.create(request.getRequestURI()));</span>
+<span class="fc" id="L157">        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+<span class="fc" id="L158">        detail.setType(URI.create(&quot;https://sgroas.uteq.edu.ec/errors/internal&quot;));</span>
+<span class="fc" id="L159">        detail.setTitle(&quot;Error interno del servidor&quot;);</span>
+<span class="fc" id="L160">        detail.setDetail(ex.getClass().getSimpleName() + &quot;: &quot; + ex.getMessage());</span>
+<span class="fc" id="L161">        detail.setInstance(URI.create(request.getRequestURI()));</span>
 
-<span class="fc" id="L123">        return detail;</span>
+<span class="fc" id="L163">        return detail;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

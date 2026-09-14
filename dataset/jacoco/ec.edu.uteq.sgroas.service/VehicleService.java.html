@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VehicleService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">ec.edu.uteq.sgroas.service</a> &gt; <span class="el_source">VehicleService.java</span></div><h1>VehicleService.java</h1><pre class="source lang-java linenums">package ec.edu.uteq.sgroas.service;
+
+import ec.edu.uteq.sgroas.dto.VehicleRequest;
+import ec.edu.uteq.sgroas.dto.VehicleResponse;
+import ec.edu.uteq.sgroas.entity.VehicleStatus;
+import ec.edu.uteq.sgroas.entity.Vehicle;
+import ec.edu.uteq.sgroas.repository.VehicleRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class VehicleService {
+
+    private final VehicleRepository vehiculoRepository;
+
+    /**
+     * Obtiene la pagina de vehiculos activos convertidos a formato de respuesta.
+     * @param pageable objeto con numero de pagina, tamanio y orden solicitados para la consulta
+     * @return pagina con los vehiculos activos encontrados
+     */
+    public Page&lt;VehicleResponse&gt; list(Pageable pageable) {
+<span class="fc" id="L31">        List&lt;VehicleResponse&gt; contenido = listCached(pageable);</span>
+<span class="fc" id="L32">        return new PageImpl&lt;&gt;(contenido, pageable, contenido.size());</span>
+    }
+
+    /**
+     * Obtiene desde la memoria cache la lista de vehiculos activos de la pagina solicitada.
+     * @param pageable objeto con numero de pagina y tamanio que identifican la entrada guardada en cache
+     * @return lista de vehiculos activos correspondientes a la pagina pedida
+     */
+    @Cacheable(value = &quot;vehiculos&quot;, key = &quot;#pageable.pageNumber + '-' + #pageable.pageSize&quot;)
+    public List&lt;VehicleResponse&gt; listCached(Pageable pageable) {
+<span class="fc" id="L42">        return vehiculoRepository.findByActivoTrue(pageable)</span>
+<span class="fc" id="L43">                .map(this::mapearAResponse)</span>
+<span class="fc" id="L44">                .getContent();</span>
+    }
+
+    /**
+     * Recupera el detalle de un vehiculo activo existente.
+     * @param id identificador del vehiculo que se desea consultar
+     * @return datos del vehiculo encontrado
+     * @throws IllegalArgumentException cuando no existe un vehiculo activo con ese identificador
+     */
+    public VehicleResponse findById(Long id) {
+<span class="fc" id="L54">        Vehicle vehiculo = getActiveVehicle(id);</span>
+<span class="fc" id="L55">        return mapearAResponse(vehiculo);</span>
+    }
+
+    /**
+     * Registra un nuevo vehiculo despues de validar que su placa no se repita.
+     * @param request datos del vehiculo con placa, marca, modelo, anio, capacidad, numeros de motor y chasis, color y estado
+     * @return datos del vehiculo recien guardado
+     * @throws IllegalArgumentException cuando ya existe otro vehiculo con la misma placa o el estado no es valido
+     */
+    @CacheEvict(value = &quot;vehiculos&quot;, allEntries = true)
+    public VehicleResponse create(VehicleRequest request) {
+<span class="fc bfc" id="L66" title="All 2 branches covered.">        if (vehiculoRepository.existsByPlaca(request.placa())) {</span>
+<span class="fc" id="L67">            throw new IllegalArgumentException(&quot;Ya existe un vehiculo con esa placa&quot;);</span>
+        }
+
+<span class="fc" id="L70">        Vehicle vehiculo = Vehicle.builder()</span>
+<span class="fc" id="L71">                .placa(request.placa())</span>
+<span class="fc" id="L72">                .marca(request.marca())</span>
+<span class="fc" id="L73">                .modelo(request.modelo())</span>
+<span class="fc" id="L74">                .anio(request.anio())</span>
+<span class="fc" id="L75">                .capacidadPasajeros(request.capacidadPasajeros())</span>
+<span class="fc" id="L76">                .numeroMotor(request.numeroMotor())</span>
+<span class="fc" id="L77">                .numeroChasis(request.numeroChasis())</span>
+<span class="fc" id="L78">                .color(request.color())</span>
+<span class="fc" id="L79">                .estado(toStatus(request.estado()))</span>
+<span class="fc" id="L80">                .activo(true)</span>
+<span class="fc" id="L81">                .creadoEn(Instant.now())</span>
+<span class="fc" id="L82">                .actualizadoEn(Instant.now())</span>
+<span class="fc" id="L83">                .build();</span>
+
+<span class="fc" id="L85">        Vehicle vehiculoGuardado = vehiculoRepository.save(vehiculo);</span>
+<span class="fc" id="L86">        return mapearAResponse(vehiculoGuardado);</span>
+    }
+
+    /**
+     * Reemplaza los datos de un vehiculo activo por los valores recibidos.
+     * @param id identificador del vehiculo que se desea modificar
+     * @param request nuevos datos del vehiculo con placa, marca, modelo, anio, capacidad, numeros de motor y chasis, color y estado
+     * @return datos del vehiculo ya actualizado
+     * @throws IllegalArgumentException cuando el vehiculo no existe, la placa choca con otro registro o el estado no es valido
+     */
+    @CacheEvict(value = &quot;vehiculos&quot;, allEntries = true)
+    public VehicleResponse update(Long id, VehicleRequest request) {
+<span class="fc" id="L98">        Vehicle vehiculo = getActiveVehicle(id);</span>
+
+<span class="fc bfc" id="L100" title="All 2 branches covered.">        if (!vehiculo.getPlaca().equals(request.placa())</span>
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">                &amp;&amp; vehiculoRepository.existsByPlaca(request.placa())) {</span>
+<span class="fc" id="L102">            throw new IllegalArgumentException(&quot;Ya existe un vehiculo con esa placa&quot;);</span>
+        }
+
+<span class="fc" id="L105">        vehiculo.setPlaca(request.placa());</span>
+<span class="fc" id="L106">        vehiculo.setMarca(request.marca());</span>
+<span class="fc" id="L107">        vehiculo.setModelo(request.modelo());</span>
+<span class="fc" id="L108">        vehiculo.setAnio(request.anio());</span>
+<span class="fc" id="L109">        vehiculo.setCapacidadPasajeros(request.capacidadPasajeros());</span>
+<span class="fc" id="L110">        vehiculo.setNumeroMotor(request.numeroMotor());</span>
+<span class="fc" id="L111">        vehiculo.setNumeroChasis(request.numeroChasis());</span>
+<span class="fc" id="L112">        vehiculo.setColor(request.color());</span>
+<span class="fc" id="L113">        vehiculo.setEstado(toStatus(request.estado()));</span>
+<span class="fc" id="L114">        vehiculo.setActualizadoEn(Instant.now());</span>
+
+<span class="fc" id="L116">        Vehicle vehiculoActualizado = vehiculoRepository.save(vehiculo);</span>
+<span class="fc" id="L117">        return mapearAResponse(vehiculoActualizado);</span>
+    }
+
+    /**
+     * Marca un vehiculo como inactivo y lo deja fuera de servicio.
+     * @param id identificador del vehiculo que se desea dar de baja
+     * @throws IllegalArgumentException cuando no existe un vehiculo activo con ese identificador
+     */
+    @CacheEvict(value = &quot;vehiculos&quot;, allEntries = true)
+    public void desactivar(Long id) {
+<span class="fc" id="L127">        Vehicle vehiculo = getActiveVehicle(id);</span>
+<span class="fc" id="L128">        vehiculo.setActivo(false);</span>
+<span class="fc" id="L129">        vehiculo.setEstado(VehicleStatus.FUERA_DE_SERVICIO);</span>
+<span class="fc" id="L130">        vehiculo.setActualizadoEn(Instant.now());</span>
+<span class="fc" id="L131">        vehiculoRepository.save(vehiculo);</span>
+<span class="fc" id="L132">    }</span>
+
+    private Vehicle getActiveVehicle(Long id) {
+<span class="fc" id="L135">        return vehiculoRepository.findById(id)</span>
+<span class="fc" id="L136">                .filter(Vehicle::getActivo)</span>
+<span class="fc" id="L137">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Vehicle no encontrado&quot;));</span>
+    }
+
+    private VehicleStatus toStatus(String estado) {
+        try {
+<span class="fc" id="L142">            return VehicleStatus.valueOf(estado.toUpperCase());</span>
+<span class="fc" id="L143">        } catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L144">            throw new IllegalArgumentException(&quot;Estado de vehiculo no valido&quot;);</span>
+        }
+    }
+
+    private VehicleResponse mapearAResponse(Vehicle vehiculo) {
+<span class="fc" id="L149">        return new VehicleResponse(</span>
+<span class="fc" id="L150">                vehiculo.getId(),</span>
+<span class="fc" id="L151">                vehiculo.getPlaca(),</span>
+<span class="fc" id="L152">                vehiculo.getMarca(),</span>
+<span class="fc" id="L153">                vehiculo.getModelo(),</span>
+<span class="fc" id="L154">                vehiculo.getAnio(),</span>
+<span class="fc" id="L155">                vehiculo.getCapacidadPasajeros(),</span>
+<span class="fc" id="L156">                vehiculo.getNumeroMotor(),</span>
+<span class="fc" id="L157">                vehiculo.getNumeroChasis(),</span>
+<span class="fc" id="L158">                vehiculo.getColor(),</span>
+<span class="fc" id="L159">                vehiculo.getEstado().name(),</span>
+<span class="fc" id="L160">                vehiculo.getActivo(),</span>
+<span class="fc" id="L161">                vehiculo.getCreadoEn(),</span>
+<span class="fc" id="L162">                vehiculo.getActualizadoEn()</span>
+        );
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

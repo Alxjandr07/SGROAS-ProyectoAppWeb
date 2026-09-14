@@ -27,6 +27,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final CustomUserDetailsService customUserDetailsService;
     private final TokenService tokenService;
 
+    /**
+     * Extrae el token de la cabecera o cookie y registra la autenticacion en el contexto.
+     * @param request peticion entrante de la que se obtiene el token enviado
+     * @param response respuesta donde se marca no autorizado si el token fue revocado
+     * @param filterChain cadena que continua con el siguiente filtro de la aplicacion
+     * @throws ServletException cuando ocurre un error interno al procesar el filtro
+     * @throws IOException cuando falla la lectura o escritura de la peticion o respuesta
+     */
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
@@ -34,61 +42,61 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-<span class="fc" id="L37">        String token = null;</span>
+<span class="fc" id="L45">        String token = null;</span>
 
-<span class="fc" id="L39">        String authHeader = request.getHeader(&quot;Authorization&quot;);</span>
-<span class="pc bpc" id="L40" title="1 of 4 branches missed.">        if (authHeader != null &amp;&amp; authHeader.startsWith(&quot;Bearer &quot;)) {</span>
-<span class="fc" id="L41">            token = authHeader.substring(7);</span>
+<span class="fc" id="L47">        String authHeader = request.getHeader(&quot;Authorization&quot;);</span>
+<span class="pc bpc" id="L48" title="1 of 4 branches missed.">        if (authHeader != null &amp;&amp; authHeader.startsWith(&quot;Bearer &quot;)) {</span>
+<span class="fc" id="L49">            token = authHeader.substring(7);</span>
         }
 
-<span class="fc bfc" id="L44" title="All 2 branches covered.">        if (token == null) {</span>
-<span class="fc" id="L45">            jakarta.servlet.http.Cookie[] cookies = request.getCookies();</span>
-<span class="fc bfc" id="L46" title="All 2 branches covered.">            if (cookies != null) {</span>
-<span class="pc bpc" id="L47" title="1 of 2 branches missed.">                for (jakarta.servlet.http.Cookie cookie : cookies) {</span>
-<span class="pc bpc" id="L48" title="1 of 2 branches missed.">                    if (&quot;access_token&quot;.equals(cookie.getName())) {</span>
-<span class="fc" id="L49">                        token = cookie.getValue();</span>
-<span class="fc" id="L50">                        break;</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">        if (token == null) {</span>
+<span class="fc" id="L53">            jakarta.servlet.http.Cookie[] cookies = request.getCookies();</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">            if (cookies != null) {</span>
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">                for (jakarta.servlet.http.Cookie cookie : cookies) {</span>
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">                    if (&quot;access_token&quot;.equals(cookie.getName())) {</span>
+<span class="fc" id="L57">                        token = cookie.getValue();</span>
+<span class="fc" id="L58">                        break;</span>
                     }
                 }
             }
         }
 
-<span class="fc bfc" id="L56" title="All 2 branches covered.">        if (token == null) {</span>
-<span class="fc" id="L57">            filterChain.doFilter(request, response);</span>
-<span class="fc" id="L58">            return;</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">        if (token == null) {</span>
+<span class="fc" id="L65">            filterChain.doFilter(request, response);</span>
+<span class="fc" id="L66">            return;</span>
         }
 
-<span class="fc bfc" id="L61" title="All 2 branches covered.">        if (tokenService.accessTokenEnBlacklist(token)) {</span>
-<span class="fc" id="L62">            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);</span>
-<span class="fc" id="L63">            return;</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">        if (tokenService.accessTokenEnBlacklist(token)) {</span>
+<span class="fc" id="L70">            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);</span>
+<span class="fc" id="L71">            return;</span>
         }
 
-<span class="fc" id="L66">        String email = jwtService.extraerEmail(token);</span>
+<span class="fc" id="L74">        String email = jwtService.extraerEmail(token);</span>
 
-<span class="pc bpc" id="L68" title="1 of 4 branches missed.">        if (email != null &amp;&amp; SecurityContextHolder.getContext().getAuthentication() == null) {</span>
-<span class="fc" id="L69">            UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);</span>
+<span class="pc bpc" id="L76" title="1 of 4 branches missed.">        if (email != null &amp;&amp; SecurityContextHolder.getContext().getAuthentication() == null) {</span>
+<span class="fc" id="L77">            UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);</span>
 
-<span class="fc bfc" id="L71" title="All 2 branches covered.">                if (jwtService.tokenValido(token, userDetails.getUsername())) {</span>
-<span class="fc" id="L72">                    log.info(&quot;REQUEST uri={} ip={} sub={}&quot;,</span>
-<span class="fc" id="L73">                            request.getRequestURI(),</span>
-<span class="fc" id="L74">                            request.getRemoteAddr(),</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">                if (jwtService.tokenValido(token, userDetails.getUsername())) {</span>
+<span class="fc" id="L80">                    log.info(&quot;REQUEST uri={} ip={} sub={}&quot;,</span>
+<span class="fc" id="L81">                            request.getRequestURI(),</span>
+<span class="fc" id="L82">                            request.getRemoteAddr(),</span>
                             email);
-<span class="fc" id="L76">                    UsernamePasswordAuthenticationToken authenticationToken =</span>
+<span class="fc" id="L84">                    UsernamePasswordAuthenticationToken authenticationToken =</span>
                         new UsernamePasswordAuthenticationToken(
                                 userDetails,
                                 null,
-<span class="fc" id="L80">                                userDetails.getAuthorities()</span>
+<span class="fc" id="L88">                                userDetails.getAuthorities()</span>
                         );
 
-<span class="fc" id="L83">                authenticationToken.setDetails(</span>
-<span class="fc" id="L84">                        new WebAuthenticationDetailsSource().buildDetails(request)</span>
+<span class="fc" id="L91">                authenticationToken.setDetails(</span>
+<span class="fc" id="L92">                        new WebAuthenticationDetailsSource().buildDetails(request)</span>
                 );
 
-<span class="fc" id="L87">                SecurityContextHolder.getContext().setAuthentication(authenticationToken);</span>
+<span class="fc" id="L95">                SecurityContextHolder.getContext().setAuthentication(authenticationToken);</span>
             }
         }
 
-<span class="fc" id="L91">        filterChain.doFilter(request, response);</span>
-<span class="fc" id="L92">    }</span>
+<span class="fc" id="L99">        filterChain.doFilter(request, response);</span>
+<span class="fc" id="L100">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

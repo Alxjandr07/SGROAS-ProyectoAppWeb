@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">ec.edu.uteq.sgroas.controller</a> &gt; <span class="el_source">UserController.java</span></div><h1>UserController.java</h1><pre class="source lang-java linenums">package ec.edu.uteq.sgroas.controller;
+
+import ec.edu.uteq.sgroas.dto.UserRequest;
+import ec.edu.uteq.sgroas.dto.UserResponse;
+import ec.edu.uteq.sgroas.service.UserService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping(&quot;/api/usuarios&quot;)
+@RequiredArgsConstructor
+public class UserController {
+
+    private final UserService usuarioService;
+
+    /**
+     * Recupera la lista paginada de usuarios con filtro opcional por texto.
+     * @param search criterio opcional para filtrar por nombre, correo u otros datos.
+     * @param pageable configuración de paginación y ordenamiento solicitada por el cliente.
+     * @return respuesta HTTP con la página de usuarios encontrados.
+     */
+    @GetMapping
+    public ResponseEntity&lt;Page&lt;UserResponse&gt;&gt; list(
+            @RequestParam(required = false) String search,
+            @PageableDefault(size = 10, sort = &quot;id&quot;) Pageable pageable
+    ) {
+<span class="fc" id="L33">        return ResponseEntity.ok(usuarioService.list(search, pageable));</span>
+    }
+
+    /**
+     * Obtiene el detalle de un usuario a partir de su identificador.
+     * @param id identificador único del usuario que se desea consultar.
+     * @return respuesta HTTP con los datos del usuario encontrado.
+     */
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;UserResponse&gt; findById(@PathVariable Long id) {
+<span class="fc" id="L43">        return ResponseEntity.ok(usuarioService.findById(id));</span>
+    }
+
+    /**
+     * Registra un nuevo usuario y le envía el código de activación por correo.
+     * @param request objeto con los datos personales, credenciales y rol del usuario.
+     * @return respuesta HTTP con estado creado y los datos del usuario registrado.
+     */
+    @PostMapping
+    public ResponseEntity&lt;UserResponse&gt; create(@Valid @RequestBody UserRequest request) {
+<span class="fc" id="L53">        UserResponse response = usuarioService.create(request);</span>
+<span class="fc" id="L54">        return ResponseEntity.status(HttpStatus.CREATED).body(response);</span>
+    }
+
+    /**
+     * Reenvía el código de activación al correo de un usuario aún no verificado.
+     * @param id identificador único del usuario al que se reenvía el código.
+     * @return respuesta HTTP sin contenido que confirma el envío del código.
+     */
+    @PostMapping(&quot;/{id}/reenviar-activacion&quot;)
+    public ResponseEntity&lt;Void&gt; resendActivation(@PathVariable Long id) {
+<span class="nc" id="L64">        usuarioService.resendActivationCode(id);</span>
+<span class="nc" id="L65">        return ResponseEntity.noContent().build();</span>
+    }
+
+    /**
+     * Modifica los datos de un usuario ya existente.
+     * @param id identificador único del usuario que se desea modificar.
+     * @param request objeto con los nuevos valores para actualizar el usuario.
+     * @return respuesta HTTP con los datos actualizados del usuario.
+     */
+    @PutMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;UserResponse&gt; update(
+            @PathVariable Long id,
+            @Valid @RequestBody UserRequest request
+    ) {
+<span class="fc" id="L79">        return ResponseEntity.ok(usuarioService.update(id, request));</span>
+    }
+
+    /**
+     * Desactiva lógicamente un usuario para impedir su acceso al sistema.
+     * @param id identificador único del usuario que se desea desactivar.
+     * @return respuesta HTTP sin contenido que confirma la operación realizada.
+     */
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Void&gt; desactivar(@PathVariable Long id) {
+<span class="fc" id="L89">        usuarioService.desactivar(id);</span>
+<span class="fc" id="L90">        return ResponseEntity.noContent().build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

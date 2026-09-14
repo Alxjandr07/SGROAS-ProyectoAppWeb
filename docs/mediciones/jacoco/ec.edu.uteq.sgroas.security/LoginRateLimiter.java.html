@@ -10,28 +10,41 @@ import org.springframework.stereotype.Component;
     private static final long MAX_INTENTOS = 6;
     private static final long VENTANA_MS = 60_000;
 
-    public boolean estaBloqueado(String ip) {
-<span class="fc" id="L14">        long[] datos = intentos.get(ip);</span>
-<span class="fc bfc" id="L15" title="All 2 branches covered.">        if (datos == null) return false;</span>
-<span class="fc" id="L16">        long ahora = System.currentTimeMillis();</span>
-<span class="fc bfc" id="L17" title="All 2 branches covered.">        if (ahora - datos[1] &gt; VENTANA_MS) {</span>
-<span class="fc" id="L18">            intentos.remove(ip);</span>
-<span class="fc" id="L19">            return false;</span>
+    /**
+     * Indica si una direccion ya supero los intentos fallidos de la ventana actual.
+     * @param ip direccion del cliente cuyo historial de intentos se revisa
+     * @return verdadero cuando se alcanzo el maximo y el bloqueo sigue vigente
+     */
+    public boolean isBlocked(String ip) {
+<span class="fc" id="L19">        long[] datos = intentos.get(ip);</span>
+<span class="fc bfc" id="L20" title="All 2 branches covered.">        if (datos == null) return false;</span>
+<span class="fc" id="L21">        long ahora = System.currentTimeMillis();</span>
+<span class="fc bfc" id="L22" title="All 2 branches covered.">        if (ahora - datos[1] &gt; VENTANA_MS) {</span>
+<span class="fc" id="L23">            intentos.remove(ip);</span>
+<span class="fc" id="L24">            return false;</span>
         }
-<span class="fc bfc" id="L21" title="All 2 branches covered.">        return datos[0] &gt;= MAX_INTENTOS;</span>
+<span class="fc bfc" id="L26" title="All 2 branches covered.">        return datos[0] &gt;= MAX_INTENTOS;</span>
     }
 
-    public void registrarIntentoFallido(String ip) {
-<span class="fc" id="L25">        intentos.compute(ip, (k, v) -&gt; {</span>
-<span class="fc bfc" id="L26" title="All 2 branches covered.">            if (v == null) return new long[]{1, System.currentTimeMillis()};</span>
-<span class="pc bpc" id="L27" title="1 of 2 branches missed.">            if (System.currentTimeMillis() - v[1] &gt; VENTANA_MS) return new long[]{1, System.currentTimeMillis()};</span>
-<span class="fc" id="L28">            v[0]++;</span>
-<span class="fc" id="L29">            return v;</span>
+    /**
+     * Suma un fallo de acceso al conteo de la direccion dentro de la ventana actual.
+     * @param ip direccion del cliente que realizo el intento de acceso fallido
+     */
+    public void recordFailedAttempt(String ip) {
+<span class="fc" id="L34">        intentos.compute(ip, (k, v) -&gt; {</span>
+<span class="fc bfc" id="L35" title="All 2 branches covered.">            if (v == null) return new long[]{1, System.currentTimeMillis()};</span>
+<span class="pc bpc" id="L36" title="1 of 2 branches missed.">            if (System.currentTimeMillis() - v[1] &gt; VENTANA_MS) return new long[]{1, System.currentTimeMillis()};</span>
+<span class="fc" id="L37">            v[0]++;</span>
+<span class="fc" id="L38">            return v;</span>
         });
-<span class="fc" id="L31">    }</span>
+<span class="fc" id="L40">    }</span>
 
-    public void resetear(String ip) {
-<span class="fc" id="L34">        intentos.remove(ip);</span>
-<span class="fc" id="L35">    }</span>
+    /**
+     * Borra el historial de fallos de una direccion tras un acceso exitoso.
+     * @param ip direccion del cliente cuyo conteo de intentos se elimina
+     */
+    public void reset(String ip) {
+<span class="fc" id="L47">        intentos.remove(ip);</span>
+<span class="fc" id="L48">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RouteService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">ec.edu.uteq.sgroas.service</a> &gt; <span class="el_source">RouteService.java</span></div><h1>RouteService.java</h1><pre class="source lang-java linenums">package ec.edu.uteq.sgroas.service;
+
+import ec.edu.uteq.sgroas.dto.RouteRequest;
+import ec.edu.uteq.sgroas.dto.RouteResponse;
+import ec.edu.uteq.sgroas.entity.RouteStatus;
+import ec.edu.uteq.sgroas.entity.Route;
+import ec.edu.uteq.sgroas.repository.RouteRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class RouteService {
+
+    private final RouteRepository rutaRepository;
+
+    /**
+     * Obtiene la pagina de rutas activas convertidas a formato de respuesta.
+     * @param pageable objeto con numero de pagina, tamanio y orden solicitados para la consulta
+     * @return pagina con las rutas activas encontradas
+     */
+    public Page&lt;RouteResponse&gt; list(Pageable pageable) {
+<span class="fc" id="L31">        List&lt;RouteResponse&gt; contenido = listCached(pageable);</span>
+<span class="fc" id="L32">        return new PageImpl&lt;&gt;(contenido, pageable, contenido.size());</span>
+    }
+
+    /**
+     * Obtiene desde la memoria cache la lista de rutas activas de la pagina solicitada.
+     * @param pageable objeto con numero de pagina y tamanio que identifican la entrada guardada en cache
+     * @return lista de rutas activas correspondientes a la pagina pedida
+     */
+    @Cacheable(value = &quot;rutas&quot;, key = &quot;#pageable.pageNumber + '-' + #pageable.pageSize&quot;)
+    public List&lt;RouteResponse&gt; listCached(Pageable pageable) {
+<span class="fc" id="L42">        return rutaRepository.findByActivoTrue(pageable)</span>
+<span class="fc" id="L43">                .map(this::mapearAResponse)</span>
+<span class="fc" id="L44">                .getContent();</span>
+    }
+
+    /**
+     * Recupera el detalle de una ruta activa existente.
+     * @param id identificador de la ruta que se desea consultar
+     * @return datos de la ruta encontrada
+     * @throws IllegalArgumentException cuando no existe una ruta activa con ese identificador
+     */
+    public RouteResponse findById(Long id) {
+<span class="fc" id="L54">        Route ruta = getActiveRoute(id);</span>
+<span class="fc" id="L55">        return mapearAResponse(ruta);</span>
+    }
+
+    /**
+     * Registra una nueva ruta despues de validar que su codigo no se repita.
+     * @param request datos de la ruta con codigo, nombre, origen, destino, distancia, duracion y estado
+     * @return datos de la ruta recien guardada
+     * @throws IllegalArgumentException cuando ya existe otra ruta con el mismo codigo o el estado no es valido
+     */
+    @CacheEvict(value = &quot;rutas&quot;, allEntries = true)
+    public RouteResponse create(RouteRequest request) {
+<span class="fc bfc" id="L66" title="All 2 branches covered.">        if (rutaRepository.existsByCodigo(request.codigo())) {</span>
+<span class="fc" id="L67">            throw new IllegalArgumentException(&quot;Ya existe una ruta con ese codigo&quot;);</span>
+        }
+
+<span class="fc" id="L70">        Route ruta = Route.builder()</span>
+<span class="fc" id="L71">                .codigo(request.codigo())</span>
+<span class="fc" id="L72">                .nombre(request.nombre())</span>
+<span class="fc" id="L73">                .origen(request.origen())</span>
+<span class="fc" id="L74">                .destino(request.destino())</span>
+<span class="fc" id="L75">                .distanciaKm(request.distanciaKm())</span>
+<span class="fc" id="L76">                .duracionEstimadaMin(request.duracionEstimadaMin())</span>
+<span class="fc" id="L77">                .estado(toStatus(request.estado()))</span>
+<span class="fc" id="L78">                .activo(true)</span>
+<span class="fc" id="L79">                .creadoEn(Instant.now())</span>
+<span class="fc" id="L80">                .actualizadoEn(Instant.now())</span>
+<span class="fc" id="L81">                .build();</span>
+
+<span class="fc" id="L83">        Route rutaGuardada = rutaRepository.save(ruta);</span>
+<span class="fc" id="L84">        return mapearAResponse(rutaGuardada);</span>
+    }
+
+    /**
+     * Reemplaza los datos de una ruta activa por los valores recibidos.
+     * @param id identificador de la ruta que se desea modificar
+     * @param request nuevos datos de la ruta con codigo, nombre, origen, destino, distancia, duracion y estado
+     * @return datos de la ruta ya actualizada
+     * @throws IllegalArgumentException cuando la ruta no existe, el codigo choca con otra ruta o el estado no es valido
+     */
+    @CacheEvict(value = &quot;rutas&quot;, allEntries = true)
+    public RouteResponse update(Long id, RouteRequest request) {
+<span class="fc" id="L96">        Route ruta = getActiveRoute(id);</span>
+
+<span class="fc bfc" id="L98" title="All 2 branches covered.">        if (!ruta.getCodigo().equals(request.codigo())</span>
+<span class="pc bpc" id="L99" title="1 of 2 branches missed.">                &amp;&amp; rutaRepository.existsByCodigo(request.codigo())) {</span>
+<span class="fc" id="L100">            throw new IllegalArgumentException(&quot;Ya existe una ruta con ese codigo&quot;);</span>
+        }
+
+<span class="fc" id="L103">        ruta.setCodigo(request.codigo());</span>
+<span class="fc" id="L104">        ruta.setNombre(request.nombre());</span>
+<span class="fc" id="L105">        ruta.setOrigen(request.origen());</span>
+<span class="fc" id="L106">        ruta.setDestino(request.destino());</span>
+<span class="fc" id="L107">        ruta.setDistanciaKm(request.distanciaKm());</span>
+<span class="fc" id="L108">        ruta.setDuracionEstimadaMin(request.duracionEstimadaMin());</span>
+<span class="fc" id="L109">        ruta.setEstado(toStatus(request.estado()));</span>
+<span class="fc" id="L110">        ruta.setActualizadoEn(Instant.now());</span>
+
+<span class="fc" id="L112">        Route rutaActualizada = rutaRepository.save(ruta);</span>
+<span class="fc" id="L113">        return mapearAResponse(rutaActualizada);</span>
+    }
+
+    /**
+     * Marca una ruta como inactiva y la deja en estado inactiva.
+     * @param id identificador de la ruta que se desea dar de baja
+     * @throws IllegalArgumentException cuando no existe una ruta activa con ese identificador
+     */
+    @CacheEvict(value = &quot;rutas&quot;, allEntries = true)
+    public void desactivar(Long id) {
+<span class="fc" id="L123">        Route ruta = getActiveRoute(id);</span>
+<span class="fc" id="L124">        ruta.setActivo(false);</span>
+<span class="fc" id="L125">        ruta.setEstado(RouteStatus.INACTIVA);</span>
+<span class="fc" id="L126">        ruta.setActualizadoEn(Instant.now());</span>
+<span class="fc" id="L127">        rutaRepository.save(ruta);</span>
+<span class="fc" id="L128">    }</span>
+
+    private Route getActiveRoute(Long id) {
+<span class="fc" id="L131">        return rutaRepository.findById(id)</span>
+<span class="fc" id="L132">                .filter(Route::getActivo)</span>
+<span class="fc" id="L133">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Route no encontrada&quot;));</span>
+    }
+
+    private RouteStatus toStatus(String estado) {
+        try {
+<span class="fc" id="L138">            return RouteStatus.valueOf(estado.toUpperCase());</span>
+<span class="fc" id="L139">        } catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L140">            throw new IllegalArgumentException(&quot;Estado de ruta no valido&quot;);</span>
+        }
+    }
+
+    private RouteResponse mapearAResponse(Route ruta) {
+<span class="fc" id="L145">        return new RouteResponse(</span>
+<span class="fc" id="L146">                ruta.getId(),</span>
+<span class="fc" id="L147">                ruta.getCodigo(),</span>
+<span class="fc" id="L148">                ruta.getNombre(),</span>
+<span class="fc" id="L149">                ruta.getOrigen(),</span>
+<span class="fc" id="L150">                ruta.getDestino(),</span>
+<span class="fc" id="L151">                ruta.getDistanciaKm(),</span>
+<span class="fc" id="L152">                ruta.getDuracionEstimadaMin(),</span>
+<span class="fc" id="L153">                ruta.getEstado().name(),</span>
+<span class="fc" id="L154">                ruta.getActivo(),</span>
+<span class="fc" id="L155">                ruta.getCreadoEn(),</span>
+<span class="fc" id="L156">                ruta.getActualizadoEn()</span>
+        );
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

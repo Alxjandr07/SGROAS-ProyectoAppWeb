@@ -3,7 +3,12 @@
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-<span class="fc" id="L6">public record LoginRequest(</span>
+/**
+ * Peticion de inicio de sesion con credenciales del usuario.
+ * @param email correo del usuario.
+ * @param password contrasena del usuario.
+ */
+<span class="fc" id="L11">public record LoginRequest(</span>
 
         @NotBlank(message = &quot;El email es obligatorio&quot;)
         @Email(message = &quot;El email debe tener un formato valido&quot;)

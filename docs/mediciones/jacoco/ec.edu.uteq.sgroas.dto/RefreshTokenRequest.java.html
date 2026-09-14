@@ -2,7 +2,11 @@
 
 import jakarta.validation.constraints.NotBlank;
 
-<span class="fc" id="L5">public record RefreshTokenRequest(</span>
+/**
+ * Peticion para renovar la sesion con el token de refresco.
+ * @param refreshToken token de refresco vigente.
+ */
+<span class="fc" id="L9">public record RefreshTokenRequest(</span>
 
         @NotBlank(message = &quot;El refresh token es obligatorio&quot;)
         String refreshToken

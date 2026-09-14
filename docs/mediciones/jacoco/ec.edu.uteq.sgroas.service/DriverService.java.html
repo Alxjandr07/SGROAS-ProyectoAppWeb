@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DriverService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">ec.edu.uteq.sgroas.service</a> &gt; <span class="el_source">DriverService.java</span></div><h1>DriverService.java</h1><pre class="source lang-java linenums">package ec.edu.uteq.sgroas.service;
+
+import ec.edu.uteq.sgroas.dto.DriverRequest;
+import ec.edu.uteq.sgroas.dto.DriverResponse;
+import ec.edu.uteq.sgroas.entity.Driver;
+import ec.edu.uteq.sgroas.entity.DriverStatus;
+import ec.edu.uteq.sgroas.repository.DriverRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class DriverService {
+
+    private final DriverRepository conductorRepository;
+
+    /**
+     * Obtiene la pagina de conductores activos, con filtro opcional por texto de busqueda.
+     * @param search texto opcional para filtrar por nombres, cedula o licencia, nulo o vacio para traer todo
+     * @param pageable objeto con numero de pagina, tamanio y orden solicitados para la consulta
+     * @return pagina con los conductores activos encontrados
+     */
+    public Page&lt;DriverResponse&gt; list(String search, Pageable pageable) {
+<span class="fc bfc" id="L31" title="All 4 branches covered.">        if (search == null || search.isBlank()) {</span>
+<span class="fc" id="L32">            return conductorRepository.findByActivoTrue(pageable).map(this::mapearAResponse);</span>
+        }
+<span class="fc" id="L34">        return conductorRepository.searchActive(search.trim().toLowerCase(), pageable)</span>
+<span class="fc" id="L35">                .map(this::mapearAResponse);</span>
+    }
+
+    /**
+     * Recupera el detalle de un conductor activo existente.
+     * @param id identificador del conductor que se desea consultar
+     * @return datos del conductor encontrado
+     * @throws IllegalArgumentException cuando no existe un conductor activo con ese identificador
+     */
+    public DriverResponse findById(Long id) {
+<span class="fc" id="L45">        Driver conductor = getActiveDriver(id);</span>
+<span class="fc" id="L46">        return mapearAResponse(conductor);</span>
+    }
+
+    /**
+     * Registra un nuevo conductor despues de validar que cedula y licencia no se repitan.
+     * @param request datos personales, de licencia y de contacto del conductor por registrar
+     * @return datos del conductor recien guardado
+     * @throws IllegalArgumentException cuando la cedula o la licencia ya estan registradas, o el estado no es valido
+     */
+    @CacheEvict(value = &quot;conductores&quot;, allEntries = true)
+    public DriverResponse create(DriverRequest request) {
+<span class="fc" id="L57">        validateUniqueCedula(request.cedula());</span>
+<span class="fc" id="L58">        validateUniqueLicense(request.numeroLicencia());</span>
+
+<span class="fc" id="L60">        Driver conductor = Driver.builder()</span>
+<span class="fc" id="L61">                .nombres(request.nombres())</span>
+<span class="fc" id="L62">                .apellidos(request.apellidos())</span>
+<span class="fc" id="L63">                .cedula(request.cedula())</span>
+<span class="fc" id="L64">                .numeroLicencia(request.numeroLicencia())</span>
+<span class="fc" id="L65">                .tipoLicencia(request.tipoLicencia())</span>
+<span class="fc" id="L66">                .fechaVencimientoLicencia(request.fechaVencimientoLicencia())</span>
+<span class="fc" id="L67">                .telefono(request.telefono())</span>
+<span class="fc" id="L68">                .email(request.email())</span>
+<span class="fc" id="L69">                .estado(toStatus(request.estado()))</span>
+<span class="fc" id="L70">                .activo(true)</span>
+<span class="fc" id="L71">                .creadoEn(Instant.now())</span>
+<span class="fc" id="L72">                .actualizadoEn(Instant.now())</span>
+<span class="fc" id="L73">                .build();</span>
+
+<span class="fc" id="L75">        Driver conductorGuardado = conductorRepository.save(conductor);</span>
+<span class="fc" id="L76">        return mapearAResponse(conductorGuardado);</span>
+    }
+
+    /**
+     * Reemplaza los datos de un conductor activo por los valores recibidos.
+     * @param id identificador del conductor que se desea modificar
+     * @param request nuevos datos personales, de licencia y de contacto para el conductor
+     * @return datos del conductor ya actualizado
+     * @throws IllegalArgumentException cuando el conductor no existe, la cedula o licencia chocan con otro registro, o el estado no es valido
+     */
+    @CacheEvict(value = &quot;conductores&quot;, allEntries = true)
+    public DriverResponse update(Long id, DriverRequest request) {
+<span class="fc" id="L88">        Driver conductor = getActiveDriver(id);</span>
+
+<span class="fc bfc" id="L90" title="All 2 branches covered.">        if (!conductor.getCedula().equals(request.cedula())</span>
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">                &amp;&amp; conductorRepository.existsByCedula(request.cedula())) {</span>
+<span class="fc" id="L92">            throw new IllegalArgumentException(&quot;Ya existe un conductor con esa cedula&quot;);</span>
+        }
+
+<span class="fc bfc" id="L95" title="All 2 branches covered.">        if (!conductor.getNumeroLicencia().equals(request.numeroLicencia())</span>
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">                &amp;&amp; conductorRepository.existsByNumeroLicencia(request.numeroLicencia())) {</span>
+<span class="fc" id="L97">            throw new IllegalArgumentException(&quot;Ya existe un conductor con ese numero de licencia&quot;);</span>
+        }
+
+<span class="fc" id="L100">        conductor.setNombres(request.nombres());</span>
+<span class="fc" id="L101">        conductor.setApellidos(request.apellidos());</span>
+<span class="fc" id="L102">        conductor.setCedula(request.cedula());</span>
+<span class="fc" id="L103">        conductor.setNumeroLicencia(request.numeroLicencia());</span>
+<span class="fc" id="L104">        conductor.setTipoLicencia(request.tipoLicencia());</span>
+<span class="fc" id="L105">        conductor.setFechaVencimientoLicencia(request.fechaVencimientoLicencia());</span>
+<span class="fc" id="L106">        conductor.setTelefono(request.telefono());</span>
+<span class="fc" id="L107">        conductor.setEmail(request.email());</span>
+<span class="fc" id="L108">        conductor.setEstado(toStatus(request.estado()));</span>
+<span class="fc" id="L109">        conductor.setActualizadoEn(Instant.now());</span>
+
+<span class="fc" id="L111">        Driver conductorActualizado = conductorRepository.save(conductor);</span>
+<span class="fc" id="L112">        return mapearAResponse(conductorActualizado);</span>
+    }
+
+    /**
+     * Marca un conductor como inactivo y lo deja en estado inactivo.
+     * @param id identificador del conductor que se desea dar de baja
+     * @throws IllegalArgumentException cuando no existe un conductor activo con ese identificador
+     */
+    @CacheEvict(value = &quot;conductores&quot;, allEntries = true)
+    public void desactivar(Long id) {
+<span class="fc" id="L122">        Driver conductor = getActiveDriver(id);</span>
+<span class="fc" id="L123">        conductor.setActivo(false);</span>
+<span class="fc" id="L124">        conductor.setEstado(DriverStatus.INACTIVO);</span>
+<span class="fc" id="L125">        conductor.setActualizadoEn(Instant.now());</span>
+<span class="fc" id="L126">        conductorRepository.save(conductor);</span>
+<span class="fc" id="L127">    }</span>
+
+    private Driver getActiveDriver(Long id) {
+<span class="fc" id="L130">        return conductorRepository.findById(id)</span>
+<span class="fc" id="L131">                .filter(Driver::getActivo)</span>
+<span class="fc" id="L132">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Driver no encontrado&quot;));</span>
+    }
+
+    private void validateUniqueCedula(String cedula) {
+<span class="fc bfc" id="L136" title="All 2 branches covered.">        if (conductorRepository.existsByCedula(cedula)) {</span>
+<span class="fc" id="L137">            throw new IllegalArgumentException(&quot;Ya existe un conductor con esa cedula&quot;);</span>
+        }
+<span class="fc" id="L139">    }</span>
+
+    private void validateUniqueLicense(String numeroLicencia) {
+<span class="fc bfc" id="L142" title="All 2 branches covered.">        if (conductorRepository.existsByNumeroLicencia(numeroLicencia)) {</span>
+<span class="fc" id="L143">            throw new IllegalArgumentException(&quot;Ya existe un conductor con ese numero de licencia&quot;);</span>
+        }
+<span class="fc" id="L145">    }</span>
+
+    private DriverStatus toStatus(String estado) {
+        try {
+<span class="fc" id="L149">            return DriverStatus.valueOf(estado.toUpperCase());</span>
+<span class="fc" id="L150">        } catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L151">            throw new IllegalArgumentException(&quot;Estado de conductor no valido&quot;);</span>
+        }
+    }
+
+    private Boolean licenseExpiring(LocalDate fechaVencimiento) {
+<span class="fc" id="L156">        LocalDate hoy = LocalDate.now();</span>
+<span class="fc" id="L157">        LocalDate limite = hoy.plusDays(30);</span>
+
+<span class="fc bfc" id="L159" title="All 4 branches covered.">        return !fechaVencimiento.isBefore(hoy) &amp;&amp; !fechaVencimiento.isAfter(limite);</span>
+    }
+
+    private DriverResponse mapearAResponse(Driver conductor) {
+<span class="fc" id="L163">        return new DriverResponse(</span>
+<span class="fc" id="L164">                conductor.getId(),</span>
+<span class="fc" id="L165">                conductor.getNombres(),</span>
+<span class="fc" id="L166">                conductor.getApellidos(),</span>
+<span class="fc" id="L167">                conductor.getCedula(),</span>
+<span class="fc" id="L168">                conductor.getNumeroLicencia(),</span>
+<span class="fc" id="L169">                conductor.getTipoLicencia(),</span>
+<span class="fc" id="L170">                conductor.getFechaVencimientoLicencia(),</span>
+<span class="fc" id="L171">                conductor.getTelefono(),</span>
+<span class="fc" id="L172">                conductor.getEmail(),</span>
+<span class="fc" id="L173">                conductor.getEstado().name(),</span>
+<span class="fc" id="L174">                conductor.getActivo(),</span>
+<span class="fc" id="L175">                licenseExpiring(conductor.getFechaVencimientoLicencia()),</span>
+<span class="fc" id="L176">                conductor.getCreadoEn(),</span>
+<span class="fc" id="L177">                conductor.getActualizadoEn()</span>
+        );
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

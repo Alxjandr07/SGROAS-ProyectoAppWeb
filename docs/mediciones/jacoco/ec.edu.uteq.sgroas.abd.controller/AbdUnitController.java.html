@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbdUnitController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">ec.edu.uteq.sgroas.abd.controller</a> &gt; <span class="el_source">AbdUnitController.java</span></div><h1>AbdUnitController.java</h1><pre class="source lang-java linenums">package ec.edu.uteq.sgroas.abd.controller;
+
+import ec.edu.uteq.sgroas.abd.dto.AbdDtos;
+import ec.edu.uteq.sgroas.abd.service.AbdUnitService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping(&quot;/api/abd/unidades&quot;)
+@RequiredArgsConstructor
+public class AbdUnitController {
+
+    private final AbdUnitService unidadAbdService;
+
+    /**
+     * Atiende la peticion de consulta paginada de unidades con filtros opcionales.
+     * @param estado estado por el que se desea filtrar las unidades, puede ser nulo para no filtrar.
+     * @param search texto para buscar coincidencias en placa, disco o modelo, puede ser nulo para no filtrar.
+     * @param pageable configuracion de paginacion y orden enviada por el cliente.
+     * @return respuesta con la pagina de unidades encontradas y estado 200.
+     */
+    @GetMapping
+    public ResponseEntity&lt;Page&lt;AbdDtos.UnitResponse&gt;&gt; list(
+            @RequestParam(required = false) String estado,
+            @RequestParam(required = false) String search,
+            @PageableDefault(size = 50, sort = &quot;idUnidad&quot;) Pageable pageable) {
+<span class="nc" id="L33">        return ResponseEntity.ok(unidadAbdService.list(estado, search, pageable));</span>
+    }
+
+    /**
+     * Atiende la peticion de consulta del detalle de una unidad existente.
+     * @param id identificador de la unidad recibido en la ruta de la peticion.
+     * @return respuesta con los datos de la unidad encontrada y estado 200.
+     */
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;AbdDtos.UnitResponse&gt; findById(@PathVariable Integer id) {
+<span class="nc" id="L43">        return ResponseEntity.ok(unidadAbdService.findById(id));</span>
+    }
+
+    /**
+     * Atiende la peticion de registro de una unidad nueva en el sistema.
+     * @param request cuerpo de la peticion con los datos validados de la unidad por registrar.
+     * @return respuesta con los datos de la unidad guardada y estado 201.
+     */
+    @PostMapping
+    public ResponseEntity&lt;AbdDtos.UnitResponse&gt; create(@Valid @RequestBody AbdDtos.UnitRequest request) {
+<span class="nc" id="L53">        return ResponseEntity.status(HttpStatus.CREATED).body(unidadAbdService.create(request));</span>
+    }
+
+    /**
+     * Atiende la peticion de modificacion de los datos de una unidad existente.
+     * @param id identificador de la unidad recibido en la ruta de la peticion.
+     * @param request cuerpo de la peticion con los nuevos datos validados de la unidad.
+     * @return respuesta con los datos de la unidad actualizada y estado 200.
+     */
+    @PutMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;AbdDtos.UnitResponse&gt; update(@PathVariable Integer id,
+                                                             @Valid @RequestBody AbdDtos.UnitRequest request) {
+<span class="nc" id="L65">        return ResponseEntity.ok(unidadAbdService.update(id, request));</span>
+    }
+
+    /**
+     * Atiende la peticion de supresion del registro de una unidad existente.
+     * @param id identificador de la unidad recibido en la ruta de la peticion.
+     * @return respuesta sin contenido y estado 204 cuando la supresion termina con exito.
+     */
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Void&gt; delete(@PathVariable Integer id) {
+<span class="nc" id="L75">        unidadAbdService.delete(id);</span>
+<span class="nc" id="L76">        return ResponseEntity.noContent().build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

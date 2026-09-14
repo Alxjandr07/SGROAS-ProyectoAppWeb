@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbdIncidentService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">ec.edu.uteq.sgroas.abd.service</a> &gt; <span class="el_source">AbdIncidentService.java</span></div><h1>AbdIncidentService.java</h1><pre class="source lang-java linenums">package ec.edu.uteq.sgroas.abd.service;
+
+import ec.edu.uteq.sgroas.abd.dto.AbdDtos;
+import ec.edu.uteq.sgroas.abd.entity.Alert;
+import ec.edu.uteq.sgroas.abd.entity.AbdIncident;
+import ec.edu.uteq.sgroas.abd.entity.Unit;
+import ec.edu.uteq.sgroas.abd.repository.AlertRepository;
+import ec.edu.uteq.sgroas.abd.repository.AbdIncidentRepository;
+import ec.edu.uteq.sgroas.abd.repository.UnitRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class AbdIncidentService {
+
+    private final AbdIncidentRepository incidenteRepository;
+    private final AlertRepository alertaRepository;
+    private final UnitRepository unidadRepository;
+
+    /**
+     * Recupera los incidentes registrados aplicando filtros opcionales de forma paginada.
+     * @param estado estado por el que se desea filtrar los incidentes, puede ser nulo para no filtrar.
+     * @param nivel nivel de riesgo sugerido por el que se desea filtrar, puede ser nulo para no filtrar.
+     * @param search texto para buscar coincidencias en los datos del incidente, puede ser nulo para no filtrar.
+     * @param pageable configuracion de paginacion y orden solicitada por el cliente.
+     * @return pagina con los datos resumidos de los incidentes encontrados.
+     */
+    @Transactional(readOnly = true)
+    public Page&lt;AbdDtos.AbdIncidentResponse&gt; list(String estado, String nivel, String search, Pageable pageable) {
+<span class="pc bpc" id="L36" title="1 of 4 branches missed.">        String estadoFiltro = (estado == null || estado.isBlank()) ? null : estado.trim().toLowerCase();</span>
+<span class="fc bfc" id="L37" title="All 4 branches covered.">        String nivelFiltro = (nivel == null || nivel.isBlank()) ? null : nivel.trim().toLowerCase();</span>
+<span class="pc bpc" id="L38" title="1 of 4 branches missed.">        String searchFiltro = (search == null || search.isBlank()) ? null : search.trim().toLowerCase();</span>
+<span class="pc bpc" id="L39" title="1 of 6 branches missed.">        if (estadoFiltro == null &amp;&amp; nivelFiltro == null &amp;&amp; searchFiltro == null) {</span>
+<span class="fc" id="L40">            return incidenteRepository.findAll(pageable).map(this::aResponse);</span>
+        }
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        if (searchFiltro != null) {</span>
+<span class="fc" id="L43">            return incidenteRepository</span>
+<span class="fc" id="L44">                    .searchWithFilters(estadoFiltro, nivelFiltro, searchFiltro,</span>
+<span class="fc" id="L45">                            PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()))</span>
+<span class="fc" id="L46">                    .map(this::aResponse);</span>
+        }
+        Page&lt;AbdIncident&gt; page;
+<span class="fc bfc" id="L49" title="All 2 branches covered.">        if (estadoFiltro != null) {</span>
+<span class="fc" id="L50">            page = incidenteRepository.findByEstadoIgnoreCase(estadoFiltro, pageable);</span>
+        } else {
+<span class="fc" id="L52">            page = incidenteRepository.findByNivelSugeridoIgnoreCase(nivelFiltro, pageable);</span>
+        }
+<span class="fc" id="L54">        return page.map(this::aResponse);</span>
+    }
+
+    /**
+     * Registra un incidente asociado a una unidad y genera una alerta cuando el riesgo es alto.
+     * @param request datos del incidente reportado junto con la unidad involucrada.
+     * @return datos resumidos del incidente guardado.
+     * @throws IllegalArgumentException cuando la unidad indicada no existe en el sistema.
+     */
+    public AbdDtos.AbdIncidentResponse create(AbdDtos.AbdIncidentRequest request) {
+<span class="fc" id="L64">        Unit unidad = unidadRepository.findById(request.idUnidad())</span>
+<span class="fc" id="L65">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Unit no encontrada: &quot; + request.idUnidad()));</span>
+<span class="fc" id="L66">        AbdIncident incidente = AbdIncident.builder()</span>
+<span class="fc" id="L67">                .tipo(request.tipo())</span>
+<span class="fc" id="L68">                .descripcion(request.descripcion())</span>
+<span class="fc" id="L69">                .nivelSugerido(request.nivelSugerido())</span>
+<span class="fc" id="L70">                .evidencia(request.evidencia())</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">                .estado(request.estado() == null ? &quot;Reportado&quot; : request.estado())</span>
+<span class="fc" id="L72">                .unidad(unidad)</span>
+<span class="fc" id="L73">                .build();</span>
+<span class="fc" id="L74">        incidente = incidenteRepository.save(incidente);</span>
+
+<span class="fc bfc" id="L76" title="All 2 branches covered.">        if (&quot;ALTO&quot;.equalsIgnoreCase(incidente.getNivelSugerido())) {</span>
+<span class="fc" id="L77">            generateAlert(incidente);</span>
+        }
+<span class="fc" id="L79">        return aResponse(incidente);</span>
+    }
+
+    /**
+     * Modifica los datos de un incidente existente y actualiza la unidad involucrada.
+     * @param idIncidente identificador del incidente que se desea modificar.
+     * @param request nuevos datos del incidente que reemplazaran a los actuales.
+     * @return datos resumidos del incidente actualizado.
+     * @throws IllegalArgumentException cuando el incidente o la unidad indicada no existen en el sistema.
+     */
+    public AbdDtos.AbdIncidentResponse update(Integer idIncidente, AbdDtos.AbdIncidentRequest request) {
+<span class="fc" id="L90">        AbdIncident incidente = incidenteRepository.findById(idIncidente)</span>
+<span class="fc" id="L91">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Incident no encontrado: &quot; + idIncidente));</span>
+<span class="fc" id="L92">        Unit unidad = unidadRepository.findById(request.idUnidad())</span>
+<span class="fc" id="L93">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Unit no encontrada: &quot; + request.idUnidad()));</span>
+<span class="fc" id="L94">        incidente.setTipo(request.tipo());</span>
+<span class="fc" id="L95">        incidente.setDescripcion(request.descripcion());</span>
+<span class="fc" id="L96">        incidente.setNivelSugerido(request.nivelSugerido());</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">        if (request.evidencia() != null) {</span>
+<span class="fc" id="L98">            incidente.setEvidencia(request.evidencia());</span>
+        }
+<span class="fc bfc" id="L100" title="All 2 branches covered.">        if (request.estado() != null) {</span>
+<span class="fc" id="L101">            incidente.setEstado(request.estado());</span>
+        }
+<span class="fc" id="L103">        incidente.setUnidad(unidad);</span>
+<span class="fc" id="L104">        return aResponse(incidenteRepository.save(incidente));</span>
+    }
+
+    /**
+     * Suprime del sistema el registro de un incidente existente.
+     * @param idIncidente identificador del incidente que se desea suprimir.
+     * @throws IllegalArgumentException cuando no existe un incidente con el identificador indicado.
+     */
+    public void delete(Integer idIncidente) {
+<span class="fc bfc" id="L113" title="All 2 branches covered.">        if (!incidenteRepository.existsById(idIncidente)) {</span>
+<span class="fc" id="L114">            throw new IllegalArgumentException(&quot;Incident no encontrado: &quot; + idIncidente);</span>
+        }
+<span class="fc" id="L116">        incidenteRepository.deleteById(idIncidente);</span>
+<span class="fc" id="L117">    }</span>
+
+    private void generateAlert(AbdIncident incidente) {
+<span class="fc" id="L120">        Alert alerta = Alert.builder()</span>
+<span class="fc" id="L121">                .nivelRiesgo(&quot;ALTO&quot;)</span>
+<span class="fc" id="L122">                .descripcion(incidente.getDescripcion())</span>
+<span class="fc" id="L123">                .incidente(incidente)</span>
+<span class="fc" id="L124">                .build();</span>
+<span class="fc" id="L125">        alertaRepository.save(alerta);</span>
+<span class="fc" id="L126">    }</span>
+
+    private AbdDtos.AbdIncidentResponse aResponse(AbdIncident i) {
+<span class="fc" id="L129">        return new AbdDtos.AbdIncidentResponse(</span>
+<span class="fc" id="L130">                i.getIdIncidente(), i.getTipo(), i.getDescripcion(),</span>
+<span class="fc" id="L131">                i.getNivelSugerido(), i.getFechaIncidente().toString(), i.getEvidencia(),</span>
+<span class="fc" id="L132">                i.getEstado(), i.getUnidad().getIdUnidad(), i.getUnidad().getPlaca()</span>
+        );
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

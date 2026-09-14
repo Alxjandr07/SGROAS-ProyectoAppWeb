@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbdRouteService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">ec.edu.uteq.sgroas.abd.service</a> &gt; <span class="el_source">AbdRouteService.java</span></div><h1>AbdRouteService.java</h1><pre class="source lang-java linenums">package ec.edu.uteq.sgroas.abd.service;
+
+import ec.edu.uteq.sgroas.abd.dto.AbdDtos;
+import ec.edu.uteq.sgroas.abd.entity.AbdRoute;
+import ec.edu.uteq.sgroas.abd.repository.ScheduleRepository;
+import ec.edu.uteq.sgroas.abd.repository.AbdRouteRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class AbdRouteService {
+
+    private final AbdRouteRepository rutaAbdRepository;
+    private final AbdCatalogService catalogoAbdService;
+
+    /**
+     * Recupera las rutas registradas aplicando un filtro de busqueda opcional de forma paginada.
+     * @param search texto para buscar coincidencias en terminales de origen o destino, puede ser nulo para traer todo.
+     * @param pageable configuracion de paginacion y orden solicitada por el cliente.
+     * @return pagina con los datos resumidos de las rutas encontradas.
+     */
+    @Transactional(readOnly = true)
+    public Page&lt;AbdDtos.AbdRouteResponse&gt; list(String search, Pageable pageable) {
+<span class="fc bfc" id="L29" title="All 4 branches covered.">        String filtro = (search == null || search.isBlank()) ? null : search.trim().toLowerCase();</span>
+<span class="fc bfc" id="L30" title="All 2 branches covered.">        Page&lt;AbdRoute&gt; page = filtro == null</span>
+<span class="fc" id="L31">                ? rutaAbdRepository.findAll(pageable)</span>
+<span class="fc" id="L32">                : rutaAbdRepository.search(filtro, pageable);</span>
+<span class="fc" id="L33">        return page.map(this::aResponse);</span>
+    }
+
+    /**
+     * Obtiene el detalle de una ruta existente a partir de su identificador.
+     * @param idRuta identificador de la ruta que se desea consultar.
+     * @return datos resumidos de la ruta encontrada.
+     * @throws IllegalArgumentException cuando no existe una ruta con el identificador indicado.
+     */
+    @Transactional(readOnly = true)
+    public AbdDtos.AbdRouteResponse findById(Integer idRuta) {
+<span class="fc" id="L44">        return rutaAbdRepository.findById(idRuta).map(this::aResponse)</span>
+<span class="fc" id="L45">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Route no encontrada: &quot; + idRuta));</span>
+    }
+
+    /**
+     * Registra una ruta nueva entre dos terminales distintos con su precio de pasaje.
+     * @param request datos de los terminales de origen y destino junto con el precio del pasaje.
+     * @return datos resumidos de la ruta guardada.
+     * @throws IllegalArgumentException cuando el origen y el destino son el mismo terminal o un terminal no existe.
+     */
+    public AbdDtos.AbdRouteResponse create(AbdDtos.AbdRouteRequest request) {
+<span class="fc bfc" id="L55" title="All 2 branches covered.">        if (request.idTerminalOrigen().equals(request.idTerminalDestino())) {</span>
+<span class="fc" id="L56">            throw new IllegalArgumentException(&quot;El origen y el destino no pueden ser el mismo terminal&quot;);</span>
+        }
+<span class="fc" id="L58">        AbdRoute ruta = AbdRoute.builder()</span>
+<span class="fc" id="L59">                .terminalOrigen(catalogoAbdService.findTerminal(request.idTerminalOrigen()))</span>
+<span class="fc" id="L60">                .terminalDestino(catalogoAbdService.findTerminal(request.idTerminalDestino()))</span>
+<span class="fc" id="L61">                .precioPasaje(request.precioPasaje())</span>
+<span class="fc" id="L62">                .build();</span>
+<span class="fc" id="L63">        return aResponse(rutaAbdRepository.save(ruta));</span>
+    }
+
+    /**
+     * Modifica los terminales y el precio de una ruta existente.
+     * @param idRuta identificador de la ruta que se desea modificar.
+     * @param request nuevos datos de terminales y precio que reemplazaran a los actuales.
+     * @return datos resumidos de la ruta actualizada.
+     * @throws IllegalArgumentException cuando la ruta no existe, un terminal no existe o el origen y el destino coinciden.
+     */
+    public AbdDtos.AbdRouteResponse update(Integer idRuta, AbdDtos.AbdRouteRequest request) {
+<span class="fc bfc" id="L74" title="All 2 branches covered.">        if (request.idTerminalOrigen().equals(request.idTerminalDestino())) {</span>
+<span class="fc" id="L75">            throw new IllegalArgumentException(&quot;El origen y el destino no pueden ser el mismo terminal&quot;);</span>
+        }
+<span class="fc" id="L77">        AbdRoute ruta = rutaAbdRepository.findById(idRuta)</span>
+<span class="fc" id="L78">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Route no encontrada: &quot; + idRuta));</span>
+<span class="fc" id="L79">        ruta.setTerminalOrigen(catalogoAbdService.findTerminal(request.idTerminalOrigen()));</span>
+<span class="fc" id="L80">        ruta.setTerminalDestino(catalogoAbdService.findTerminal(request.idTerminalDestino()));</span>
+<span class="fc" id="L81">        ruta.setPrecioPasaje(request.precioPasaje());</span>
+<span class="fc" id="L82">        return aResponse(rutaAbdRepository.save(ruta));</span>
+    }
+
+    /**
+     * Suprime del sistema el registro de una ruta existente.
+     * @param idRuta identificador de la ruta que se desea suprimir.
+     * @throws IllegalArgumentException cuando no existe una ruta con el identificador indicado.
+     */
+    public void delete(Integer idRuta) {
+<span class="fc bfc" id="L91" title="All 2 branches covered.">        if (!rutaAbdRepository.existsById(idRuta)) {</span>
+<span class="fc" id="L92">            throw new IllegalArgumentException(&quot;Route no encontrada: &quot; + idRuta);</span>
+        }
+<span class="fc" id="L94">        rutaAbdRepository.deleteById(idRuta);</span>
+<span class="fc" id="L95">    }</span>
+
+    private AbdDtos.AbdRouteResponse aResponse(AbdRoute r) {
+<span class="fc" id="L98">        return new AbdDtos.AbdRouteResponse(</span>
+<span class="fc" id="L99">                r.getIdRuta(),</span>
+<span class="fc" id="L100">                r.getTerminalOrigen().getIdTerminal(),</span>
+<span class="fc" id="L101">                r.getTerminalOrigen().getNombre() + &quot; (&quot; + r.getTerminalOrigen().getCiudad().getNombre() + &quot;)&quot;,</span>
+<span class="fc" id="L102">                r.getTerminalDestino().getIdTerminal(),</span>
+<span class="fc" id="L103">                r.getTerminalDestino().getNombre() + &quot; (&quot; + r.getTerminalDestino().getCiudad().getNombre() + &quot;)&quot;,</span>
+<span class="fc" id="L104">                r.getPrecioPasaje(),</span>
+<span class="fc" id="L105">                rutaAbdRepository.countSchedules(r.getIdRuta())</span>
+        );
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbdUnitService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">ec.edu.uteq.sgroas.abd.service</a> &gt; <span class="el_source">AbdUnitService.java</span></div><h1>AbdUnitService.java</h1><pre class="source lang-java linenums">package ec.edu.uteq.sgroas.abd.service;
+
+import ec.edu.uteq.sgroas.abd.dto.AbdDtos;
+import ec.edu.uteq.sgroas.abd.entity.Unit;
+import ec.edu.uteq.sgroas.abd.repository.UnitRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class AbdUnitService {
+
+    private final UnitRepository unidadRepository;
+
+    /**
+     * Recupera las unidades registradas aplicando filtros opcionales de forma paginada.
+     * @param estado estado por el que se desea filtrar las unidades, puede ser nulo para no filtrar.
+     * @param search texto para buscar coincidencias en placa, disco o modelo, puede ser nulo para no filtrar.
+     * @param pageable configuracion de paginacion y orden solicitada por el cliente.
+     * @return pagina con los datos resumidos de las unidades encontradas.
+     */
+    @Transactional(readOnly = true)
+    public Page&lt;AbdDtos.UnitResponse&gt; list(String estado, String search, Pageable pageable) {
+<span class="fc bfc" id="L29" title="All 4 branches covered.">        String estadoFiltro = (estado == null || estado.isBlank()) ? null : estado.trim().toLowerCase();</span>
+<span class="fc bfc" id="L30" title="All 4 branches covered.">        String searchFiltro = (search == null || search.isBlank()) ? null : search.trim().toLowerCase();</span>
+        Page&lt;Unit&gt; page;
+<span class="pc bpc" id="L32" title="1 of 4 branches missed.">        if (estadoFiltro == null &amp;&amp; searchFiltro == null) {</span>
+<span class="fc" id="L33">            page = unidadRepository.findAll(pageable);</span>
+        } else {
+<span class="fc" id="L35">            page = unidadRepository.searchWithFilters(estadoFiltro, searchFiltro,</span>
+<span class="fc" id="L36">                    PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()));</span>
+        }
+<span class="fc" id="L38">        return page.map(this::aResponse);</span>
+    }
+
+    /**
+     * Obtiene el detalle de una unidad existente a partir de su identificador.
+     * @param idUnidad identificador de la unidad que se desea consultar.
+     * @return datos resumidos de la unidad encontrada.
+     * @throws IllegalArgumentException cuando no existe una unidad con el identificador indicado.
+     */
+    @Transactional(readOnly = true)
+    public AbdDtos.UnitResponse findById(Integer idUnidad) {
+<span class="fc" id="L49">        return unidadRepository.findById(idUnidad).map(this::aResponse)</span>
+<span class="fc" id="L50">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Unit no encontrada: &quot; + idUnidad));</span>
+    }
+
+    /**
+     * Registra una unidad nueva verificando que la placa y el disco no esten duplicados.
+     * @param request datos de la unidad que se desea registrar.
+     * @return datos resumidos de la unidad guardada.
+     * @throws IllegalArgumentException cuando la placa o el numero de disco ya estan registrados.
+     */
+    public AbdDtos.UnitResponse create(AbdDtos.UnitRequest request) {
+<span class="fc" id="L60">        validateUniqueness(request.placa(), request.numeroDisco(), null);</span>
+<span class="fc" id="L61">        Unit unidad = Unit.builder()</span>
+<span class="fc" id="L62">                .placa(request.placa())</span>
+<span class="fc" id="L63">                .numeroDisco(request.numeroDisco())</span>
+<span class="fc" id="L64">                .modelo(request.modelo())</span>
+<span class="fc" id="L65">                .capacidad(request.capacidad())</span>
+<span class="fc" id="L66">                .anioFabricacion(request.anioFabricacion())</span>
+<span class="pc bpc" id="L67" title="1 of 2 branches missed.">                .estado(request.estado() == null ? &quot;Activo&quot; : request.estado())</span>
+<span class="fc" id="L68">                .build();</span>
+<span class="fc" id="L69">        return aResponse(unidadRepository.save(unidad));</span>
+    }
+
+    /**
+     * Modifica los datos de una unidad existente verificando que no se dupliquen placa ni disco.
+     * @param idUnidad identificador de la unidad que se desea modificar.
+     * @param request nuevos datos que reemplazaran a los actuales de la unidad.
+     * @return datos resumidos de la unidad actualizada.
+     * @throws IllegalArgumentException cuando la unidad no existe o la placa o el disco ya pertenecen a otra unidad.
+     */
+    public AbdDtos.UnitResponse update(Integer idUnidad, AbdDtos.UnitRequest request) {
+<span class="fc" id="L80">        Unit unidad = unidadRepository.findById(idUnidad)</span>
+<span class="fc" id="L81">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Unit no encontrada: &quot; + idUnidad));</span>
+<span class="fc" id="L82">        validateUniqueness(request.placa(), request.numeroDisco(), idUnidad);</span>
+<span class="fc" id="L83">        unidad.setPlaca(request.placa());</span>
+<span class="fc" id="L84">        unidad.setNumeroDisco(request.numeroDisco());</span>
+<span class="fc" id="L85">        unidad.setModelo(request.modelo());</span>
+<span class="fc" id="L86">        unidad.setCapacidad(request.capacidad());</span>
+<span class="fc" id="L87">        unidad.setAnioFabricacion(request.anioFabricacion());</span>
+<span class="fc bfc" id="L88" title="All 2 branches covered.">        if (request.estado() != null) {</span>
+<span class="fc" id="L89">            unidad.setEstado(request.estado());</span>
+        }
+<span class="fc" id="L91">        return aResponse(unidadRepository.save(unidad));</span>
+    }
+
+    /**
+     * Suprime del sistema el registro de una unidad existente.
+     * @param idUnidad identificador de la unidad que se desea suprimir.
+     * @throws IllegalArgumentException cuando no existe una unidad con el identificador indicado.
+     */
+    public void delete(Integer idUnidad) {
+<span class="fc bfc" id="L100" title="All 2 branches covered.">        if (!unidadRepository.existsById(idUnidad)) {</span>
+<span class="fc" id="L101">            throw new IllegalArgumentException(&quot;Unit no encontrada: &quot; + idUnidad);</span>
+        }
+<span class="fc" id="L103">        unidadRepository.deleteById(idUnidad);</span>
+<span class="fc" id="L104">    }</span>
+
+    private void validateUniqueness(String placa, String numeroDisco, Integer idExcluir) {
+<span class="fc bfc" id="L107" title="All 2 branches covered.">        if (idExcluir == null) {</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">            if (unidadRepository.existsByPlacaIgnoreCase(placa)) {</span>
+<span class="fc" id="L109">                throw new IllegalArgumentException(&quot;Ya existe una unidad con la placa &quot; + placa);</span>
+            }
+<span class="fc bfc" id="L111" title="All 2 branches covered.">            if (unidadRepository.existsByNumeroDiscoIgnoreCase(numeroDisco)) {</span>
+<span class="fc" id="L112">                throw new IllegalArgumentException(&quot;Ya existe una unidad con el disco &quot; + numeroDisco);</span>
+            }
+<span class="fc" id="L114">            return;</span>
+        }
+<span class="fc" id="L116">        Unit actual = unidadRepository.findById(idExcluir)</span>
+<span class="pc" id="L117">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Unit no encontrada: &quot; + idExcluir));</span>
+<span class="fc bfc" id="L118" title="All 2 branches covered.">        boolean cambioPlaca = !actual.getPlaca().equalsIgnoreCase(placa);</span>
+<span class="fc bfc" id="L119" title="All 2 branches covered.">        boolean cambioDisco = !actual.getNumeroDisco().equalsIgnoreCase(numeroDisco);</span>
+<span class="fc bfc" id="L120" title="All 4 branches covered.">        if (cambioPlaca &amp;&amp; unidadRepository.existsByPlacaIgnoreCase(placa)) {</span>
+<span class="fc" id="L121">            throw new IllegalArgumentException(&quot;Ya existe una unidad con la placa &quot; + placa);</span>
+        }
+<span class="fc bfc" id="L123" title="All 4 branches covered.">        if (cambioDisco &amp;&amp; unidadRepository.existsByNumeroDiscoIgnoreCase(numeroDisco)) {</span>
+<span class="fc" id="L124">            throw new IllegalArgumentException(&quot;Ya existe una unidad con el disco &quot; + numeroDisco);</span>
+        }
+<span class="fc" id="L126">    }</span>
+
+    private AbdDtos.UnitResponse aResponse(Unit u) {
+<span class="fc" id="L129">        return new AbdDtos.UnitResponse(u.getIdUnidad(), u.getPlaca(), u.getNumeroDisco(),</span>
+<span class="fc" id="L130">                u.getModelo(), u.getCapacidad(), u.getAnioFabricacion(), u.getEstado());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

@@ -3,7 +3,11 @@
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-<span class="fc" id="L6">public record EmailRequest(</span>
+/**
+ * Peticion para enviar un correo de verificacion o recuperacion.
+ * @param email correo electronico del destinatario
+ */
+<span class="fc" id="L10">public record EmailRequest(</span>
         @NotBlank(message = &quot;El email es obligatorio&quot;)
         @Email(message = &quot;Debe ser un email valido&quot;)
         String email
