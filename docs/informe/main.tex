@@ -166,9 +166,9 @@ componen el sistema (backend, PostgreSQL y Redis) desde un entorno Windows con D
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\linewidth]{imagen1}
-    \caption{Arranque del sistema completo mediante \texttt{docker compose up}: construcción de
-    la imagen del backend y levantamiento de los contenedores \texttt{sgroas-postgres},
-    \texttt{sgroas-redis-compose} y \texttt{sgroas-backend}.}
+    \caption{Full system startup through \texttt{docker compose up}: backend image build and
+    startup of the \texttt{sgroas-postgres}, \texttt{sgroas-redis-compose} and
+    \texttt{sgroas-backend} containers.}
     \label{fig:imagen1}
 \end{figure}
 
@@ -179,9 +179,9 @@ durante la sesión de pruebas.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\linewidth]{imagen8}
-    \caption{Salida de \texttt{docker ps} confirmando los contenedores
-    \texttt{sgroas-backend}, \texttt{sgroas-postgres} y \texttt{sgroas-redis-compose} en
-    estado \textit{Up}, con el mapeo de puertos correspondiente.}
+    \caption{\texttt{docker ps} output confirming the \texttt{sgroas-backend},
+    \texttt{sgroas-postgres} and \texttt{sgroas-redis-compose} containers in \textit{Up}
+    state, with the corresponding port mapping.}
     \label{fig:imagen8}
 \end{figure}
 
@@ -192,9 +192,8 @@ requisito del Bloque A.1 de la guía de entrega \cite{uteq2026guia}.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\linewidth]{imagen2}
-    \caption{Interfaz Swagger UI de la API SGROAS (versión \texttt{0.9.0-rc}, especificación
-    OAS 3.1), mostrando los endpoints del controlador de conductores y del controlador de
-    autenticación.}
+    \caption{SGROAS API Swagger UI (version \texttt{0.9.0-rc}, OAS 3.1 specification),
+    showing the endpoints of the driver controller and the authentication controller.}
     \label{fig:imagen2}
 \end{figure}
 
@@ -207,8 +206,7 @@ pantalla de inicio de sesión.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\linewidth]{imagen-login}
-    \caption{Pantalla de inicio de sesión del frontend Angular con formulario reactivo y
-    validación en tiempo real.}
+    \caption{Angular frontend login screen with a reactive form and real-time validation.}
     \label{fig:login-frontend}
 \end{figure}
 
@@ -218,8 +216,8 @@ sección, como se observa en la Figura~\ref{fig:dashboard}.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\linewidth]{imagen-dashboard}
-    \caption{Dashboard principal de SGROAS con resumen de indicadores y acceso a los seis
-    módulos del sistema.}
+    \caption{Main SGROAS dashboard with an indicators summary and access to the six system
+    modules.}
     \label{fig:dashboard}
 \end{figure}
 
@@ -230,14 +228,14 @@ Figura~\ref{fig:listado-usuarios}).
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\linewidth]{imagen-conductores}
-    \caption{Listado paginado de conductores con opciones de edición y desactivación.}
+    \caption{Paginated driver listing with edit and deactivation options.}
     \label{fig:listado-conductores}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\linewidth]{imagen-usuarios}
-    \caption{Listado paginado de usuarios del sistema con indicación de rol y estado.}
+    \caption{Paginated system user listing showing role and status.}
     \label{fig:listado-usuarios}
 \end{figure}
 
@@ -272,9 +270,9 @@ presenta en la Figura~\ref{fig:imagen13}.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\linewidth]{imagen13}
-    \caption{Salida de \texttt{docker compose config} mostrando el anclaje de las imágenes de
-    PostgreSQL y Redis por \textit{digest} \texttt{sha256}, junto con las variables de entorno
-    del backend (JWT, credenciales de base de datos y Redis).}
+    \caption{\texttt{docker compose config} output showing the PostgreSQL and Redis image
+    pinning by \textit{digest} \texttt{sha256}, together with the backend environment
+    variables (JWT, database credentials and Redis).}
     \label{fig:imagen13}
 \end{figure}
 
@@ -284,9 +282,9 @@ se verifica en la Figura~\ref{fig:imagen14}.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\linewidth]{imagen14}
-    \caption{Listado de imágenes locales con \texttt{docker images --digests}, filtrado por
-    \texttt{postgres} y \texttt{redis}, confirmando la coincidencia del \textit{digest}
-    \texttt{sha256} utilizado en el \texttt{docker-compose.yml}.}
+    \caption{Local images listing with \texttt{docker images --digests}, filtered by
+    \texttt{postgres} and \texttt{redis}, confirming the match of the \texttt{sha256}
+    \textit{digest} used in \texttt{docker-compose.yml}.}
     \label{fig:imagen14}
 \end{figure}
 
@@ -297,19 +295,18 @@ en las \textit{releases} publicadas en GitHub (Figura~\ref{fig:imagen12}).
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\linewidth]{imagen11}
-    \caption{Historial de \texttt{git log --oneline --decorate}, mostrando el \textit{commit}
-    \texttt{HEAD} etiquetado como \texttt{v0.9.0-rc} sobre la rama \texttt{main}, precedido por
-    la fusión de la rama \texttt{feat/alejandro-auth}.}
+    \caption{\texttt{git log --oneline --decorate} history showing the \texttt{HEAD}
+    \textit{commit} tagged as \texttt{v0.9.0-rc} on the \texttt{main} branch, preceded by
+    the merge of the \texttt{feat/alejandro-auth} branch.}
     \label{fig:imagen11}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\linewidth]{imagen12}
-    \caption{Etiquetas (\textit{tags}) publicadas en el repositorio
-    \texttt{Alxjandr07/SGROAS-ProyectoAppWeb}: \texttt{v0.9.0-rc} (Tercera Entrega) y
-    \texttt{v0.7.1} (cierre de observaciones de la Entrega 1B), esta última verificada por
-    GitHub.}
+    \caption{Tags published in the \texttt{Alxjandr07/SGROAS-ProyectoAppWeb} repository:
+    \texttt{v0.9.0-rc} (Third Delivery) and \texttt{v0.7.1} (closing the Delivery 1B
+    observations), the latter verified by GitHub.}
     \label{fig:imagen12}
 \end{figure}
 
@@ -363,10 +360,9 @@ la Figura~\ref{fig:imagen7}.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\linewidth]{imagen7}
-    \caption{Resultado de las tres corridas de carga con k6 (50 VUs, 30 s) sobre el endpoint de
-    listado: 4468 peticiones HTTP en total, 0{,}00\,\% de tasa de error, tiempo de respuesta
-    p95 medio = 81{,}43 ms y p99 medio = 188{,}16 ms, cumpliendo el umbral de
-    \texttt{tiempo\_respuesta < 500 ms}.}
+    \caption{Result of the three k6 load runs (50 VUs, 30 s) against the listing endpoint:
+    4468 HTTP requests in total, 0{,}00\,\% error rate, mean p95 response time 81{,}43\,ms and
+    mean p99 188{,}16\,ms, meeting the \texttt{response\_time < 500 ms} threshold.}
     \label{fig:imagen7}
 \end{figure}
 
@@ -409,29 +405,29 @@ El módulo de autenticación se evaluó mediante peticiones directas con Postman
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\linewidth]{imagen3}
-    \caption{Petición \texttt{POST /api/auth/login} con credenciales válidas
-    (\texttt{admin@sgroas.com}), respondiendo \texttt{200 OK} en 1{,}83\,s y estableciendo la
-    cookie \texttt{access\_token} con los atributos \texttt{HttpOnly} y \texttt{Secure}
-    activos.}
+    \caption{\texttt{POST /api/auth/login} request with valid credentials
+    (\texttt{admin@sgroas.com}), returning \texttt{200 OK} in 1{,}83\,s and setting the
+    \texttt{access\_token} cookie with the \texttt{HttpOnly} and \texttt{Secure} attributes
+    enabled.}
     \label{fig:imagen3}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\linewidth]{imagen4}
-    \caption{Petición con cuerpo incompleto (sin campo \texttt{password}), respondiendo
-    \texttt{422 Unprocessable Entity} con estructura ProblemDetails conforme al RFC 7807
-    \cite{rfc7807}: \texttt{type}, \texttt{title}, \texttt{status}, \texttt{detail} e
-    \texttt{instance}, junto con el detalle del error de validación por campo.}
+    \caption{Request with an incomplete body (without the \texttt{password} field),
+    returning \texttt{422 Unprocessable Entity} with a ProblemDetails structure as per RFC
+    7807 \cite{rfc7807}: \texttt{type}, \texttt{title}, \texttt{status}, \texttt{detail} and
+    \texttt{instance}, along with the per-field validation error detail.}
     \label{fig:imagen4}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\linewidth]{imagen5}
-    \caption{Respuesta \texttt{200 OK} del inicio de sesión exitoso, incluyendo
-    \texttt{accessToken}, \texttt{refreshToken}, \texttt{tokenType}, \texttt{expiresIn} y los
-    datos del usuario autenticado (\texttt{nombre}, \texttt{email}, \texttt{rol}).}
+    \caption{\texttt{200 OK} response of the successful login, including \texttt{accessToken},
+    \texttt{refreshToken}, \texttt{tokenType}, \texttt{expiresIn} and the authenticated user
+    data (\texttt{name}, \texttt{email}, \texttt{role}).}
     \label{fig:imagen5}
 \end{figure}
 
@@ -442,9 +438,9 @@ guía \cite{uteq2026guia,rfc7519} (Figura~\ref{fig:imagen6}).
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\linewidth]{imagen6}
-    \caption{Decodificación del JWT emitido por SGROAS mostrando los \textit{claims}
-    \texttt{jti}, \texttt{iss}, \texttt{sub}, \texttt{aud}, \texttt{iat}, \texttt{nbf},
-    \texttt{exp}, junto con los \textit{claims} personalizados \texttt{nombre} y \texttt{rol}.}
+    \caption{Decoding of the JWT issued by SGROAS showing the \texttt{jti}, \texttt{iss},
+    \texttt{sub}, \texttt{aud}, \texttt{iat}, \texttt{nbf}, \texttt{exp} \textit{claims},
+    together with the custom \texttt{name} and \texttt{role} \textit{claims}.}
     \label{fig:imagen6}
 \end{figure}
 
@@ -473,21 +469,19 @@ Figura~\ref{fig:imagen10}.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\linewidth]{imagen9}
-    \caption{Reporte JaCoCo por paquete: cobertura de instrucciones del 98{,}8\,\% global (3484 de
-    3527 instrucciones cubiertas), cobertura de ramas del 85{,}4\,\% (70 de 82) y cobertura de
-    líneas del 99{,}7\,\% (778 de 780). Los paquetes \texttt{controller}, \texttt{dto},
-    \texttt{entity}, \texttt{config} y \texttt{exception} alcanzan el 100\,\% de cobertura de
-    instrucciones.}
+    \caption{JaCoCo per-package report: 98{,}8\,\% global instruction coverage (3484 of 3527
+    covered instructions), 85{,}4\,\% branch coverage (70 of 82) and 99{,}7\,\% line coverage
+    (778 of 780). The \texttt{controller}, \texttt{dto}, \texttt{entity}, \texttt{config} and
+    \texttt{exception} packages reach 100\,\% instruction coverage.}
     \label{fig:imagen9}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\linewidth]{imagen10}
-    \caption{Estructura del directorio \texttt{docs/mediciones/jacoco/} versionada en el
-    repositorio, con el desglose por paquete y los archivos \texttt{index.html},
-    \texttt{jacoco.csv} y \texttt{jacoco.xml} requeridos para la trazabilidad de la
-    evidencia.}
+    \caption{Versioned structure of the \texttt{docs/mediciones/jacoco/} directory in the
+    repository, with the per-package breakdown and the \texttt{index.html}, \texttt{jacoco.csv}
+    and \texttt{jacoco.xml} files required for evidence traceability.}
     \label{fig:imagen10}
 \end{figure}
 
