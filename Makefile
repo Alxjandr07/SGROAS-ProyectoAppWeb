@@ -55,6 +55,8 @@ audit:
 	scripts/validate-listings.sh
 	@echo "Auditoria: self-test de exit codes (P11)..."
 	scripts/test-validators.sh
+	@echo "Auditoria: demografia SUS cap.5 vs sus-raw.csv (P13)..."
+	scripts/validate-sus-demografia.sh
 	@echo "Auditorias completas (exit 0 = OK)."
 
 jacoco:
