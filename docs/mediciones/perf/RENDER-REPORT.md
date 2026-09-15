@@ -50,6 +50,8 @@
 
 ## Contraste no parametrico (metodo de la guia, Bloque C)
 
+Regenerable con `python scripts/perf/recalcular-contraste.py`, que lee las
+corridas crudas `dataset/perf/kNN-cold.json` y `kNN-run1.json` y usa
 `scripts/perf/nonparametric.py` (U de Mann-Whitney con aproximacion normal, d de Cliff):
 
 | Estadistico | Valor |

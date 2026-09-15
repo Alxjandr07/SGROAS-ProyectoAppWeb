@@ -18,6 +18,10 @@ grep -n "SPRING_DATASOURCE_PASSWORD\|JWT_SECRET" docker-compose.yml
 grep -n "JWT_SECRET" src/test/java/ec/edu/uteq/sgroas/security/JwtServiceTest.java
 # 4. .env.example tiene placeholders
 grep -n "ROTATED" .env.example
+# 5. Búsqueda de la contraseña de BD / JWT secret literales (≠ demo de login, ≠ ${...})
+grep -rEn "spring.datasource.password=([^$]|$)|POSTGRES_PASSWORD|APP_JWT_SECRET|app.jwt.secret" \
+  src docker-compose.yml .env.example k6 .github 2>/dev/null \
+  | grep -v '\$\{' | grep -v '<ROTATED' | grep -v 'secrets\.' | grep -v 'APP_COOKIE'
 ```
 
 **Salida (2026-09-15):**
@@ -31,10 +35,14 @@ grep -n "ROTATED" .env.example
    ReflectionTestUtils.setField(jwtService, "jwtSecret", JWT_SECRET);
 4. SPRING_DATASOURCE_PASSWORD=<ROTATED_DB_PASSWORD>
    APP_JWT_SECRET=<ROTATED_JWT_SECRET_MIN_32_CHARS>
+5. (búsqueda 5: 0 resultados — ninguna contraseña de BD ni JWT secret literal en el
+   árbol; solo `${{...}}`/`${...}`, placeholders `<ROTATED_...>` y credenciales demo
+   de login del README; el CI usa `secrets.CI_POSTGRES_PASSWORD` con `trust` local)
 ```
 
 **Archivos:** `src/main/resources/application.properties`, `docker-compose.yml`,
-`.env.example`, `src/test/java/ec/edu/uteq/sgroas/security/JwtServiceTest.java`
+`.env.example`, `src/test/java/ec/edu/uteq/sgroas/security/JwtServiceTest.java`,
+`src/test/resources/application-test.properties`, `.github/workflows/ci.yml`
 (contraseña real rotada en el despliegue y declarada en `.env.example`).
 
 ---
@@ -46,20 +54,31 @@ grep -n "ROTATED" .env.example
 # Verificar que existen corridas crudas por escenario (k01..k08, incl. frío)
 ls dataset/perf/k*.json | wc -l
 head -20 dataset/perf/k08-run1.json
+# Recalcular el análisis no paramétrico desde las corridas crudas
+python scripts/perf/recalcular-contraste.py
 ```
 
 **Salida (2026-09-15):**
 ```
 13
+k01-run1.json k02-run2.json k03-run3.json
 k04-cold.json k04-run1.json k05-cold.json k05-run1.json k06-cold.json
 k06-run1.json k07-cold.json k07-run1.json k08-cold.json k08-run1.json
-k01-run1.json k02-run2.json k03-run3.json
 (JSON de k08-run1 con métricas agregadas de una corrida v6)
+
+Contraste no parametrico cache frio vs caliente (n = 5 por condicion)
+U (Mann-Whitney)       : 0.0
+z (aproximacion normal): -2.61
+p (bilateral)          : 0.0090
+d de Cliff             : -1.00 -> grande
+OK: contraste reproducible desde las corridas crudas
 ```
 
-**Archivos:** `dataset/perf/k*.json` (13 corridas: 3 locales + 5 calientes + 5 frías),
-análisis en `dataset/perf/REPORT.md` recalculado con `scripts/perf/nonparametric.py`
-desde esas corridas (ver `docs/mediciones/perf/RENDER-REPORT.md`).
+**Archivos:** `dataset/perf/k*.json` (13 corridas: k01–k03 locales por escenario +
+5 calientes + 5 frías), análisis recalculado con `scripts/perf/recalcular-contraste.py`
+que carga `scripts/perf/nonparametric.py` (Mann-Whitney + d de Cliff) directamente
+desde las corridas crudas; resultados en `docs/mediciones/perf/RENDER-REPORT.md`
+(y `dataset/perf/REPORT.md` para la serie local K1).
 
 ---
 
@@ -198,7 +217,10 @@ OK: demografia cap.5 cruza 1:1 con sus-raw.csv (n=15, 8H/7M, 19-25, B3/M10/A2, m
 - `dataset/sus/sus-raw.csv` — datos crudos (15 participantes)
 - `scripts/generate-sus-demographics.py` — regenera la tabla desde el CSV
 - `scripts/validate-sus-demografia.sh` — cruza la demografía del cap.5 1:1 con el CSV
-- Tabla `tab:sus-demografia` en `docs/informe-final/capitulos/cap8-evaluacion.tex`
+- Tabla `tab:sus-demografia` en `docs/informe-final/capitulos/cap5-materiales-metodos.tex`
+  (sección "Participantes SUS"), regenerada desde el CSV por
+  `scripts/generate-sus-demographics.py` y cruzada 1:1 con el CSV por
+  `scripts/validate-sus-demografia.sh`
 
 ---
 
@@ -220,6 +242,17 @@ cat docs/mediciones/sec/live-session/asignaciones.json
 (HTTP/1.1 200 — GET /api/asignaciones?page=0&size=10 con cookie: content con 8 elementos)
 ```
 
+**Reproducción en vivo (2026-09-15):**
+```
+$ curl -s -o /dev/null -w '%{http_code}\n' -b cookies.txt \
+    "https://sgroas-backend.onrender.com/api/asignaciones?page=0&size=10"
+200
+$ curl -s -o /dev/null -w '%{http_code}\n' -b cookies.txt \
+    "https://sgroas-backend.onrender.com/api/auth/me"
+200
+```
+(Login 200 → cookie; asignaciones y `/me` 200 con datos; sin cookie → 403.)
+
 **Archivos:**
 - `docs/postman/coleccion.json` — carpeta "Asignaciones" con 6 requests CRUD
 - `docs/mediciones/sec/live-session/asignaciones.json` — 200 con datos contra el deploy,
@@ -232,17 +265,24 @@ cat docs/mediciones/sec/live-session/asignaciones.json
 
 **Orden de verificación:**
 ```bash
-powershell -ExecutionPolicy Bypass -File scripts/verify-manifest.ps1
+sha256sum -c dataset/MANIFEST.sha256
 ```
 
-**Salida (2026-09-15):**
+**Salida (2026-09-15, Git Bash):**
 ```
-(283 archivos OK, incluido dataset/jacoco/*, lighthouse/*, perf/*, sus/*, zap/*, zenodo.json)
-Results: 283 OK, 0 FAILED, 0 MISSING out of 283 entries
+dataset/DATA-DICTIONARY.md: OK
+dataset/DATA-PROVENANCE.md: OK
+...
+dataset/zenodo.json: OK
+sha256sum: dataset/MANIFEST.sha256: 283 lines processed
+(283 "OK", 0 FAILED, 0 MISSING; exit code 0)
 ```
+
+La verificación también se cubre con el script PowerShell (`scripts/verify-manifest.ps1`):
+`Results: 283 OK, 0 FAILED, 0 MISSING out of 283 entries`.
 
 **Archivos:**
-- `dataset/MANIFEST.sha256` — 283 entradas SHA-256
+- `dataset/MANIFEST.sha256` — 283 entradas SHA-256 (LF)
 - `scripts/verify-manifest.ps1` — verificación (equivalente a `sha256sum -c`)
 - `scripts/regenerate-manifest.ps1` — regeneración
 
@@ -281,6 +321,11 @@ make verify
 **Salida (2026-09-15):**
 ```
 [P1] OK
+[P2] Checking raw k6 runs (hot x5 + cold x5) reproducible contrast...
+  6 hot runs found
+  5 cold runs found
+  OK: nonparametric contrast reproducible (nonparametric.py)
+[P2] OK
 [P4] OK
 [P5] OK - no Spanish fields in entities
 [P5] Total methods (main + tests): 496 / OK: 0 Spanish method names (0%)
