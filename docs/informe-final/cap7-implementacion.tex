@@ -54,7 +54,7 @@ La estrategia híbrida documentada en ADR-006 (Sección~\ref{sec:adr006}) se imp
 
 Las operaciones CRUD elementales utilizan repositorios que extienden \texttt{JpaRepository}. El siguiente listado muestra el repositorio de conductores con consultas derivadas de nombres de métodos:
 
-\begin{lstlisting}[language=Java, caption={Repositorio de conductores con consultas derivadas.}, label={lst:conductor-repo}]
+\begin{lstlisting}[language=Java, caption={Driver repository with derived queries.}, label={lst:conductor-repo}]
 public interface DriverRepository extends JpaRepository<Driver, Long> {
 
     Page<Driver> findByActivoTrue(Pageable pageable);
@@ -79,7 +79,7 @@ Los métodos \texttt{findByActivoTrue} y \texttt{searchActive} utilizan consulta
 
 Las operaciones de reportes y agregaciones se encapsulan en stored procedures de PostgreSQL. El siguiente listado muestra la declaración en la entidad \texttt{Incidente} y la invocación desde el repositorio:
 
-\begin{lstlisting}[language=Java, caption={Declaración @NamedStoredProcedureQuery en Incidente.}, label={lst:incidente-sp}]
+\begin{lstlisting}[language=Java, caption={@NamedStoredProcedureQuery declaration in Incident.}, label={lst:incidente-sp}]
 @NamedStoredProcedureQuery(
     name = "Incident.incidentesPorGravedad",
     procedureName = "sp_incidentes_por_gravedad",
@@ -94,7 +94,7 @@ Las operaciones de reportes y agregaciones se encapsulan en stored procedures de
 public class Incident { ... }
 \end{lstlisting}
 
-\begin{lstlisting}[language=Java, caption={Invocación del SP desde el repositorio.}, label={lst:incidente-repo}]
+\begin{lstlisting}[language=Java, caption={SP invocation from the repository.}, label={lst:incidente-repo}]
 public interface IncidentRepository
         extends JpaRepository<Incident, Long> {
 
@@ -110,7 +110,7 @@ El cursor REFCURSOR se lee dentro de la misma transacción JDBC, por lo que \tex
 
 Las funciones SQL se invocan con \texttt{SELECT}. El siguiente listado muestra la función \texttt{fn\_total\_programaciones}:
 
-\begin{lstlisting}[language=Java, caption={Consultas nativas en ScheduleRepository.}, label={lst:fn-programaciones}]
+\begin{lstlisting}[language=Java, caption={Native queries in ScheduleRepository.}, label={lst:fn-programaciones}]
 public interface ScheduleRepository
         extends JpaRepository<Schedule, Integer> {
 
