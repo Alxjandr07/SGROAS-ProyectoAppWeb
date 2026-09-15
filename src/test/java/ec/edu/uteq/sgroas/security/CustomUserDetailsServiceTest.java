@@ -31,13 +31,13 @@ class CustomUserDetailsServiceTest {
     void loadUserByUsernameDebeRetornarUsuario() {
         User usuario = User.builder()
                 .id(1L)
-                .nombre("Administrador SGROAS")
+                .name("Administrador SGROAS")
                 .email("admin@sgroas.com")
                 .passwordHash("password-encriptado")
-                .rol(Role.ROLE_ADMIN)
-                .activo(true)
-                .creadoEn(Instant.now())
-                .actualizadoEn(Instant.now())
+                .role(Role.ROLE_ADMIN)
+                .active(true)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
                 .build();
         when(usuarioRepository.findByEmail("admin@sgroas.com"))
                 .thenReturn(Optional.of(usuario));
@@ -63,11 +63,11 @@ class CustomUserDetailsServiceTest {
     void loadUserByUsernameConUsuarioInactivoDebeLanzarExcepcion() {
         User inactivo = User.builder()
                 .id(1L)
-                .nombre("Administrador")
+                .name("Administrador")
                 .email("admin@sgroas.com")
                 .passwordHash("hash")
-                .rol(Role.ROLE_ADMIN)
-                .activo(false)
+                .role(Role.ROLE_ADMIN)
+                .active(false)
                 .build();
         when(usuarioRepository.findByEmail("admin@sgroas.com"))
                 .thenReturn(Optional.of(inactivo));

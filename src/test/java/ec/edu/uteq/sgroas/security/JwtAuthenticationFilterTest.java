@@ -123,13 +123,13 @@ class JwtAuthenticationFilterTest {
     void tokenValidoDebeEstablecerAutenticacion() throws Exception {
         User usuario = User.builder()
                 .id(1L)
-                .nombre("Administrador SGROAS")
+                .name("Administrador SGROAS")
                 .email("admin@sgroas.com")
                 .passwordHash("hash")
-                .rol(Role.ROLE_ADMIN)
-                .activo(true)
-                .creadoEn(Instant.now())
-                .actualizadoEn(Instant.now())
+                .role(Role.ROLE_ADMIN)
+                .active(true)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
                 .build();
         org.springframework.security.core.userdetails.User userDetails =
                 new org.springframework.security.core.userdetails.User(

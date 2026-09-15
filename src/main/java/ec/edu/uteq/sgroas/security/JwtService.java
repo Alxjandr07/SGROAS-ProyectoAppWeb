@@ -50,8 +50,8 @@ public class JwtService {
                 .issuedAt(ahora)
                 .notBefore(ahora)
                 .expiration(expiracion)
-                .claim("nombre", usuario.getNombre())
-                .claim("rol", usuario.getRol().name())
+                .claim("nombre", usuario.getName())
+                .claim("rol", usuario.getRole().name())
                 .signWith(getSigningKey(), Jwts.SIG.HS256)
                 .compact();
     }
