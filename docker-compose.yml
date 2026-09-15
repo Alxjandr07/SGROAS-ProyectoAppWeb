@@ -3,9 +3,9 @@ services:
     image: postgres:18@sha256:3a82e1f56c8f0f5616a11103ac3d47e632c3938698946a7ad26da0df1334744a
     container_name: sgroas-postgres
     environment:
-      POSTGRES_DB: sgroas_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-sgroas_db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5433:5432"
     volumes:
@@ -35,14 +35,14 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/sgroas_db
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
 
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
       SPRING_REDIS_HOST: redis
       SPRING_REDIS_PORT: 6379
 
-      APP_JWT_SECRET: SGROAS_SECRET_KEY_DE_DESARROLLO_2026_ENTREGA_1B_CON_MINIMO_32_CARACTERES
+      APP_JWT_SECRET: ${JWT_SECRET}
       APP_JWT_EXPIRATION_MS: 3600000
       APP_JWT_REFRESH_EXPIRATION_MS: 604800000
     ports:
