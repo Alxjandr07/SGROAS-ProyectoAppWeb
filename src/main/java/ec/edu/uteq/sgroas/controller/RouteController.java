@@ -74,8 +74,8 @@ public class RouteController {
      * @return respuesta HTTP sin contenido que confirma la operación realizada.
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> desactivar(@PathVariable Long id) {
-        rutaService.desactivar(id);
+    public ResponseEntity<Void> deactivate(@PathVariable Long id) {
+        rutaService.deactivate(id);
         return ResponseEntity.noContent().build();
     }
 }

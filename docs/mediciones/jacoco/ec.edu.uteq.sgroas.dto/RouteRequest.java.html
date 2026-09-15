@@ -2,7 +2,17 @@
 
 import jakarta.validation.constraints.*;
 
-<span class="fc" id="L5">public record RouteRequest(</span>
+    /**
+     * Route data required to create or update a route record.
+     * @param code unique route code.
+     * @param name route display name.
+     * @param origin departure point.
+     * @param destination arrival point.
+     * @param distanceKm route distance in kilometers.
+     * @param durationMin estimated travel time in minutes.
+     * @param status route status code.
+     */
+<span class="fc" id="L15">public record RouteRequest(</span>
 
         @NotBlank(message = &quot;El codigo es obligatorio&quot;)
         @Size(max = 20, message = &quot;El codigo no puede superar los 20 caracteres&quot;)

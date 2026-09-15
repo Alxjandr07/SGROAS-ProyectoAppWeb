@@ -35,7 +35,7 @@ class ReporteControllerTest {
     }
 
     @Test
-    void estadisticasGeneralesDevuelveDatos() throws Exception {
+    void generalStatisticsDevuelveDatos() throws Exception {
         when(reporteService.generalStatistics())
                 .thenReturn(List.of(Map.of(
                         "total_conductores", 10L,
@@ -48,7 +48,7 @@ class ReporteControllerTest {
     }
 
     @Test
-    void incidentesPorGravedadFiltraPorTipo() throws Exception {
+    void incidentsBySeverityFiltersByType() throws Exception {
         when(reporteService.incidentsBySeverity("ROBO")).thenReturn(
                 List.of(Map.of("gravedad", "ALTA", "total_incidentes", 2L)));
 
@@ -58,7 +58,7 @@ class ReporteControllerTest {
     }
 
     @Test
-    void incidentesPorRangoConFechas() throws Exception {
+    void incidentsByRangeWithDates() throws Exception {
         when(reporteService.incidentsByRange(any(Instant.class), any(Instant.class)))
                 .thenReturn(List.of(Map.of("incidente_id", 1L, "tipo", "ACCIDENTE")));
 
@@ -80,7 +80,7 @@ class ReporteControllerTest {
     }
 
     @Test
-    void vehiculosEnMantenimientoDevuelveLista() throws Exception {
+    void vehiclesInMaintenanceReturnsList() throws Exception {
         when(reporteService.vehiclesInMaintenance())
                 .thenReturn(List.of(Map.of("placa", "PCH-1234")));
 
@@ -100,7 +100,7 @@ class ReporteControllerTest {
     }
 
     @Test
-    void asignacionesActivasDevuelveAsignaciones() throws Exception {
+    void activeAssignmentsReturnsAssignments() throws Exception {
         when(reporteService.activeAssignmentsByDriver(anyLong()))
                 .thenReturn(List.of(Map.of("vehiculo_placa", "PCH-5678")));
 
@@ -110,7 +110,7 @@ class ReporteControllerTest {
     }
 
     @Test
-    void incidentesPorGravedadSinParametroNoFalla() throws Exception {
+    void incidentsBySeverityWithoutParameterDoesNotFail() throws Exception {
         when(reporteService.incidentsBySeverity(nullable(String.class)))
                 .thenReturn(List.of(Map.of("gravedad", "BAJA", "total_incidentes", 0L)));
 

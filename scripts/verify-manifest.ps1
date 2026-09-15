@@ -1,12 +1,13 @@
 #!/usr/bin/env pwsh
-# verify-manifest.ps1 — Equivalente a sha256sum -c MANIFEST.sha256
+# verify-manifest.ps1 — Equivalente a sha256sum -c dataset/MANIFEST.sha256
 # Uso: .\scripts\verify-manifest.ps1
 # Salida: OK o FAILED por cada archivo, y resumen final.
+# Las rutas del manifiesto son relativas a la raiz del repositorio.
 
 $ErrorActionPreference = "Stop"
 $scriptDir = Split-Path $MyInvocation.MyCommand.Path -Parent
-$manifestPath = Join-Path (Join-Path $scriptDir "..") "dataset\MANIFEST.sha256"
-$baseDir = Split-Path $manifestPath -Parent
+$repoRoot = Resolve-Path (Join-Path $scriptDir "..")
+$manifestPath = Join-Path $repoRoot "dataset\MANIFEST.sha256"
 
 if (-not (Test-Path $manifestPath)) {
     Write-Error "Manifest not found: $manifestPath"
@@ -28,7 +29,7 @@ foreach ($line in $lines) {
 
     $expectedHash = $parts[0]
     $filePath = $parts[1]
-    $fullPath = Join-Path $baseDir $filePath
+    $fullPath = Join-Path $repoRoot $filePath
 
     if (-not (Test-Path $fullPath)) {
         Write-Host "FAILED: $filePath (file not found)"

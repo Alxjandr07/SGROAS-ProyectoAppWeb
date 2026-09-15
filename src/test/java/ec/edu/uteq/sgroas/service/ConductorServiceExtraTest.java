@@ -59,7 +59,7 @@ class ConductorServiceExtraTest {
     }
 
     @Test
-    void listarDebeRetornarPagina() {
+    void listReturnsPage() {
         PageRequest pageable = PageRequest.of(0, 10);
         when(conductorRepository.findByActiveTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(conductorEjemplo())));
@@ -71,7 +71,7 @@ class ConductorServiceExtraTest {
     }
 
     @Test
-    void buscarPorIdInexistenteDebeLanzarExcepcion() {
+    void findByIdNonexistentThrowsException() {
         when(conductorRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class,
@@ -79,7 +79,7 @@ class ConductorServiceExtraTest {
     }
 
     @Test
-    void buscarConductorInactivoDebeLanzarExcepcion() {
+    void findInactiveDriverThrowsException() {
         Driver inactivo = conductorEjemplo();
         inactivo.setActive(false);
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(inactivo));
@@ -89,7 +89,7 @@ class ConductorServiceExtraTest {
     }
 
     @Test
-    void crearConLicenciaDuplicadaDebeLanzarExcepcion() {
+    void createWithDuplicateLicenseThrowsException() {
         when(conductorRepository.existsByNationalId("1200000001")).thenReturn(false);
         when(conductorRepository.existsByLicenseNumber("LIC-001-2026")).thenReturn(true);
 
@@ -98,7 +98,7 @@ class ConductorServiceExtraTest {
     }
 
     @Test
-    void crearConEstadoInvalidoDebeLanzarExcepcion() {
+    void createWithInvalidStatusThrowsException() {
         when(conductorRepository.existsByNationalId("1200000001")).thenReturn(false);
         when(conductorRepository.existsByLicenseNumber("LIC-001-2026")).thenReturn(false);
 
@@ -113,7 +113,7 @@ class ConductorServiceExtraTest {
     }
 
     @Test
-    void actualizarDebeModificarYRetornar() {
+    void updateModifiesAndReturns() {
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductorEjemplo()));
         when(conductorRepository.save(any(Driver.class))).thenReturn(conductorEjemplo());
 
@@ -124,7 +124,7 @@ class ConductorServiceExtraTest {
     }
 
     @Test
-    void actualizarConCedulaDeOtroDebeLanzarExcepcion() {
+    void updateWithOtherCedulaThrowsException() {
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductorEjemplo()));
         when(conductorRepository.existsByNationalId("1299999999")).thenReturn(true);
 
@@ -139,7 +139,7 @@ class ConductorServiceExtraTest {
     }
 
     @Test
-    void actualizarConLicenciaDeOtroDebeLanzarExcepcion() {
+    void updateWithOtherLicenseThrowsException() {
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductorEjemplo()));
         when(conductorRepository.existsByLicenseNumber("LIC-999-2026")).thenReturn(true);
 
@@ -154,10 +154,10 @@ class ConductorServiceExtraTest {
     }
 
     @Test
-    void desactivarDebeCambiarEstado() {
+    void deactivateChangesStatus() {
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductorEjemplo()));
 
-        conductorService.desactivar(1L);
+        conductorService.deactivate(1L);
 
         verify(conductorRepository).save(argThat(c ->
                 !c.getActive() && c.getStatus() == DriverStatus.INACTIVO));

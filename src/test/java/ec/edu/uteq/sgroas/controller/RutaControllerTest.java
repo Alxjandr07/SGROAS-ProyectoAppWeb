@@ -50,7 +50,7 @@ class RutaControllerTest {
     }
 
     @Test
-    void listarDebeRetornar200() throws Exception {
+    void listReturns200() throws Exception {
         when(rutaService.list(any()))
                 .thenReturn(new PageImpl<>(List.of(responseEjemplo())));
 
@@ -59,7 +59,7 @@ class RutaControllerTest {
     }
 
     @Test
-    void buscarPorIdDebeRetornar200() throws Exception {
+    void findByIdReturns200() throws Exception {
         when(rutaService.findById(1L)).thenReturn(responseEjemplo());
 
         mockMvc().perform(get("/api/rutas/1"))
@@ -68,7 +68,7 @@ class RutaControllerTest {
     }
 
     @Test
-    void crearDebeRetornar201() throws Exception {
+    void createReturns201() throws Exception {
         when(rutaService.create(any())).thenReturn(responseEjemplo());
 
         mockMvc().perform(post("/api/rutas")
@@ -89,7 +89,7 @@ class RutaControllerTest {
     }
 
     @Test
-    void actualizarDebeRetornar200() throws Exception {
+    void updateReturns200() throws Exception {
         when(rutaService.update(any(), any())).thenReturn(responseEjemplo());
 
         mockMvc().perform(put("/api/rutas/1")
@@ -109,7 +109,7 @@ class RutaControllerTest {
     }
 
     @Test
-    void desactivarDebeRetornar204() throws Exception {
+    void deactivateReturns204() throws Exception {
         mockMvc().perform(delete("/api/rutas/1"))
                 .andExpect(status().isNoContent());
     }

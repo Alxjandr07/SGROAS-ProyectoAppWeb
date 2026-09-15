@@ -28,6 +28,11 @@ public class RouteAssignmentService {
     private final VehicleRepository vehiculoRepository;
     private final RouteRepository rutaRepository;
 
+    /**
+     * Returns a paginated list of active route assignments.
+     * @param pageable pagination and sorting configuration.
+     * @return page of assignment response records.
+     */
     @Transactional(readOnly = true)
     public Page<RouteAssignmentResponse> list(Pageable pageable) {
         Page<RouteAssignment> page = asignacionRutaRepository.findByActiveTrue(pageable);
@@ -35,6 +40,11 @@ public class RouteAssignmentService {
         return new PageImpl<>(contenido, pageable, page.getTotalElements());
     }
 
+    /**
+     * Returns the cached list of active assignments for the given pageable, keyed by page.
+     * @param pageable pagination and sorting configuration.
+     * @return list of assignment response records.
+     */
     @Cacheable(value = "asignaciones", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
     @Transactional(readOnly = true)
     public List<RouteAssignmentResponse> listCached(Pageable pageable) {
@@ -43,12 +53,22 @@ public class RouteAssignmentService {
                 .getContent();
     }
 
+    /**
+     * Retrieves a route assignment by its unique identifier.
+     * @param id assignment unique identifier.
+     * @return the matching assignment response.
+     */
     @Transactional(readOnly = true)
     public RouteAssignmentResponse findById(Long id) {
         RouteAssignment asignacion = getActiveAssignment(id);
         return mapearAResponse(asignacion);
     }
 
+    /**
+     * Registers a new route assignment. Caches are evicted after creation.
+     * @param request assignment data to register.
+     * @return the created assignment response.
+     */
     @CacheEvict(value = "asignaciones", allEntries = true)
     public RouteAssignmentResponse create(RouteAssignmentRequest request) {
         Driver conductor = conductorRepository.findById(request.driverId())
@@ -80,6 +100,12 @@ public class RouteAssignmentService {
         return mapearAResponse(asignacionGuardada);
     }
 
+    /**
+     * Updates an existing active route assignment. Caches are evicted after update.
+     * @param id assignment unique identifier.
+     * @param request new assignment data.
+     * @return the updated assignment response.
+     */
     @CacheEvict(value = "asignaciones", allEntries = true)
     public RouteAssignmentResponse update(Long id, RouteAssignmentRequest request) {
         RouteAssignment asignacion = getActiveAssignment(id);
@@ -109,8 +135,12 @@ public class RouteAssignmentService {
         return mapearAResponse(asignacionActualizada);
     }
 
+    /**
+     * Logically deactivates a route assignment. Caches are evicted after deactivation.
+     * @param id routeassignment unique identifier.
+     */
     @CacheEvict(value = "asignaciones", allEntries = true)
-    public void desactivar(Long id) {
+    public void deactivate(Long id) {
         RouteAssignment asignacion = getActiveAssignment(id);
         asignacion.setActive(false);
         asignacion.setStatus(AssignmentStatus.CANCELADA);

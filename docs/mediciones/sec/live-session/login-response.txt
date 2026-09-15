@@ -1,0 +1,27 @@
+HTTP/1.1 200 OK
+Date: Mon, 14 Sep 2026 04:25:26 GMT
+Content-Type: application/json
+Transfer-Encoding: chunked
+Connection: keep-alive
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+content-security-policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'
+expires: 0
+pragma: no-cache
+rndr-id: 9deaa2fe-3cc2-470d
+Server: cloudflare
+Set-Cookie: access_token=eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI0ZDY0NzhlYy1iMDU2LTQxNWItYTg3OC04MTg2ODJlNWZkMzciLCJpc3MiOiJodHRwczovL3Nncm9hcy1iYWNrZW5kLm9ucmVuZGVyLmNvbSIsInN1YiI6ImFkbWluQHNncm9hcy5jb20iLCJhdWQiOlsic2dyb2FzLWZyb250ZW5kIl0sImlhdCI6MTc4OTM1OTkyNiwibmJmIjoxNzg5MzU5OTI2LCJleHAiOjE3ODkzNjM1MjYsIm5vbWJyZSI6IkFkbWluIFNHUk9BUyIsInJvbCI6IlJPTEVfQURNSU4ifQ.JVJQ4IHd6dmAOQOJEKdLkNetC6YXFZyT-hSuuPVA4qo; Path=/; Max-Age=3600; Expires=Mon, 14 Sep 2026 05:25:26 GMT; Secure; HttpOnly; SameSite=Strict
+Set-Cookie: refresh_token=d2e80c26-d691-4cf3-89c0-a55fd7e454fd; Path=/api/auth; Max-Age=604800; Expires=Mon, 21 Sep 2026 04:25:26 GMT; Secure; HttpOnly; SameSite=Strict
+strict-transport-security: max-age=31536000 ; includeSubDomains
+vary: Origin
+vary: Access-Control-Request-Method
+vary: Access-Control-Request-Headers
+vary: Accept-Encoding
+x-content-type-options: nosniff
+x-frame-options: DENY
+x-render-origin-server: Render
+x-xss-protection: 0
+cf-cache-status: DYNAMIC
+CF-RAY: a3aca0affa278253-GYE
+alt-svc: h3=":443"; ma=86400
+
+{"nombre":"Admin SGROAS","email":"admin@sgroas.com","rol":"ROLE_ADMIN","expiresIn":3600000}

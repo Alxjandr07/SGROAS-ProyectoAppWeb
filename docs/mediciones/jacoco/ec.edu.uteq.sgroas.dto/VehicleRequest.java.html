@@ -2,7 +2,19 @@
 
 import jakarta.validation.constraints.*;
 
-<span class="fc" id="L5">public record VehicleRequest(</span>
+    /**
+     * Vehicle data required to create or update a vehicle record.
+     * @param plate vehicle plate number.
+     * @param brand vehicle brand.
+     * @param model vehicle model.
+     * @param year manufacturing year.
+     * @param capacity passenger capacity.
+     * @param engineNumber optional engine number.
+     * @param chassisNumber optional chassis number.
+     * @param color optional vehicle color.
+     * @param status vehicle status code.
+     */
+<span class="fc" id="L17">public record VehicleRequest(</span>
 
         @NotBlank(message = &quot;La placa es obligatoria&quot;)
         @Size(max = 20, message = &quot;La placa no puede superar los 20 caracteres&quot;)

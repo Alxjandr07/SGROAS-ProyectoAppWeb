@@ -35,6 +35,12 @@ public class VerificationCodeService {
     private final VerificationCodeRepository repository;
     private final SecureRandom aleatorio = new SecureRandom();
 
+    /**
+     * Generates a new 6-digit single-use code for the given email and type, deleting any previous code, and stores only its SHA-256 hash.
+     * @param email recipient email address.
+     * @param type code purpose (verification or password reset).
+     * @return the plain 6-digit code to deliver to the user.
+     */
     @Transactional
     public String generate(String email, Type type) {
         repository.deleteByEmailAndType(email, type.name());
@@ -52,12 +58,25 @@ public class VerificationCodeService {
         return codigo;
     }
 
+    /**
+     * Checks whether a new code may be resent for the given email and type respecting the resend cooldown.
+     * @param email recipient email address.
+     * @param type code purpose.
+     * @return true if resending is allowed, false otherwise.
+     */
     public boolean canResend(String email, Type type) {
         return repository.findFirstByEmailAndTypeOrderByCreatedAtDesc(email, type.name())
                 .map(c -> c.getCreatedAt().isBefore(Instant.now().minus(ESPERA_REENVIO)))
                 .orElse(true);
     }
 
+    /**
+     * Validates a code for the given email and type: checks usage, expiration, attempt limit and hash match, marking it as used on success.
+     * @param email recipient email address.
+     * @param type code purpose.
+     * @param codigo plain 6-digit code entered by the user.
+     * @throws IllegalArgumentException if the code is invalid, expired or exhausted.
+     */
     @Transactional
     public void validate(String email, Type type, String codigo) {
         VerificationCode registro = repository

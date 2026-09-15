@@ -56,6 +56,15 @@ Todo número del informe es re-derivable desde estas fuentes (reglas de oro 6 y 
 |---|---|---|---|
 | Evidencias OWASP A01–A09 | `docs/mediciones/sec/*` | scripts de evidencia (`A01-*.sh`, etc.) | `34f3a6a`, `56002f3`, `9f67bfc` |
 | ZAP baseline | `docs/mediciones/sec/zap/zap-baseline-2026-09-06.html`, `.md` | `scripts/zap/run-zap.sh` | `ca7f700` |
+| Sesión en vivo + cookie segura (P6/P16) | `docs/mediciones/sec/live-session/{login-response.txt,auth-me.json,asignaciones.json,sin-sesion-403.txt}` | `curl` contra `https://sgroas-backend.onrender.com` | `7e49da9` |
+
+## 5b. Usabilidad (SUS) — ampliación demográfica (P13)
+
+| Artefacto (tabla/figura) en informe | Datos crudos | Script | Commit |
+|---|---|---|---|
+| Tabla "Demografía y puntaje SUS" (`tab:sus-demografia`) | `docs/mediciones/sus/sus-raw.csv` (15 filas `P01`…`P15`, con `edad/sexo/experiencia_web/dispositivo`) | `scripts/validate-sus-demografia.sh` | `7e49da9` |
+| Fig. "Demografía vs SUS" | ídem | `scripts/gen-figuras.py` → `fig-sus-demografia.png` | `7e49da9` |
+| Reporte SUS alineado (n=15) | ídem | — | `7e49da9` |
 
 ## 6. Dataset público (Zenodo) — Bloque G / K6
 

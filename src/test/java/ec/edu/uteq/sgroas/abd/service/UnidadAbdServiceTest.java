@@ -40,7 +40,7 @@ class UnidadAbdServiceTest {
     }
 
     @Test
-    void listarSinFiltrosUsaFindAll() {
+    void listWithoutFiltersUsesFindAll() {
         PageRequest pageable = PageRequest.of(0, 10);
         when(unidadRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(unidadEjemplo())));
 
@@ -52,7 +52,7 @@ class UnidadAbdServiceTest {
     }
 
     @Test
-    void listarConBlancosUsaFindAll() {
+    void listWithBlanksUsesFindAll() {
         PageRequest pageable = PageRequest.of(0, 10);
         when(unidadRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of()));
 
@@ -62,7 +62,7 @@ class UnidadAbdServiceTest {
     }
 
     @Test
-    void listarConFiltrosUsaBuscar() {
+    void listWithFiltersUsesSearch() {
         PageRequest pageable = PageRequest.of(0, 10);
         when(unidadRepository.searchWithFilters(eq("activo"), eq("abc"), any()))
                 .thenReturn(new PageImpl<>(List.of(unidadEjemplo())));
@@ -74,7 +74,7 @@ class UnidadAbdServiceTest {
     }
 
     @Test
-    void buscarPorIdOkYNoEncontrado() {
+    void findByIdOkAndNotFound() {
         when(unidadRepository.findById(1)).thenReturn(Optional.of(unidadEjemplo()));
         assertEquals("ABC-1234", service.findById(1).placa());
 
@@ -83,7 +83,7 @@ class UnidadAbdServiceTest {
     }
 
     @Test
-    void crearConEstadoNuloUsaActivoPorDefecto() {
+    void createWithNullStatusUsesActiveByDefault() {
         when(unidadRepository.existsByPlacaIgnoreCase("ABC-1234")).thenReturn(false);
         when(unidadRepository.existsByNumeroDiscoIgnoreCase("001")).thenReturn(false);
         when(unidadRepository.save(any(Unit.class))).thenReturn(unidadEjemplo());
@@ -95,7 +95,7 @@ class UnidadAbdServiceTest {
     }
 
     @Test
-    void crearConPlacaDuplicadaFalla() {
+    void createWithDuplicatePlateFails() {
         when(unidadRepository.existsByPlacaIgnoreCase("ABC-1234")).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class, () -> service.create(requestEjemplo("Activo")));
@@ -103,7 +103,7 @@ class UnidadAbdServiceTest {
     }
 
     @Test
-    void crearConDiscoDuplicadoFalla() {
+    void createWithDuplicateDiskFails() {
         when(unidadRepository.existsByPlacaIgnoreCase("ABC-1234")).thenReturn(false);
         when(unidadRepository.existsByNumeroDiscoIgnoreCase("001")).thenReturn(true);
 
@@ -111,7 +111,7 @@ class UnidadAbdServiceTest {
     }
 
     @Test
-    void actualizarSinEstadoMantieneActual() {
+    void updateWithoutStatusKeepsCurrent() {
         Unit actual = unidadEjemplo();
         when(unidadRepository.findById(1)).thenReturn(Optional.of(actual));
         when(unidadRepository.save(any(Unit.class))).thenReturn(actual);
@@ -123,7 +123,7 @@ class UnidadAbdServiceTest {
     }
 
     @Test
-    void actualizarConEstadoLoCambia() {
+    void updateWithStatusChangesIt() {
         Unit actual = unidadEjemplo();
         actual.setPlaca("XYZ-9999");
         actual.setNumeroDisco("009");
@@ -138,7 +138,7 @@ class UnidadAbdServiceTest {
     }
 
     @Test
-    void actualizarPlacaDuplicadaFalla() {
+    void updateWithDuplicatePlateFails() {
         Unit actual = unidadEjemplo();
         actual.setPlaca("OTRA-0000");
         when(unidadRepository.findById(1)).thenReturn(Optional.of(actual));
@@ -148,7 +148,7 @@ class UnidadAbdServiceTest {
     }
 
     @Test
-    void actualizarDiscoDuplicadoFalla() {
+    void updateWithDuplicateDiskFails() {
         Unit actual = unidadEjemplo();
         actual.setNumeroDisco("009");
         when(unidadRepository.findById(1)).thenReturn(Optional.of(actual));
@@ -158,14 +158,14 @@ class UnidadAbdServiceTest {
     }
 
     @Test
-    void actualizarInexistenteFalla() {
+    void updateNonexistentFails() {
         when(unidadRepository.findById(99)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () -> service.update(99, requestEjemplo("Activo")));
     }
 
     @Test
-    void eliminarOkYNoExiste() {
+    void deleteOkAndDoesNotExist() {
         when(unidadRepository.existsById(1)).thenReturn(true);
         service.delete(1);
         verify(unidadRepository).deleteById(1);

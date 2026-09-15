@@ -74,8 +74,8 @@ public class IncidentController {
      * @return respuesta HTTP sin contenido que confirma la operación realizada.
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> desactivar(@PathVariable Long id) {
-        incidenteService.desactivar(id);
+    public ResponseEntity<Void> deactivate(@PathVariable Long id) {
+        incidenteService.deactivate(id);
         return ResponseEntity.noContent().build();
     }
 }

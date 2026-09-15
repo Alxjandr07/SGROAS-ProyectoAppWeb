@@ -23,11 +23,21 @@ public class IncidentService {
     private final IncidentRepository incidenteRepository;
     private final RouteAssignmentRepository asignacionRutaRepository;
 
+    /**
+     * Returns a paginated list of active incidents.
+     * @param pageable pagination and sorting configuration.
+     * @return page of incident response records.
+     */
     public Page<IncidentResponse> list(Pageable pageable) {
         List<IncidentResponse> contenido = listCached(pageable);
         return new PageImpl<>(contenido, pageable, contenido.size());
     }
 
+    /**
+     * Returns the cached list of active incidents for the given pageable, keyed by page.
+     * @param pageable pagination and sorting configuration.
+     * @return list of incident response records.
+     */
     @Cacheable(value = "incidentes", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
     public List<IncidentResponse> listCached(Pageable pageable) {
         return incidenteRepository.findByActiveTrue(pageable)
@@ -35,11 +45,22 @@ public class IncidentService {
                 .getContent();
     }
 
+    /**
+     * Retrieves an incident by its unique identifier.
+     * @param id incident unique identifier.
+     * @return the matching incident response.
+     */
     public IncidentResponse findById(Long id) {
         Incident incidente = getActiveIncident(id);
         return mapearAResponse(incidente);
     }
 
+    /**
+     * Registers a new incident associated with an active assignment. Caches are evicted after creation.
+     * @param request incident data to register.
+     * @return the created incident response.
+     * @throws IllegalArgumentException if the assignment is not found or is inactive.
+     */
     @CacheEvict(value = "incidentes", allEntries = true)
     public IncidentResponse create(IncidentRequest request) {
         RouteAssignment asignacion = asignacionRutaRepository.findById(request.assignmentId())
@@ -64,6 +85,12 @@ public class IncidentService {
         return mapearAResponse(incidenteGuardado);
     }
 
+    /**
+     * Updates an existing active incident. Caches are evicted after update.
+     * @param id incident unique identifier.
+     * @param request new incident data.
+     * @return the updated incident response.
+     */
     @CacheEvict(value = "incidentes", allEntries = true)
     public IncidentResponse update(Long id, IncidentRequest request) {
         Incident incidente = getActiveIncident(id);
@@ -86,8 +113,12 @@ public class IncidentService {
         return mapearAResponse(incidenteActualizado);
     }
 
+    /**
+     * Logically deactivates an incident and closes it. Caches are evicted after deactivation.
+     * @param id incident unique identifier.
+     */
     @CacheEvict(value = "incidentes", allEntries = true)
-    public void desactivar(Long id) {
+    public void deactivate(Long id) {
         Incident incidente = getActiveIncident(id);
         incidente.setActive(false);
         incidente.setStatus(IncidentStatus.CERRADO);

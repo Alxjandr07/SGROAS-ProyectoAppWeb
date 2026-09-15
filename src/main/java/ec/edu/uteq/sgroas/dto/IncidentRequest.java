@@ -6,6 +6,17 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 
+    /**
+     * Incident data required to create or update an incident record.
+     * @param assignmentId assignment associated with the incident.
+     * @param reportedBy person or system that reported the incident.
+     * @param type incident type code.
+     * @param description free-text description of the incident.
+     * @param incidentDate date and time when the incident happened.
+     * @param location optional place where the incident occurred.
+     * @param severity incident severity code.
+     * @param status incident status code.
+     */
 public record IncidentRequest(
 
         @NotNull(message = "La asignacion es obligatoria")

@@ -1,12 +1,13 @@
 # CONTRIBUCIONES — SGROAS Supletorio v1.1.0
 
 Estudiante: Luis Tejada
-Repositorio: SGROAS-Teacher
+Repositorio: https://github.com/gleiston-guerrero/SGROAS-ProyectoAppWeb
 Período: Supletorio 2026-09
+Integrantes: Luis Alejandro Tejada Bajaña, María del Rosario Escudero Plaza, Kevin Moisés Castro Espinoza
 
 ---
 
-## P1 — Passwords/secrets a variables de entorno (commit aabf596)
+## P1 — Passwords/secrets a variables de entorno (commit ac72f7a)
 
 **Archivos modificados:**
 - `src/main/resources/application.properties` — Reemplazado password hardcodeado por `${SPRING_DATASOURCE_PASSWORD}` y `${JWT_SECRET}`
@@ -14,20 +15,20 @@ Período: Supletorio 2026-09
 - `.env.example` — Archivo de ejemplo con placeholders CHANGE_ME
 - `src/test/java/ec/edu/uteq/sgroas/security/JwtServiceTest.java` — JWT_SECRET desde System.getenv() con fallback de test
 
-**Commit:** `aabf596` — "P1: remove hardcoded DB password and JWT secret from source"
+**Commit:** `ac72f7a` — "P1: remove hardcoded DB password and JWT secret from source"
 
 ---
 
-## P4 — Cookie Secure(true) (commit bbb0c95)
+## P4 — Cookie Secure(true) (commit 92576cf)
 
 **Archivos modificados:**
 - `src/main/java/ec/edu/uteq/sgroas/controller/AuthController.java` — 4 cookies actualizadas de `.secure(cookieSecure)` a `.secure(true)` (líneas 158, 195, 235, 252)
 
-**Commit:** `bbb0c95` — "P4: set cookie .secure(true) for all session cookies"
+**Commit:** `92576cf` — "P4+P5: rename entity fields to English and set cookie secure(true)"
 
 ---
 
-## P5 — Renombramiento de campos entidades (commit 7ca0117)
+## P5 — Renombramiento de campos entidades (commit c09f981)
 
 **Archivos modificados (entidades):**
 - `src/main/java/ec/edu/uteq/sgroas/entity/Driver.java` — 11 campos renombrados (nombres→firstNames, apellidos→lastNames, cedula→nationalId, etc.)
@@ -96,32 +97,32 @@ Período: Supletorio 2026-09
 - `src/test/java/ec/edu/uteq/sgroas/service/RutaServiceTest.java`
 - `src/test/java/ec/edu/uteq/sgroas/service/VehiculoServiceTest.java`
 
-**Commit:** `7ca0117` — "P5: rename all entity fields from Spanish to English"
+**Commit:** `92576cf` + `c09f981` — "P5: rename all entity fields from Spanish to English" + "refactor: update security classes for P5 field renames"
 
 ---
 
-## P7 — Captions de figuras/tablas en inglés (commit 7ce83f2)
+## P7 — Captions de figuras/tablas en inglés (commit 33e25e5)
 
 **Archivos modificados:**
-- `docs/informe-final/informe-final.md` — 12 captions traducidos:
+- `docs/informe-final/cap*.tex` y `docs/informe-final/capitulos/cap*.tex` — 12 captions traducidos:
   - 8 tablas: cap3 (Rol-based access control), cap4×2 (Password policies, Authentication time), cap5×2 (Route API, Incident API), cap6 (Response codes), cap8 (UTM zones), capA (Rate-limiting)
   - 4 listados: cap7 (JWT filter, Repositories, Email service, Validation)
 
-**Commit:** `7ce83f2` — "P7: translate all Spanish table and listing captions to English"
+**Commit:** `33e25e5` — "P7: translate all Spanish table and listing captions to English"
 
 ---
 
-## P8 — Script demografía SUS (commit ec2f34a)
+## P8 — Script demografía SUS (commit 5fa09b4)
 
 **Archivos creados:**
-- `scripts/generate-sus-demographics.py` — Lee `dataset/sus/sus-raw.csv`, genera tabla de demografía (15 participantes, 8H/7M, edades 19-25, SUS mean=68.5)
+- `scripts/generate-sus-demographics.py` — Lee `dataset/sus/sus-raw.csv`, genera tabla de demografía (15 participantes, 8M/7F, edades 19-25, SUS mean=68.5)
 - `dataset/sus/sus-raw.csv` — Datos crudos de participantes
 
-**Commit:** `ec2f34a` — "P8: add script to generate SUS demographics from raw CSV"
+**Commit:** `5fa09b4` — "P8: add script to generate SUS demographics from raw CSV"
 
 ---
 
-## P9 — Postman CRUD asignaciones (commit 6e14325)
+## P9 — Postman CRUD asignaciones (commit 20a487f)
 
 **Archivos modificados:**
 - `docs/postman/coleccion.json` — Agregada carpeta "Asignaciones" con 6 requests:
@@ -132,29 +133,29 @@ Período: Supletorio 2026-09
   5. DELETE (204)
   6. POST 422 validation
 
-**Commit:** `6e14325` — "P9: add CRUD requests for /api/asignaciones to Postman collection"
+**Commit:** `20a487f` — "P9: add CRUD requests for /api/asignaciones to Postman collection"
 
 ---
 
-## P10 — Manifest SHA-256 verificable (commit b875ad4)
+## P10 — Manifest SHA-256 verificable (commit fc25cb8)
 
 **Archivos creados/modificados:**
 - `dataset/MANIFEST.sha256` — Regenerado con 280 entradas
 - `scripts/verify-manifest.ps1` — Script de verificación (equivalente a sha256sum -c)
 - `scripts/regenerate-manifest.ps1` — Script de regeneración
 
-**Commit:** `b875ad4` — "P10: regenerate MANIFEST.sha256 and add verification scripts"
+**Commit:** `fc25cb8` — "P10: regenerate MANIFEST.sha256 and add verification scripts"
 
 ---
 
-## P11 — Instrumento Brooke + consentimientos (commit 15f1000)
+## P11 — Instrumento Brooke + consentimientos (commit fa1274c)
 
 **Archivos creados:**
 - `dataset/sus/SUS-INSTRUMENT.md` — Cuestionario System Usability Scale (Brooke 1996), 10 ítems
 - `dataset/sus/CONSENT-FORM.md` — Consentimiento informado según LOPDP
 - `dataset/sus/CONSENT-REGISTRY.md` — Registro de consentimiento de 15 participantes
 
-**Commit:** `15f1000` — "P11: add SUS instrument, consent form, and acceptance registry"
+**Commit:** `fa1274c` — "P11: add SUS instrument, consent form, and acceptance registry"
 
 ---
 
@@ -178,4 +179,17 @@ powershell -ExecutionPolicy Bypass -File scripts/verify-manifest.ps1
 
 ## Tag v1.1.0
 
-El tag `v1.1.0` apunta al commit `7ca0117` (último commit antes de la fecha límite).
+El tag `v1.1.0` apunta al commit `c09f981` (último commit antes de la fecha límite).
+
+---
+
+## Firmas
+
+Declaramos que los puntos pendientes listados en este documento fueron cerrados por los
+integrantes que firman, con los archivos y commits indicados en cada sección.
+
+| Integrante | Correo institucional | Firma |
+|---|---|---|
+| Luis Alejandro Tejada Bajaña | ltejadab@uteq.edu.ec | |
+| María del Rosario Escudero Plaza | mescuderop@uteq.edu.ec | |
+| Kevin Moisés Castro Espinoza | kcastroe2@uteq.edu.ec | |

@@ -49,7 +49,7 @@ class ConductorAbdControllerTest {
     }
 
     @Test
-    void listarSinSearchUsaFindAll() throws Exception {
+    void listWithoutSearchUsesFindAll() throws Exception {
         when(conductorAbdRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(conductor())));
 
         mockMvc().perform(get("/api/abd/conductores")).andExpect(status().isOk());
@@ -58,7 +58,7 @@ class ConductorAbdControllerTest {
     }
 
     @Test
-    void listarBlancoUsaFindAll() throws Exception {
+    void listBlankUsesFindAll() throws Exception {
         when(conductorAbdRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
 
         mockMvc().perform(get("/api/abd/conductores").param("search", "   "))
@@ -68,7 +68,7 @@ class ConductorAbdControllerTest {
     }
 
     @Test
-    void listarConSearchUsaBuscar() throws Exception {
+    void listWithSearchUsesSearch() throws Exception {
         when(conductorAbdRepository.search(eq("carlos"), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(conductor())));
 

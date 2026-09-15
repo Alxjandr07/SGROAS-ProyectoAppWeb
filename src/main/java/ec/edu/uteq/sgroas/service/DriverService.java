@@ -21,6 +21,12 @@ public class DriverService {
 
     private final DriverRepository conductorRepository;
 
+    /**
+     * Returns a paginated list of active drivers, optionally filtered by search text.
+     * @param search optional text filter applied to driver data.
+     * @param pageable pagination and sorting configuration.
+     * @return page of driver response records.
+     */
     public Page<DriverResponse> list(String search, Pageable pageable) {
         if (search == null || search.isBlank()) {
             return conductorRepository.findByActiveTrue(pageable).map(this::mapearAResponse);
@@ -29,11 +35,23 @@ public class DriverService {
                 .map(this::mapearAResponse);
     }
 
+    /**
+     * Retrieves a driver by its unique identifier.
+     * @param id driver unique identifier.
+     * @return the matching driver response.
+     * @throws IllegalArgumentException if no active driver exists with that id.
+     */
     public DriverResponse findById(Long id) {
         Driver conductor = getActiveDriver(id);
         return mapearAResponse(conductor);
     }
 
+    /**
+     * Registers a new driver with the received request data. Caches are evicted after creation.
+     * @param request driver data to register.
+     * @return the created driver response.
+     * @throws IllegalArgumentException if the national id or license is already in use.
+     */
     @CacheEvict(value = "conductores", allEntries = true)
     public DriverResponse create(DriverRequest request) {
         validateUniqueNationalId(request.nationalId());
@@ -58,6 +76,13 @@ public class DriverService {
         return mapearAResponse(conductorGuardado);
     }
 
+    /**
+     * Updates an existing active driver with the received request data. Caches are evicted after update.
+     * @param id driver unique identifier.
+     * @param request new driver data.
+     * @return the updated driver response.
+     * @throws IllegalArgumentException if the driver does not exist or identifiers collide.
+     */
     @CacheEvict(value = "conductores", allEntries = true)
     public DriverResponse update(Long id, DriverRequest request) {
         Driver conductor = getActiveDriver(id);
@@ -87,8 +112,12 @@ public class DriverService {
         return mapearAResponse(conductorActualizado);
     }
 
+    /**
+     * Logically deactivates a driver so it stops being available. Caches are evicted after deactivation.
+     * @param id driver unique identifier.
+     */
     @CacheEvict(value = "conductores", allEntries = true)
-    public void desactivar(Long id) {
+    public void deactivate(Long id) {
         Driver conductor = getActiveDriver(id);
         conductor.setActive(false);
         conductor.setStatus(DriverStatus.INACTIVO);

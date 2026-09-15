@@ -76,7 +76,7 @@ class AuthServiceExtraTest {
     }
 
     @Test
-    void verificarEmailCorrectoDebeActivarCuentaYRetornarTokens() {
+    void verifyCorrectEmailActivatesAccountAndReturnsTokens() {
         User usuario = usuarioEjemplo();
         usuario.setActive(false);
         usuario.setVerified(false);

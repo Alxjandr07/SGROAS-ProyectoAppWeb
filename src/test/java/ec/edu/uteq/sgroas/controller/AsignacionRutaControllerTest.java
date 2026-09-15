@@ -54,7 +54,7 @@ class AsignacionRutaControllerTest {
     }
 
     @Test
-    void listarDebeRetornar200() throws Exception {
+    void listReturns200() throws Exception {
         when(asignacionRutaService.list(any()))
                 .thenReturn(new PageImpl<>(List.of(responseEjemplo())));
 
@@ -63,7 +63,7 @@ class AsignacionRutaControllerTest {
     }
 
     @Test
-    void buscarPorIdDebeRetornar200() throws Exception {
+    void findByIdReturns200() throws Exception {
         when(asignacionRutaService.findById(1L)).thenReturn(responseEjemplo());
 
         mockMvc().perform(get("/api/asignaciones/1"))
@@ -72,7 +72,7 @@ class AsignacionRutaControllerTest {
     }
 
     @Test
-    void crearDebeRetornar201() throws Exception {
+    void createReturns201() throws Exception {
         when(asignacionRutaService.create(any())).thenReturn(responseEjemplo());
 
         mockMvc().perform(post("/api/asignaciones")
@@ -93,7 +93,7 @@ class AsignacionRutaControllerTest {
     }
 
     @Test
-    void actualizarDebeRetornar200() throws Exception {
+    void updateReturns200() throws Exception {
         when(asignacionRutaService.update(any(), any())).thenReturn(responseEjemplo());
 
         mockMvc().perform(put("/api/asignaciones/1")
@@ -113,7 +113,7 @@ class AsignacionRutaControllerTest {
     }
 
     @Test
-    void desactivarDebeRetornar204() throws Exception {
+    void deactivateReturns204() throws Exception {
         mockMvc().perform(delete("/api/asignaciones/1"))
                 .andExpect(status().isNoContent());
     }

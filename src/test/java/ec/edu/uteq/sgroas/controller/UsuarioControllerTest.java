@@ -50,7 +50,7 @@ class UsuarioControllerTest {
     }
 
     @Test
-    void listarDebeRetornar200() throws Exception {
+    void listReturns200() throws Exception {
         when(usuarioService.list(any(), any()))
                 .thenReturn(new PageImpl<>(List.of(responseEjemplo())));
 
@@ -59,7 +59,7 @@ class UsuarioControllerTest {
     }
 
     @Test
-    void buscarPorIdDebeRetornar200() throws Exception {
+    void findByIdReturns200() throws Exception {
         when(usuarioService.findById(1L)).thenReturn(responseEjemplo());
 
         mockMvc().perform(get("/api/usuarios/1"))
@@ -68,7 +68,7 @@ class UsuarioControllerTest {
     }
 
     @Test
-    void crearDebeRetornar201() throws Exception {
+    void createReturns201() throws Exception {
         when(usuarioService.create(any())).thenReturn(responseEjemplo());
 
         mockMvc().perform(post("/api/usuarios")
@@ -86,7 +86,7 @@ class UsuarioControllerTest {
     }
 
     @Test
-    void actualizarDebeRetornar200() throws Exception {
+    void updateReturns200() throws Exception {
         when(usuarioService.update(any(), any())).thenReturn(responseEjemplo());
 
         mockMvc().perform(put("/api/usuarios/1")
@@ -103,7 +103,7 @@ class UsuarioControllerTest {
     }
 
     @Test
-    void desactivarDebeRetornar204() throws Exception {
+    void deactivateReturns204() throws Exception {
         mockMvc().perform(delete("/api/usuarios/1"))
                 .andExpect(status().isNoContent());
     }

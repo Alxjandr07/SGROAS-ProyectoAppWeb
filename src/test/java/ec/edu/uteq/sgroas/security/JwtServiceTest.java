@@ -39,7 +39,7 @@ class JwtServiceTest {
     }
 
     @Test
-    void generarTokenDebePermitirExtraerDatos() {
+    void generateTokenAllowsExtractingData() {
         String token = jwtService.generateToken(usuarioEjemplo());
 
         assertNotNull(token);

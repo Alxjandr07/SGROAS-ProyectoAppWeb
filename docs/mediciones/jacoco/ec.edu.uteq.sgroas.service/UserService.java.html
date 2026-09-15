@@ -135,7 +135,7 @@ public class UserService {
      * @param id identificador del usuario que se desea dar de baja
      * @throws EntityNotFoundException cuando no existe un usuario con ese identificador
      */
-    public void desactivar(Long id) {
+    public void deactivate(Long id) {
 <span class="fc" id="L139">        User usuario = usuarioRepository.findById(id)</span>
 <span class="fc" id="L140">                .orElseThrow(() -&gt; new EntityNotFoundException(&quot;User no encontrado con id: &quot; + id));</span>
 <span class="fc" id="L141">        usuario.setActive(false);</span>

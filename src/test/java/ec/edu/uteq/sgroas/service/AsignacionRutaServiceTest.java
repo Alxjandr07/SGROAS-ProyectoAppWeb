@@ -91,7 +91,7 @@ class AsignacionRutaServiceTest {
     }
 
     @Test
-    void listarDebeRetornarPagina() {
+    void listReturnsPage() {
         PageRequest pageable = PageRequest.of(0, 10);
         when(asignacionRutaRepository.findByActiveTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(asignacionEjemplo())));
@@ -105,7 +105,7 @@ class AsignacionRutaServiceTest {
     }
 
     @Test
-    void buscarPorIdDebeRetornarAsignacion() {
+    void findByIdReturnsAssignment() {
         when(asignacionRutaRepository.findWithDetalle(1L))
                 .thenReturn(Optional.of(asignacionEjemplo()));
 
@@ -116,7 +116,7 @@ class AsignacionRutaServiceTest {
     }
 
     @Test
-    void buscarPorIdInexistenteDebeLanzarExcepcion() {
+    void findByIdNonexistentThrowsException() {
         when(asignacionRutaRepository.findWithDetalle(99L)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class,
@@ -124,7 +124,7 @@ class AsignacionRutaServiceTest {
     }
 
     @Test
-    void crearDebeGuardarYRetornar() {
+    void createSavesAndReturns() {
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductorEjemplo()));
         when(vehiculoRepository.findById(1L)).thenReturn(Optional.of(vehiculoEjemplo()));
         when(rutaRepository.findById(1L)).thenReturn(Optional.of(rutaEjemplo()));
@@ -139,7 +139,7 @@ class AsignacionRutaServiceTest {
     }
 
     @Test
-    void crearSinConductorDebeLanzarExcepcion() {
+    void createWithoutDriverThrowsException() {
         when(conductorRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class,
@@ -147,7 +147,7 @@ class AsignacionRutaServiceTest {
     }
 
     @Test
-    void crearSinVehiculoDebeLanzarExcepcion() {
+    void createWithoutVehicleThrowsException() {
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductorEjemplo()));
         when(vehiculoRepository.findById(1L)).thenReturn(Optional.empty());
 
@@ -156,7 +156,7 @@ class AsignacionRutaServiceTest {
     }
 
     @Test
-    void crearSinRutaDebeLanzarExcepcion() {
+    void createWithoutRouteThrowsException() {
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductorEjemplo()));
         when(vehiculoRepository.findById(1L)).thenReturn(Optional.of(vehiculoEjemplo()));
         when(rutaRepository.findById(1L)).thenReturn(Optional.empty());
@@ -166,7 +166,7 @@ class AsignacionRutaServiceTest {
     }
 
     @Test
-    void crearConEstadoInvalidoDebeLanzarExcepcion() {
+    void createWithInvalidStatusThrowsException() {
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductorEjemplo()));
         when(vehiculoRepository.findById(1L)).thenReturn(Optional.of(vehiculoEjemplo()));
         when(rutaRepository.findById(1L)).thenReturn(Optional.of(rutaEjemplo()));
@@ -181,7 +181,7 @@ class AsignacionRutaServiceTest {
     }
 
     @Test
-    void actualizarDebeModificarYRetornar() {
+    void updateModifiesAndReturns() {
         when(asignacionRutaRepository.findWithDetalle(1L))
                 .thenReturn(Optional.of(asignacionEjemplo()));
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductorEjemplo()));
@@ -197,11 +197,11 @@ class AsignacionRutaServiceTest {
     }
 
     @Test
-    void desactivarDebeCambiarEstado() {
+    void deactivateChangesStatus() {
         when(asignacionRutaRepository.findWithDetalle(1L))
                 .thenReturn(Optional.of(asignacionEjemplo()));
 
-        asignacionRutaService.desactivar(1L);
+        asignacionRutaService.deactivate(1L);
 
         verify(asignacionRutaRepository).save(argThat(a ->
                 !a.getActive() && a.getStatus() == AssignmentStatus.CANCELADA));

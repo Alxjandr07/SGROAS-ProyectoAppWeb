@@ -22,110 +22,141 @@ public class VehicleService {
 
     private final VehicleRepository vehiculoRepository;
 
+    /**
+     * Returns a paginated list of active vehicles.
+     * @param pageable pagination and sorting configuration.
+     * @return page of vehicle response records.
+     */
     public Page&lt;VehicleResponse&gt; list(Pageable pageable) {
-<span class="fc" id="L26">        List&lt;VehicleResponse&gt; contenido = listCached(pageable);</span>
-<span class="fc" id="L27">        return new PageImpl&lt;&gt;(contenido, pageable, contenido.size());</span>
+<span class="fc" id="L31">        List&lt;VehicleResponse&gt; contenido = listCached(pageable);</span>
+<span class="fc" id="L32">        return new PageImpl&lt;&gt;(contenido, pageable, contenido.size());</span>
     }
 
+    /**
+     * Returns the cached list of active vehicles for the given pageable, keyed by page.
+     * @param pageable pagination and sorting configuration.
+     * @return list of vehicle response records.
+     */
     @Cacheable(value = &quot;vehiculos&quot;, key = &quot;#pageable.pageNumber + '-' + #pageable.pageSize&quot;)
     public List&lt;VehicleResponse&gt; listCached(Pageable pageable) {
-<span class="fc" id="L32">        return vehiculoRepository.findByActiveTrue(pageable)</span>
-<span class="fc" id="L33">                .map(this::mapearAResponse)</span>
-<span class="fc" id="L34">                .getContent();</span>
+<span class="fc" id="L42">        return vehiculoRepository.findByActiveTrue(pageable)</span>
+<span class="fc" id="L43">                .map(this::mapearAResponse)</span>
+<span class="fc" id="L44">                .getContent();</span>
     }
 
+    /**
+     * Retrieves a vehicle by its unique identifier.
+     * @param id vehicle unique identifier.
+     * @return the matching vehicle response.
+     */
     public VehicleResponse findById(Long id) {
-<span class="fc" id="L38">        Vehicle vehiculo = getActiveVehicle(id);</span>
-<span class="fc" id="L39">        return mapearAResponse(vehiculo);</span>
+<span class="fc" id="L53">        Vehicle vehiculo = getActiveVehicle(id);</span>
+<span class="fc" id="L54">        return mapearAResponse(vehiculo);</span>
     }
 
+    /**
+     * Registers a new vehicle. Caches are evicted after creation.
+     * @param request vehicle data to register.
+     * @return the created vehicle response.
+     * @throws IllegalArgumentException if the plate is already in use.
+     */
     @CacheEvict(value = &quot;vehiculos&quot;, allEntries = true)
     public VehicleResponse create(VehicleRequest request) {
-<span class="fc bfc" id="L44" title="All 2 branches covered.">        if (vehiculoRepository.existsByPlate(request.plate())) {</span>
-<span class="fc" id="L45">            throw new IllegalArgumentException(&quot;Ya existe un vehiculo con esa placa&quot;);</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        if (vehiculoRepository.existsByPlate(request.plate())) {</span>
+<span class="fc" id="L66">            throw new IllegalArgumentException(&quot;Ya existe un vehiculo con esa placa&quot;);</span>
         }
 
-<span class="fc" id="L48">        Vehicle vehiculo = Vehicle.builder()</span>
-<span class="fc" id="L49">                .plate(request.plate())</span>
-<span class="fc" id="L50">                .brand(request.brand())</span>
-<span class="fc" id="L51">                .model(request.model())</span>
-<span class="fc" id="L52">                .year(request.year())</span>
-<span class="fc" id="L53">                .capacity(request.capacity())</span>
-<span class="fc" id="L54">                .engineNumber(request.engineNumber())</span>
-<span class="fc" id="L55">                .chassisNumber(request.chassisNumber())</span>
-<span class="fc" id="L56">                .color(request.color())</span>
-<span class="fc" id="L57">                .status(toStatus(request.status()))</span>
-<span class="fc" id="L58">                .active(true)</span>
-<span class="fc" id="L59">                .createdAt(Instant.now())</span>
-<span class="fc" id="L60">                .updatedAt(Instant.now())</span>
-<span class="fc" id="L61">                .build();</span>
+<span class="fc" id="L69">        Vehicle vehiculo = Vehicle.builder()</span>
+<span class="fc" id="L70">                .plate(request.plate())</span>
+<span class="fc" id="L71">                .brand(request.brand())</span>
+<span class="fc" id="L72">                .model(request.model())</span>
+<span class="fc" id="L73">                .year(request.year())</span>
+<span class="fc" id="L74">                .capacity(request.capacity())</span>
+<span class="fc" id="L75">                .engineNumber(request.engineNumber())</span>
+<span class="fc" id="L76">                .chassisNumber(request.chassisNumber())</span>
+<span class="fc" id="L77">                .color(request.color())</span>
+<span class="fc" id="L78">                .status(toStatus(request.status()))</span>
+<span class="fc" id="L79">                .active(true)</span>
+<span class="fc" id="L80">                .createdAt(Instant.now())</span>
+<span class="fc" id="L81">                .updatedAt(Instant.now())</span>
+<span class="fc" id="L82">                .build();</span>
 
-<span class="fc" id="L63">        Vehicle vehiculoGuardado = vehiculoRepository.save(vehiculo);</span>
-<span class="fc" id="L64">        return mapearAResponse(vehiculoGuardado);</span>
+<span class="fc" id="L84">        Vehicle vehiculoGuardado = vehiculoRepository.save(vehiculo);</span>
+<span class="fc" id="L85">        return mapearAResponse(vehiculoGuardado);</span>
     }
 
+    /**
+     * Updates an existing active vehicle. Caches are evicted after update.
+     * @param id vehicle unique identifier.
+     * @param request new vehicle data.
+     * @return the updated vehicle response.
+     */
     @CacheEvict(value = &quot;vehiculos&quot;, allEntries = true)
     public VehicleResponse update(Long id, VehicleRequest request) {
-<span class="fc" id="L69">        Vehicle vehiculo = getActiveVehicle(id);</span>
+<span class="fc" id="L96">        Vehicle vehiculo = getActiveVehicle(id);</span>
 
-<span class="fc bfc" id="L71" title="All 2 branches covered.">        if (!vehiculo.getPlate().equals(request.plate())</span>
-<span class="pc bpc" id="L72" title="1 of 2 branches missed.">                &amp;&amp; vehiculoRepository.existsByPlate(request.plate())) {</span>
-<span class="fc" id="L73">            throw new IllegalArgumentException(&quot;Ya existe un vehiculo con esa placa&quot;);</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">        if (!vehiculo.getPlate().equals(request.plate())</span>
+<span class="pc bpc" id="L99" title="1 of 2 branches missed.">                &amp;&amp; vehiculoRepository.existsByPlate(request.plate())) {</span>
+<span class="fc" id="L100">            throw new IllegalArgumentException(&quot;Ya existe un vehiculo con esa placa&quot;);</span>
         }
 
-<span class="fc" id="L76">        vehiculo.setPlate(request.plate());</span>
-<span class="fc" id="L77">        vehiculo.setBrand(request.brand());</span>
-<span class="fc" id="L78">        vehiculo.setModel(request.model());</span>
-<span class="fc" id="L79">        vehiculo.setYear(request.year());</span>
-<span class="fc" id="L80">        vehiculo.setCapacity(request.capacity());</span>
-<span class="fc" id="L81">        vehiculo.setEngineNumber(request.engineNumber());</span>
-<span class="fc" id="L82">        vehiculo.setChassisNumber(request.chassisNumber());</span>
-<span class="fc" id="L83">        vehiculo.setColor(request.color());</span>
-<span class="fc" id="L84">        vehiculo.setStatus(toStatus(request.status()));</span>
-<span class="fc" id="L85">        vehiculo.setUpdatedAt(Instant.now());</span>
+<span class="fc" id="L103">        vehiculo.setPlate(request.plate());</span>
+<span class="fc" id="L104">        vehiculo.setBrand(request.brand());</span>
+<span class="fc" id="L105">        vehiculo.setModel(request.model());</span>
+<span class="fc" id="L106">        vehiculo.setYear(request.year());</span>
+<span class="fc" id="L107">        vehiculo.setCapacity(request.capacity());</span>
+<span class="fc" id="L108">        vehiculo.setEngineNumber(request.engineNumber());</span>
+<span class="fc" id="L109">        vehiculo.setChassisNumber(request.chassisNumber());</span>
+<span class="fc" id="L110">        vehiculo.setColor(request.color());</span>
+<span class="fc" id="L111">        vehiculo.setStatus(toStatus(request.status()));</span>
+<span class="fc" id="L112">        vehiculo.setUpdatedAt(Instant.now());</span>
 
-<span class="fc" id="L87">        Vehicle vehiculoActualizado = vehiculoRepository.save(vehiculo);</span>
-<span class="fc" id="L88">        return mapearAResponse(vehiculoActualizado);</span>
+<span class="fc" id="L114">        Vehicle vehiculoActualizado = vehiculoRepository.save(vehiculo);</span>
+<span class="fc" id="L115">        return mapearAResponse(vehiculoActualizado);</span>
     }
 
+    /**
+     * Logically deactivates a vehicle. Caches are evicted after deactivation.
+     * @param id vehicle unique identifier.
+     */
     @CacheEvict(value = &quot;vehiculos&quot;, allEntries = true)
-    public void desactivar(Long id) {
-<span class="fc" id="L93">        Vehicle vehiculo = getActiveVehicle(id);</span>
-<span class="fc" id="L94">        vehiculo.setActive(false);</span>
-<span class="fc" id="L95">        vehiculo.setStatus(VehicleStatus.FUERA_DE_SERVICIO);</span>
-<span class="fc" id="L96">        vehiculo.setUpdatedAt(Instant.now());</span>
-<span class="fc" id="L97">        vehiculoRepository.save(vehiculo);</span>
-<span class="fc" id="L98">    }</span>
+    public void deactivate(Long id) {
+<span class="fc" id="L124">        Vehicle vehiculo = getActiveVehicle(id);</span>
+<span class="fc" id="L125">        vehiculo.setActive(false);</span>
+<span class="fc" id="L126">        vehiculo.setStatus(VehicleStatus.FUERA_DE_SERVICIO);</span>
+<span class="fc" id="L127">        vehiculo.setUpdatedAt(Instant.now());</span>
+<span class="fc" id="L128">        vehiculoRepository.save(vehiculo);</span>
+<span class="fc" id="L129">    }</span>
 
     private Vehicle getActiveVehicle(Long id) {
-<span class="fc" id="L101">        return vehiculoRepository.findById(id)</span>
-<span class="fc" id="L102">                .filter(Vehicle::getActive)</span>
-<span class="fc" id="L103">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Vehicle no encontrado&quot;));</span>
+<span class="fc" id="L132">        return vehiculoRepository.findById(id)</span>
+<span class="fc" id="L133">                .filter(Vehicle::getActive)</span>
+<span class="fc" id="L134">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Vehicle no encontrado&quot;));</span>
     }
 
     private VehicleStatus toStatus(String status) {
         try {
-<span class="fc" id="L108">            return VehicleStatus.valueOf(status.toUpperCase());</span>
-<span class="fc" id="L109">        } catch (IllegalArgumentException e) {</span>
-<span class="fc" id="L110">            throw new IllegalArgumentException(&quot;Estado de vehiculo no valido&quot;);</span>
+<span class="fc" id="L139">            return VehicleStatus.valueOf(status.toUpperCase());</span>
+<span class="fc" id="L140">        } catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L141">            throw new IllegalArgumentException(&quot;Estado de vehiculo no valido&quot;);</span>
         }
     }
 
     private VehicleResponse mapearAResponse(Vehicle vehiculo) {
-<span class="fc" id="L115">        return new VehicleResponse(</span>
-<span class="fc" id="L116">                vehiculo.getId(),</span>
-<span class="fc" id="L117">                vehiculo.getPlate(),</span>
-<span class="fc" id="L118">                vehiculo.getBrand(),</span>
-<span class="fc" id="L119">                vehiculo.getModel(),</span>
-<span class="fc" id="L120">                vehiculo.getYear(),</span>
-<span class="fc" id="L121">                vehiculo.getCapacity(),</span>
-<span class="fc" id="L122">                vehiculo.getEngineNumber(),</span>
-<span class="fc" id="L123">                vehiculo.getChassisNumber(),</span>
-<span class="fc" id="L124">                vehiculo.getColor(),</span>
-<span class="fc" id="L125">                vehiculo.getStatus().name(),</span>
-<span class="fc" id="L126">                vehiculo.getActive(),</span>
-<span class="fc" id="L127">                vehiculo.getCreatedAt(),</span>
-<span class="fc" id="L128">                vehiculo.getUpdatedAt()</span>
+<span class="fc" id="L146">        return new VehicleResponse(</span>
+<span class="fc" id="L147">                vehiculo.getId(),</span>
+<span class="fc" id="L148">                vehiculo.getPlate(),</span>
+<span class="fc" id="L149">                vehiculo.getBrand(),</span>
+<span class="fc" id="L150">                vehiculo.getModel(),</span>
+<span class="fc" id="L151">                vehiculo.getYear(),</span>
+<span class="fc" id="L152">                vehiculo.getCapacity(),</span>
+<span class="fc" id="L153">                vehiculo.getEngineNumber(),</span>
+<span class="fc" id="L154">                vehiculo.getChassisNumber(),</span>
+<span class="fc" id="L155">                vehiculo.getColor(),</span>
+<span class="fc" id="L156">                vehiculo.getStatus().name(),</span>
+<span class="fc" id="L157">                vehiculo.getActive(),</span>
+<span class="fc" id="L158">                vehiculo.getCreatedAt(),</span>
+<span class="fc" id="L159">                vehiculo.getUpdatedAt()</span>
         );
     }
 }

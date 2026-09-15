@@ -34,7 +34,7 @@ class LoginRateLimiterTest {
     }
 
     @Test
-    void resetearDebeDesbloquearIp() {
+    void resetUnblocksIp() {
         LoginRateLimiter limiter = new LoginRateLimiter();
         for (int i = 0; i < 6; i++) {
             limiter.recordFailedAttempt("192.168.1.1");

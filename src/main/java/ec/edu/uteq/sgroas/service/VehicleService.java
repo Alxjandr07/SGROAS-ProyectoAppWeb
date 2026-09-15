@@ -22,11 +22,21 @@ public class VehicleService {
 
     private final VehicleRepository vehiculoRepository;
 
+    /**
+     * Returns a paginated list of active vehicles.
+     * @param pageable pagination and sorting configuration.
+     * @return page of vehicle response records.
+     */
     public Page<VehicleResponse> list(Pageable pageable) {
         List<VehicleResponse> contenido = listCached(pageable);
         return new PageImpl<>(contenido, pageable, contenido.size());
     }
 
+    /**
+     * Returns the cached list of active vehicles for the given pageable, keyed by page.
+     * @param pageable pagination and sorting configuration.
+     * @return list of vehicle response records.
+     */
     @Cacheable(value = "vehiculos", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
     public List<VehicleResponse> listCached(Pageable pageable) {
         return vehiculoRepository.findByActiveTrue(pageable)
@@ -34,11 +44,22 @@ public class VehicleService {
                 .getContent();
     }
 
+    /**
+     * Retrieves a vehicle by its unique identifier.
+     * @param id vehicle unique identifier.
+     * @return the matching vehicle response.
+     */
     public VehicleResponse findById(Long id) {
         Vehicle vehiculo = getActiveVehicle(id);
         return mapearAResponse(vehiculo);
     }
 
+    /**
+     * Registers a new vehicle. Caches are evicted after creation.
+     * @param request vehicle data to register.
+     * @return the created vehicle response.
+     * @throws IllegalArgumentException if the plate is already in use.
+     */
     @CacheEvict(value = "vehiculos", allEntries = true)
     public VehicleResponse create(VehicleRequest request) {
         if (vehiculoRepository.existsByPlate(request.plate())) {
@@ -64,6 +85,12 @@ public class VehicleService {
         return mapearAResponse(vehiculoGuardado);
     }
 
+    /**
+     * Updates an existing active vehicle. Caches are evicted after update.
+     * @param id vehicle unique identifier.
+     * @param request new vehicle data.
+     * @return the updated vehicle response.
+     */
     @CacheEvict(value = "vehiculos", allEntries = true)
     public VehicleResponse update(Long id, VehicleRequest request) {
         Vehicle vehiculo = getActiveVehicle(id);
@@ -88,8 +115,12 @@ public class VehicleService {
         return mapearAResponse(vehiculoActualizado);
     }
 
+    /**
+     * Logically deactivates a vehicle. Caches are evicted after deactivation.
+     * @param id vehicle unique identifier.
+     */
     @CacheEvict(value = "vehiculos", allEntries = true)
-    public void desactivar(Long id) {
+    public void deactivate(Long id) {
         Vehicle vehiculo = getActiveVehicle(id);
         vehiculo.setActive(false);
         vehiculo.setStatus(VehicleStatus.FUERA_DE_SERVICIO);

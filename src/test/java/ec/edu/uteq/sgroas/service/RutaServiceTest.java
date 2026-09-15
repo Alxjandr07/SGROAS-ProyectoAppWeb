@@ -55,7 +55,7 @@ class RutaServiceTest {
     }
 
     @Test
-    void listarDebeRetornarPagina() {
+    void listReturnsPage() {
         PageRequest pageable = PageRequest.of(0, 10);
         when(rutaRepository.findByActiveTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(rutaEjemplo())));
@@ -67,7 +67,7 @@ class RutaServiceTest {
     }
 
     @Test
-    void buscarPorIdDebeRetornarRuta() {
+    void findByIdReturnsRoute() {
         when(rutaRepository.findById(1L)).thenReturn(Optional.of(rutaEjemplo()));
 
         RouteResponse response = rutaService.findById(1L);
@@ -77,7 +77,7 @@ class RutaServiceTest {
     }
 
     @Test
-    void buscarPorIdInexistenteDebeLanzarExcepcion() {
+    void findByIdNonexistentThrowsException() {
         when(rutaRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class,
@@ -85,7 +85,7 @@ class RutaServiceTest {
     }
 
     @Test
-    void crearDebeGuardarYRetornar() {
+    void createSavesAndReturns() {
         when(rutaRepository.existsByCode("R-001")).thenReturn(false);
         when(rutaRepository.save(any(Route.class))).thenReturn(rutaEjemplo());
 
@@ -96,7 +96,7 @@ class RutaServiceTest {
     }
 
     @Test
-    void crearConCodigoDuplicadoDebeLanzarExcepcion() {
+    void createWithDuplicateCodeThrowsException() {
         when(rutaRepository.existsByCode("R-001")).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class,
@@ -104,7 +104,7 @@ class RutaServiceTest {
     }
 
     @Test
-    void crearConEstadoInvalidoDebeLanzarExcepcion() {
+    void createWithInvalidStatusThrowsException() {
         when(rutaRepository.existsByCode("R-001")).thenReturn(false);
         RouteRequest request = new RouteRequest(
                 "R-001", "Quito - Guayaquil", "Quito", "Guayaquil",
@@ -116,7 +116,7 @@ class RutaServiceTest {
     }
 
     @Test
-    void actualizarDebeModificarYRetornar() {
+    void updateModifiesAndReturns() {
         when(rutaRepository.findById(1L)).thenReturn(Optional.of(rutaEjemplo()));
         when(rutaRepository.save(any(Route.class))).thenReturn(rutaEjemplo());
 
@@ -126,7 +126,7 @@ class RutaServiceTest {
     }
 
     @Test
-    void actualizarConCodigoDuplicadoDebeLanzarExcepcion() {
+    void updateWithDuplicateCodeThrowsException() {
         when(rutaRepository.findById(1L)).thenReturn(Optional.of(rutaEjemplo()));
         when(rutaRepository.existsByCode("R-999")).thenReturn(true);
 
@@ -140,10 +140,10 @@ class RutaServiceTest {
     }
 
     @Test
-    void desactivarDebeCambiarEstado() {
+    void deactivateChangesStatus() {
         when(rutaRepository.findById(1L)).thenReturn(Optional.of(rutaEjemplo()));
 
-        rutaService.desactivar(1L);
+        rutaService.deactivate(1L);
 
         verify(rutaRepository).save(argThat(r ->
                 !r.getActive() && r.getStatus() == RouteStatus.INACTIVA));

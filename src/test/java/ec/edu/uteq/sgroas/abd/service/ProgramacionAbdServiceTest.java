@@ -72,7 +72,7 @@ class ProgramacionAbdServiceTest {
     }
 
     @Test
-    void listarSinFiltrosUsaFindAll() {
+    void listWithoutFiltersUsesFindAll() {
         PageRequest pageable = PageRequest.of(0, 10);
         when(programacionRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(programacion())));
 
@@ -81,7 +81,7 @@ class ProgramacionAbdServiceTest {
     }
 
     @Test
-    void listarIdsCeroONulosSeNormalizan() {
+    void listIdsZeroOrNullAreNormalized() {
         PageRequest pageable = PageRequest.of(0, 10);
         when(programacionRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of()));
 
@@ -91,7 +91,7 @@ class ProgramacionAbdServiceTest {
     }
 
     @Test
-    void listarConFiltrosUsaBuscar() {
+    void listWithFiltersUsesSearch() {
         PageRequest pageable = PageRequest.of(0, 10);
         when(programacionRepository.searchWithFilters(any(), any(), any(), any(), any(), any()))
                 .thenReturn(new PageImpl<>(List.of(programacion())));
@@ -101,7 +101,7 @@ class ProgramacionAbdServiceTest {
     }
 
     @Test
-    void crearOkConEstadoPorDefecto() {
+    void createOkWithDefaultStatus() {
         when(rutaAbdRepository.findById(1)).thenReturn(Optional.of(ruta()));
         when(unidadRepository.findById(1)).thenReturn(Optional.of(unidad("Activo")));
         when(conductorAbdRepository.findById(1)).thenReturn(Optional.of(conductor()));
@@ -111,7 +111,7 @@ class ProgramacionAbdServiceTest {
     }
 
     @Test
-    void crearHoraInvalidaFalla() {
+    void createWithInvalidTimeFails() {
         AbdDtos.ScheduleRequest bad = new AbdDtos.ScheduleRequest(LocalDate.now(),
                 LocalTime.of(10, 0), LocalTime.of(8, 0), null, 1, 1, 1);
 
@@ -120,7 +120,7 @@ class ProgramacionAbdServiceTest {
     }
 
     @Test
-    void crearSinRutaUnidadOConductorFalla() {
+    void createWithoutRouteUnitOrDriverFails() {
         when(rutaAbdRepository.findById(1)).thenReturn(Optional.empty());
         assertThrows(IllegalArgumentException.class, () -> service.create(request(null)));
 
@@ -134,7 +134,7 @@ class ProgramacionAbdServiceTest {
     }
 
     @Test
-    void crearConUnidadInactivaFalla() {
+    void createWithInactiveUnitFails() {
         when(rutaAbdRepository.findById(1)).thenReturn(Optional.of(ruta()));
         when(unidadRepository.findById(1)).thenReturn(Optional.of(unidad("Inactivo")));
         when(conductorAbdRepository.findById(1)).thenReturn(Optional.of(conductor()));
@@ -143,7 +143,7 @@ class ProgramacionAbdServiceTest {
     }
 
     @Test
-    void actualizarSinEstadoMantieneYConEstadoCambia() {
+    void updateWithoutStatusKeepsAndWithStatusChanges() {
         Schedule p = programacion();
         when(programacionRepository.findById(1)).thenReturn(Optional.of(p));
         when(rutaAbdRepository.findById(1)).thenReturn(Optional.of(ruta()));
@@ -156,7 +156,7 @@ class ProgramacionAbdServiceTest {
     }
 
     @Test
-    void actualizarInexistenteYUnidadInactivaFallan() {
+    void updateNonexistentAndInactiveUnitFail() {
         when(programacionRepository.findById(99)).thenReturn(Optional.empty());
         assertThrows(IllegalArgumentException.class, () -> service.update(99, request(null)));
 
@@ -168,7 +168,7 @@ class ProgramacionAbdServiceTest {
     }
 
     @Test
-    void eliminarOkYNoExiste() {
+    void deleteOkAndDoesNotExist() {
         when(programacionRepository.existsById(1)).thenReturn(true);
         service.delete(1);
         verify(programacionRepository).deleteById(1);

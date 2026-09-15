@@ -22,11 +22,21 @@ public class RouteService {
 
     private final RouteRepository rutaRepository;
 
+    /**
+     * Returns a paginated list of active routes.
+     * @param pageable pagination and sorting configuration.
+     * @return page of route response records.
+     */
     public Page<RouteResponse> list(Pageable pageable) {
         List<RouteResponse> contenido = listCached(pageable);
         return new PageImpl<>(contenido, pageable, contenido.size());
     }
 
+    /**
+     * Returns the cached list of active routes for the given pageable, keyed by page.
+     * @param pageable pagination and sorting configuration.
+     * @return list of route response records.
+     */
     @Cacheable(value = "rutas", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
     public List<RouteResponse> listCached(Pageable pageable) {
         return rutaRepository.findByActiveTrue(pageable)
@@ -34,11 +44,22 @@ public class RouteService {
                 .getContent();
     }
 
+    /**
+     * Retrieves a route by its unique identifier.
+     * @param id route unique identifier.
+     * @return the matching route response.
+     */
     public RouteResponse findById(Long id) {
         Route ruta = getActiveRoute(id);
         return mapearAResponse(ruta);
     }
 
+    /**
+     * Registers a new route. Caches are evicted after creation.
+     * @param request route data to register.
+     * @return the created route response.
+     * @throws IllegalArgumentException if the route code is already in use.
+     */
     @CacheEvict(value = "rutas", allEntries = true)
     public RouteResponse create(RouteRequest request) {
         if (rutaRepository.existsByCode(request.code())) {
@@ -62,6 +83,12 @@ public class RouteService {
         return mapearAResponse(rutaGuardada);
     }
 
+    /**
+     * Updates an existing active route. Caches are evicted after update.
+     * @param id route unique identifier.
+     * @param request new route data.
+     * @return the updated route response.
+     */
     @CacheEvict(value = "rutas", allEntries = true)
     public RouteResponse update(Long id, RouteRequest request) {
         Route ruta = getActiveRoute(id);
@@ -84,8 +111,12 @@ public class RouteService {
         return mapearAResponse(rutaActualizada);
     }
 
+    /**
+     * Logically deactivates a route. Caches are evicted after deactivation.
+     * @param id route unique identifier.
+     */
     @CacheEvict(value = "rutas", allEntries = true)
-    public void desactivar(Long id) {
+    public void deactivate(Long id) {
         Route ruta = getActiveRoute(id);
         ruta.setActive(false);
         ruta.setStatus(RouteStatus.INACTIVA);

@@ -57,7 +57,7 @@ class VehiculoServiceTest {
     }
 
     @Test
-    void listarDebeRetornarPagina() {
+    void listReturnsPage() {
         PageRequest pageable = PageRequest.of(0, 10);
         Vehicle vehiculo = vehiculoEjemplo();
         when(vehiculoRepository.findByActiveTrue(pageable))
@@ -71,7 +71,7 @@ class VehiculoServiceTest {
     }
 
     @Test
-    void buscarPorIdDebeRetornarVehiculo() {
+    void findByIdReturnsVehicle() {
         when(vehiculoRepository.findById(1L))
                 .thenReturn(Optional.of(vehiculoEjemplo()));
 
@@ -83,7 +83,7 @@ class VehiculoServiceTest {
     }
 
     @Test
-    void buscarPorIdInexistenteDebeLanzarExcepcion() {
+    void findByIdNonexistentThrowsException() {
         when(vehiculoRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class,
@@ -91,7 +91,7 @@ class VehiculoServiceTest {
     }
 
     @Test
-    void crearDebeGuardarYRetornar() {
+    void createSavesAndReturns() {
         when(vehiculoRepository.existsByPlate("GTU-001")).thenReturn(false);
         when(vehiculoRepository.save(any(Vehicle.class)))
                 .thenReturn(vehiculoEjemplo());
@@ -104,7 +104,7 @@ class VehiculoServiceTest {
     }
 
     @Test
-    void crearConPlacaDuplicadaDebeLanzarExcepcion() {
+    void createWithDuplicatePlateThrowsException() {
         when(vehiculoRepository.existsByPlate("GTU-001")).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class,
@@ -113,7 +113,7 @@ class VehiculoServiceTest {
     }
 
     @Test
-    void crearConEstadoInvalidoDebeLanzarExcepcion() {
+    void createWithInvalidStatusThrowsException() {
         when(vehiculoRepository.existsByPlate("GTU-001")).thenReturn(false);
         VehicleRequest request = new VehicleRequest(
                 "GTU-001", "Toyota", "Hiace", 2020, 14,
@@ -125,7 +125,7 @@ class VehiculoServiceTest {
     }
 
     @Test
-    void actualizarDebeModificarYRetornar() {
+    void updateModifiesAndReturns() {
         when(vehiculoRepository.findById(1L))
                 .thenReturn(Optional.of(vehiculoEjemplo()));
         when(vehiculoRepository.save(any(Vehicle.class)))
@@ -139,7 +139,7 @@ class VehiculoServiceTest {
     }
 
     @Test
-    void actualizarConPlacaDuplicadaDebeLanzarExcepcion() {
+    void updateWithDuplicatePlateThrowsException() {
         Vehicle vehiculo = vehiculoEjemplo();
         when(vehiculoRepository.findById(1L)).thenReturn(Optional.of(vehiculo));
         when(vehiculoRepository.existsByPlate("GTU-999")).thenReturn(true);
@@ -154,11 +154,11 @@ class VehiculoServiceTest {
     }
 
     @Test
-    void desactivarDebeCambiarEstado() {
+    void deactivateChangesStatus() {
         when(vehiculoRepository.findById(1L))
                 .thenReturn(Optional.of(vehiculoEjemplo()));
 
-        vehiculoService.desactivar(1L);
+        vehiculoService.deactivate(1L);
 
         verify(vehiculoRepository).save(argThat(v ->
                 !v.getActive() && v.getStatus() == VehicleStatus.FUERA_DE_SERVICIO));

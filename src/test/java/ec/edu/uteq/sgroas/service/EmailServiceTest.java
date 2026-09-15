@@ -16,21 +16,21 @@ class EmailServiceTest {
     }
 
     @Test
-    void configuradoSinHostDebeSerFalse() {
+    void configuredWithoutHostIsFalse() {
         ReflectionTestUtils.setField(service, "host", null);
 
         assertFalse(service.isConfigured());
     }
 
     @Test
-    void configuradoConHostEnBlancoDebeSerFalse() {
+    void configuredWithBlankHostIsFalse() {
         ReflectionTestUtils.setField(service, "host", "   ");
 
         assertFalse(service.isConfigured());
     }
 
     @Test
-    void configuradoConHostDebeSerTrue() {
+    void configuredWithHostIsTrue() {
         ReflectionTestUtils.setField(service, "host", "smtp.sgroas.com");
 
         assertTrue(service.isConfigured());
@@ -47,7 +47,7 @@ class EmailServiceTest {
     }
 
     @Test
-    void envioConSmtpSinServidorDebeLanzarIllegalState() {
+    void sendWithSmtpWithoutServerThrowsIllegalState() {
         ReflectionTestUtils.setField(service, "host", "127.0.0.1");
         ReflectionTestUtils.setField(service, "port", 25);
         ReflectionTestUtils.setField(service, "username", "");
@@ -59,7 +59,7 @@ class EmailServiceTest {
     }
 
     @Test
-    void envioConSmtpYCredencialesSinServidorDebeLanzarIllegalState() {
+    void sendWithSmtpAndCredentialsWithoutServerThrowsIllegalState() {
         ReflectionTestUtils.setField(service, "host", "127.0.0.1");
         ReflectionTestUtils.setField(service, "port", 25);
         ReflectionTestUtils.setField(service, "username", "smtp-user");

@@ -69,7 +69,7 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void rutaInexistenteDebeRetornarNoEncontrado() {
+    void routeNonexistentReturnsNotFound() {
         when(request.getRequestURI()).thenReturn("/api/auth/register");
 
         ProblemDetail detail = handler.handleNotFound(

@@ -91,7 +91,7 @@ class IncidenteServiceTest {
     }
 
     @Test
-    void listarDebeRetornarPagina() {
+    void listReturnsPage() {
         PageRequest pageable = PageRequest.of(0, 10);
         when(incidenteRepository.findByActiveTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(incidenteEjemplo())));
@@ -103,7 +103,7 @@ class IncidenteServiceTest {
     }
 
     @Test
-    void buscarPorIdDebeRetornarIncidente() {
+    void findByIdReturnsIncident() {
         when(incidenteRepository.findById(1L)).thenReturn(Optional.of(incidenteEjemplo()));
 
         IncidentResponse response = incidenteService.findById(1L);
@@ -113,7 +113,7 @@ class IncidenteServiceTest {
     }
 
     @Test
-    void buscarPorIdInexistenteDebeLanzarExcepcion() {
+    void findByIdNonexistentThrowsException() {
         when(incidenteRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class,
@@ -121,7 +121,7 @@ class IncidenteServiceTest {
     }
 
     @Test
-    void crearDebeGuardarYRetornar() {
+    void createSavesAndReturns() {
         when(asignacionRutaRepository.findById(1L))
                 .thenReturn(Optional.of(asignacionEjemplo()));
         when(incidenteRepository.save(any(Incident.class)))
@@ -135,7 +135,7 @@ class IncidenteServiceTest {
     }
 
     @Test
-    void crearConAsignacionInexistenteDebeLanzarExcepcion() {
+    void createWithNonexistentAssignmentThrowsException() {
         when(asignacionRutaRepository.findById(99L)).thenReturn(Optional.empty());
 
         IncidentRequest request = new IncidentRequest(
@@ -148,7 +148,7 @@ class IncidenteServiceTest {
     }
 
     @Test
-    void crearConTipoInvalidoDebeLanzarExcepcion() {
+    void createWithInvalidTypeThrowsException() {
         when(asignacionRutaRepository.findById(1L))
                 .thenReturn(Optional.of(asignacionEjemplo()));
 
@@ -162,7 +162,7 @@ class IncidenteServiceTest {
     }
 
     @Test
-    void crearConGravedadInvalidaDebeLanzarExcepcion() {
+    void createWithInvalidSeverityThrowsException() {
         when(asignacionRutaRepository.findById(1L))
                 .thenReturn(Optional.of(asignacionEjemplo()));
 
@@ -176,7 +176,7 @@ class IncidenteServiceTest {
     }
 
     @Test
-    void crearConEstadoInvalidoDebeLanzarExcepcion() {
+    void createWithInvalidStatusThrowsException() {
         when(asignacionRutaRepository.findById(1L))
                 .thenReturn(Optional.of(asignacionEjemplo()));
 
@@ -190,7 +190,7 @@ class IncidenteServiceTest {
     }
 
     @Test
-    void actualizarDebeModificarYRetornar() {
+    void updateModifiesAndReturns() {
         when(incidenteRepository.findById(1L)).thenReturn(Optional.of(incidenteEjemplo()));
         when(asignacionRutaRepository.findById(1L))
                 .thenReturn(Optional.of(asignacionEjemplo()));
@@ -204,10 +204,10 @@ class IncidenteServiceTest {
     }
 
     @Test
-    void desactivarDebeCambiarEstado() {
+    void deactivateChangesStatus() {
         when(incidenteRepository.findById(1L)).thenReturn(Optional.of(incidenteEjemplo()));
 
-        incidenteService.desactivar(1L);
+        incidenteService.deactivate(1L);
 
         verify(incidenteRepository).save(argThat(i ->
                 !i.getActive() && i.getStatus() == IncidentStatus.CERRADO));

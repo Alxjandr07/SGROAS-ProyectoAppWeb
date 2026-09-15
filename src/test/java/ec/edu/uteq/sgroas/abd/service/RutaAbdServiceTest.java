@@ -48,7 +48,7 @@ class RutaAbdServiceTest {
     }
 
     @Test
-    void listarSinSearchUsaFindAllYBlancoTambien() {
+    void listWithoutSearchUsesFindAllYBlancoTambien() {
         PageRequest pageable = PageRequest.of(0, 10);
         when(rutaAbdRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(ruta())));
         when(rutaAbdRepository.countSchedules(1)).thenReturn(0L);
@@ -59,7 +59,7 @@ class RutaAbdServiceTest {
     }
 
     @Test
-    void listarConSearchUsaBuscar() {
+    void listWithSearchUsesSearch() {
         PageRequest pageable = PageRequest.of(0, 10);
         when(rutaAbdRepository.search(eq("quevedo"), eq(pageable)))
                 .thenReturn(new PageImpl<>(List.of(ruta())));
@@ -69,7 +69,7 @@ class RutaAbdServiceTest {
     }
 
     @Test
-    void buscarPorIdOkYNoEncontrado() {
+    void findByIdOkAndNotFound() {
         when(rutaAbdRepository.findById(1)).thenReturn(Optional.of(ruta()));
         when(rutaAbdRepository.countSchedules(1)).thenReturn(0L);
         assertEquals(1, service.findById(1).idRuta());
@@ -79,7 +79,7 @@ class RutaAbdServiceTest {
     }
 
     @Test
-    void crearOkYMismoTerminalFalla() {
+    void createOkAndSameTerminalFails() {
         when(catalogoAbdService.findTerminal(1)).thenReturn(terminal(1, "T1"));
         when(catalogoAbdService.findTerminal(2)).thenReturn(terminal(2, "T2"));
         when(rutaAbdRepository.save(any(AbdRoute.class))).thenReturn(ruta());
@@ -90,7 +90,7 @@ class RutaAbdServiceTest {
     }
 
     @Test
-    void actualizarOkMismoTerminalYNoEncontradaFallan() {
+    void updateOkSameTerminalAndNotFoundFail() {
         when(rutaAbdRepository.findById(1)).thenReturn(Optional.of(ruta()));
         when(catalogoAbdService.findTerminal(1)).thenReturn(terminal(1, "T1"));
         when(catalogoAbdService.findTerminal(2)).thenReturn(terminal(2, "T2"));
@@ -105,7 +105,7 @@ class RutaAbdServiceTest {
     }
 
     @Test
-    void eliminarOkYNoExiste() {
+    void deleteOkAndDoesNotExist() {
         when(rutaAbdRepository.existsById(1)).thenReturn(true);
         service.delete(1);
         verify(rutaAbdRepository).deleteById(1);

@@ -2,6 +2,16 @@ package ec.edu.uteq.sgroas.dto;
 
 import jakarta.validation.constraints.*;
 
+    /**
+     * Route data required to create or update a route record.
+     * @param code unique route code.
+     * @param name route display name.
+     * @param origin departure point.
+     * @param destination arrival point.
+     * @param distanceKm route distance in kilometers.
+     * @param durationMin estimated travel time in minutes.
+     * @param status route status code.
+     */
 public record RouteRequest(
 
         @NotBlank(message = "El codigo es obligatorio")

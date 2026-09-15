@@ -42,7 +42,7 @@ class DtoTest {
     }
 
     @Test
-    void verificarEmailRequestDebeConservarValores() {
+    void verifyEmailRequestPreservesValues() {
         VerifyEmailRequest request = new VerifyEmailRequest(
                 "maria@sgroas.com", "123456"
         );
@@ -70,7 +70,7 @@ class DtoTest {
     }
 
     @Test
-    void usuarioRequestDebeConservarValores() {
+    void userRequestPreservesValues() {
         UserRequest request = new UserRequest(
                 "Carlos Mendoza", "carlos@sgroas.com", "123456", "ROLE_ADMIN"
         );
@@ -82,7 +82,7 @@ class DtoTest {
     }
 
     @Test
-    void usuarioResponseDebeConservarValores() {
+    void userResponsePreservesValues() {
         Instant ahora = Instant.now();
         UserResponse response = new UserResponse(
                 1L, "Carlos Mendoza", "carlos@sgroas.com",
@@ -99,7 +99,7 @@ class DtoTest {
     }
 
     @Test
-    void vehiculoRequestDebeConservarValores() {
+    void vehicleRequestPreservesValues() {
         VehicleRequest request = new VehicleRequest(
                 "GTU-001", "Toyota", "Hiace", 2020, 14,
                 "MOT-123", "CHAS-123", "Blanco", "ACTIVO"
@@ -117,7 +117,7 @@ class DtoTest {
     }
 
     @Test
-    void vehiculoResponseDebeConservarValores() {
+    void vehicleResponsePreservesValues() {
         Instant ahora = Instant.now();
         VehicleResponse response = new VehicleResponse(
                 1L, "GTU-001", "Toyota", "Hiace", 2020, 14,
@@ -138,7 +138,7 @@ class DtoTest {
     }
 
     @Test
-    void rutaRequestDebeConservarValores() {
+    void routeRequestPreservesValues() {
         RouteRequest request = new RouteRequest(
                 "R-001", "Quito - Guayaquil", "Quito", "Guayaquil",
                 420.0, 480, "ACTIVA"
@@ -154,7 +154,7 @@ class DtoTest {
     }
 
     @Test
-    void rutaResponseDebeConservarValores() {
+    void routeResponsePreservesValues() {
         Instant ahora = Instant.now();
         RouteResponse response = new RouteResponse(
                 1L, "R-001", "Quito - Guayaquil", "Quito", "Guayaquil",
@@ -173,7 +173,7 @@ class DtoTest {
     }
 
     @Test
-    void incidenteRequestDebeConservarValores() {
+    void incidentRequestPreservesValues() {
         LocalDateTime fecha = LocalDateTime.now();
         IncidentRequest request = new IncidentRequest(
                 1L, "Carlos Mendoza", "AVERIA_MECANICA", "Falla en el motor",
@@ -191,7 +191,7 @@ class DtoTest {
     }
 
     @Test
-    void incidenteResponseDebeConservarValores() {
+    void incidentResponsePreservesValues() {
         Instant ahora = Instant.now();
         LocalDateTime fecha = LocalDateTime.now();
         IncidentResponse response = new IncidentResponse(
@@ -213,7 +213,7 @@ class DtoTest {
     }
 
     @Test
-    void asignacionRutaRequestDebeConservarValores() {
+    void routeAssignmentRequestPreservesValues() {
         LocalDate fecha = LocalDate.now();
         RouteAssignmentRequest request = new RouteAssignmentRequest(
                 1L, 1L, 1L, fecha, fecha, fecha.plusDays(1), "ACTIVA"
@@ -229,7 +229,7 @@ class DtoTest {
     }
 
     @Test
-    void asignacionRutaResponseDebeConservarValores() {
+    void routeAssignmentResponsePreservesValues() {
         Instant ahora = Instant.now();
         LocalDate fecha = LocalDate.now();
         RouteAssignmentResponse response = new RouteAssignmentResponse(

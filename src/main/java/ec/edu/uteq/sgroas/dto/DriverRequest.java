@@ -8,6 +8,18 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
+    /**
+     * Driver data required to create or update a driver record.
+     * @param firstNames driver given names.
+     * @param lastNames driver family names.
+     * @param nationalId unique 10-digit national identification number.
+     * @param licenseNumber driver license number.
+     * @param licenseType driver license class or category.
+     * @param licenseExpiry date when the license expires.
+     * @param phone optional contact phone number.
+     * @param email optional contact email address.
+     * @param status driver status code.
+     */
 public record DriverRequest(
 
         @NotBlank(message = "Los nombres son obligatorios")

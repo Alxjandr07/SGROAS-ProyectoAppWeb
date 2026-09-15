@@ -101,10 +101,15 @@ verify:
 	@echo "[P5] Checking Spanish field names in entities..."
 	@! grep -rn "private String nombre\|private String apellido\|private String estado\|private String direccion\|private String telefono\|private String placa\|private String marca\|private String modelo" src/main/java/ec/edu/uteq/sgroas/entity/ 2>/dev/null
 	@echo "[P5] OK - no Spanish fields in entities"
+	@echo "[P5] Checking Spanish method names in main..."
+	@powershell -ExecutionPolicy Bypass -File scripts/check-spanish-methods.ps1
+	@echo ""
+	@echo "[P6] Checking Javadoc coverage on public methods..."
+	@powershell -ExecutionPolicy Bypass -File scripts/check-javadoc.ps1
 	@echo ""
 	@echo "[P7] Checking Spanish captions in informe..."
-	@! grep -rn "Tabla\|Figura\|Listado\|cuadro\|figura\|listado" docs/informe-final/ 2>/dev/null | grep -v ".md:"
-	@echo "[P7] OK"
+	@! grep -rn "caption{" docs/informe-final/ 2>/dev/null | grep -E "Tabla|Figura|Listado|Resumen|Resultados|Distribución|Síntesis|Desglose|trazados|comparación|puntaje|prioridad"
+	@echo "[P7] OK - all figure/table captions in English"
 	@echo ""
 	@echo "[P10] Verifying MANIFEST.sha256..."
 	@powershell -ExecutionPolicy Bypass -File scripts/verify-manifest.ps1

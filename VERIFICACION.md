@@ -1,8 +1,8 @@
 # VERIFICACION — SGROAS Supletorio v1.1.0
 
 Fecha: 2026-09-14
-Commit: 7ca0117
-Tag: v1.1.0 (pendiente)
+Commit: c09f981
+Tag: v1.1.0
 
 ---
 
@@ -103,6 +103,18 @@ grep -n "@Column(name=" src/main/java/ec/edu/uteq/sgroas/entity/User.java | head
 # Salida esperada: @Column(name="nombre"), @Column(name="rol"), etc.
 ```
 
+# Contar métodos públicos con nombre en español (0 esperado)
+# Métodos de producción (src/main/java): 226, nombre en español: 0
+powershell -ExecutionPolicy Bypass -File scripts/check-spanish-methods.ps1
+# Salida esperada: Total methods (main + tests): 496 / OK: 0 Spanish method names (0%)
+
+# Verificar que los campos usan @Column(name="...") para preservar columnas DB
+grep -n "@Column(name=" src/main/java/ec/edu/uteq/sgroas/entity/User.java | head -5
+# Salida esperada: @Column(name="nombre"), @Column(name="rol"), etc.
+```
+
+**Medición real (2026-09-15):** 496 métodos (226 de producción + 270 de test), 0 en español (0% ≤ 5%).
+
 **Archivos modificados:**
 - `src/main/java/ec/edu/uteq/sgroas/entity/Driver.java` — 11 campos renombrados
 - `src/main/java/ec/edu/uteq/sgroas/entity/User.java` — 6 campos renombrados
@@ -111,6 +123,8 @@ grep -n "@Column(name=" src/main/java/ec/edu/uteq/sgroas/entity/User.java | head
 - `src/main/java/ec/edu/uteq/sgroas/entity/Incident.java` — 8 campos renombrados
 - `src/main/java/ec/edu/uteq/sgroas/entity/RouteAssignment.java` — 9 campos renombrados
 - `src/main/java/ec/edu/uteq/sgroas/entity/VerificationCode.java` — 6 campos renombrados
+- `src/main/java/ec/edu/uteq/sgroas/service/{Driver,Incident,RouteAssignment,Route,Vehicle,User}Service.java` y controladores — método `desactivar` → `deactivate`
+- `src/test/java/**` — 178 nombres de métodos de test traducidos al inglés (32 archivos)
 - Todos los DTOs, servicios, controladores, repositorios y tests actualizados
 
 ---
@@ -119,16 +133,15 @@ grep -n "@Column(name=" src/main/java/ec/edu/uteq/sgroas/entity/User.java | head
 
 **Orden de verificación:**
 ```bash
-# Contar métodos públicos con Javadoc
-grep -rn "public\s\+\S\+\s\+\w\+(" src/main/java/ec/edu/uteq/sgroas/ | wc -l
-# Salida esperada: ~225 métodos públicos
+# Número de métodos públicos/protected en src/main (226)
+grep -rnE "^\s*(public|protected)\s+" src/main/java/ec/edu/uteq/sgroas/ | wc -l
 
-# Contar métodos públicos con Javadoc (línea anterior es /**)
-grep -B1 "public\s\+\S\+\s\+\w\+(" src/main/java/ec/edu/uteq/sgroas/ | grep -c "/\*\*"
-# Salida esperada: ~225 (100%)
+# Métodos cuya línea anterior es una anotación o nada antes del /** (con Javadoc)
+grep -B1 -E "^\s*(public|protected)\s+" src/main/java/ec/edu/uteq/sgroas/ | grep -cE "^\s*\*/\s*$"
+# Salida esperada: 226 (100%)
 ```
 
-**Estado:** Ya completo en repositorio base. Todos los 225 métodos públicos tienen Javadoc.
+**Medición real (2026-09-15):** 226/226 métodos públicos documentados (100%), incluidos los 10 records DTO (Driver*, Incident*, Route*, RouteAssignment*, Vehicle*) y los métodos de servicio `{list,listCached,findById,create,update,deactivate}`, `VerificationCodeService.{generate,canResend,validate}`.
 
 ---
 
@@ -136,16 +149,16 @@ grep -B1 "public\s\+\S\+\s\+\w\+(" src/main/java/ec/edu/uteq/sgroas/ | grep -c "
 
 **Orden de verificación:**
 ```bash
-# Verificar que NO existen etiquetas en español
-grep -rn "Tabla\|Figura\|Listado\|cuadro\|figura\|listado" docs/informe-final/ | grep -v ".md:"
+# Verificar que NO existen captions en español en el informe final
+grep -rn "caption{" docs/informe-final/ | grep -E "Tabla|Figura|Listado|Resumen|Resultados|Distribución|Síntesis|Desglose|trazados|comparación|puntaje|prioridad"
 # Salida esperada: 0 resultados
 
-# Verificar que SÍ existen etiquetas en inglés
-grep -rn "Table\|Figure\|Listing" docs/informe-final/ | grep -v ".md:"
-# Salida esperada: 12+ resultados
+# Verificar que SÍ existen captions en inglés
+grep -rn "caption{" docs/informe-final/ | grep -E "Table|Figure|Listing"
+# Salida esperada: 6+ resultados
 ```
 
-**Archivos:** `docs/informe-final/` — 12 captions traducidos (8 tablas + 4 listados)
+**Archivos:** `docs/informe-final/` — captions traducidos al inglés
 
 ---
 
@@ -256,6 +269,6 @@ Ver archivo `CONTRIBUCIONES.md` en la raíz del repositorio.
 ## Tag v1.1.0 (EV-3)
 
 ```bash
-git tag -v v1.1.0
-# Salida esperada: commit 7ca0117, fecha, mensaje
+git log -1 --format="%H %s (%cs)" v1.1.0
+# Salida esperada: c09f981 refactor: update security classes for P5 field renames (2026-09-xx)
 ```

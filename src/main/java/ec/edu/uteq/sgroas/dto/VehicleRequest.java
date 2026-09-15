@@ -2,6 +2,18 @@ package ec.edu.uteq.sgroas.dto;
 
 import jakarta.validation.constraints.*;
 
+    /**
+     * Vehicle data required to create or update a vehicle record.
+     * @param plate vehicle plate number.
+     * @param brand vehicle brand.
+     * @param model vehicle model.
+     * @param year manufacturing year.
+     * @param capacity passenger capacity.
+     * @param engineNumber optional engine number.
+     * @param chassisNumber optional chassis number.
+     * @param color optional vehicle color.
+     * @param status vehicle status code.
+     */
 public record VehicleRequest(
 
         @NotBlank(message = "La placa es obligatoria")

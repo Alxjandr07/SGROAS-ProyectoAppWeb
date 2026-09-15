@@ -58,7 +58,7 @@ class CodigoVerificacionServiceTest {
     }
 
     @Test
-    void generarDebeInvalidarAnterioresYGuardarNuevo() {
+    void generateInvalidatesPreviousAndSavesNew() {
         when(repository.save(any(VerificationCode.class))).thenAnswer(inv -> inv.getArgument(0));
 
         String codigo = service.generate(EMAIL, Type.VERIFICACION);
@@ -101,7 +101,7 @@ class CodigoVerificacionServiceTest {
     }
 
     @Test
-    void validarCodigoCorrectoDebeMarcarloUsado() {
+    void validateCorrectCodeMarksItUsed() {
         when(repository.findFirstByEmailAndTypeOrderByCreatedAtDesc(
                 EMAIL, Type.VERIFICACION.name())).thenReturn(Optional.of(registro("123456")));
 
@@ -111,7 +111,7 @@ class CodigoVerificacionServiceTest {
     }
 
     @Test
-    void validarCodigoIncorrectoDebeIncrementarIntentosYFallar() {
+    void validateIncorrectCodeIncrementsAttemptsAndFails() {
         VerificationCode reg = registro("123456");
         when(repository.findFirstByEmailAndTypeOrderByCreatedAtDesc(
                 EMAIL, Type.VERIFICACION.name())).thenReturn(Optional.of(reg));
@@ -122,7 +122,7 @@ class CodigoVerificacionServiceTest {
     }
 
     @Test
-    void validarSinRegistroDebeFallar() {
+    void validateWithoutRecordFails() {
         when(repository.findFirstByEmailAndTypeOrderByCreatedAtDesc(
                 EMAIL, Type.VERIFICACION.name())).thenReturn(Optional.empty());
 
@@ -131,7 +131,7 @@ class CodigoVerificacionServiceTest {
     }
 
     @Test
-    void validarCodigoYaUsadoDebeFallar() {
+    void validateAlreadyUsedCodeFails() {
         VerificationCode usado = registro("123456");
         usado.setUsed(true);
         when(repository.findFirstByEmailAndTypeOrderByCreatedAtDesc(
@@ -142,7 +142,7 @@ class CodigoVerificacionServiceTest {
     }
 
     @Test
-    void validarCodigoExpiradoDebeFallar() {
+    void validateExpiredCodeFails() {
         VerificationCode expirado = registro("123456");
         expirado.setExpiresAt(Instant.now().minusSeconds(60));
         when(repository.findFirstByEmailAndTypeOrderByCreatedAtDesc(
@@ -153,7 +153,7 @@ class CodigoVerificacionServiceTest {
     }
 
     @Test
-    void validarConIntentosAgotadosDebeFallar() {
+    void validateWithExhaustedAttemptsFails() {
         VerificationCode agotado = registro("123456");
         agotado.setAttempts(5);
         when(repository.findFirstByEmailAndTypeOrderByCreatedAtDesc(

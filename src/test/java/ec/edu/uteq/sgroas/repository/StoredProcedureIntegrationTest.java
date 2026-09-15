@@ -43,7 +43,7 @@ class StoredProcedureIntegrationTest {
 
     @Test
     @DisplayName("fn_estadisticas_generales via @Procedure")
-    void estadisticasGenerales() {
+    void generalStatistics() {
         List<Object[]> filas = incidenteRepository.generalStatistics();
         assertNotNull(filas);
     }

@@ -57,7 +57,7 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
-    void sinTokenDebeContinuarCadena() throws Exception {
+    void withoutTokenContinuesChain() throws Exception {
         when(request.getHeader("Authorization")).thenReturn(null);
         when(request.getCookies()).thenReturn(null);
 

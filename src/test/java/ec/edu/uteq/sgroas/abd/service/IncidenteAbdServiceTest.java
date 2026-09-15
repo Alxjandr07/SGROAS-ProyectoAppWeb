@@ -52,7 +52,7 @@ class IncidenteAbdServiceTest {
     }
 
     @Test
-    void listarSinFiltrosUsaFindAll() {
+    void listWithoutFiltersUsesFindAll() {
         PageRequest pageable = PageRequest.of(0, 10);
         when(incidenteRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(incidente("BAJO"))));
 
@@ -60,7 +60,7 @@ class IncidenteAbdServiceTest {
     }
 
     @Test
-    void listarConSearchUsaBuscar() {
+    void listWithSearchUsesSearch() {
         PageRequest pageable = PageRequest.of(0, 10);
         when(incidenteRepository.searchWithFilters(any(), any(), any(), any()))
                 .thenReturn(new PageImpl<>(List.of(incidente("MEDIO"))));
@@ -69,7 +69,7 @@ class IncidenteAbdServiceTest {
     }
 
     @Test
-    void listarSoloEstadoUsaFindByEstado() {
+    void listOnlyStatusUsesFindByStatus() {
         PageRequest pageable = PageRequest.of(0, 10);
         when(incidenteRepository.findByEstadoIgnoreCase(eq("reportado"), eq(pageable)))
                 .thenReturn(new PageImpl<>(List.of(incidente("BAJO"))));
@@ -78,7 +78,7 @@ class IncidenteAbdServiceTest {
     }
 
     @Test
-    void listarSoloNivelUsaFindByNivel() {
+    void listOnlyLevelUsesFindByLevel() {
         PageRequest pageable = PageRequest.of(0, 10);
         when(incidenteRepository.findByNivelSugeridoIgnoreCase(eq("alto"), eq(pageable)))
                 .thenReturn(new PageImpl<>(List.of(incidente("ALTO"))));
@@ -87,7 +87,7 @@ class IncidenteAbdServiceTest {
     }
 
     @Test
-    void crearNivelAltoGeneraAlerta() {
+    void createHighLevelGeneratesAlert() {
         when(unidadRepository.findById(1)).thenReturn(Optional.of(unidad()));
         when(incidenteRepository.save(any(AbdIncident.class))).thenReturn(incidente("ALTO"));
 
@@ -96,7 +96,7 @@ class IncidenteAbdServiceTest {
     }
 
     @Test
-    void crearNivelBajoNoGeneraAlerta() {
+    void createLowLevelDoesNotGenerateAlert() {
         when(unidadRepository.findById(1)).thenReturn(Optional.of(unidad()));
         when(incidenteRepository.save(any(AbdIncident.class))).thenReturn(incidente("BAJO"));
 
@@ -105,14 +105,14 @@ class IncidenteAbdServiceTest {
     }
 
     @Test
-    void crearSinUnidadFalla() {
+    void createWithoutUnitFails() {
         when(unidadRepository.findById(1)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () -> service.create(request("BAJO", null, null)));
     }
 
     @Test
-    void actualizarConEvidenciaYEstado() {
+    void updateWithEvidenceAndStatus() {
         AbdIncident i = incidente("MEDIO");
         when(incidenteRepository.findById(1)).thenReturn(Optional.of(i));
         when(unidadRepository.findById(1)).thenReturn(Optional.of(unidad()));
@@ -125,7 +125,7 @@ class IncidenteAbdServiceTest {
     }
 
     @Test
-    void actualizarSinEvidenciaNiEstadoMantiene() {
+    void updateWithoutEvidenceOrStatusKeeps() {
         AbdIncident i = incidente("MEDIO");
         when(incidenteRepository.findById(1)).thenReturn(Optional.of(i));
         when(unidadRepository.findById(1)).thenReturn(Optional.of(unidad()));
@@ -138,7 +138,7 @@ class IncidenteAbdServiceTest {
     }
 
     @Test
-    void actualizarInexistenteOSinUnidadFalla() {
+    void updateNonexistentOrWithoutUnitFails() {
         when(incidenteRepository.findById(99)).thenReturn(Optional.empty());
         assertThrows(IllegalArgumentException.class,
                 () -> service.update(99, request("BAJO", null, null)));
@@ -150,7 +150,7 @@ class IncidenteAbdServiceTest {
     }
 
     @Test
-    void eliminarOkYNoExiste() {
+    void deleteOkAndDoesNotExist() {
         when(incidenteRepository.existsById(1)).thenReturn(true);
         service.delete(1);
         verify(incidenteRepository).deleteById(1);

@@ -60,7 +60,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void listarDebeRetornarPagina() {
+    void listReturnsPage() {
         PageRequest pageable = PageRequest.of(0, 10);
         when(usuarioRepository.findByActiveTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(usuarioEjemplo())));
@@ -72,7 +72,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void listarConBusquedaDebeUsarBuscarActivos() {
+    void listWithSearchUsesSearchActive() {
         PageRequest pageable = PageRequest.of(0, 10);
         when(usuarioRepository.searchActive("carlos", pageable))
                 .thenReturn(new PageImpl<>(List.of(usuarioEjemplo())));
@@ -85,7 +85,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void listarConBusquedaEnBlancoDebeUsarFindByActivoTrue() {
+    void listWithBlankSearchUsesFindByActivoTrue() {
         PageRequest pageable = PageRequest.of(0, 10);
         when(usuarioRepository.findByActiveTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(usuarioEjemplo())));
@@ -98,7 +98,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void buscarPorIdDebeRetornarUsuario() {
+    void findByIdReturnsUser() {
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioEjemplo()));
 
         UserResponse response = usuarioService.findById(1L);
@@ -108,7 +108,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void buscarPorIdInexistenteDebeLanzarExcepcion() {
+    void findByIdNonexistentThrowsException() {
         when(usuarioRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class,
@@ -116,7 +116,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void crearDebeGuardarSinVerificarYEnviarCodigoActivacion() {
+    void createSavesUnverifiedAndSendsActivationCode() {
         when(usuarioRepository.existsByEmail("carlos@sgroas.com")).thenReturn(false);
         when(passwordEncoder.encode("123456")).thenReturn("hash-encrypted");
         when(usuarioRepository.save(any(User.class))).thenAnswer(inv -> {
@@ -137,7 +137,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void crearConEmailDuplicadoDebeLanzarExcepcion() {
+    void createWithDuplicateEmailThrowsException() {
         when(usuarioRepository.existsByEmail("carlos@sgroas.com")).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class,
@@ -190,7 +190,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void actualizarDebeModificarYRetornar() {
+    void updateModifiesAndReturns() {
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioEjemplo()));
         when(usuarioRepository.save(any(User.class))).thenReturn(usuarioEjemplo());
 
@@ -201,7 +201,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void actualizarSinPasswordDebeMantenerPasswordHash() {
+    void updateWithoutPasswordKeepsPasswordHash() {
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioEjemplo()));
         when(usuarioRepository.save(any(User.class))).thenReturn(usuarioEjemplo());
 
@@ -215,7 +215,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void actualizarConPasswordEnBlancoDebeMantenerPasswordHash() {
+    void updateWithBlankPasswordKeepsPasswordHash() {
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioEjemplo()));
         when(usuarioRepository.save(any(User.class))).thenReturn(usuarioEjemplo());
 
@@ -229,7 +229,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void actualizarInexistenteDebeLanzarExcepcion() {
+    void updateNonexistentThrowsException() {
         when(usuarioRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class,
@@ -237,19 +237,19 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void desactivarDebeMarcarInactivo() {
+    void deactivateMarksInactive() {
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioEjemplo()));
 
-        usuarioService.desactivar(1L);
+        usuarioService.deactivate(1L);
 
         verify(usuarioRepository).save(argThat(u -> !u.getActive()));
     }
 
     @Test
-    void desactivarInexistenteDebeLanzarExcepcion() {
+    void deactivateNonexistentThrowsException() {
         when(usuarioRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class,
-                () -> usuarioService.desactivar(99L));
+                () -> usuarioService.deactivate(99L));
     }
 }

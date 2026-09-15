@@ -157,7 +157,7 @@ class AuthControllerTest {
     }
 
     @Test
-    void verificarEmailDebeRetornar200YCookie() throws Exception {
+    void verifyEmailReturns200AndCookie() throws Exception {
         when(authService.verifyEmail(any(), any())).thenReturn(authResponse());
 
         mockMvc().perform(post("/api/auth/verify-email")

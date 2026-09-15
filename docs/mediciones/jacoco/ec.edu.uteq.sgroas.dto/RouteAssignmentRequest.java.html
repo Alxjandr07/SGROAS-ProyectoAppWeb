@@ -4,7 +4,17 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
-<span class="fc" id="L7">public record RouteAssignmentRequest(</span>
+    /**
+     * Route assignment data required to create or update an assignment.
+     * @param driverId driver assigned to the route.
+     * @param vehicleId vehicle assigned to the route.
+     * @param routeId route that will be covered.
+     * @param assignmentDate date when the assignment was registered.
+     * @param startDate date when the assignment starts.
+     * @param endDate optional date when the assignment ends.
+     * @param status assignment status code.
+     */
+<span class="fc" id="L17">public record RouteAssignmentRequest(</span>
 
         @NotNull(message = &quot;El conductor es obligatorio&quot;)
         Long driverId,

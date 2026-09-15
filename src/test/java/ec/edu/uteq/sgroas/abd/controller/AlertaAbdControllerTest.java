@@ -45,7 +45,7 @@ class AlertaAbdControllerTest {
     }
 
     @Test
-    void listarConFechaEIncidenteMapeaTodo() throws Exception {
+    void listWithDateAndIncidentMapsAll() throws Exception {
         AbdIncident incidente = AbdIncident.builder()
                 .idIncidente(7).tipo("Choque").build();
         Alert alerta = Alert.builder().idAlerta(1).nivelRiesgo("ALTO")
@@ -60,7 +60,7 @@ class AlertaAbdControllerTest {
     }
 
     @Test
-    void listarConNulosMapeaNull() throws Exception {
+    void listWithNullsMapsNull() throws Exception {
         Alert alerta = Alert.builder().idAlerta(2).nivelRiesgo("BAJO")
                 .descripcion("Sin datos").build();
         when(alertaRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(alerta)));

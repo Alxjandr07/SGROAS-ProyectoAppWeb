@@ -8,7 +8,19 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
-<span class="fc" id="L11">public record DriverRequest(</span>
+    /**
+     * Driver data required to create or update a driver record.
+     * @param firstNames driver given names.
+     * @param lastNames driver family names.
+     * @param nationalId unique 10-digit national identification number.
+     * @param licenseNumber driver license number.
+     * @param licenseType driver license class or category.
+     * @param licenseExpiry date when the license expires.
+     * @param phone optional contact phone number.
+     * @param email optional contact email address.
+     * @param status driver status code.
+     */
+<span class="fc" id="L23">public record DriverRequest(</span>
 
         @NotBlank(message = &quot;Los nombres son obligatorios&quot;)
         @Size(max = 100, message = &quot;Los nombres no pueden superar los 100 caracteres&quot;)

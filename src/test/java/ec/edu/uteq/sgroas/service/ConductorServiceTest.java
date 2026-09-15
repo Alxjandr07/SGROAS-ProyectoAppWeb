@@ -61,7 +61,7 @@ class ConductorServiceTest {
     }
 
     @Test
-    void crearConductorCorrectamente() {
+    void createDriverCorrectly() {
         DriverRequest request = new DriverRequest(
                 "Carlos Alberto",
                 "Mendoza Vera",
@@ -108,7 +108,7 @@ class ConductorServiceTest {
     }
 
     @Test
-    void crearConductorConCedulaDuplicadaDebeLanzarExcepcion() {
+    void createDriverWithDuplicateCedulaThrowsException() {
         DriverRequest request = new DriverRequest(
                 "Carlos Alberto",
                 "Mendoza Vera",
@@ -134,7 +134,7 @@ class ConductorServiceTest {
     }
 
     @Test
-    void buscarConductorPorIdCorrectamente() {
+    void findDriverByIdCorrectly() {
         Driver conductor = Driver.builder()
                 .id(1L)
                 .firstNames("Carlos Alberto")
@@ -163,7 +163,7 @@ class ConductorServiceTest {
     }
 
     @Test
-    void listarSinBusquedaDebeUsarFindByActiveTrue() {
+    void listWithoutSearchUsesFindByActiveTrue() {
         org.springframework.data.domain.PageRequest pageable =
                 org.springframework.data.domain.PageRequest.of(0, 10);
         when(conductorRepository.findByActiveTrue(pageable))
@@ -177,7 +177,7 @@ class ConductorServiceTest {
     }
 
     @Test
-    void listarConBusquedaEnBlancoDebeUsarFindByActiveTrue() {
+    void listWithBlankSearchUsesFindByActiveTrue() {
         org.springframework.data.domain.PageRequest pageable =
                 org.springframework.data.domain.PageRequest.of(0, 10);
         when(conductorRepository.findByActiveTrue(pageable))
@@ -190,7 +190,7 @@ class ConductorServiceTest {
     }
 
     @Test
-    void listarConBusquedaDebeUsarBuscarActivos() {
+    void listWithSearchUsesSearchActive() {
         org.springframework.data.domain.PageRequest pageable =
                 org.springframework.data.domain.PageRequest.of(0, 10);
         when(conductorRepository.searchActive("carlos", pageable))
@@ -204,7 +204,7 @@ class ConductorServiceTest {
     }
 
     @Test
-    void actualizarConCedulaDuplicadaDebeLanzarExcepcion() {
+    void updateWithDuplicateCedulaThrowsException() {
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductorBase()));
         when(conductorRepository.existsByNationalId("0999999999")).thenReturn(true);
 
@@ -218,7 +218,7 @@ class ConductorServiceTest {
     }
 
     @Test
-    void actualizarConLicenciaDuplicadaDebeLanzarExcepcion() {
+    void updateWithDuplicateLicenseThrowsException() {
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductorBase()));
         when(conductorRepository.existsByLicenseNumber("LIC-999-2026")).thenReturn(true);
 
@@ -232,7 +232,7 @@ class ConductorServiceTest {
     }
 
     @Test
-    void actualizarDebeModificarYGuardar() {
+    void updateModifiesAndSaves() {
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductorBase()));
         when(conductorRepository.save(any(Driver.class))).thenReturn(conductorBase());
 
@@ -246,10 +246,10 @@ class ConductorServiceTest {
     }
 
     @Test
-    void desactivarDebeMarcarInactivo() {
+    void deactivateMarksInactive() {
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductorBase()));
 
-        conductorService.desactivar(1L);
+        conductorService.deactivate(1L);
 
         verify(conductorRepository).save(argThat(c ->
                 !c.getActive() && c.getStatus() == DriverStatus.INACTIVO));
