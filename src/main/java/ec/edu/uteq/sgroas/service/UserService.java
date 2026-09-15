@@ -31,7 +31,7 @@ public class UserService {
      */
     public Page<UserResponse> list(String search, Pageable pageable) {
         if (search == null || search.isBlank()) {
-            return usuarioRepository.findByActivoTrue(pageable).map(this::toResponse);
+            return usuarioRepository.findByActiveTrue(pageable).map(this::toResponse);
         }
         return usuarioRepository.searchActive(search.trim().toLowerCase(), pageable)
                 .map(this::toResponse);
@@ -62,14 +62,14 @@ public class UserService {
         }
 
         User usuario = User.builder()
-                .nombre(request.nombre())
+                .name(request.name())
                 .email(request.email())
                 .passwordHash(passwordEncoder.encode(request.password()))
-                .rol(Role.valueOf(request.rol().toUpperCase()))
-                .activo(true)
-                .verificado(false)
-                .creadoEn(Instant.now())
-                .actualizadoEn(Instant.now())
+                .role(Role.valueOf(request.role().toUpperCase()))
+                .active(true)
+                .verified(false)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
                 .build();
 
         User guardado = usuarioRepository.save(usuario);
@@ -89,7 +89,7 @@ public class UserService {
         User usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User no encontrado con id: " + id));
 
-        if (Boolean.TRUE.equals(usuario.getVerificado())) {
+        if (Boolean.TRUE.equals(usuario.getVerified())) {
             throw new IllegalArgumentException("Ese usuario ya verifico su correo");
         }
         if (!codigoVerificacionService.canResend(usuario.getEmail(),
@@ -103,7 +103,7 @@ public class UserService {
     private void sendActivationCode(User usuario) {
         String codigo = codigoVerificacionService.generate(usuario.getEmail(),
                 VerificationCodeService.Type.VERIFICACION);
-        emailService.sendVerificationCode(usuario.getEmail(), usuario.getNombre(), codigo);
+        emailService.sendVerificationCode(usuario.getEmail(), usuario.getName(), codigo);
     }
 
     /**
@@ -118,10 +118,10 @@ public class UserService {
         User usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User no encontrado con id: " + id));
 
-        usuario.setNombre(request.nombre());
+        usuario.setName(request.name());
         usuario.setEmail(request.email());
-        usuario.setRol(Role.valueOf(request.rol().toUpperCase()));
-        usuario.setActualizadoEn(Instant.now());
+        usuario.setRole(Role.valueOf(request.role().toUpperCase()));
+        usuario.setUpdatedAt(Instant.now());
 
         if (request.password() != null && !request.password().isBlank()) {
             usuario.setPasswordHash(passwordEncoder.encode(request.password()));
@@ -138,16 +138,16 @@ public class UserService {
     public void desactivar(Long id) {
         User usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User no encontrado con id: " + id));
-        usuario.setActivo(false);
-        usuario.setActualizadoEn(Instant.now());
+        usuario.setActive(false);
+        usuario.setUpdatedAt(Instant.now());
         usuarioRepository.save(usuario);
     }
 
     private UserResponse toResponse(User u) {
         return new UserResponse(
-                u.getId(), u.getNombre(), u.getEmail(),
-                u.getRol().name(), u.getActivo(),
-                u.getCreadoEn(), u.getActualizadoEn()
+                u.getId(), u.getName(), u.getEmail(),
+                u.getRole().name(), u.getActive(),
+                u.getCreatedAt(), u.getUpdatedAt()
         );
     }
 }

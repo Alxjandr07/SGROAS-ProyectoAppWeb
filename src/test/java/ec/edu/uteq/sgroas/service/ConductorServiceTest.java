@@ -31,18 +31,18 @@ class ConductorServiceTest {
     private Driver conductorBase() {
         return Driver.builder()
                 .id(1L)
-                .nombres("Carlos Alberto")
-                .apellidos("Mendoza Vera")
-                .cedula("1200000001")
-                .numeroLicencia("LIC-001-2026")
-                .tipoLicencia("E")
-                .fechaVencimientoLicencia(LocalDate.now().plusDays(20))
-                .telefono("0988888888")
+                .firstNames("Carlos Alberto")
+                .lastNames("Mendoza Vera")
+                .nationalId("1200000001")
+                .licenseNumber("LIC-001-2026")
+                .licenseType("E")
+                .licenseExpiry(LocalDate.now().plusDays(20))
+                .phone("0988888888")
                 .email("carlos.mendoza@sgroas.com")
-                .estado(DriverStatus.ACTIVO)
-                .activo(true)
-                .creadoEn(Instant.now())
-                .actualizadoEn(Instant.now())
+                .status(DriverStatus.ACTIVO)
+                .active(true)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
                 .build();
     }
 
@@ -76,23 +76,23 @@ class ConductorServiceTest {
 
         Driver conductorGuardado = Driver.builder()
                 .id(1L)
-                .nombres("Carlos Alberto")
-                .apellidos("Mendoza Vera")
-                .cedula("1200000001")
-                .numeroLicencia("LIC-001-2026")
-                .tipoLicencia("E")
-                .fechaVencimientoLicencia(LocalDate.of(2026, 7, 15))
-                .telefono("0988888888")
+                .firstNames("Carlos Alberto")
+                .lastNames("Mendoza Vera")
+                .nationalId("1200000001")
+                .licenseNumber("LIC-001-2026")
+                .licenseType("E")
+                .licenseExpiry(LocalDate.of(2026, 7, 15))
+                .phone("0988888888")
                 .email("carlos.mendoza@sgroas.com")
-                .estado(DriverStatus.ACTIVO)
-                .activo(true)
-                .creadoEn(Instant.now())
-                .actualizadoEn(Instant.now())
+                .status(DriverStatus.ACTIVO)
+                .active(true)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
                 .build();
 
-        when(conductorRepository.existsByCedula("1200000001"))
+        when(conductorRepository.existsByNationalId("1200000001"))
                 .thenReturn(false);
-        when(conductorRepository.existsByNumeroLicencia("LIC-001-2026"))
+        when(conductorRepository.existsByLicenseNumber("LIC-001-2026"))
                 .thenReturn(false);
         when(conductorRepository.save(any(Driver.class)))
                 .thenReturn(conductorGuardado);
@@ -101,9 +101,9 @@ class ConductorServiceTest {
 
         assertNotNull(response);
         assertEquals(1L, response.id());
-        assertEquals("Carlos Alberto", response.nombres());
-        assertEquals("1200000001", response.cedula());
-        assertEquals("ACTIVO", response.estado());
+        assertEquals("Carlos Alberto", response.firstNames());
+        assertEquals("1200000001", response.nationalId());
+        assertEquals("ACTIVO", response.status());
         verify(conductorRepository).save(any(Driver.class));
     }
 
@@ -121,7 +121,7 @@ class ConductorServiceTest {
                 "ACTIVO"
         );
 
-        when(conductorRepository.existsByCedula("1200000001"))
+        when(conductorRepository.existsByNationalId("1200000001"))
                 .thenReturn(true);
 
         IllegalArgumentException exception = assertThrows(
@@ -137,18 +137,18 @@ class ConductorServiceTest {
     void buscarConductorPorIdCorrectamente() {
         Driver conductor = Driver.builder()
                 .id(1L)
-                .nombres("Carlos Alberto")
-                .apellidos("Mendoza Vera")
-                .cedula("1200000001")
-                .numeroLicencia("LIC-001-2026")
-                .tipoLicencia("E")
-                .fechaVencimientoLicencia(LocalDate.now().plusDays(20))
-                .telefono("0988888888")
+                .firstNames("Carlos Alberto")
+                .lastNames("Mendoza Vera")
+                .nationalId("1200000001")
+                .licenseNumber("LIC-001-2026")
+                .licenseType("E")
+                .licenseExpiry(LocalDate.now().plusDays(20))
+                .phone("0988888888")
                 .email("carlos.mendoza@sgroas.com")
-                .estado(DriverStatus.ACTIVO)
-                .activo(true)
-                .creadoEn(Instant.now())
-                .actualizadoEn(Instant.now())
+                .status(DriverStatus.ACTIVO)
+                .active(true)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
                 .build();
 
         when(conductorRepository.findById(1L))
@@ -158,35 +158,35 @@ class ConductorServiceTest {
 
         assertNotNull(response);
         assertEquals(1L, response.id());
-        assertEquals("Carlos Alberto", response.nombres());
+        assertEquals("Carlos Alberto", response.firstNames());
         assertTrue(response.licenseExpiring());
     }
 
     @Test
-    void listarSinBusquedaDebeUsarFindByActivoTrue() {
+    void listarSinBusquedaDebeUsarFindByActiveTrue() {
         org.springframework.data.domain.PageRequest pageable =
                 org.springframework.data.domain.PageRequest.of(0, 10);
-        when(conductorRepository.findByActivoTrue(pageable))
+        when(conductorRepository.findByActiveTrue(pageable))
                 .thenReturn(new org.springframework.data.domain.PageImpl<>(List.of(conductorBase())));
 
         var pagina = conductorService.list(null, pageable);
 
         assertEquals(1, pagina.getTotalElements());
-        verify(conductorRepository).findByActivoTrue(pageable);
+        verify(conductorRepository).findByActiveTrue(pageable);
         verify(conductorRepository, never()).searchActive(any(), any());
     }
 
     @Test
-    void listarConBusquedaEnBlancoDebeUsarFindByActivoTrue() {
+    void listarConBusquedaEnBlancoDebeUsarFindByActiveTrue() {
         org.springframework.data.domain.PageRequest pageable =
                 org.springframework.data.domain.PageRequest.of(0, 10);
-        when(conductorRepository.findByActivoTrue(pageable))
+        when(conductorRepository.findByActiveTrue(pageable))
                 .thenReturn(new org.springframework.data.domain.PageImpl<>(List.of(conductorBase())));
 
         var pagina = conductorService.list("   ", pageable);
 
         assertEquals(1, pagina.getTotalElements());
-        verify(conductorRepository).findByActivoTrue(pageable);
+        verify(conductorRepository).findByActiveTrue(pageable);
     }
 
     @Test
@@ -200,13 +200,13 @@ class ConductorServiceTest {
 
         assertEquals(1, pagina.getTotalElements());
         verify(conductorRepository).searchActive("carlos", pageable);
-        verify(conductorRepository, never()).findByActivoTrue(pageable);
+        verify(conductorRepository, never()).findByActiveTrue(pageable);
     }
 
     @Test
     void actualizarConCedulaDuplicadaDebeLanzarExcepcion() {
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductorBase()));
-        when(conductorRepository.existsByCedula("0999999999")).thenReturn(true);
+        when(conductorRepository.existsByNationalId("0999999999")).thenReturn(true);
 
         DriverRequest request = new DriverRequest(
                 "Carlos Alberto", "Mendoza Vera", "0999999999", "LIC-001-2026",
@@ -220,7 +220,7 @@ class ConductorServiceTest {
     @Test
     void actualizarConLicenciaDuplicadaDebeLanzarExcepcion() {
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(conductorBase()));
-        when(conductorRepository.existsByNumeroLicencia("LIC-999-2026")).thenReturn(true);
+        when(conductorRepository.existsByLicenseNumber("LIC-999-2026")).thenReturn(true);
 
         DriverRequest request = new DriverRequest(
                 "Carlos Alberto", "Mendoza Vera", "1200000001", "LIC-999-2026",
@@ -239,10 +239,10 @@ class ConductorServiceTest {
         DriverResponse response = conductorService.update(1L, requestBase());
 
         assertEquals(1L, response.id());
-        assertEquals("1200000001", response.cedula());
+        assertEquals("1200000001", response.nationalId());
         verify(conductorRepository).save(any(Driver.class));
-        verify(conductorRepository, never()).existsByCedula(any());
-        verify(conductorRepository, never()).existsByNumeroLicencia(any());
+        verify(conductorRepository, never()).existsByNationalId(any());
+        verify(conductorRepository, never()).existsByLicenseNumber(any());
     }
 
     @Test
@@ -252,13 +252,13 @@ class ConductorServiceTest {
         conductorService.desactivar(1L);
 
         verify(conductorRepository).save(argThat(c ->
-                !c.getActivo() && c.getEstado() == DriverStatus.INACTIVO));
+                !c.getActive() && c.getStatus() == DriverStatus.INACTIVO));
     }
 
     @Test
     void licenciaVencidaDebeMarcarLicenciaPorVencerFalse() {
         Driver vencido = conductorBase();
-        vencido.setFechaVencimientoLicencia(LocalDate.now().minusDays(5));
+        vencido.setLicenseExpiry(LocalDate.now().minusDays(5));
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(vencido));
 
         DriverResponse response = conductorService.findById(1L);
@@ -269,7 +269,7 @@ class ConductorServiceTest {
     @Test
     void licenciaLejanaDebeMarcarLicenciaPorVencerFalse() {
         Driver lejana = conductorBase();
-        lejana.setFechaVencimientoLicencia(LocalDate.now().plusDays(60));
+        lejana.setLicenseExpiry(LocalDate.now().plusDays(60));
         when(conductorRepository.findById(1L)).thenReturn(Optional.of(lejana));
 
         DriverResponse response = conductorService.findById(1L);

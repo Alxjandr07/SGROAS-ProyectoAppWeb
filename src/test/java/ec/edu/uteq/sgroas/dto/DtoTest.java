@@ -75,10 +75,10 @@ class DtoTest {
                 "Carlos Mendoza", "carlos@sgroas.com", "123456", "ROLE_ADMIN"
         );
 
-        assertEquals("Carlos Mendoza", request.nombre());
+        assertEquals("Carlos Mendoza", request.name());
         assertEquals("carlos@sgroas.com", request.email());
         assertEquals("123456", request.password());
-        assertEquals("ROLE_ADMIN", request.rol());
+        assertEquals("ROLE_ADMIN", request.role());
     }
 
     @Test
@@ -90,12 +90,12 @@ class DtoTest {
         );
 
         assertEquals(1L, response.id());
-        assertEquals("Carlos Mendoza", response.nombre());
+        assertEquals("Carlos Mendoza", response.name());
         assertEquals("carlos@sgroas.com", response.email());
-        assertEquals("ROLE_ADMIN", response.rol());
-        assertTrue(response.activo());
-        assertEquals(ahora, response.creadoEn());
-        assertEquals(ahora, response.actualizadoEn());
+        assertEquals("ROLE_ADMIN", response.role());
+        assertTrue(response.active());
+        assertEquals(ahora, response.createdAt());
+        assertEquals(ahora, response.updatedAt());
     }
 
     @Test
@@ -105,15 +105,15 @@ class DtoTest {
                 "MOT-123", "CHAS-123", "Blanco", "ACTIVO"
         );
 
-        assertEquals("GTU-001", request.placa());
-        assertEquals("Toyota", request.marca());
-        assertEquals("Hiace", request.modelo());
-        assertEquals(2020, request.anio());
-        assertEquals(14, request.capacidadPasajeros());
-        assertEquals("MOT-123", request.numeroMotor());
-        assertEquals("CHAS-123", request.numeroChasis());
+        assertEquals("GTU-001", request.plate());
+        assertEquals("Toyota", request.brand());
+        assertEquals("Hiace", request.model());
+        assertEquals(2020, request.year());
+        assertEquals(14, request.capacity());
+        assertEquals("MOT-123", request.engineNumber());
+        assertEquals("CHAS-123", request.chassisNumber());
         assertEquals("Blanco", request.color());
-        assertEquals("ACTIVO", request.estado());
+        assertEquals("ACTIVO", request.status());
     }
 
     @Test
@@ -125,16 +125,16 @@ class DtoTest {
         );
 
         assertEquals(1L, response.id());
-        assertEquals("GTU-001", response.placa());
-        assertEquals("Toyota", response.marca());
-        assertEquals("Hiace", response.modelo());
-        assertEquals(2020, response.anio());
-        assertEquals(14, response.capacidadPasajeros());
-        assertEquals("MOT-123", response.numeroMotor());
-        assertEquals("CHAS-123", response.numeroChasis());
+        assertEquals("GTU-001", response.plate());
+        assertEquals("Toyota", response.brand());
+        assertEquals("Hiace", response.model());
+        assertEquals(2020, response.year());
+        assertEquals(14, response.capacity());
+        assertEquals("MOT-123", response.engineNumber());
+        assertEquals("CHAS-123", response.chassisNumber());
         assertEquals("Blanco", response.color());
-        assertEquals("ACTIVO", response.estado());
-        assertTrue(response.activo());
+        assertEquals("ACTIVO", response.status());
+        assertTrue(response.active());
     }
 
     @Test
@@ -144,13 +144,13 @@ class DtoTest {
                 420.0, 480, "ACTIVA"
         );
 
-        assertEquals("R-001", request.codigo());
-        assertEquals("Quito - Guayaquil", request.nombre());
-        assertEquals("Quito", request.origen());
-        assertEquals("Guayaquil", request.destino());
-        assertEquals(420.0, request.distanciaKm());
-        assertEquals(480, request.duracionEstimadaMin());
-        assertEquals("ACTIVA", request.estado());
+        assertEquals("R-001", request.code());
+        assertEquals("Quito - Guayaquil", request.name());
+        assertEquals("Quito", request.origin());
+        assertEquals("Guayaquil", request.destination());
+        assertEquals(420.0, request.distanceKm());
+        assertEquals(480, request.durationMin());
+        assertEquals("ACTIVA", request.status());
     }
 
     @Test
@@ -162,14 +162,14 @@ class DtoTest {
         );
 
         assertEquals(1L, response.id());
-        assertEquals("R-001", response.codigo());
-        assertEquals("Quito - Guayaquil", response.nombre());
-        assertEquals("Quito", response.origen());
-        assertEquals("Guayaquil", response.destino());
-        assertEquals(420.0, response.distanciaKm());
-        assertEquals(480, response.duracionEstimadaMin());
-        assertEquals("ACTIVA", response.estado());
-        assertTrue(response.activo());
+        assertEquals("R-001", response.code());
+        assertEquals("Quito - Guayaquil", response.name());
+        assertEquals("Quito", response.origin());
+        assertEquals("Guayaquil", response.destination());
+        assertEquals(420.0, response.distanceKm());
+        assertEquals(480, response.durationMin());
+        assertEquals("ACTIVA", response.status());
+        assertTrue(response.active());
     }
 
     @Test
@@ -180,14 +180,14 @@ class DtoTest {
                 fecha, "Km 12", "MEDIA", "REPORTADO"
         );
 
-        assertEquals(1L, request.asignacionId());
-        assertEquals("Carlos Mendoza", request.reportadoPor());
-        assertEquals("AVERIA_MECANICA", request.tipo());
-        assertEquals("Falla en el motor", request.descripcion());
-        assertEquals(fecha, request.fechaIncidente());
-        assertEquals("Km 12", request.ubicacion());
-        assertEquals("MEDIA", request.gravedad());
-        assertEquals("REPORTADO", request.estado());
+        assertEquals(1L, request.assignmentId());
+        assertEquals("Carlos Mendoza", request.reportedBy());
+        assertEquals("AVERIA_MECANICA", request.type());
+        assertEquals("Falla en el motor", request.description());
+        assertEquals(fecha, request.incidentDate());
+        assertEquals("Km 12", request.location());
+        assertEquals("MEDIA", request.severity());
+        assertEquals("REPORTADO", request.status());
     }
 
     @Test
@@ -201,15 +201,15 @@ class DtoTest {
         );
 
         assertEquals(1L, response.id());
-        assertEquals(1L, response.asignacionId());
-        assertEquals("Carlos Mendoza", response.reportadoPor());
-        assertEquals("AVERIA_MECANICA", response.tipo());
-        assertEquals("Falla en el motor", response.descripcion());
-        assertEquals(fecha, response.fechaIncidente());
-        assertEquals("Km 12", response.ubicacion());
-        assertEquals("MEDIA", response.gravedad());
-        assertEquals("REPORTADO", response.estado());
-        assertTrue(response.activo());
+        assertEquals(1L, response.assignmentId());
+        assertEquals("Carlos Mendoza", response.reportedBy());
+        assertEquals("AVERIA_MECANICA", response.type());
+        assertEquals("Falla en el motor", response.description());
+        assertEquals(fecha, response.incidentDate());
+        assertEquals("Km 12", response.location());
+        assertEquals("MEDIA", response.severity());
+        assertEquals("REPORTADO", response.status());
+        assertTrue(response.active());
     }
 
     @Test
@@ -219,13 +219,13 @@ class DtoTest {
                 1L, 1L, 1L, fecha, fecha, fecha.plusDays(1), "ACTIVA"
         );
 
-        assertEquals(1L, request.conductorId());
-        assertEquals(1L, request.vehiculoId());
-        assertEquals(1L, request.rutaId());
-        assertEquals(fecha, request.fechaAsignacion());
-        assertEquals(fecha, request.fechaInicio());
-        assertEquals(fecha.plusDays(1), request.fechaFin());
-        assertEquals("ACTIVA", request.estado());
+        assertEquals(1L, request.driverId());
+        assertEquals(1L, request.vehicleId());
+        assertEquals(1L, request.routeId());
+        assertEquals(fecha, request.assignmentDate());
+        assertEquals(fecha, request.startDate());
+        assertEquals(fecha.plusDays(1), request.endDate());
+        assertEquals("ACTIVA", request.status());
     }
 
     @Test
@@ -239,16 +239,16 @@ class DtoTest {
         );
 
         assertEquals(1L, response.id());
-        assertEquals(1L, response.conductorId());
-        assertEquals("Carlos Mendoza", response.conductorNombre());
-        assertEquals(1L, response.vehiculoId());
-        assertEquals("GTU-001", response.vehiculoPlaca());
-        assertEquals(1L, response.rutaId());
-        assertEquals("Quito - Guayaquil", response.rutaNombre());
-        assertEquals(fecha, response.fechaAsignacion());
-        assertEquals(fecha, response.fechaInicio());
-        assertEquals(fecha.plusDays(1), response.fechaFin());
-        assertEquals("ACTIVA", response.estado());
-        assertTrue(response.activo());
+        assertEquals(1L, response.driverId());
+        assertEquals("Carlos Mendoza", response.driverName());
+        assertEquals(1L, response.vehicleId());
+        assertEquals("GTU-001", response.vehiclePlate());
+        assertEquals(1L, response.routeId());
+        assertEquals("Quito - Guayaquil", response.routeName());
+        assertEquals(fecha, response.assignmentDate());
+        assertEquals(fecha, response.startDate());
+        assertEquals(fecha.plusDays(1), response.endDate());
+        assertEquals("ACTIVA", response.status());
+        assertTrue(response.active());
     }
 }

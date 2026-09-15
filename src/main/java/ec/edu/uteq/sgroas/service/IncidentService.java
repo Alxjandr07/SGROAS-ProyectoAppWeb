@@ -23,137 +23,103 @@ public class IncidentService {
     private final IncidentRepository incidenteRepository;
     private final RouteAssignmentRepository asignacionRutaRepository;
 
-    /**
-     * Obtiene la pagina de incidentes activos convertidos a formato de respuesta.
-     * @param pageable objeto con numero de pagina, tamanio y orden solicitados para la consulta
-     * @return pagina con los incidentes activos encontrados
-     */
     public Page<IncidentResponse> list(Pageable pageable) {
         List<IncidentResponse> contenido = listCached(pageable);
         return new PageImpl<>(contenido, pageable, contenido.size());
     }
 
-    /**
-     * Obtiene desde la memoria cache la lista de incidentes activos de la pagina solicitada.
-     * @param pageable objeto con numero de pagina y tamanio que identifican la entrada guardada en cache
-     * @return lista de incidentes activos correspondientes a la pagina pedida
-     */
     @Cacheable(value = "incidentes", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
     public List<IncidentResponse> listCached(Pageable pageable) {
-        return incidenteRepository.findByActivoTrue(pageable)
+        return incidenteRepository.findByActiveTrue(pageable)
                 .map(this::mapearAResponse)
                 .getContent();
     }
 
-    /**
-     * Recupera el detalle de un incidente activo existente.
-     * @param id identificador del incidente que se desea consultar
-     * @return datos del incidente encontrado
-     * @throws IllegalArgumentException cuando no existe un incidente activo con ese identificador
-     */
     public IncidentResponse findById(Long id) {
         Incident incidente = getActiveIncident(id);
         return mapearAResponse(incidente);
     }
 
-    /**
-     * Registra un nuevo incidente asociado a una asignacion de ruta vigente.
-     * @param request datos del incidente con asignacion, tipo, descripcion, fecha, ubicacion, gravedad y estado
-     * @return datos del incidente recien guardado
-     * @throws IllegalArgumentException cuando la asignacion no existe o esta inactiva, o tipo, gravedad o estado no son validos
-     */
     @CacheEvict(value = "incidentes", allEntries = true)
     public IncidentResponse create(IncidentRequest request) {
-        RouteAssignment asignacion = asignacionRutaRepository.findById(request.asignacionId())
-                .filter(RouteAssignment::getActivo)
+        RouteAssignment asignacion = asignacionRutaRepository.findById(request.assignmentId())
+                .filter(RouteAssignment::getActive)
                 .orElseThrow(() -> new IllegalArgumentException("Asignacion no encontrada"));
 
         Incident incidente = Incident.builder()
-                .asignacion(asignacion)
-                .reportadoPor(request.reportadoPor())
-                .tipo(toType(request.tipo()))
-                .descripcion(request.descripcion())
-                .fechaIncidente(request.fechaIncidente())
-                .ubicacion(request.ubicacion())
-                .gravedad(toSeverity(request.gravedad()))
-                .estado(toStatus(request.estado()))
-                .activo(true)
-                .creadoEn(Instant.now())
-                .actualizadoEn(Instant.now())
+                .assignment(asignacion)
+                .reportedBy(request.reportedBy())
+                .type(toType(request.type()))
+                .description(request.description())
+                .incidentDate(request.incidentDate())
+                .location(request.location())
+                .severity(toSeverity(request.severity()))
+                .status(toStatus(request.status()))
+                .active(true)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
                 .build();
 
         Incident incidenteGuardado = incidenteRepository.save(incidente);
         return mapearAResponse(incidenteGuardado);
     }
 
-    /**
-     * Reemplaza los datos de un incidente activo por los valores recibidos.
-     * @param id identificador del incidente que se desea modificar
-     * @param request nuevos datos del incidente con asignacion, tipo, descripcion, fecha, ubicacion, gravedad y estado
-     * @return datos del incidente ya actualizado
-     * @throws IllegalArgumentException cuando el incidente o la asignacion no existe o esta inactivo, o tipo, gravedad o estado no son validos
-     */
     @CacheEvict(value = "incidentes", allEntries = true)
     public IncidentResponse update(Long id, IncidentRequest request) {
         Incident incidente = getActiveIncident(id);
 
-        RouteAssignment asignacion = asignacionRutaRepository.findById(request.asignacionId())
-                .filter(RouteAssignment::getActivo)
+        RouteAssignment asignacion = asignacionRutaRepository.findById(request.assignmentId())
+                .filter(RouteAssignment::getActive)
                 .orElseThrow(() -> new IllegalArgumentException("Asignacion no encontrada"));
 
-        incidente.setAsignacion(asignacion);
-        incidente.setReportadoPor(request.reportadoPor());
-        incidente.setTipo(toType(request.tipo()));
-        incidente.setDescripcion(request.descripcion());
-        incidente.setFechaIncidente(request.fechaIncidente());
-        incidente.setUbicacion(request.ubicacion());
-        incidente.setGravedad(toSeverity(request.gravedad()));
-        incidente.setEstado(toStatus(request.estado()));
-        incidente.setActualizadoEn(Instant.now());
+        incidente.setAssignment(asignacion);
+        incidente.setReportedBy(request.reportedBy());
+        incidente.setType(toType(request.type()));
+        incidente.setDescription(request.description());
+        incidente.setIncidentDate(request.incidentDate());
+        incidente.setLocation(request.location());
+        incidente.setSeverity(toSeverity(request.severity()));
+        incidente.setStatus(toStatus(request.status()));
+        incidente.setUpdatedAt(Instant.now());
 
         Incident incidenteActualizado = incidenteRepository.save(incidente);
         return mapearAResponse(incidenteActualizado);
     }
 
-    /**
-     * Marca un incidente como inactivo y lo deja en estado cerrado.
-     * @param id identificador del incidente que se desea dar de baja
-     * @throws IllegalArgumentException cuando no existe un incidente activo con ese identificador
-     */
     @CacheEvict(value = "incidentes", allEntries = true)
     public void desactivar(Long id) {
         Incident incidente = getActiveIncident(id);
-        incidente.setActivo(false);
-        incidente.setEstado(IncidentStatus.CERRADO);
-        incidente.setActualizadoEn(Instant.now());
+        incidente.setActive(false);
+        incidente.setStatus(IncidentStatus.CERRADO);
+        incidente.setUpdatedAt(Instant.now());
         incidenteRepository.save(incidente);
     }
 
     private Incident getActiveIncident(Long id) {
         return incidenteRepository.findById(id)
-                .filter(Incident::getActivo)
+                .filter(Incident::getActive)
                 .orElseThrow(() -> new IllegalArgumentException("Incident no encontrado"));
     }
 
-    private IncidentType toType(String tipo) {
+    private IncidentType toType(String type) {
         try {
-            return IncidentType.valueOf(tipo.toUpperCase());
+            return IncidentType.valueOf(type.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Tipo de incidente no valido");
         }
     }
 
-    private IncidentSeverity toSeverity(String gravedad) {
+    private IncidentSeverity toSeverity(String severity) {
         try {
-            return IncidentSeverity.valueOf(gravedad.toUpperCase());
+            return IncidentSeverity.valueOf(severity.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Gravedad de incidente no valida");
         }
     }
 
-    private IncidentStatus toStatus(String estado) {
+    private IncidentStatus toStatus(String status) {
         try {
-            return IncidentStatus.valueOf(estado.toUpperCase());
+            return IncidentStatus.valueOf(status.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Estado de incidente no valido");
         }
@@ -162,17 +128,17 @@ public class IncidentService {
     private IncidentResponse mapearAResponse(Incident incidente) {
         return new IncidentResponse(
                 incidente.getId(),
-                incidente.getAsignacion().getId(),
-                incidente.getReportadoPor(),
-                incidente.getTipo().name(),
-                incidente.getDescripcion(),
-                incidente.getFechaIncidente(),
-                incidente.getUbicacion(),
-                incidente.getGravedad().name(),
-                incidente.getEstado().name(),
-                incidente.getActivo(),
-                incidente.getCreadoEn(),
-                incidente.getActualizadoEn()
+                incidente.getAssignment().getId(),
+                incidente.getReportedBy(),
+                incidente.getType().name(),
+                incidente.getDescription(),
+                incidente.getIncidentDate(),
+                incidente.getLocation(),
+                incidente.getSeverity().name(),
+                incidente.getStatus().name(),
+                incidente.getActive(),
+                incidente.getCreatedAt(),
+                incidente.getUpdatedAt()
         );
     }
 }

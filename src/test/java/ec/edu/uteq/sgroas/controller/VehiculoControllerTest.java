@@ -65,7 +65,7 @@ class VehiculoControllerTest {
 
         mockMvc().perform(get("/api/vehiculos/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.marca").value("Toyota"));
+                .andExpect(jsonPath("$.brand").value("Toyota"));
     }
 
     @Test
@@ -76,15 +76,15 @@ class VehiculoControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "placa": "GTU-001",
-                                  "marca": "Toyota",
-                                  "modelo": "Hiace",
-                                  "anio": 2020,
-                                  "capacidadPasajeros": 14,
-                                  "numeroMotor": "MOT-123",
-                                  "numeroChasis": "CHAS-123",
+                                  "plate": "GTU-001",
+                                  "brand": "Toyota",
+                                  "model": "Hiace",
+                                  "year": 2020,
+                                  "capacity": 14,
+                                  "engineNumber": "MOT-123",
+                                  "chassisNumber": "CHAS-123",
                                   "color": "Blanco",
-                                  "estado": "ACTIVO"
+                                  "status": "ACTIVO"
                                 }
                                 """))
                 .andExpect(status().isCreated())
@@ -99,15 +99,15 @@ class VehiculoControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "placa": "GTU-001",
-                                  "marca": "Toyota",
-                                  "modelo": "Hiace",
-                                  "anio": 2020,
-                                  "capacidadPasajeros": 14,
-                                  "numeroMotor": "MOT-123",
-                                  "numeroChasis": "CHAS-123",
+                                  "plate": "GTU-001",
+                                  "brand": "Toyota",
+                                  "model": "Hiace",
+                                  "year": 2020,
+                                  "capacity": 14,
+                                  "engineNumber": "MOT-123",
+                                  "chassisNumber": "CHAS-123",
                                   "color": "Blanco",
-                                  "estado": "ACTIVO"
+                                  "status": "ACTIVO"
                                 }
                                 """))
                 .andExpect(status().isOk());

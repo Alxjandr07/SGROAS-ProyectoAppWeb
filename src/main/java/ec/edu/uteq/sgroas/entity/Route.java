@@ -29,34 +29,33 @@ public class Route {
     private Long id;
 
     @Column(name = "codigo", nullable = false, unique = true, length = 20)
-    private String codigo;
+    private String code;
 
     @Column(name = "nombre", nullable = false, length = 100)
-    private String nombre;
+    private String name;
 
     @Column(name = "origen", nullable = false, length = 150)
-    private String origen;
+    private String origin;
 
     @Column(name = "destino", nullable = false, length = 150)
-    private String destino;
+    private String destination;
 
     @Column(name = "distancia_km", nullable = false)
-    private Double distanciaKm;
+    private Double distanceKm;
 
     @Column(name = "duracion_estimada_min", nullable = false)
-    private Integer duracionEstimadaMin;
+    private Integer durationMin;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false, length = 10)
-    private RouteStatus estado;
+    private RouteStatus status;
 
     @Column(name = "activo", nullable = false)
-    private Boolean activo;
+    private Boolean active;
 
     @Column(name = "creado_en", nullable = false, updatable = false)
-    private Instant creadoEn;
+    private Instant createdAt;
 
     @Column(name = "actualizado_en", nullable = false)
-    private Instant actualizadoEn;
+    private Instant updatedAt;
 }
-

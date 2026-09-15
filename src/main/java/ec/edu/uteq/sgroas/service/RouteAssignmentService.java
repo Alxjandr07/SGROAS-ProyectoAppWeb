@@ -28,139 +28,105 @@ public class RouteAssignmentService {
     private final VehicleRepository vehiculoRepository;
     private final RouteRepository rutaRepository;
 
-    /**
-     * Obtiene la pagina de asignaciones activas convertidas a formato de respuesta.
-     * @param pageable objeto con numero de pagina, tamanio y orden solicitados para la consulta
-     * @return pagina con las asignaciones activas encontradas
-     */
     @Transactional(readOnly = true)
     public Page<RouteAssignmentResponse> list(Pageable pageable) {
-        Page<RouteAssignment> page = asignacionRutaRepository.findByActivoTrue(pageable);
+        Page<RouteAssignment> page = asignacionRutaRepository.findByActiveTrue(pageable);
         List<RouteAssignmentResponse> contenido = page.map(this::mapearAResponse).getContent();
         return new PageImpl<>(contenido, pageable, page.getTotalElements());
     }
 
-    /**
-     * Obtiene desde la memoria cache la lista de asignaciones activas de la pagina solicitada.
-     * @param pageable objeto con numero de pagina y tamanio que identifican la entrada guardada en cache
-     * @return lista de asignaciones activas correspondientes a la pagina pedida
-     */
     @Cacheable(value = "asignaciones", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
     @Transactional(readOnly = true)
     public List<RouteAssignmentResponse> listCached(Pageable pageable) {
-        return asignacionRutaRepository.findByActivoTrue(pageable)
+        return asignacionRutaRepository.findByActiveTrue(pageable)
                 .map(this::mapearAResponse)
                 .getContent();
     }
 
-    /**
-     * Recupera el detalle de una asignacion activa existente.
-     * @param id identificador de la asignacion que se desea consultar
-     * @return datos de la asignacion encontrada
-     * @throws IllegalArgumentException cuando no existe una asignacion activa con ese identificador
-     */
     @Transactional(readOnly = true)
     public RouteAssignmentResponse findById(Long id) {
         RouteAssignment asignacion = getActiveAssignment(id);
         return mapearAResponse(asignacion);
     }
 
-    /**
-     * Registra una nueva asignacion vinculando un conductor, un vehiculo y una ruta vigentes.
-     * @param request datos de la asignacion con participantes, fechas y estado deseado
-     * @return datos de la asignacion recien guardada
-     * @throws IllegalArgumentException cuando algun participante no existe o esta inactivo, o el estado no es valido
-     */
     @CacheEvict(value = "asignaciones", allEntries = true)
     public RouteAssignmentResponse create(RouteAssignmentRequest request) {
-        Driver conductor = conductorRepository.findById(request.conductorId())
-                .filter(Driver::getActivo)
+        Driver conductor = conductorRepository.findById(request.driverId())
+                .filter(Driver::getActive)
                 .orElseThrow(() -> new IllegalArgumentException("Driver no encontrado"));
 
-        Vehicle vehiculo = vehiculoRepository.findById(request.vehiculoId())
-                .filter(Vehicle::getActivo)
+        Vehicle vehiculo = vehiculoRepository.findById(request.vehicleId())
+                .filter(Vehicle::getActive)
                 .orElseThrow(() -> new IllegalArgumentException("Vehicle no encontrado"));
 
-        Route ruta = rutaRepository.findById(request.rutaId())
-                .filter(Route::getActivo)
+        Route ruta = rutaRepository.findById(request.routeId())
+                .filter(Route::getActive)
                 .orElseThrow(() -> new IllegalArgumentException("Route no encontrada"));
 
         RouteAssignment asignacion = RouteAssignment.builder()
-                .conductor(conductor)
-                .vehiculo(vehiculo)
-                .ruta(ruta)
-                .fechaAsignacion(request.fechaAsignacion())
-                .fechaInicio(request.fechaInicio())
-                .fechaFin(request.fechaFin())
-                .estado(toStatus(request.estado()))
-                .activo(true)
-                .creadoEn(Instant.now())
-                .actualizadoEn(Instant.now())
+                .driver(conductor)
+                .vehicle(vehiculo)
+                .route(ruta)
+                .assignmentDate(request.assignmentDate())
+                .startDate(request.startDate())
+                .endDate(request.endDate())
+                .status(toStatus(request.status()))
+                .active(true)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
                 .build();
 
         RouteAssignment asignacionGuardada = asignacionRutaRepository.save(asignacion);
         return mapearAResponse(asignacionGuardada);
     }
 
-    /**
-     * Reemplaza los datos de una asignacion activa por los valores recibidos.
-     * @param id identificador de la asignacion que se desea modificar
-     * @param request nuevos datos de participantes, fechas y estado para la asignacion
-     * @return datos de la asignacion ya actualizada
-     * @throws IllegalArgumentException cuando la asignacion o algun participante no existe o esta inactivo, o el estado no es valido
-     */
     @CacheEvict(value = "asignaciones", allEntries = true)
     public RouteAssignmentResponse update(Long id, RouteAssignmentRequest request) {
         RouteAssignment asignacion = getActiveAssignment(id);
 
-        Driver conductor = conductorRepository.findById(request.conductorId())
-                .filter(Driver::getActivo)
+        Driver conductor = conductorRepository.findById(request.driverId())
+                .filter(Driver::getActive)
                 .orElseThrow(() -> new IllegalArgumentException("Driver no encontrado"));
 
-        Vehicle vehiculo = vehiculoRepository.findById(request.vehiculoId())
-                .filter(Vehicle::getActivo)
+        Vehicle vehiculo = vehiculoRepository.findById(request.vehicleId())
+                .filter(Vehicle::getActive)
                 .orElseThrow(() -> new IllegalArgumentException("Vehicle no encontrado"));
 
-        Route ruta = rutaRepository.findById(request.rutaId())
-                .filter(Route::getActivo)
+        Route ruta = rutaRepository.findById(request.routeId())
+                .filter(Route::getActive)
                 .orElseThrow(() -> new IllegalArgumentException("Route no encontrada"));
 
-        asignacion.setConductor(conductor);
-        asignacion.setVehiculo(vehiculo);
-        asignacion.setRuta(ruta);
-        asignacion.setFechaAsignacion(request.fechaAsignacion());
-        asignacion.setFechaInicio(request.fechaInicio());
-        asignacion.setFechaFin(request.fechaFin());
-        asignacion.setEstado(toStatus(request.estado()));
-        asignacion.setActualizadoEn(Instant.now());
+        asignacion.setDriver(conductor);
+        asignacion.setVehicle(vehiculo);
+        asignacion.setRoute(ruta);
+        asignacion.setAssignmentDate(request.assignmentDate());
+        asignacion.setStartDate(request.startDate());
+        asignacion.setEndDate(request.endDate());
+        asignacion.setStatus(toStatus(request.status()));
+        asignacion.setUpdatedAt(Instant.now());
 
         RouteAssignment asignacionActualizada = asignacionRutaRepository.save(asignacion);
         return mapearAResponse(asignacionActualizada);
     }
 
-    /**
-     * Marca una asignacion como inactiva y la deja en estado cancelada.
-     * @param id identificador de la asignacion que se desea dar de baja
-     * @throws IllegalArgumentException cuando no existe una asignacion activa con ese identificador
-     */
     @CacheEvict(value = "asignaciones", allEntries = true)
     public void desactivar(Long id) {
         RouteAssignment asignacion = getActiveAssignment(id);
-        asignacion.setActivo(false);
-        asignacion.setEstado(AssignmentStatus.CANCELADA);
-        asignacion.setActualizadoEn(Instant.now());
+        asignacion.setActive(false);
+        asignacion.setStatus(AssignmentStatus.CANCELADA);
+        asignacion.setUpdatedAt(Instant.now());
         asignacionRutaRepository.save(asignacion);
     }
 
     private RouteAssignment getActiveAssignment(Long id) {
         return asignacionRutaRepository.findWithDetalle(id)
-                .filter(RouteAssignment::getActivo)
+                .filter(RouteAssignment::getActive)
                 .orElseThrow(() -> new IllegalArgumentException("Asignacion no encontrada"));
     }
 
-    private AssignmentStatus toStatus(String estado) {
+    private AssignmentStatus toStatus(String status) {
         try {
-            return AssignmentStatus.valueOf(estado.toUpperCase());
+            return AssignmentStatus.valueOf(status.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Estado de asignacion no valido");
         }
@@ -169,19 +135,19 @@ public class RouteAssignmentService {
     private RouteAssignmentResponse mapearAResponse(RouteAssignment asignacion) {
         return new RouteAssignmentResponse(
                 asignacion.getId(),
-                asignacion.getConductor().getId(),
-                asignacion.getConductor().getNombres() + " " + asignacion.getConductor().getApellidos(),
-                asignacion.getVehiculo().getId(),
-                asignacion.getVehiculo().getPlaca(),
-                asignacion.getRuta().getId(),
-                asignacion.getRuta().getNombre(),
-                asignacion.getFechaAsignacion(),
-                asignacion.getFechaInicio(),
-                asignacion.getFechaFin(),
-                asignacion.getEstado().name(),
-                asignacion.getActivo(),
-                asignacion.getCreadoEn(),
-                asignacion.getActualizadoEn()
+                asignacion.getDriver().getId(),
+                asignacion.getDriver().getFirstNames() + " " + asignacion.getDriver().getLastNames(),
+                asignacion.getVehicle().getId(),
+                asignacion.getVehicle().getPlate(),
+                asignacion.getRoute().getId(),
+                asignacion.getRoute().getName(),
+                asignacion.getAssignmentDate(),
+                asignacion.getStartDate(),
+                asignacion.getEndDate(),
+                asignacion.getStatus().name(),
+                asignacion.getActive(),
+                asignacion.getCreatedAt(),
+                asignacion.getUpdatedAt()
         );
     }
 }

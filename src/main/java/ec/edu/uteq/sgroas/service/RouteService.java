@@ -22,120 +22,86 @@ public class RouteService {
 
     private final RouteRepository rutaRepository;
 
-    /**
-     * Obtiene la pagina de rutas activas convertidas a formato de respuesta.
-     * @param pageable objeto con numero de pagina, tamanio y orden solicitados para la consulta
-     * @return pagina con las rutas activas encontradas
-     */
     public Page<RouteResponse> list(Pageable pageable) {
         List<RouteResponse> contenido = listCached(pageable);
         return new PageImpl<>(contenido, pageable, contenido.size());
     }
 
-    /**
-     * Obtiene desde la memoria cache la lista de rutas activas de la pagina solicitada.
-     * @param pageable objeto con numero de pagina y tamanio que identifican la entrada guardada en cache
-     * @return lista de rutas activas correspondientes a la pagina pedida
-     */
     @Cacheable(value = "rutas", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
     public List<RouteResponse> listCached(Pageable pageable) {
-        return rutaRepository.findByActivoTrue(pageable)
+        return rutaRepository.findByActiveTrue(pageable)
                 .map(this::mapearAResponse)
                 .getContent();
     }
 
-    /**
-     * Recupera el detalle de una ruta activa existente.
-     * @param id identificador de la ruta que se desea consultar
-     * @return datos de la ruta encontrada
-     * @throws IllegalArgumentException cuando no existe una ruta activa con ese identificador
-     */
     public RouteResponse findById(Long id) {
         Route ruta = getActiveRoute(id);
         return mapearAResponse(ruta);
     }
 
-    /**
-     * Registra una nueva ruta despues de validar que su codigo no se repita.
-     * @param request datos de la ruta con codigo, nombre, origen, destino, distancia, duracion y estado
-     * @return datos de la ruta recien guardada
-     * @throws IllegalArgumentException cuando ya existe otra ruta con el mismo codigo o el estado no es valido
-     */
     @CacheEvict(value = "rutas", allEntries = true)
     public RouteResponse create(RouteRequest request) {
-        if (rutaRepository.existsByCodigo(request.codigo())) {
+        if (rutaRepository.existsByCode(request.code())) {
             throw new IllegalArgumentException("Ya existe una ruta con ese codigo");
         }
 
         Route ruta = Route.builder()
-                .codigo(request.codigo())
-                .nombre(request.nombre())
-                .origen(request.origen())
-                .destino(request.destino())
-                .distanciaKm(request.distanciaKm())
-                .duracionEstimadaMin(request.duracionEstimadaMin())
-                .estado(toStatus(request.estado()))
-                .activo(true)
-                .creadoEn(Instant.now())
-                .actualizadoEn(Instant.now())
+                .code(request.code())
+                .name(request.name())
+                .origin(request.origin())
+                .destination(request.destination())
+                .distanceKm(request.distanceKm())
+                .durationMin(request.durationMin())
+                .status(toStatus(request.status()))
+                .active(true)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
                 .build();
 
         Route rutaGuardada = rutaRepository.save(ruta);
         return mapearAResponse(rutaGuardada);
     }
 
-    /**
-     * Reemplaza los datos de una ruta activa por los valores recibidos.
-     * @param id identificador de la ruta que se desea modificar
-     * @param request nuevos datos de la ruta con codigo, nombre, origen, destino, distancia, duracion y estado
-     * @return datos de la ruta ya actualizada
-     * @throws IllegalArgumentException cuando la ruta no existe, el codigo choca con otra ruta o el estado no es valido
-     */
     @CacheEvict(value = "rutas", allEntries = true)
     public RouteResponse update(Long id, RouteRequest request) {
         Route ruta = getActiveRoute(id);
 
-        if (!ruta.getCodigo().equals(request.codigo())
-                && rutaRepository.existsByCodigo(request.codigo())) {
+        if (!ruta.getCode().equals(request.code())
+                && rutaRepository.existsByCode(request.code())) {
             throw new IllegalArgumentException("Ya existe una ruta con ese codigo");
         }
 
-        ruta.setCodigo(request.codigo());
-        ruta.setNombre(request.nombre());
-        ruta.setOrigen(request.origen());
-        ruta.setDestino(request.destino());
-        ruta.setDistanciaKm(request.distanciaKm());
-        ruta.setDuracionEstimadaMin(request.duracionEstimadaMin());
-        ruta.setEstado(toStatus(request.estado()));
-        ruta.setActualizadoEn(Instant.now());
+        ruta.setCode(request.code());
+        ruta.setName(request.name());
+        ruta.setOrigin(request.origin());
+        ruta.setDestination(request.destination());
+        ruta.setDistanceKm(request.distanceKm());
+        ruta.setDurationMin(request.durationMin());
+        ruta.setStatus(toStatus(request.status()));
+        ruta.setUpdatedAt(Instant.now());
 
         Route rutaActualizada = rutaRepository.save(ruta);
         return mapearAResponse(rutaActualizada);
     }
 
-    /**
-     * Marca una ruta como inactiva y la deja en estado inactiva.
-     * @param id identificador de la ruta que se desea dar de baja
-     * @throws IllegalArgumentException cuando no existe una ruta activa con ese identificador
-     */
     @CacheEvict(value = "rutas", allEntries = true)
     public void desactivar(Long id) {
         Route ruta = getActiveRoute(id);
-        ruta.setActivo(false);
-        ruta.setEstado(RouteStatus.INACTIVA);
-        ruta.setActualizadoEn(Instant.now());
+        ruta.setActive(false);
+        ruta.setStatus(RouteStatus.INACTIVA);
+        ruta.setUpdatedAt(Instant.now());
         rutaRepository.save(ruta);
     }
 
     private Route getActiveRoute(Long id) {
         return rutaRepository.findById(id)
-                .filter(Route::getActivo)
+                .filter(Route::getActive)
                 .orElseThrow(() -> new IllegalArgumentException("Route no encontrada"));
     }
 
-    private RouteStatus toStatus(String estado) {
+    private RouteStatus toStatus(String status) {
         try {
-            return RouteStatus.valueOf(estado.toUpperCase());
+            return RouteStatus.valueOf(status.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Estado de ruta no valido");
         }
@@ -144,16 +110,16 @@ public class RouteService {
     private RouteResponse mapearAResponse(Route ruta) {
         return new RouteResponse(
                 ruta.getId(),
-                ruta.getCodigo(),
-                ruta.getNombre(),
-                ruta.getOrigen(),
-                ruta.getDestino(),
-                ruta.getDistanciaKm(),
-                ruta.getDuracionEstimadaMin(),
-                ruta.getEstado().name(),
-                ruta.getActivo(),
-                ruta.getCreadoEn(),
-                ruta.getActualizadoEn()
+                ruta.getCode(),
+                ruta.getName(),
+                ruta.getOrigin(),
+                ruta.getDestination(),
+                ruta.getDistanceKm(),
+                ruta.getDurationMin(),
+                ruta.getStatus().name(),
+                ruta.getActive(),
+                ruta.getCreatedAt(),
+                ruta.getUpdatedAt()
         );
     }
 }

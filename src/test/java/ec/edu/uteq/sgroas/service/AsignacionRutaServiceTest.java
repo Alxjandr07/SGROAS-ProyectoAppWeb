@@ -45,41 +45,41 @@ class AsignacionRutaServiceTest {
 
     private Driver conductorEjemplo() {
         return Driver.builder()
-                .id(1L).nombres("Carlos").apellidos("Mendoza")
-                .cedula("1200000001").numeroLicencia("LIC-001")
-                .tipoLicencia("E").fechaVencimientoLicencia(LocalDate.now().plusDays(30))
-                .telefono("0988888888").email("carlos@sgroas.com")
-                .estado(DriverStatus.ACTIVO).activo(true)
-                .creadoEn(Instant.now()).actualizadoEn(Instant.now())
+                .id(1L).firstNames("Carlos").lastNames("Mendoza")
+                .nationalId("1200000001").licenseNumber("LIC-001")
+                .licenseType("E").licenseExpiry(LocalDate.now().plusDays(30))
+                .phone("0988888888").email("carlos@sgroas.com")
+                .status(DriverStatus.ACTIVO).active(true)
+                .createdAt(Instant.now()).updatedAt(Instant.now())
                 .build();
     }
 
     private Vehicle vehiculoEjemplo() {
         return Vehicle.builder()
-                .id(1L).placa("GTU-001").marca("Toyota").modelo("Hiace")
-                .anio(2020).capacidadPasajeros(14).numeroMotor("MOT")
-                .numeroChasis("CHAS").color("Blanco")
-                .estado(VehicleStatus.ACTIVO).activo(true)
-                .creadoEn(Instant.now()).actualizadoEn(Instant.now())
+                .id(1L).plate("GTU-001").brand("Toyota").model("Hiace")
+                .year(2020).capacity(14).engineNumber("MOT")
+                .chassisNumber("CHAS").color("Blanco")
+                .status(VehicleStatus.ACTIVO).active(true)
+                .createdAt(Instant.now()).updatedAt(Instant.now())
                 .build();
     }
 
     private Route rutaEjemplo() {
         return Route.builder()
-                .id(1L).codigo("R-001").nombre("Quito-Guayaquil")
-                .origen("Quito").destino("Guayaquil").distanciaKm(420.0)
-                .duracionEstimadaMin(480).estado(RouteStatus.ACTIVA).activo(true)
-                .creadoEn(Instant.now()).actualizadoEn(Instant.now())
+                .id(1L).code("R-001").name("Quito-Guayaquil")
+                .origin("Quito").destination("Guayaquil").distanceKm(420.0)
+                .durationMin(480).status(RouteStatus.ACTIVA).active(true)
+                .createdAt(Instant.now()).updatedAt(Instant.now())
                 .build();
     }
 
     private RouteAssignment asignacionEjemplo() {
         return RouteAssignment.builder()
-                .id(1L).conductor(conductorEjemplo()).vehiculo(vehiculoEjemplo())
-                .ruta(rutaEjemplo()).fechaAsignacion(LocalDate.now())
-                .fechaInicio(LocalDate.now()).fechaFin(LocalDate.now().plusDays(1))
-                .estado(AssignmentStatus.ACTIVA).activo(true)
-                .creadoEn(Instant.now()).actualizadoEn(Instant.now())
+                .id(1L).driver(conductorEjemplo()).vehicle(vehiculoEjemplo())
+                .route(rutaEjemplo()).assignmentDate(LocalDate.now())
+                .startDate(LocalDate.now()).endDate(LocalDate.now().plusDays(1))
+                .status(AssignmentStatus.ACTIVA).active(true)
+                .createdAt(Instant.now()).updatedAt(Instant.now())
                 .build();
     }
 
@@ -93,15 +93,15 @@ class AsignacionRutaServiceTest {
     @Test
     void listarDebeRetornarPagina() {
         PageRequest pageable = PageRequest.of(0, 10);
-        when(asignacionRutaRepository.findByActivoTrue(pageable))
+        when(asignacionRutaRepository.findByActiveTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(asignacionEjemplo())));
 
         Page<RouteAssignmentResponse> pagina = asignacionRutaService.list(pageable);
 
         assertEquals(1, pagina.getTotalElements());
-        assertEquals("Carlos Mendoza", pagina.getContent().get(0).conductorNombre());
-        assertEquals("GTU-001", pagina.getContent().get(0).vehiculoPlaca());
-        assertEquals("Quito-Guayaquil", pagina.getContent().get(0).rutaNombre());
+        assertEquals("Carlos Mendoza", pagina.getContent().get(0).driverName());
+        assertEquals("GTU-001", pagina.getContent().get(0).vehiclePlate());
+        assertEquals("Quito-Guayaquil", pagina.getContent().get(0).routeName());
     }
 
     @Test
@@ -112,7 +112,7 @@ class AsignacionRutaServiceTest {
         RouteAssignmentResponse response = asignacionRutaService.findById(1L);
 
         assertEquals(1L, response.id());
-        assertEquals("ACTIVA", response.estado());
+        assertEquals("ACTIVA", response.status());
     }
 
     @Test
@@ -204,6 +204,6 @@ class AsignacionRutaServiceTest {
         asignacionRutaService.desactivar(1L);
 
         verify(asignacionRutaRepository).save(argThat(a ->
-                !a.getActivo() && a.getEstado() == AssignmentStatus.CANCELADA));
+                !a.getActive() && a.getStatus() == AssignmentStatus.CANCELADA));
     }
 }

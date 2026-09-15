@@ -13,7 +13,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class JwtServiceTest {
 
     private static final String JWT_SECRET =
-            "SGROAS_SECRET_KEY_DE_DESARROLLO_2026_ENTREGA_1B_CON_MINIMO_32_CARACTERES";
+            System.getenv().getOrDefault("JWT_SECRET",
+                    "TEST_ONLY_SECRET_KEY_2026_NOT_FOR_PRODUCTION_MIN_32");
 
     private JwtService jwtService;
 
@@ -29,11 +30,11 @@ class JwtServiceTest {
     private User usuarioEjemplo() {
         return User.builder()
                 .id(1L)
-                .nombre("Administrador SGROAS")
+                .name("Administrador SGROAS")
                 .email("admin@sgroas.com")
                 .passwordHash("hash")
-                .rol(Role.ROLE_ADMIN)
-                .activo(true)
+                .role(Role.ROLE_ADMIN)
+                .active(true)
                 .build();
     }
 

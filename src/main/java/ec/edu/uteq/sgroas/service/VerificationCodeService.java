@@ -35,68 +35,47 @@ public class VerificationCodeService {
     private final VerificationCodeRepository repository;
     private final SecureRandom aleatorio = new SecureRandom();
 
-    /**
-     * Genera un codigo nuevo de seis digitos, invalida los anteriores del mismo tipo y lo devuelve en claro.
-     * Guarda solo el resumen cifrado y concede diez minutos de vigencia para su uso.
-     * @param email correo del usuario al que pertenece el codigo por generar
-     * @param tipo proposito del codigo, activacion de cuenta o restablecimiento de contrasena
-     * @return codigo de seis digitos en claro listo para enviarse por correo
-     */
     @Transactional
-    public String generate(String email, Type tipo) {
-        repository.deleteByEmailAndTipo(email, tipo.name());
+    public String generate(String email, Type type) {
+        repository.deleteByEmailAndType(email, type.name());
 
         String codigo = String.format("%06d", aleatorio.nextInt(1_000_000));
         repository.save(VerificationCode.builder()
                 .email(email)
-                .codigoHash(sha256(codigo))
-                .tipo(tipo.name())
-                .expiraEn(Instant.now().plus(VALIDEZ))
-                .intentos(0)
-                .usado(false)
-                .creadoEn(Instant.now())
+                .codeHash(sha256(codigo))
+                .type(type.name())
+                .expiresAt(Instant.now().plus(VALIDEZ))
+                .attempts(0)
+                .used(false)
+                .createdAt(Instant.now())
                 .build());
         return codigo;
     }
 
-    /**
-     * Indica si ya transcurrio la espera minima de sesenta segundos para pedir otro codigo.
-     * @param email correo del usuario que desea saber si puede solicitar un reenvio
-     * @param tipo proposito del codigo, activacion de cuenta o restablecimiento de contrasena
-     * @return verdadero cuando puede generarse otro codigo, falso cuando aun debe esperar
-     */
-    public boolean canResend(String email, Type tipo) {
-        return repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(email, tipo.name())
-                .map(c -> c.getCreadoEn().isBefore(Instant.now().minus(ESPERA_REENVIO)))
+    public boolean canResend(String email, Type type) {
+        return repository.findFirstByEmailAndTypeOrderByCreatedAtDesc(email, type.name())
+                .map(c -> c.getCreatedAt().isBefore(Instant.now().minus(ESPERA_REENVIO)))
                 .orElse(true);
     }
 
-    /**
-     * Valida el codigo recibido contra el ultimo emitido y lo marca como usado si coincide.
-     * Cuenta cada intento fallido y bloquea el codigo tras cinco errores o al vencer su vigencia.
-     * @param email correo del usuario propietario del codigo por validar
-     * @param tipo proposito del codigo, activacion de cuenta o restablecimiento de contrasena
-     * @param codigo codigo de seis digitos ingresado por el usuario para su comprobacion
-     * @throws IllegalArgumentException cuando no existe codigo, ya fue usado, expiro, supero los intentos o no coincide
-     */
     @Transactional
-    public void validate(String email, Type tipo, String codigo) {
+    public void validate(String email, Type type, String codigo) {
         VerificationCode registro = repository
-                .findFirstByEmailAndTipoOrderByCreadoEnDesc(email, tipo.name())
+                .findFirstByEmailAndTypeOrderByCreatedAtDesc(email, type.name())
                 .orElseThrow(() -> new IllegalArgumentException(CODIGO_INVALIDO));
 
-        if (registro.isUsado() || registro.getExpiraEn().isBefore(Instant.now())) {
+        if (registro.isUsed() || registro.getExpiresAt().isBefore(Instant.now())) {
             throw new IllegalArgumentException(CODIGO_INVALIDO);
         }
-        if (registro.getIntentos() >= MAX_INTENTOS) {
+        if (registro.getAttempts() >= MAX_INTENTOS) {
             throw new IllegalArgumentException(CODIGO_INVALIDO);
         }
-        if (!registro.getCodigoHash().equals(sha256(codigo))) {
-            registro.setIntentos(registro.getIntentos() + 1);
+        if (!registro.getCodeHash().equals(sha256(codigo))) {
+            registro.setAttempts(registro.getAttempts() + 1);
             repository.save(registro);
             throw new IllegalArgumentException(CODIGO_INVALIDO);
         }
-        registro.setUsado(true);
+        registro.setUsed(true);
         repository.save(registro);
     }
 

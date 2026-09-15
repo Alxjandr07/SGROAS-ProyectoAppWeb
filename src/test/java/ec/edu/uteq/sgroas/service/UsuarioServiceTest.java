@@ -45,13 +45,13 @@ class UsuarioServiceTest {
     private User usuarioEjemplo() {
         return User.builder()
                 .id(1L)
-                .nombre("Carlos Mendoza")
+                .name("Carlos Mendoza")
                 .email("carlos@sgroas.com")
                 .passwordHash("hash")
-                .rol(Role.ROLE_ADMIN)
-                .activo(true)
-                .creadoEn(Instant.now())
-                .actualizadoEn(Instant.now())
+                .role(Role.ROLE_ADMIN)
+                .active(true)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
                 .build();
     }
 
@@ -62,13 +62,13 @@ class UsuarioServiceTest {
     @Test
     void listarDebeRetornarPagina() {
         PageRequest pageable = PageRequest.of(0, 10);
-        when(usuarioRepository.findByActivoTrue(pageable))
+        when(usuarioRepository.findByActiveTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(usuarioEjemplo())));
 
         Page<UserResponse> pagina = usuarioService.list(null, pageable);
 
         assertEquals(1, pagina.getTotalElements());
-        assertEquals("ROLE_ADMIN", pagina.getContent().get(0).rol());
+        assertEquals("ROLE_ADMIN", pagina.getContent().get(0).role());
     }
 
     @Test
@@ -81,19 +81,19 @@ class UsuarioServiceTest {
 
         assertEquals(1, pagina.getTotalElements());
         verify(usuarioRepository).searchActive("carlos", pageable);
-        verify(usuarioRepository, never()).findByActivoTrue(pageable);
+        verify(usuarioRepository, never()).findByActiveTrue(pageable);
     }
 
     @Test
     void listarConBusquedaEnBlancoDebeUsarFindByActivoTrue() {
         PageRequest pageable = PageRequest.of(0, 10);
-        when(usuarioRepository.findByActivoTrue(pageable))
+        when(usuarioRepository.findByActiveTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(usuarioEjemplo())));
 
         Page<UserResponse> pagina = usuarioService.list("   ", pageable);
 
         assertEquals(1, pagina.getTotalElements());
-        verify(usuarioRepository).findByActivoTrue(pageable);
+        verify(usuarioRepository).findByActiveTrue(pageable);
         verify(usuarioRepository, never()).searchActive(any(), any());
     }
 
@@ -131,7 +131,7 @@ class UsuarioServiceTest {
 
         assertEquals("carlos@sgroas.com", response.email());
         verify(usuarioRepository).save(argThat(u ->
-                Boolean.FALSE.equals(u.getVerificado()) && Boolean.TRUE.equals(u.getActivo())));
+                Boolean.FALSE.equals(u.getVerified()) && Boolean.TRUE.equals(u.getActive())));
         verify(emailService).sendVerificationCode(
                 "carlos@sgroas.com", "Carlos Mendoza", "123456");
     }
@@ -147,7 +147,7 @@ class UsuarioServiceTest {
     @Test
     void reenviarActivacionDebeEnviarNuevoCodigo() {
         User sinVerificar = usuarioEjemplo();
-        sinVerificar.setVerificado(false);
+        sinVerificar.setVerified(false);
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(sinVerificar));
         when(codigoVerificacionService.canResend("carlos@sgroas.com",
                 VerificationCodeService.Type.VERIFICACION)).thenReturn(true);
@@ -171,7 +171,7 @@ class UsuarioServiceTest {
     @Test
     void reenviarActivacionDentroDeLaEsperaDebeLanzarExcepcion() {
         User sinVerificar = usuarioEjemplo();
-        sinVerificar.setVerificado(false);
+        sinVerificar.setVerified(false);
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(sinVerificar));
         when(codigoVerificacionService.canResend("carlos@sgroas.com",
                 VerificationCodeService.Type.VERIFICACION)).thenReturn(false);
@@ -210,7 +210,7 @@ class UsuarioServiceTest {
 
         UserResponse response = usuarioService.update(1L, request);
 
-        assertEquals("Carlos Mendoza", response.nombre());
+        assertEquals("Carlos Mendoza", response.name());
         verify(passwordEncoder, never()).encode(any());
     }
 
@@ -224,7 +224,7 @@ class UsuarioServiceTest {
 
         UserResponse response = usuarioService.update(1L, request);
 
-        assertEquals("Carlos Mendoza", response.nombre());
+        assertEquals("Carlos Mendoza", response.name());
         verify(passwordEncoder, never()).encode(any());
     }
 
@@ -242,7 +242,7 @@ class UsuarioServiceTest {
 
         usuarioService.desactivar(1L);
 
-        verify(usuarioRepository).save(argThat(u -> !u.getActivo()));
+        verify(usuarioRepository).save(argThat(u -> !u.getActive()));
     }
 
     @Test

@@ -64,7 +64,7 @@ class RutaControllerTest {
 
         mockMvc().perform(get("/api/rutas/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nombre").value("Quito - Guayaquil"));
+                .andExpect(jsonPath("$.name").value("Quito - Guayaquil"));
     }
 
     @Test
@@ -75,13 +75,13 @@ class RutaControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "codigo": "R-001",
-                                  "nombre": "Quito - Guayaquil",
-                                  "origen": "Quito",
-                                  "destino": "Guayaquil",
-                                  "distanciaKm": 420.0,
-                                  "duracionEstimadaMin": 480,
-                                  "estado": "ACTIVA"
+                                  "code": "R-001",
+                                  "name": "Quito - Guayaquil",
+                                  "origin": "Quito",
+                                  "destination": "Guayaquil",
+                                  "distanceKm": 420.0,
+                                  "durationMin": 480,
+                                  "status": "ACTIVA"
                                 }
                                 """))
                 .andExpect(status().isCreated())
@@ -96,13 +96,13 @@ class RutaControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "codigo": "R-001",
-                                  "nombre": "Quito - Guayaquil",
-                                  "origen": "Quito",
-                                  "destino": "Guayaquil",
-                                  "distanciaKm": 420.0,
-                                  "duracionEstimadaMin": 480,
-                                  "estado": "ACTIVA"
+                                  "code": "R-001",
+                                  "name": "Quito - Guayaquil",
+                                  "origin": "Quito",
+                                  "destination": "Guayaquil",
+                                  "distanceKm": 420.0,
+                                  "durationMin": 480,
+                                  "status": "ACTIVA"
                                 }
                                 """))
                 .andExpect(status().isOk());

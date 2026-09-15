@@ -32,21 +32,21 @@ public class VerificationCode {
 
     /** Hash SHA-256 del codigo de 6 digitos; nunca se guarda el codigo en claro. */
     @Column(name = "codigo_hash", nullable = false, length = 64)
-    private String codigoHash;
+    private String codeHash;
 
     /** VERIFICACION | RESET_PASSWORD */
     @Column(name = "tipo", nullable = false, length = 20)
-    private String tipo;
+    private String type;
 
     @Column(name = "expira_en", nullable = false)
-    private Instant expiraEn;
+    private Instant expiresAt;
 
     @Column(name = "intentos", nullable = false)
-    private int intentos;
+    private int attempts;
 
     @Column(name = "usado", nullable = false)
-    private boolean usado;
+    private boolean used;
 
     @Column(name = "creado_en", nullable = false, updatable = false)
-    private Instant creadoEn;
+    private Instant createdAt;
 }

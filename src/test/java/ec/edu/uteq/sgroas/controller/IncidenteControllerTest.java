@@ -66,7 +66,7 @@ class IncidenteControllerTest {
 
         mockMvc().perform(get("/api/incidentes/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.gravedad").value("MEDIA"));
+                .andExpect(jsonPath("$.severity").value("MEDIA"));
     }
 
     @Test
@@ -77,14 +77,14 @@ class IncidenteControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "asignacionId": 1,
-                                  "reportadoPor": "Carlos Mendoza",
-                                  "tipo": "AVERIA_MECANICA",
-                                  "descripcion": "Falla en el motor",
-                                  "fechaIncidente": "2026-07-30T10:00:00",
-                                  "ubicacion": "Km 12 Via Quito",
-                                  "gravedad": "MEDIA",
-                                  "estado": "REPORTADO"
+                                  "assignmentId": 1,
+                                  "reportedBy": "Carlos Mendoza",
+                                  "type": "AVERIA_MECANICA",
+                                  "description": "Falla en el motor",
+                                  "incidentDate": "2026-07-30T10:00:00",
+                                  "location": "Km 12 Via Quito",
+                                  "severity": "MEDIA",
+                                  "status": "REPORTADO"
                                 }
                                 """))
                 .andExpect(status().isCreated())
@@ -99,14 +99,14 @@ class IncidenteControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "asignacionId": 1,
-                                  "reportadoPor": "Carlos Mendoza",
-                                  "tipo": "AVERIA_MECANICA",
-                                  "descripcion": "Falla en el motor",
-                                  "fechaIncidente": "2026-07-30T10:00:00",
-                                  "ubicacion": "Km 12 Via Quito",
-                                  "gravedad": "MEDIA",
-                                  "estado": "REPORTADO"
+                                  "assignmentId": 1,
+                                  "reportedBy": "Carlos Mendoza",
+                                  "type": "AVERIA_MECANICA",
+                                  "description": "Falla en el motor",
+                                  "incidentDate": "2026-07-30T10:00:00",
+                                  "location": "Km 12 Via Quito",
+                                  "severity": "MEDIA",
+                                  "status": "REPORTADO"
                                 }
                                 """))
                 .andExpect(status().isOk());

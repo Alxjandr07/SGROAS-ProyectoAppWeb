@@ -68,15 +68,15 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         User usuario = usuarioRepository.findByEmail(email)
-                .filter(User::getActivo)
+                .filter(User::getActive)
                 .orElse(null);
         if (usuario == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         return ResponseEntity.ok(new SessionResponse(
-                usuario.getNombre(),
+                usuario.getName(),
                 usuario.getEmail(),
-                usuario.getRol().name(),
+                usuario.getRole().name(),
                 jwtService.getExpirationMs()
         ));
     }
@@ -237,9 +237,9 @@ public class AuthController {
 
     private SessionResponse aSesion(AuthResponse response) {
         return new SessionResponse(
-                response.nombre(),
+                response.name(),
                 response.email(),
-                response.rol(),
+                response.role(),
                 response.expiresIn()
         );
     }
@@ -247,7 +247,7 @@ public class AuthController {
     private String buildAccessTokenCookie(String token) {
         return ResponseCookie.from("access_token", token)
                 .httpOnly(true)
-                .secure(cookieSecure)
+                .secure(true)
                 .sameSite("Strict")
                 .path("/")
                 .maxAge(Duration.ofHours(1))
@@ -258,7 +258,7 @@ public class AuthController {
     private String buildRefreshTokenCookie(String token) {
         return ResponseCookie.from("refresh_token", token)
                 .httpOnly(true)
-                .secure(cookieSecure)
+                .secure(true)
                 .sameSite("Strict")
                 .path("/api/auth")
                 .maxAge(Duration.ofMillis(refreshExpirationMs))
@@ -269,7 +269,7 @@ public class AuthController {
     private String removeAccessTokenCookie() {
         return ResponseCookie.from("access_token", "")
                 .httpOnly(true)
-                .secure(cookieSecure)
+                .secure(true)
                 .sameSite("Strict")
                 .path("/")
                 .maxAge(0)
@@ -280,7 +280,7 @@ public class AuthController {
     private String removeRefreshTokenCookie() {
         return ResponseCookie.from("refresh_token", "")
                 .httpOnly(true)
-                .secure(cookieSecure)
+                .secure(true)
                 .sameSite("Strict")
                 .path("/api/auth")
                 .maxAge(0)

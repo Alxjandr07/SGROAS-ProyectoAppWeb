@@ -34,18 +34,18 @@ class VehiculoServiceTest {
     private Vehicle vehiculoEjemplo() {
         return Vehicle.builder()
                 .id(1L)
-                .placa("GTU-001")
-                .marca("Toyota")
-                .modelo("Hiace")
-                .anio(2020)
-                .capacidadPasajeros(14)
-                .numeroMotor("MOT-123")
-                .numeroChasis("CHAS-123")
+                .plate("GTU-001")
+                .brand("Toyota")
+                .model("Hiace")
+                .year(2020)
+                .capacity(14)
+                .engineNumber("MOT-123")
+                .chassisNumber("CHAS-123")
                 .color("Blanco")
-                .estado(VehicleStatus.ACTIVO)
-                .activo(true)
-                .creadoEn(Instant.now())
-                .actualizadoEn(Instant.now())
+                .status(VehicleStatus.ACTIVO)
+                .active(true)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
                 .build();
     }
 
@@ -60,14 +60,14 @@ class VehiculoServiceTest {
     void listarDebeRetornarPagina() {
         PageRequest pageable = PageRequest.of(0, 10);
         Vehicle vehiculo = vehiculoEjemplo();
-        when(vehiculoRepository.findByActivoTrue(pageable))
+        when(vehiculoRepository.findByActiveTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(vehiculo)));
 
         Page<VehicleResponse> pagina = vehiculoService.list(pageable);
 
         assertEquals(1, pagina.getTotalElements());
-        assertEquals("GTU-001", pagina.getContent().get(0).placa());
-        assertEquals("ACTIVO", pagina.getContent().get(0).estado());
+        assertEquals("GTU-001", pagina.getContent().get(0).plate());
+        assertEquals("ACTIVO", pagina.getContent().get(0).status());
     }
 
     @Test
@@ -79,7 +79,7 @@ class VehiculoServiceTest {
 
         assertNotNull(response);
         assertEquals(1L, response.id());
-        assertEquals("Toyota", response.marca());
+        assertEquals("Toyota", response.brand());
     }
 
     @Test
@@ -92,20 +92,20 @@ class VehiculoServiceTest {
 
     @Test
     void crearDebeGuardarYRetornar() {
-        when(vehiculoRepository.existsByPlaca("GTU-001")).thenReturn(false);
+        when(vehiculoRepository.existsByPlate("GTU-001")).thenReturn(false);
         when(vehiculoRepository.save(any(Vehicle.class)))
                 .thenReturn(vehiculoEjemplo());
 
         VehicleResponse response = vehiculoService.create(requestEjemplo());
 
         assertNotNull(response);
-        assertEquals("GTU-001", response.placa());
+        assertEquals("GTU-001", response.plate());
         verify(vehiculoRepository).save(any(Vehicle.class));
     }
 
     @Test
     void crearConPlacaDuplicadaDebeLanzarExcepcion() {
-        when(vehiculoRepository.existsByPlaca("GTU-001")).thenReturn(true);
+        when(vehiculoRepository.existsByPlate("GTU-001")).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class,
                 () -> vehiculoService.create(requestEjemplo()));
@@ -114,7 +114,7 @@ class VehiculoServiceTest {
 
     @Test
     void crearConEstadoInvalidoDebeLanzarExcepcion() {
-        when(vehiculoRepository.existsByPlaca("GTU-001")).thenReturn(false);
+        when(vehiculoRepository.existsByPlate("GTU-001")).thenReturn(false);
         VehicleRequest request = new VehicleRequest(
                 "GTU-001", "Toyota", "Hiace", 2020, 14,
                 "MOT-123", "CHAS-123", "Blanco", "INVALIDO"
@@ -142,7 +142,7 @@ class VehiculoServiceTest {
     void actualizarConPlacaDuplicadaDebeLanzarExcepcion() {
         Vehicle vehiculo = vehiculoEjemplo();
         when(vehiculoRepository.findById(1L)).thenReturn(Optional.of(vehiculo));
-        when(vehiculoRepository.existsByPlaca("GTU-999")).thenReturn(true);
+        when(vehiculoRepository.existsByPlate("GTU-999")).thenReturn(true);
 
         VehicleRequest request = new VehicleRequest(
                 "GTU-999", "Toyota", "Hiace", 2020, 14,
@@ -161,6 +161,6 @@ class VehiculoServiceTest {
         vehiculoService.desactivar(1L);
 
         verify(vehiculoRepository).save(argThat(v ->
-                !v.getActivo() && v.getEstado() == VehicleStatus.FUERA_DE_SERVICIO));
+                !v.getActive() && v.getStatus() == VehicleStatus.FUERA_DE_SERVICIO));
     }
 }

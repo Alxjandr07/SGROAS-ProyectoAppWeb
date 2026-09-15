@@ -67,7 +67,7 @@ class ConductorControllerTest {
 
         mockMvc().perform(get("/api/conductores/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.cedula").value("1200000001"));
+                .andExpect(jsonPath("$.nationalId").value("1200000001"));
     }
 
     @Test
@@ -78,15 +78,15 @@ class ConductorControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "nombres": "Carlos Alberto",
-                                  "apellidos": "Mendoza Vera",
-                                  "cedula": "1200000001",
-                                  "numeroLicencia": "LIC-001-2026",
-                                  "tipoLicencia": "E",
-                                  "fechaVencimientoLicencia": "2026-12-31",
-                                  "telefono": "0988888888",
+                                  "firstNames": "Carlos Alberto",
+                                  "lastNames": "Mendoza Vera",
+                                  "nationalId": "1200000001",
+                                  "licenseNumber": "LIC-001-2026",
+                                  "licenseType": "E",
+                                  "licenseExpiry": "2026-12-31",
+                                  "phone": "0988888888",
                                   "email": "carlos.mendoza@sgroas.com",
-                                  "estado": "ACTIVO"
+                                  "status": "ACTIVO"
                                 }
                                 """))
                 .andExpect(status().isCreated())
@@ -101,15 +101,15 @@ class ConductorControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "nombres": "Carlos Alberto",
-                                  "apellidos": "Mendoza Vera",
-                                  "cedula": "1200000001",
-                                  "numeroLicencia": "LIC-001-2026",
-                                  "tipoLicencia": "E",
-                                  "fechaVencimientoLicencia": "2026-12-31",
-                                  "telefono": "0988888888",
+                                  "firstNames": "Carlos Alberto",
+                                  "lastNames": "Mendoza Vera",
+                                  "nationalId": "1200000001",
+                                  "licenseNumber": "LIC-001-2026",
+                                  "licenseType": "E",
+                                  "licenseExpiry": "2026-12-31",
+                                  "phone": "0988888888",
                                   "email": "carlos.mendoza@sgroas.com",
-                                  "estado": "ACTIVO"
+                                  "status": "ACTIVO"
                                 }
                                 """))
                 .andExpect(status().isOk());

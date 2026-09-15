@@ -58,13 +58,13 @@ class AuthServiceExtraTest {
     private User usuarioEjemplo() {
         return User.builder()
                 .id(1L)
-                .nombre("Administrador SGROAS")
+                .name("Administrador SGROAS")
                 .email("admin@sgroas.com")
                 .passwordHash("password-encriptado")
-                .rol(Role.ROLE_ADMIN)
-                .activo(true)
-                .creadoEn(Instant.now())
-                .actualizadoEn(Instant.now())
+                .role(Role.ROLE_ADMIN)
+                .active(true)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
                 .build();
     }
 
@@ -78,8 +78,8 @@ class AuthServiceExtraTest {
     @Test
     void verificarEmailCorrectoDebeActivarCuentaYRetornarTokens() {
         User usuario = usuarioEjemplo();
-        usuario.setActivo(false);
-        usuario.setVerificado(false);
+        usuario.setActive(false);
+        usuario.setVerified(false);
         when(usuarioRepository.findByEmail("admin@sgroas.com"))
                 .thenReturn(Optional.of(usuario));
         simularGeneracionTokens(usuario);
@@ -90,14 +90,14 @@ class AuthServiceExtraTest {
         verify(codigoVerificacionService).validate("admin@sgroas.com",
                 VerificationCodeService.Type.VERIFICACION, "654321");
         verify(usuarioRepository).save(argThat(u ->
-                Boolean.TRUE.equals(u.getActivo()) && Boolean.TRUE.equals(u.getVerificado())));
+                Boolean.TRUE.equals(u.getActive()) && Boolean.TRUE.equals(u.getVerified())));
     }
 
     @Test
     void loginConCorreoNoVerificadoDebeLanzarExcepcion() {
         User sinVerificar = usuarioEjemplo();
-        sinVerificar.setActivo(false);
-        sinVerificar.setVerificado(false);
+        sinVerificar.setActive(false);
+        sinVerificar.setVerified(false);
         when(usuarioRepository.findByEmail("admin@sgroas.com"))
                 .thenReturn(Optional.of(sinVerificar));
         when(passwordEncoder.matches("123456", "password-encriptado")).thenReturn(true);
@@ -123,7 +123,7 @@ class AuthServiceExtraTest {
     @Test
     void reenviarCodigoDebeGenerarYEnviarNuevoCodigo() {
         User sinVerificar = usuarioEjemplo();
-        sinVerificar.setVerificado(false);
+        sinVerificar.setVerified(false);
         when(usuarioRepository.findByEmail("admin@sgroas.com"))
                 .thenReturn(Optional.of(sinVerificar));
         when(codigoVerificacionService.canResend("admin@sgroas.com",
@@ -140,7 +140,7 @@ class AuthServiceExtraTest {
     @Test
     void reenviarCodigoConCuentaVerificadaNoDebeEnviarNada() {
         User verificado = usuarioEjemplo();
-        verificado.setVerificado(true);
+        verificado.setVerified(true);
         when(usuarioRepository.findByEmail("admin@sgroas.com"))
                 .thenReturn(Optional.of(verificado));
 
@@ -185,7 +185,7 @@ class AuthServiceExtraTest {
     @Test
     void refreshConUsuarioInactivoDebeLanzarExcepcion() {
         User inactivo = usuarioEjemplo();
-        inactivo.setActivo(false);
+        inactivo.setActive(false);
         when(tokenService.getEmailFromRefreshToken("refresh-token-prueba"))
                 .thenReturn("admin@sgroas.com");
         when(usuarioRepository.findByEmail("admin@sgroas.com"))

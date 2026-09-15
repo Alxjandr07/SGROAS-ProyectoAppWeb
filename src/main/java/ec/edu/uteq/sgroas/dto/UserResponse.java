@@ -3,22 +3,22 @@ package ec.edu.uteq.sgroas.dto;
 import java.time.Instant;
 
 /**
- * Respuesta con los datos completos de un usuario.
- * @param id identificador unico del usuario
- * @param nombre nombre del usuario
- * @param email correo electronico del usuario
- * @param rol rol asignado al usuario
- * @param activo indica si el usuario esta activo
- * @param creadoEn fecha de creacion del registro
- * @param actualizadoEn fecha de la ultima actualizacion
+ * Response with full user data.
+ * @param id unique user identifier
+ * @param name user name
+ * @param email user email
+ * @param role assigned role
+ * @param active whether the user is active
+ * @param createdAt record creation timestamp
+ * @param updatedAt last update timestamp
  */
 public record UserResponse(
         Long id,
-        String nombre,
+        String name,
         String email,
-        String rol,
-        Boolean activo,
-        Instant creadoEn,
-        Instant actualizadoEn
+        String role,
+        Boolean active,
+        Instant createdAt,
+        Instant updatedAt
 ) {
 }

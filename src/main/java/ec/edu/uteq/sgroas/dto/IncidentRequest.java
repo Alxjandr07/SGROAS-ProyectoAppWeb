@@ -6,42 +6,31 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 
-/**
- * Peticion para crear o actualizar un incidente.
- * @param asignacionId identificador de la asignacion relacionada
- * @param reportadoPor persona que reporta el incidente
- * @param tipo tipo de incidente ocurrido
- * @param descripcion detalle del incidente
- * @param fechaIncidente fecha y hora en que ocurrio
- * @param ubicacion lugar del incidente
- * @param gravedad nivel de gravedad del incidente
- * @param estado estado del incidente
- */
 public record IncidentRequest(
 
         @NotNull(message = "La asignacion es obligatoria")
-        Long asignacionId,
+        Long assignmentId,
 
         @NotBlank(message = "El reportante es obligatorio")
         @Size(max = 100, message = "El reportante no puede superar los 100 caracteres")
-        String reportadoPor,
+        String reportedBy,
 
         @NotBlank(message = "El tipo es obligatorio")
-        String tipo,
+        String type,
 
         @NotBlank(message = "La descripcion es obligatoria")
-        String descripcion,
+        String description,
 
         @NotNull(message = "La fecha del incidente es obligatoria")
-        LocalDateTime fechaIncidente,
+        LocalDateTime incidentDate,
 
         @Size(max = 255, message = "La ubicacion no puede superar los 255 caracteres")
-        String ubicacion,
+        String location,
 
         @NotBlank(message = "La gravedad es obligatoria")
-        String gravedad,
+        String severity,
 
         @NotBlank(message = "El estado es obligatorio")
-        String estado
+        String status
 ) {
 }

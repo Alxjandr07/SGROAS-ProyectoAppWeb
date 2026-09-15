@@ -68,7 +68,7 @@ class AsignacionRutaControllerTest {
 
         mockMvc().perform(get("/api/asignaciones/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.vehiculoPlaca").value("GTU-001"));
+                .andExpect(jsonPath("$.vehiclePlate").value("GTU-001"));
     }
 
     @Test
@@ -79,13 +79,13 @@ class AsignacionRutaControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "conductorId": 1,
-                                  "vehiculoId": 1,
-                                  "rutaId": 1,
-                                  "fechaAsignacion": "2026-07-30",
-                                  "fechaInicio": "2026-07-30",
-                                  "fechaFin": "2026-07-31",
-                                  "estado": "ACTIVA"
+                                  "driverId": 1,
+                                  "vehicleId": 1,
+                                  "routeId": 1,
+                                  "assignmentDate": "2026-07-30",
+                                  "startDate": "2026-07-30",
+                                  "endDate": "2026-07-31",
+                                  "status": "ACTIVA"
                                 }
                                 """))
                 .andExpect(status().isCreated())
@@ -100,13 +100,13 @@ class AsignacionRutaControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "conductorId": 1,
-                                  "vehiculoId": 1,
-                                  "rutaId": 1,
-                                  "fechaAsignacion": "2026-07-30",
-                                  "fechaInicio": "2026-07-30",
-                                  "fechaFin": "2026-07-31",
-                                  "estado": "ACTIVA"
+                                  "driverId": 1,
+                                  "vehicleId": 1,
+                                  "routeId": 1,
+                                  "assignmentDate": "2026-07-30",
+                                  "startDate": "2026-07-30",
+                                  "endDate": "2026-07-31",
+                                  "status": "ACTIVA"
                                 }
                                 """))
                 .andExpect(status().isOk());

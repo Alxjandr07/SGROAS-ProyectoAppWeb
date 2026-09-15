@@ -22,124 +22,90 @@ public class VehicleService {
 
     private final VehicleRepository vehiculoRepository;
 
-    /**
-     * Obtiene la pagina de vehiculos activos convertidos a formato de respuesta.
-     * @param pageable objeto con numero de pagina, tamanio y orden solicitados para la consulta
-     * @return pagina con los vehiculos activos encontrados
-     */
     public Page<VehicleResponse> list(Pageable pageable) {
         List<VehicleResponse> contenido = listCached(pageable);
         return new PageImpl<>(contenido, pageable, contenido.size());
     }
 
-    /**
-     * Obtiene desde la memoria cache la lista de vehiculos activos de la pagina solicitada.
-     * @param pageable objeto con numero de pagina y tamanio que identifican la entrada guardada en cache
-     * @return lista de vehiculos activos correspondientes a la pagina pedida
-     */
     @Cacheable(value = "vehiculos", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
     public List<VehicleResponse> listCached(Pageable pageable) {
-        return vehiculoRepository.findByActivoTrue(pageable)
+        return vehiculoRepository.findByActiveTrue(pageable)
                 .map(this::mapearAResponse)
                 .getContent();
     }
 
-    /**
-     * Recupera el detalle de un vehiculo activo existente.
-     * @param id identificador del vehiculo que se desea consultar
-     * @return datos del vehiculo encontrado
-     * @throws IllegalArgumentException cuando no existe un vehiculo activo con ese identificador
-     */
     public VehicleResponse findById(Long id) {
         Vehicle vehiculo = getActiveVehicle(id);
         return mapearAResponse(vehiculo);
     }
 
-    /**
-     * Registra un nuevo vehiculo despues de validar que su placa no se repita.
-     * @param request datos del vehiculo con placa, marca, modelo, anio, capacidad, numeros de motor y chasis, color y estado
-     * @return datos del vehiculo recien guardado
-     * @throws IllegalArgumentException cuando ya existe otro vehiculo con la misma placa o el estado no es valido
-     */
     @CacheEvict(value = "vehiculos", allEntries = true)
     public VehicleResponse create(VehicleRequest request) {
-        if (vehiculoRepository.existsByPlaca(request.placa())) {
+        if (vehiculoRepository.existsByPlate(request.plate())) {
             throw new IllegalArgumentException("Ya existe un vehiculo con esa placa");
         }
 
         Vehicle vehiculo = Vehicle.builder()
-                .placa(request.placa())
-                .marca(request.marca())
-                .modelo(request.modelo())
-                .anio(request.anio())
-                .capacidadPasajeros(request.capacidadPasajeros())
-                .numeroMotor(request.numeroMotor())
-                .numeroChasis(request.numeroChasis())
+                .plate(request.plate())
+                .brand(request.brand())
+                .model(request.model())
+                .year(request.year())
+                .capacity(request.capacity())
+                .engineNumber(request.engineNumber())
+                .chassisNumber(request.chassisNumber())
                 .color(request.color())
-                .estado(toStatus(request.estado()))
-                .activo(true)
-                .creadoEn(Instant.now())
-                .actualizadoEn(Instant.now())
+                .status(toStatus(request.status()))
+                .active(true)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
                 .build();
 
         Vehicle vehiculoGuardado = vehiculoRepository.save(vehiculo);
         return mapearAResponse(vehiculoGuardado);
     }
 
-    /**
-     * Reemplaza los datos de un vehiculo activo por los valores recibidos.
-     * @param id identificador del vehiculo que se desea modificar
-     * @param request nuevos datos del vehiculo con placa, marca, modelo, anio, capacidad, numeros de motor y chasis, color y estado
-     * @return datos del vehiculo ya actualizado
-     * @throws IllegalArgumentException cuando el vehiculo no existe, la placa choca con otro registro o el estado no es valido
-     */
     @CacheEvict(value = "vehiculos", allEntries = true)
     public VehicleResponse update(Long id, VehicleRequest request) {
         Vehicle vehiculo = getActiveVehicle(id);
 
-        if (!vehiculo.getPlaca().equals(request.placa())
-                && vehiculoRepository.existsByPlaca(request.placa())) {
+        if (!vehiculo.getPlate().equals(request.plate())
+                && vehiculoRepository.existsByPlate(request.plate())) {
             throw new IllegalArgumentException("Ya existe un vehiculo con esa placa");
         }
 
-        vehiculo.setPlaca(request.placa());
-        vehiculo.setMarca(request.marca());
-        vehiculo.setModelo(request.modelo());
-        vehiculo.setAnio(request.anio());
-        vehiculo.setCapacidadPasajeros(request.capacidadPasajeros());
-        vehiculo.setNumeroMotor(request.numeroMotor());
-        vehiculo.setNumeroChasis(request.numeroChasis());
+        vehiculo.setPlate(request.plate());
+        vehiculo.setBrand(request.brand());
+        vehiculo.setModel(request.model());
+        vehiculo.setYear(request.year());
+        vehiculo.setCapacity(request.capacity());
+        vehiculo.setEngineNumber(request.engineNumber());
+        vehiculo.setChassisNumber(request.chassisNumber());
         vehiculo.setColor(request.color());
-        vehiculo.setEstado(toStatus(request.estado()));
-        vehiculo.setActualizadoEn(Instant.now());
+        vehiculo.setStatus(toStatus(request.status()));
+        vehiculo.setUpdatedAt(Instant.now());
 
         Vehicle vehiculoActualizado = vehiculoRepository.save(vehiculo);
         return mapearAResponse(vehiculoActualizado);
     }
 
-    /**
-     * Marca un vehiculo como inactivo y lo deja fuera de servicio.
-     * @param id identificador del vehiculo que se desea dar de baja
-     * @throws IllegalArgumentException cuando no existe un vehiculo activo con ese identificador
-     */
     @CacheEvict(value = "vehiculos", allEntries = true)
     public void desactivar(Long id) {
         Vehicle vehiculo = getActiveVehicle(id);
-        vehiculo.setActivo(false);
-        vehiculo.setEstado(VehicleStatus.FUERA_DE_SERVICIO);
-        vehiculo.setActualizadoEn(Instant.now());
+        vehiculo.setActive(false);
+        vehiculo.setStatus(VehicleStatus.FUERA_DE_SERVICIO);
+        vehiculo.setUpdatedAt(Instant.now());
         vehiculoRepository.save(vehiculo);
     }
 
     private Vehicle getActiveVehicle(Long id) {
         return vehiculoRepository.findById(id)
-                .filter(Vehicle::getActivo)
+                .filter(Vehicle::getActive)
                 .orElseThrow(() -> new IllegalArgumentException("Vehicle no encontrado"));
     }
 
-    private VehicleStatus toStatus(String estado) {
+    private VehicleStatus toStatus(String status) {
         try {
-            return VehicleStatus.valueOf(estado.toUpperCase());
+            return VehicleStatus.valueOf(status.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Estado de vehiculo no valido");
         }
@@ -148,18 +114,18 @@ public class VehicleService {
     private VehicleResponse mapearAResponse(Vehicle vehiculo) {
         return new VehicleResponse(
                 vehiculo.getId(),
-                vehiculo.getPlaca(),
-                vehiculo.getMarca(),
-                vehiculo.getModelo(),
-                vehiculo.getAnio(),
-                vehiculo.getCapacidadPasajeros(),
-                vehiculo.getNumeroMotor(),
-                vehiculo.getNumeroChasis(),
+                vehiculo.getPlate(),
+                vehiculo.getBrand(),
+                vehiculo.getModel(),
+                vehiculo.getYear(),
+                vehiculo.getCapacity(),
+                vehiculo.getEngineNumber(),
+                vehiculo.getChassisNumber(),
                 vehiculo.getColor(),
-                vehiculo.getEstado().name(),
-                vehiculo.getActivo(),
-                vehiculo.getCreadoEn(),
-                vehiculo.getActualizadoEn()
+                vehiculo.getStatus().name(),
+                vehiculo.getActive(),
+                vehiculo.getCreatedAt(),
+                vehiculo.getUpdatedAt()
         );
     }
 }

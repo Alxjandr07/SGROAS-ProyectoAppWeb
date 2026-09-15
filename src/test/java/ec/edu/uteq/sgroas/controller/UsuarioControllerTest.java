@@ -75,10 +75,10 @@ class UsuarioControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "nombre": "Administrador SGROAS",
+                                  "name": "Administrador SGROAS",
                                   "email": "admin@sgroas.com",
                                   "password": "123456",
-                                  "rol": "ROLE_ADMIN"
+                                  "role": "ROLE_ADMIN"
                                 }
                                 """))
                 .andExpect(status().isCreated())
@@ -93,10 +93,10 @@ class UsuarioControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "nombre": "Administrador SGROAS",
+                                  "name": "Administrador SGROAS",
                                   "email": "admin@sgroas.com",
                                   "password": "123456",
-                                  "rol": "ROLE_ADMIN"
+                                  "role": "ROLE_ADMIN"
                                 }
                                 """))
                 .andExpect(status().isOk());

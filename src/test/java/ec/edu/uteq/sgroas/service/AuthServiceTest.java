@@ -42,13 +42,13 @@ class AuthServiceTest {
     void loginCorrectoDebeRetornarTokens() {
         User usuario = User.builder()
                 .id(1L)
-                .nombre("Administrador SGROAS")
+                .name("Administrador SGROAS")
                 .email("admin@sgroas.com")
                 .passwordHash("password-encriptado")
-                .rol(Role.ROLE_ADMIN)
-                .activo(true)
-                .creadoEn(Instant.now())
-                .actualizadoEn(Instant.now())
+                .role(Role.ROLE_ADMIN)
+                .active(true)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
                 .build();
 
         when(usuarioRepository.findByEmail("admin@sgroas.com"))
@@ -70,20 +70,20 @@ class AuthServiceTest {
         assertEquals("access-token-prueba", response.accessToken());
         assertEquals("refresh-token-prueba", response.refreshToken());
         assertEquals("Bearer", response.tokenType());
-        assertEquals("ROLE_ADMIN", response.rol());
+        assertEquals("ROLE_ADMIN", response.role());
     }
 
     @Test
     void loginConPasswordIncorrectoDebeLanzarExcepcion() {
         User usuario = User.builder()
                 .id(1L)
-                .nombre("Administrador SGROAS")
+                .name("Administrador SGROAS")
                 .email("admin@sgroas.com")
                 .passwordHash("password-encriptado")
-                .rol(Role.ROLE_ADMIN)
-                .activo(true)
-                .creadoEn(Instant.now())
-                .actualizadoEn(Instant.now())
+                .role(Role.ROLE_ADMIN)
+                .active(true)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
                 .build();
 
         when(usuarioRepository.findByEmail("admin@sgroas.com"))

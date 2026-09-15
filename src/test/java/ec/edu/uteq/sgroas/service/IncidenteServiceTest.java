@@ -38,48 +38,48 @@ class IncidenteServiceTest {
 
     private RouteAssignment asignacionEjemplo() {
         Driver conductor = Driver.builder()
-                .id(1L).nombres("Carlos").apellidos("Mendoza")
-                .cedula("1200000001").numeroLicencia("LIC-001")
-                .tipoLicencia("E").fechaVencimientoLicencia(LocalDate.now().plusDays(30))
-                .telefono("0988888888").email("carlos@sgroas.com")
-                .estado(DriverStatus.ACTIVO).activo(true)
-                .creadoEn(Instant.now()).actualizadoEn(Instant.now())
+                .id(1L).firstNames("Carlos").lastNames("Mendoza")
+                .nationalId("1200000001").licenseNumber("LIC-001")
+                .licenseType("E").licenseExpiry(LocalDate.now().plusDays(30))
+                .phone("0988888888").email("carlos@sgroas.com")
+                .status(DriverStatus.ACTIVO).active(true)
+                .createdAt(Instant.now()).updatedAt(Instant.now())
                 .build();
         Vehicle vehiculo = Vehicle.builder()
-                .id(1L).placa("GTU-001").marca("Toyota").modelo("Hiace")
-                .anio(2020).capacidadPasajeros(14).numeroMotor("MOT")
-                .numeroChasis("CHAS").color("Blanco")
-                .estado(VehicleStatus.ACTIVO).activo(true)
-                .creadoEn(Instant.now()).actualizadoEn(Instant.now())
+                .id(1L).plate("GTU-001").brand("Toyota").model("Hiace")
+                .year(2020).capacity(14).engineNumber("MOT")
+                .chassisNumber("CHAS").color("Blanco")
+                .status(VehicleStatus.ACTIVO).active(true)
+                .createdAt(Instant.now()).updatedAt(Instant.now())
                 .build();
         Route ruta = Route.builder()
-                .id(1L).codigo("R-001").nombre("Quito-Guayaquil")
-                .origen("Quito").destino("Guayaquil").distanciaKm(420.0)
-                .duracionEstimadaMin(480).estado(RouteStatus.ACTIVA).activo(true)
-                .creadoEn(Instant.now()).actualizadoEn(Instant.now())
+                .id(1L).code("R-001").name("Quito-Guayaquil")
+                .origin("Quito").destination("Guayaquil").distanceKm(420.0)
+                .durationMin(480).status(RouteStatus.ACTIVA).active(true)
+                .createdAt(Instant.now()).updatedAt(Instant.now())
                 .build();
         return RouteAssignment.builder()
-                .id(1L).conductor(conductor).vehiculo(vehiculo).ruta(ruta)
-                .fechaAsignacion(LocalDate.now()).fechaInicio(LocalDate.now())
-                .fechaFin(LocalDate.now().plusDays(1)).estado(AssignmentStatus.ACTIVA)
-                .activo(true).creadoEn(Instant.now()).actualizadoEn(Instant.now())
+                .id(1L).driver(conductor).vehicle(vehiculo).route(ruta)
+                .assignmentDate(LocalDate.now()).startDate(LocalDate.now())
+                .endDate(LocalDate.now().plusDays(1)).status(AssignmentStatus.ACTIVA)
+                .active(true).createdAt(Instant.now()).updatedAt(Instant.now())
                 .build();
     }
 
     private Incident incidenteEjemplo() {
         return Incident.builder()
                 .id(1L)
-                .asignacion(asignacionEjemplo())
-                .reportadoPor("Carlos Mendoza")
-                .tipo(IncidentType.AVERIA_MECANICA)
-                .descripcion("Falla en el motor")
-                .fechaIncidente(LocalDateTime.now())
-                .ubicacion("Km 12 Via Quito")
-                .gravedad(IncidentSeverity.MEDIA)
-                .estado(IncidentStatus.REPORTADO)
-                .activo(true)
-                .creadoEn(Instant.now())
-                .actualizadoEn(Instant.now())
+                .assignment(asignacionEjemplo())
+                .reportedBy("Carlos Mendoza")
+                .type(IncidentType.AVERIA_MECANICA)
+                .description("Falla en el motor")
+                .incidentDate(LocalDateTime.now())
+                .location("Km 12 Via Quito")
+                .severity(IncidentSeverity.MEDIA)
+                .status(IncidentStatus.REPORTADO)
+                .active(true)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
                 .build();
     }
 
@@ -93,13 +93,13 @@ class IncidenteServiceTest {
     @Test
     void listarDebeRetornarPagina() {
         PageRequest pageable = PageRequest.of(0, 10);
-        when(incidenteRepository.findByActivoTrue(pageable))
+        when(incidenteRepository.findByActiveTrue(pageable))
                 .thenReturn(new PageImpl<>(List.of(incidenteEjemplo())));
 
         Page<IncidentResponse> pagina = incidenteService.list(pageable);
 
         assertEquals(1, pagina.getTotalElements());
-        assertEquals("AVERIA_MECANICA", pagina.getContent().get(0).tipo());
+        assertEquals("AVERIA_MECANICA", pagina.getContent().get(0).type());
     }
 
     @Test
@@ -109,7 +109,7 @@ class IncidenteServiceTest {
         IncidentResponse response = incidenteService.findById(1L);
 
         assertEquals(1L, response.id());
-        assertEquals(1L, response.asignacionId());
+        assertEquals(1L, response.assignmentId());
     }
 
     @Test
@@ -130,7 +130,7 @@ class IncidenteServiceTest {
         IncidentResponse response = incidenteService.create(requestEjemplo());
 
         assertNotNull(response);
-        assertEquals("MEDIA", response.gravedad());
+        assertEquals("MEDIA", response.severity());
         verify(incidenteRepository).save(any(Incident.class));
     }
 
@@ -210,6 +210,6 @@ class IncidenteServiceTest {
         incidenteService.desactivar(1L);
 
         verify(incidenteRepository).save(argThat(i ->
-                !i.getActivo() && i.getEstado() == IncidentStatus.CERRADO));
+                !i.getActive() && i.getStatus() == IncidentStatus.CERRADO));
     }
 }

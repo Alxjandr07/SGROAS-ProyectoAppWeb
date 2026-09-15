@@ -48,12 +48,12 @@ class CodigoVerificacionServiceTest {
         return VerificationCode.builder()
                 .id(1L)
                 .email(EMAIL)
-                .codigoHash(sha256(codigoClaro))
-                .tipo(Type.VERIFICACION.name())
-                .expiraEn(Instant.now().plusSeconds(600))
-                .intentos(0)
-                .usado(false)
-                .creadoEn(Instant.now())
+                .codeHash(sha256(codigoClaro))
+                .type(Type.VERIFICACION.name())
+                .expiresAt(Instant.now().plusSeconds(600))
+                .attempts(0)
+                .used(false)
+                .createdAt(Instant.now())
                 .build();
     }
 
@@ -63,18 +63,18 @@ class CodigoVerificacionServiceTest {
 
         String codigo = service.generate(EMAIL, Type.VERIFICACION);
 
-        verify(repository).deleteByEmailAndTipo(EMAIL, Type.VERIFICACION.name());
+        verify(repository).deleteByEmailAndType(EMAIL, Type.VERIFICACION.name());
         verify(repository).save(argThat(reg ->
-                reg.getCodigoHash().equals(sha256(codigo))
+                reg.getCodeHash().equals(sha256(codigo))
                         && reg.getEmail().equals(EMAIL)
-                        && reg.getTipo().equals(Type.VERIFICACION.name())
-                        && !reg.isUsado()));
+                        && reg.getType().equals(Type.VERIFICACION.name())
+                        && !reg.isUsed()));
         assertTrue(codigo.matches("\\d{6}"));
     }
 
     @Test
     void puedeReenviarSinRegistroDebeSerTrue() {
-        when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
+        when(repository.findFirstByEmailAndTypeOrderByCreatedAtDesc(
                 EMAIL, Type.VERIFICACION.name())).thenReturn(Optional.empty());
 
         assertTrue(service.canResend(EMAIL, Type.VERIFICACION));
@@ -83,8 +83,8 @@ class CodigoVerificacionServiceTest {
     @Test
     void puedeReenviarConCodigoRecienteDebeSerFalse() {
         VerificationCode reciente = registro("123456");
-        reciente.setCreadoEn(Instant.now().minusSeconds(10));
-        when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
+        reciente.setCreatedAt(Instant.now().minusSeconds(10));
+        when(repository.findFirstByEmailAndTypeOrderByCreatedAtDesc(
                 EMAIL, Type.VERIFICACION.name())).thenReturn(Optional.of(reciente));
 
         assertFalse(service.canResend(EMAIL, Type.VERIFICACION));
@@ -93,8 +93,8 @@ class CodigoVerificacionServiceTest {
     @Test
     void puedeReenviarConCodigoAntiguoDebeSerTrue() {
         VerificationCode antiguo = registro("123456");
-        antiguo.setCreadoEn(Instant.now().minusSeconds(120));
-        when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
+        antiguo.setCreatedAt(Instant.now().minusSeconds(120));
+        when(repository.findFirstByEmailAndTypeOrderByCreatedAtDesc(
                 EMAIL, Type.VERIFICACION.name())).thenReturn(Optional.of(antiguo));
 
         assertTrue(service.canResend(EMAIL, Type.VERIFICACION));
@@ -102,28 +102,28 @@ class CodigoVerificacionServiceTest {
 
     @Test
     void validarCodigoCorrectoDebeMarcarloUsado() {
-        when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
+        when(repository.findFirstByEmailAndTypeOrderByCreatedAtDesc(
                 EMAIL, Type.VERIFICACION.name())).thenReturn(Optional.of(registro("123456")));
 
         service.validate(EMAIL, Type.VERIFICACION, "123456");
 
-        verify(repository).save(argThat(VerificationCode::isUsado));
+        verify(repository).save(argThat(VerificationCode::isUsed));
     }
 
     @Test
     void validarCodigoIncorrectoDebeIncrementarIntentosYFallar() {
         VerificationCode reg = registro("123456");
-        when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
+        when(repository.findFirstByEmailAndTypeOrderByCreatedAtDesc(
                 EMAIL, Type.VERIFICACION.name())).thenReturn(Optional.of(reg));
 
         assertThrows(IllegalArgumentException.class,
                 () -> service.validate(EMAIL, Type.VERIFICACION, "999999"));
-        verify(repository).save(argThat(c -> c.getIntentos() == 1 && !c.isUsado()));
+        verify(repository).save(argThat(c -> c.getAttempts() == 1 && !c.isUsed()));
     }
 
     @Test
     void validarSinRegistroDebeFallar() {
-        when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
+        when(repository.findFirstByEmailAndTypeOrderByCreatedAtDesc(
                 EMAIL, Type.VERIFICACION.name())).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class,
@@ -133,8 +133,8 @@ class CodigoVerificacionServiceTest {
     @Test
     void validarCodigoYaUsadoDebeFallar() {
         VerificationCode usado = registro("123456");
-        usado.setUsado(true);
-        when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
+        usado.setUsed(true);
+        when(repository.findFirstByEmailAndTypeOrderByCreatedAtDesc(
                 EMAIL, Type.VERIFICACION.name())).thenReturn(Optional.of(usado));
 
         assertThrows(IllegalArgumentException.class,
@@ -144,8 +144,8 @@ class CodigoVerificacionServiceTest {
     @Test
     void validarCodigoExpiradoDebeFallar() {
         VerificationCode expirado = registro("123456");
-        expirado.setExpiraEn(Instant.now().minusSeconds(60));
-        when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
+        expirado.setExpiresAt(Instant.now().minusSeconds(60));
+        when(repository.findFirstByEmailAndTypeOrderByCreatedAtDesc(
                 EMAIL, Type.VERIFICACION.name())).thenReturn(Optional.of(expirado));
 
         assertThrows(IllegalArgumentException.class,
@@ -155,8 +155,8 @@ class CodigoVerificacionServiceTest {
     @Test
     void validarConIntentosAgotadosDebeFallar() {
         VerificationCode agotado = registro("123456");
-        agotado.setIntentos(5);
-        when(repository.findFirstByEmailAndTipoOrderByCreadoEnDesc(
+        agotado.setAttempts(5);
+        when(repository.findFirstByEmailAndTypeOrderByCreatedAtDesc(
                 EMAIL, Type.VERIFICACION.name())).thenReturn(Optional.of(agotado));
 
         assertThrows(IllegalArgumentException.class,

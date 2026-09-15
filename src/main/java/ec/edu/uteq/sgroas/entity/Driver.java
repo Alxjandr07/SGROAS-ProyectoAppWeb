@@ -31,39 +31,39 @@ public class Driver {
     private Long id;
 
     @Column(name = "nombres", nullable = false, length = 100)
-    private String nombres;
+    private String firstNames;
 
     @Column(name = "apellidos", nullable = false, length = 100)
-    private String apellidos;
+    private String lastNames;
 
     @Column(name = "cedula", nullable = false, unique = true, length = 10)
-    private String cedula;
+    private String nationalId;
 
     @Column(name = "numero_licencia", nullable = false, unique = true, length = 30)
-    private String numeroLicencia;
+    private String licenseNumber;
 
     @Column(name = "tipo_licencia", nullable = false, length = 10)
-    private String tipoLicencia;
+    private String licenseType;
 
     @Column(name = "fecha_vencimiento_licencia", nullable = false)
-    private LocalDate fechaVencimientoLicencia;
+    private LocalDate licenseExpiry;
 
     @Column(name = "telefono", length = 20)
-    private String telefono;
+    private String phone;
 
     @Column(name = "email", length = 255)
     private String email;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false, length = 20)
-    private DriverStatus estado;
+    private DriverStatus status;
 
     @Column(name = "activo", nullable = false)
-    private Boolean activo;
+    private Boolean active;
 
     @Column(name = "creado_en", nullable = false, updatable = false)
-    private Instant creadoEn;
+    private Instant createdAt;
 
     @Column(name = "actualizado_en", nullable = false)
-    private Instant actualizadoEn;
+    private Instant updatedAt;
 }

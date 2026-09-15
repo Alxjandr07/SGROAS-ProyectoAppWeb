@@ -50,12 +50,12 @@ public class AuthService {
             throw new BadCredentialsException("Credenciales invalidas");
         }
 
-        if (Boolean.FALSE.equals(usuario.getVerificado())) {
+        if (Boolean.FALSE.equals(usuario.getVerified())) {
             throw new UnverifiedEmailException(
                     "Tu cuenta aun no esta verificada. Revisa tu correo e ingresa el codigo de 6 digitos.");
         }
 
-        if (!usuario.getActivo()) {
+        if (!usuario.getActive()) {
             throw new BadCredentialsException("Credenciales invalidas");
         }
 
@@ -76,9 +76,9 @@ public class AuthService {
 
         codigoVerificacionService.validate(email, VerificationCodeService.Type.VERIFICACION, codigo);
 
-        usuario.setVerificado(true);
-        usuario.setActivo(true);
-        usuario.setActualizadoEn(Instant.now());
+        usuario.setVerified(true);
+        usuario.setActive(true);
+        usuario.setUpdatedAt(Instant.now());
         usuarioRepository.save(usuario);
 
         return buildAuthResponse(usuario);
@@ -91,7 +91,7 @@ public class AuthService {
      */
     public void resendVerificationCode(String email) {
         usuarioRepository.findByEmail(email)
-                .filter(u -> Boolean.FALSE.equals(u.getVerificado()))
+                .filter(u -> Boolean.FALSE.equals(u.getVerified()))
                 .filter(u -> codigoVerificacionService.canResend(email,
                         VerificationCodeService.Type.VERIFICACION))
                 .ifPresent(this::sendActivationCode);
@@ -104,7 +104,7 @@ public class AuthService {
      */
     public void requestPasswordReset(String email) {
         usuarioRepository.findByEmail(email)
-                .filter(User::getActivo)
+                .filter(User::getActive)
                 .filter(u -> codigoVerificacionService.canResend(email,
                         VerificationCodeService.Type.RESET_PASSWORD))
                 .ifPresent(u -> {
@@ -129,16 +129,16 @@ public class AuthService {
         codigoVerificacionService.validate(email, VerificationCodeService.Type.RESET_PASSWORD, codigo);
 
         usuario.setPasswordHash(passwordEncoder.encode(nuevaPassword));
-        usuario.setActivo(true);
-        usuario.setVerificado(true);
-        usuario.setActualizadoEn(Instant.now());
+        usuario.setActive(true);
+        usuario.setVerified(true);
+        usuario.setUpdatedAt(Instant.now());
         usuarioRepository.save(usuario);
     }
 
     private void sendActivationCode(User usuario) {
         String codigo = codigoVerificacionService.generate(usuario.getEmail(),
                 VerificationCodeService.Type.VERIFICACION);
-        emailService.sendVerificationCode(usuario.getEmail(), usuario.getNombre(), codigo);
+        emailService.sendVerificationCode(usuario.getEmail(), usuario.getName(), codigo);
     }
 
     /**
@@ -153,7 +153,7 @@ public class AuthService {
         String email = tokenService.getEmailFromRefreshToken(request.refreshToken());
 
         User usuario = usuarioRepository.findByEmail(email)
-                .filter(User::getActivo)
+                .filter(User::getActive)
                 .orElseThrow(() -> new BadCredentialsException("User no valido"));
 
         tokenService.deleteRefreshToken(request.refreshToken());
@@ -184,9 +184,9 @@ public class AuthService {
                 refreshToken,
                 "Bearer",
                 jwtService.getExpirationMs(),
-                usuario.getNombre(),
+                usuario.getName(),
                 usuario.getEmail(),
-                usuario.getRol().name()
+                usuario.getRole().name()
         );
     }
 }

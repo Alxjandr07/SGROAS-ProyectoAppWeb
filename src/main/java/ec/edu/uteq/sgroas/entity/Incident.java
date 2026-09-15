@@ -46,39 +46,38 @@ public class Incident {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asignacion_id", nullable = false)
-    private RouteAssignment asignacion;
+    private RouteAssignment assignment;
 
     @Column(name = "reportado_por", nullable = false, length = 100)
-    private String reportadoPor;
+    private String reportedBy;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", nullable = false, length = 25)
-    private IncidentType tipo;
+    private IncidentType type;
 
     @Column(name = "descripcion", nullable = false, columnDefinition = "TEXT")
-    private String descripcion;
+    private String description;
 
     @Column(name = "fecha_incidente", nullable = false)
-    private LocalDateTime fechaIncidente;
+    private LocalDateTime incidentDate;
 
     @Column(name = "ubicacion", length = 255)
-    private String ubicacion;
+    private String location;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "gravedad", nullable = false, length = 10)
-    private IncidentSeverity gravedad;
+    private IncidentSeverity severity;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false, length = 20)
-    private IncidentStatus estado;
+    private IncidentStatus status;
 
     @Column(name = "activo", nullable = false)
-    private Boolean activo;
+    private Boolean active;
 
     @Column(name = "creado_en", nullable = false, updatable = false)
-    private Instant creadoEn;
+    private Instant createdAt;
 
     @Column(name = "actualizado_en", nullable = false)
-    private Instant actualizadoEn;
+    private Instant updatedAt;
 }
-

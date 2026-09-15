@@ -23,7 +23,7 @@ public class User {
     private Long id;
 
     @Column(name = "nombre", nullable = false, length = 100)
-    private String nombre;
+    private String name;
 
     @Column(name = "email", nullable = false, unique = true, length = 255)
     private String email;
@@ -33,18 +33,18 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "rol", nullable = false, length = 30)
-    private Role rol;
+    private Role role;
 
     @Column(name = "activo", nullable = false)
-    private Boolean activo;
+    private Boolean active;
 
     /** false mientras la cuenta no confirma el codigo enviado a su correo. */
     @Column(name = "verificado", nullable = false)
-    private Boolean verificado;
+    private Boolean verified;
 
     @Column(name = "creado_en", nullable = false, updatable = false)
-    private Instant creadoEn;
+    private Instant createdAt;
 
     @Column(name = "actualizado_en", nullable = false)
-    private Instant actualizadoEn;
+    private Instant updatedAt;
 }

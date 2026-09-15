@@ -24,7 +24,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @param pageable configuracion de paginacion y ordenamiento.
      * @return pagina con los usuarios activos.
      */
-    Page<User> findByActivoTrue(Pageable pageable);
+    Page<User> findByActiveTrue(Pageable pageable);
 
     /**
      * Consulta los usuarios activos que coinciden con un texto de busqueda por nombre o correo.
@@ -34,8 +34,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
      */
     @Query("""
             SELECT u FROM User u
-            WHERE u.activo = true
-              AND (:search IS NULL OR LOWER(u.nombre) LIKE LOWER(CONCAT('%', :search, '%'))
+            WHERE u.active = true
+              AND (:search IS NULL OR LOWER(u.name) LIKE LOWER(CONCAT('%', :search, '%'))
                        OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%')))
             """)
     Page<User> searchActive(@Param("search") String search, Pageable pageable);

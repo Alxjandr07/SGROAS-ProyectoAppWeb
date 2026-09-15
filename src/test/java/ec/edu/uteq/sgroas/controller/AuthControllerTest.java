@@ -63,14 +63,14 @@ class AuthControllerTest {
     private User usuarioActivo() {
         return User.builder()
                 .id(1L)
-                .nombre("Administrador SGROAS")
+                .name("Administrador SGROAS")
                 .email("admin@sgroas.com")
                 .passwordHash("hash")
-                .rol(Role.ROLE_ADMIN)
-                .activo(true)
-                .verificado(true)
-                .creadoEn(Instant.now())
-                .actualizadoEn(Instant.now())
+                .role(Role.ROLE_ADMIN)
+                .active(true)
+                .verified(true)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
                 .build();
     }
 
@@ -86,8 +86,8 @@ class AuthControllerTest {
                         .cookie(new jakarta.servlet.http.Cookie("access_token", "access-token")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("admin@sgroas.com"))
-                .andExpect(jsonPath("$.rol").value("ROLE_ADMIN"))
-                .andExpect(jsonPath("$.nombre").value("Administrador SGROAS"));
+                .andExpect(jsonPath("$.role").value("ROLE_ADMIN"))
+                .andExpect(jsonPath("$.name").value("Administrador SGROAS"));
     }
 
     @Test
@@ -132,7 +132,7 @@ class AuthControllerTest {
     @Test
     void meConUsuarioInactivoDebeRetornar401() throws Exception {
         User inactivo = usuarioActivo();
-        inactivo.setActivo(false);
+        inactivo.setActive(false);
         when(tokenService.accessTokenEnBlacklist("access-token")).thenReturn(false);
         when(jwtService.extraerEmail("access-token")).thenReturn("admin@sgroas.com");
         when(usuarioRepository.findByEmail("admin@sgroas.com"))
