@@ -1,7 +1,7 @@
 # VERIFICACION — SGROAS Supletorio v1.1.0
 
 Fecha: 2026-09-15
-Commit: b7a6731
+Commit: 51202f5
 Tag: v1.1.0
 
 ---
@@ -348,10 +348,12 @@ integrantes con su correo institucional).
 
 ## Tag v1.1.0 (EV-3)
 
-```bash
-git log -1 --format="%H %s (%cs)" v1.1.0
-```
+El tag `v1.1.0` se colocó sobre el ÚLTIMO commit de la cadena de cierre
+(contenido sustantivo en `51202f5`; el commit del tag es el que cierra). Se verifica:
 
-**Salida:** `b7a6731 docs(EV-4): apuntar tag v1.1.0 al commit final d2b88b7 en CONTRIBUCIONES.md (2026-09-15)`
+```bash
+git rev-parse v1.1.0
+git log --oneline v1.1.0 -1
+```
 
 URL pública del sistema en la primera pantalla del README: `https://sgroas-backend.onrender.com`.
