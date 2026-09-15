@@ -179,7 +179,9 @@ powershell -ExecutionPolicy Bypass -File scripts/verify-manifest.ps1
 
 ## Tag v1.1.0
 
-El tag `v1.1.0` apunta al commit `c09f981` (último commit antes de la fecha límite).
+El tag `v1.1.0` apunta al commit `d2b88b7` (último commit antes de la fecha
+límite; incluye traducir los métodos de test al inglés, Javadoc 226/226, la
+firma EV-4 con correos institucionales y la evidencia de sesión en vivo).
 
 ---
 
