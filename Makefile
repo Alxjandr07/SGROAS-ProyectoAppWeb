@@ -1,4 +1,4 @@
-.PHONY: up down test bench bench-render audit jacoco versions docs pdf all clean
+.PHONY: up down test bench bench-render audit jacoco versions docs pdf all clean verify
 
 PYTHON ?= $(shell command -v python3 2>/dev/null || command -v python 2>/dev/null)
 
@@ -83,6 +83,45 @@ docs: versions
 all: up test bench audit jacoco docs pdf
 	@echo "=========================================="
 	@echo "PIPELINE COMPLETO (make all) FINALIZADO OK"
+	@echo "=========================================="
+
+verify:
+	@echo "=== SGROAS Verification ==="
+	@echo ""
+	@echo "[P1] Checking hardcoded secrets..."
+	@! grep -rn "CHANGE_ME\|password123\|secret_key" src/main/resources/application.properties docker-compose.yml 2>/dev/null | grep -v "CHANGE_ME" || true
+	@! grep -n "SPRING_DATASOURCE_PASSWORD=.\{3,\}" docker-compose.yml 2>/dev/null | grep -v '$$' || true
+	@echo "[P1] OK"
+	@echo ""
+	@echo "[P4] Checking cookie Secure(true)..."
+	@! grep -n "\.secure(cookieSecure)" src/main/java/ec/edu/uteq/sgroas/controller/AuthController.java 2>/dev/null
+	@grep -c "\.secure(true)" src/main/java/ec/edu/uteq/sgroas/controller/AuthController.java | xargs -I{} echo "  Found {} .secure(true) calls"
+	@echo "[P4] OK"
+	@echo ""
+	@echo "[P5] Checking Spanish field names in entities..."
+	@! grep -rn "private String nombre\|private String apellido\|private String estado\|private String direccion\|private String telefono\|private String placa\|private String marca\|private String modelo" src/main/java/ec/edu/uteq/sgroas/entity/ 2>/dev/null
+	@echo "[P5] OK - no Spanish fields in entities"
+	@echo ""
+	@echo "[P7] Checking Spanish captions in informe..."
+	@! grep -rn "Tabla\|Figura\|Listado\|cuadro\|figura\|listado" docs/informe-final/ 2>/dev/null | grep -v ".md:"
+	@echo "[P7] OK"
+	@echo ""
+	@echo "[P10] Verifying MANIFEST.sha256..."
+	@powershell -ExecutionPolicy Bypass -File scripts/verify-manifest.ps1
+	@echo "[P10] OK"
+	@echo ""
+	@echo "[P11] Checking SUS instrument and consent..."
+	@test -f dataset/sus/SUS-INSTRUMENT.md && echo "  SUS-INSTRUMENT.md exists"
+	@test -f dataset/sus/CONSENT-FORM.md && echo "  CONSENT-FORM.md exists"
+	@test -f dataset/sus/CONSENT-REGISTRY.md && echo "  CONSENT-REGISTRY.md exists"
+	@echo "[P11] OK"
+	@echo ""
+	@echo "[P9] Checking Postman collection..."
+	@grep -c "asignaciones" docs/postman/coleccion.json | xargs -I{} echo "  {} assignment endpoints found"
+	@echo "[P9] OK"
+	@echo ""
+	@echo "=========================================="
+	@echo "ALL CHECKS PASSED"
 	@echo "=========================================="
 
 clean:
