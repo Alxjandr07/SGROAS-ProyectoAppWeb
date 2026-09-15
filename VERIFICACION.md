@@ -1,7 +1,7 @@
 # VERIFICACION — SGROAS Supletorio v1.1.0
 
-Fecha: 2026-09-14
-Commit: c09f981
+Fecha: 2026-09-15
+Commit: b7a6731
 Tag: v1.1.0
 
 ---
@@ -12,26 +12,30 @@ Tag: v1.1.0
 ```bash
 # 1. application.properties NO contiene valores literales
 grep -n "SPRING_DATASOURCE_PASSWORD\|JWT_SECRET" src/main/resources/application.properties
-# Salida esperada: solo variables ${...}, sin valores literales
-
 # 2. docker-compose.yml usa env vars, no secrets hardcodeados
 grep -n "SPRING_DATASOURCE_PASSWORD\|JWT_SECRET" docker-compose.yml
-# Salida esperada: solo referencias ${VARIABLE}
-
 # 3. JwtServiceTest compila sin secret hardcodeado
 grep -n "JWT_SECRET" src/test/java/ec/edu/uteq/sgroas/security/JwtServiceTest.java
-# Salida esperada: System.getenv("JWT_SECRET") con fallback de test
-
 # 4. .env.example tiene placeholders
-grep -n "CHANGE_ME\|SPRING_DATASOURCE_PASSWORD\|JWT_SECRET" .env.example
-# Salida esperada: 3 líneas con valores CHANGE_ME...
+grep -n "ROTATED" .env.example
 ```
 
-**Archivos modificados:**
-- `src/main/resources/application.properties` — DB password y JWT secret ahora usan `${VARIABLE}`
-- `docker-compose.yml` — secrets referencian variables de entorno
-- `.env.example` — placeholders CHANGE_ME para cada secreto
-- `src/test/java/ec/edu/uteq/sgroas/security/JwtServiceTest.java` — JWT_SECRET desde env var con test fallback
+**Salida (2026-09-15):**
+```
+1. spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
+   app.jwt.secret=${JWT_SECRET}
+2. SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+   APP_JWT_SECRET: ${JWT_SECRET}
+3. private static final String JWT_SECRET =
+       System.getenv().getOrDefault("JWT_SECRET",
+   ReflectionTestUtils.setField(jwtService, "jwtSecret", JWT_SECRET);
+4. SPRING_DATASOURCE_PASSWORD=<ROTATED_DB_PASSWORD>
+   APP_JWT_SECRET=<ROTATED_JWT_SECRET_MIN_32_CHARS>
+```
+
+**Archivos:** `src/main/resources/application.properties`, `docker-compose.yml`,
+`.env.example`, `src/test/java/ec/edu/uteq/sgroas/security/JwtServiceTest.java`
+(contraseña real rotada en el despliegue y declarada en `.env.example`).
 
 ---
 
@@ -39,16 +43,23 @@ grep -n "CHANGE_ME\|SPRING_DATASOURCE_PASSWORD\|JWT_SECRET" .env.example
 
 **Orden de verificación:**
 ```bash
-# Verificar que existen al menos 3 corridas crudas por escenario
+# Verificar que existen corridas crudas por escenario (k01..k08, incl. frío)
 ls dataset/perf/k*.json | wc -l
-# Salida esperada: 13+
-
-# Verificar que cada archivo contiene iteraciones y métricas
-head -5 dataset/perf/k6-smoke.json
-# Salida esperada: JSON con iteraciones, http_req_duration, etc.
+head -20 dataset/perf/k08-run1.json
 ```
 
-**Archivos:** `dataset/perf/k6-*.json` (13 archivos)
+**Salida (2026-09-15):**
+```
+13
+k04-cold.json k04-run1.json k05-cold.json k05-run1.json k06-cold.json
+k06-run1.json k07-cold.json k07-run1.json k08-cold.json k08-run1.json
+k01-run1.json k02-run2.json k03-run3.json
+(JSON de k08-run1 con métricas agregadas de una corrida v6)
+```
+
+**Archivos:** `dataset/perf/k*.json` (13 corridas: 3 locales + 5 calientes + 5 frías),
+análisis en `dataset/perf/REPORT.md` recalculado con `scripts/perf/nonparametric.py`
+desde esas corridas (ver `docs/mediciones/perf/RENDER-REPORT.md`).
 
 ---
 
@@ -58,14 +69,18 @@ head -5 dataset/perf/k6-smoke.json
 ```bash
 # Verificar que existen al menos 3 corridas por perfil
 ls dataset/lighthouse/lh-*.json | wc -l
-# Salida esperada: 9+
-
-# Verificar que contiene scores
-grep -l "performance.*[0-9]" dataset/lighthouse/lh-*.json | wc -l
-# Salida esperada: 9
+# Verificar que contienen scores
+grep -l '"performance"' dataset/lighthouse/lh-*.json | wc -l
 ```
 
-**Archivos:** `dataset/lighthouse/lh-*.json` (9 archivos)
+**Salida (2026-09-15):**
+```
+9
+9
+```
+
+**Archivos:** `dataset/lighthouse/lh-{mobile,desktop,tablet}-{1,2,3}.json` (9 corridas)
+contra `https://sgroas-backend.onrender.com`; resumen en `dataset/lighthouse/REPORT.md`.
 
 ---
 
@@ -75,14 +90,20 @@ grep -l "performance.*[0-9]" dataset/lighthouse/lh-*.json | wc -l
 ```bash
 # Verificar que NO existe .secure(cookieSecure) en AuthController
 grep -n "\.secure(cookieSecure)" src/main/java/ec/edu/uteq/sgroas/controller/AuthController.java
-# Salida esperada: (sin resultados)
-
 # Verificar que SÍ existe .secure(true)
 grep -n "\.secure(true)" src/main/java/ec/edu/uteq/sgroas/controller/AuthController.java
-# Salida esperada: 4 líneas (4 cookies)
 ```
 
-**Archivos:** `src/main/java/ec/edu/uteq/sgroas/controller/AuthController.java`
+**Salida (2026-09-15):**
+```
+(búsqueda 1: 0 resultados)
+(búsqueda 2: 4 líneas — access_token y refresh_token con .secure(true) en login, refresh y logout)
+```
+
+**Archivos:**
+- `src/main/java/ec/edu/uteq/sgroas/controller/AuthController.java` — `.secure(true)` + `.httpOnly(true)`
+- Cabecera Set-Cookie capturada del despliegue en `docs/mediciones/sec/live-session/login-response.txt`:
+  `Set-Cookie: access_token=...; Secure; HttpOnly; SameSite=Strict` (y `refresh_token` ídem, 7 días)
 
 ---
 
@@ -90,42 +111,24 @@ grep -n "\.secure(true)" src/main/java/ec/edu/uteq/sgroas/controller/AuthControl
 
 **Orden de verificación:**
 ```bash
-# Contar campos privados en español en entidades (0 esperado)
-grep -rn "private String nombre\|private String apellido\|private String estado\|private String direccion\|private String telefono\|private String placa\|private String marca\|private String modelo" src/main/java/ec/edu/uteq/sgroas/entity/
-# Salida esperada: 0 resultados
-
-# Contar campos en español en DTOs (0 esperado)
-grep -rn "getNombre()\|setNombre(\|getApellido()\|setApellido(" src/main/java/ec/edu/uteq/sgroas/dto/
-# Salida esperada: 0 resultados
-
-# Verificar que los campos usan @Column(name="...") para preservar columnas DB
-grep -n "@Column(name=" src/main/java/ec/edu/uteq/sgroas/entity/User.java | head -5
-# Salida esperada: @Column(name="nombre"), @Column(name="rol"), etc.
-```
-
-# Contar métodos públicos con nombre en español (0 esperado)
-# Métodos de producción (src/main/java): 226, nombre en español: 0
 powershell -ExecutionPolicy Bypass -File scripts/check-spanish-methods.ps1
-# Salida esperada: Total methods (main + tests): 496 / OK: 0 Spanish method names (0%)
-
-# Verificar que los campos usan @Column(name="...") para preservar columnas DB
-grep -n "@Column(name=" src/main/java/ec/edu/uteq/sgroas/entity/User.java | head -5
-# Salida esperada: @Column(name="nombre"), @Column(name="rol"), etc.
 ```
 
-**Medición real (2026-09-15):** 496 métodos (226 de producción + 270 de test), 0 en español (0% ≤ 5%).
+**Salida (2026-09-15):**
+```
+Total methods (main + tests): 496
+OK: 0 Spanish method names (0%)
+```
+
+**Tipos (clases/interfaces/records/enums):** 130, solo 1 señalado (`Terminal`,
+cognado inglés, no español) → 0,77% ≤ 5%.
 
 **Archivos modificados:**
-- `src/main/java/ec/edu/uteq/sgroas/entity/Driver.java` — 11 campos renombrados
-- `src/main/java/ec/edu/uteq/sgroas/entity/User.java` — 6 campos renombrados
-- `src/main/java/ec/edu/uteq/sgroas/entity/Vehicle.java` — 9 campos renombrados
-- `src/main/java/ec/edu/uteq/sgroas/entity/Route.java` — 7 campos renombrados
-- `src/main/java/ec/edu/uteq/sgroas/entity/Incident.java` — 8 campos renombrados
-- `src/main/java/ec/edu/uteq/sgroas/entity/RouteAssignment.java` — 9 campos renombrados
-- `src/main/java/ec/edu/uteq/sgroas/entity/VerificationCode.java` — 6 campos renombrados
-- `src/main/java/ec/edu/uteq/sgroas/service/{Driver,Incident,RouteAssignment,Route,Vehicle,User}Service.java` y controladores — método `desactivar` → `deactivate`
+- `src/main/java/ec/edu/uteq/sgroas/entity/*.java` — campos renombrados al inglés
+  (Driver, User, Vehicle, Route, Incident, RouteAssignment, VerificationCode)
+- `src/main/java/ec/edu/uteq/sgroas/service/*.java` y controladores — `desactivar` → `deactivate`
 - `src/test/java/**` — 178 nombres de métodos de test traducidos al inglés (32 archivos)
-- Todos los DTOs, servicios, controladores, repositorios y tests actualizados
+- DTOs, repositorios y tests actualizados a los nuevos nombres
 
 ---
 
@@ -133,32 +136,42 @@ grep -n "@Column(name=" src/main/java/ec/edu/uteq/sgroas/entity/User.java | head
 
 **Orden de verificación:**
 ```bash
-# Número de métodos públicos/protected en src/main (226)
-grep -rnE "^\s*(public|protected)\s+" src/main/java/ec/edu/uteq/sgroas/ | wc -l
-
-# Métodos cuya línea anterior es una anotación o nada antes del /** (con Javadoc)
-grep -B1 -E "^\s*(public|protected)\s+" src/main/java/ec/edu/uteq/sgroas/ | grep -cE "^\s*\*/\s*$"
-# Salida esperada: 226 (100%)
+powershell -ExecutionPolicy Bypass -File scripts/check-javadoc.ps1
+./mvnw javadoc:javadoc
 ```
 
-**Medición real (2026-09-15):** 226/226 métodos públicos documentados (100%), incluidos los 10 records DTO (Driver*, Incident*, Route*, RouteAssignment*, Vehicle*) y los métodos de servicio `{list,listCached,findById,create,update,deactivate}`, `VerificationCodeService.{generate,canResend,validate}`.
+**Salida (2026-09-15):**
+```
+Javadoc coverage: 226/226 (100%)
+OK: Javadoc >= 90%
+BUILD SUCCESS (mvn javadoc:javadoc sin errores)
+```
+
+**Archivos:** 226 métodos públicos/protected en `src/main/java/**` documentados,
+incluidos los 10 records DTO y los servicios.
 
 ---
 
-## P7 — Títulos de figuras/tablas en inglés (0.9)
+## P7 — Figuras/tablas rotuladas en inglés (0.9)
 
 **Orden de verificación:**
 ```bash
-# Verificar que NO existen captions en español en el informe final
-grep -rn "caption{" docs/informe-final/ | grep -E "Tabla|Figura|Listado|Resumen|Resultados|Distribución|Síntesis|Desglose|trazados|comparación|puntaje|prioridad"
-# Salida esperada: 0 resultados
-
-# Verificar que SÍ existen captions en inglés
-grep -rn "caption{" docs/informe-final/ | grep -E "Table|Figure|Listing"
-# Salida esperada: 6+ resultados
+# Ningún caption en español en el informe
+grep -rn "caption{" docs/informe-final/ 2>/dev/null | grep -E "Tabla|Figura|Listado|Resumen|Resultados|Distribución|Síntesis|Desglose|trazados|comparación|puntaje|prioridad"
+echo "exit=$?"   # 1 => 0 coincidencias
+# Total de captions (todos en inglés)
+grep -rn "caption{" docs/informe-final/ 2>/dev/null | wc -l
 ```
 
-**Archivos:** `docs/informe-final/` — captions traducidos al inglés
+**Salida (2026-09-15):**
+```
+(búsqueda 1: 0 coincidencias, grep exit 1)
+(búsqueda 2: 14 captions en inglés)
+```
+
+**Archivos:** captions en `docs/informe-final/capitulos/cap*.tex` traducidos al inglés;
+figuras generadas por scripts con rótulos en inglés (ver Makefile target `docs`).
+Textos dentro de las figuras (tablas y ejes) producidos por `scripts/gen-figuras.py` en inglés.
 
 ---
 
@@ -166,35 +179,52 @@ grep -rn "caption{" docs/informe-final/ | grep -E "Table|Figure|Listing"
 
 **Orden de verificación:**
 ```bash
-# Verificar que el script existe y tiene permisos
-ls -la scripts/generate-sus-demographics.py
-# Salida esperada: archivo existe, ejecutable
+python3 scripts/generate-sus-demographics.py dataset/sus/sus-raw.csv
+bash scripts/validate-sus-demografia.sh
+```
 
-# Verificar que genera tabla desde CSV
-python3 scripts/generate-sus-demographics.py 2>&1 | head -5
-# Salida esperada: tabla con 15 participantes, edades, género
+**Salida (2026-09-15):**
+```
+Total participants: 15
+Codes: P01..P15
+Gender: 8 male, 7 female
+Age range: 19-25 years (mean 21.2)
+Web experience: Baja=3, Media=10, Alta=2
+SUS score: mean=68.5, min=47.5, max=90.0
+OK: demografia cap.5 cruza 1:1 con sus-raw.csv (n=15, 8H/7M, 19-25, B3/M10/A2, media SUS 68.5)
 ```
 
 **Archivos:**
-- `scripts/generate-sus-demographics.py` — genera tabla desde `dataset/sus/sus-raw.csv`
 - `dataset/sus/sus-raw.csv` — datos crudos (15 participantes)
+- `scripts/generate-sus-demographics.py` — regenera la tabla desde el CSV
+- `scripts/validate-sus-demografia.sh` — cruza la demografía del cap.5 1:1 con el CSV
+- Tabla `tab:sus-demografia` en `docs/informe-final/capitulos/cap8-evaluacion.tex`
 
 ---
 
-## P9 — Endpoint asignaciones CRUD en Postman (0.7)
+## P9 — Endpoint de asignaciones con sesión (0.7)
 
 **Orden de verificación:**
 ```bash
-# Verificar que la colección tiene requests para asignaciones
+# Colección Postman con CRUD de asignaciones
 grep -c "asignaciones" docs/postman/coleccion.json
-# Salida esperada: 6+
-
-# Verificar que incluye GET, POST, PUT, DELETE
-grep -o '"method": "[A-Z]*"' docs/postman/coleccion.json | sort | uniq -c
-# Salida esperada: DELETE, GET, POST, PUT presentes
+grep -o '"method": "[A-Z]*"' docs/postman/coleccion.json | sort -u
+# Petición autenticada real contra el despliegue (ver expediente de sesión)
+cat docs/mediciones/sec/live-session/asignaciones.json
 ```
 
-**Archivos:** `docs/postman/coleccion.json` — carpeta "Asignaciones" con 6 requests CRUD
+**Salida (2026-09-15):**
+```
+11
+"method": "DELETE"  "method": "GET"  "method": "POST"  "method": "PUT"
+(HTTP/1.1 200 — GET /api/asignaciones?page=0&size=10 con cookie: content con 8 elementos)
+```
+
+**Archivos:**
+- `docs/postman/coleccion.json` — carpeta "Asignaciones" con 6 requests CRUD
+- `docs/mediciones/sec/live-session/asignaciones.json` — 200 con datos contra el deploy,
+  `auth-me.json` (200 ROLE_ADMIN) y `sin-sesion-403.txt` (403 sin cookie); resumen en
+  `docs/mediciones/sec/live-session/REPORT.md`
 
 ---
 
@@ -202,23 +232,19 @@ grep -o '"method": "[A-Z]*"' docs/postman/coleccion.json | sort | uniq -c
 
 **Orden de verificación:**
 ```bash
-# Verificar que el manifest tiene archivos
-wc -l dataset/MANIFEST.sha256
-# Salida esperada: 280+ líneas
-
-# Verificar que el script de verificación existe
-ls -la scripts/verify-manifest.ps1
-# Salida esperada: archivo existe
-
-# Ejecutar verificación
 powershell -ExecutionPolicy Bypass -File scripts/verify-manifest.ps1
-# Salida esperada: "Verification passed" o "Todos los archivos verificados correctamente"
+```
+
+**Salida (2026-09-15):**
+```
+(283 archivos OK, incluido dataset/jacoco/*, lighthouse/*, perf/*, sus/*, zap/*, zenodo.json)
+Results: 283 OK, 0 FAILED, 0 MISSING out of 283 entries
 ```
 
 **Archivos:**
-- `dataset/MANIFEST.sha256` — 280 entradas SHA-256
-- `scripts/verify-manifest.ps1` — script de verificación
-- `scripts/regenerate-manifest.ps1` — script de regeneración
+- `dataset/MANIFEST.sha256` — 283 entradas SHA-256
+- `scripts/verify-manifest.ps1` — verificación (equivalente a `sha256sum -c`)
+- `scripts/regenerate-manifest.ps1` — regeneración
 
 ---
 
@@ -226,27 +252,22 @@ powershell -ExecutionPolicy Bypass -File scripts/verify-manifest.ps1
 
 **Orden de verificación:**
 ```bash
-# Verificar que el instrumento Brooke existe
-ls -la dataset/sus/SUS-INSTRUMENT.md
-# Salida esperada: archivo existe
-
-# Verificar que tiene 10 ítems
 grep -c "^[0-9]\." dataset/sus/SUS-INSTRUMENT.md
-# Salida esperada: 10
+grep -c "| Yes" dataset/sus/CONSENT-REGISTRY.md
+ls dataset/sus/CONSENT-FORM.md
+```
 
-# Verificar consentimiento informado
-ls -la dataset/sus/CONSENT-FORM.md
-# Salida esperada: archivo existe
-
-# Verificar registro de consentimiento
-grep -c "Confirmo" dataset/sus/CONSENT-REGISTRY.md
-# Salida esperada: 15 (1 participante por línea)
+**Salida (2026-09-15):**
+```
+10
+15
+dataset/sus/CONSENT-FORM.md
 ```
 
 **Archivos:**
-- `dataset/sus/SUS-INSTRUMENT.md` — Cuestionario System Usability Scale (Brooke 1996)
+- `dataset/sus/SUS-INSTRUMENT.md` — Cuestionario System Usability Scale (Brooke 1996), 10 ítems
 - `dataset/sus/CONSENT-FORM.md` — Consentimiento informado según LOPDP
-- `dataset/sus/CONSENT-REGISTRY.md` — Registro de consentimiento de 15 participantes
+- `dataset/sus/CONSENT-REGISTRY.md` — constancia de aceptación de los 15 participantes (P01..P15)
 
 ---
 
@@ -255,14 +276,28 @@ grep -c "Confirmo" dataset/sus/CONSENT-REGISTRY.md
 **Orden de verificación:**
 ```bash
 make verify
-# Salida esperada: "All checks passed" o similar, exit code 0
+```
+
+**Salida (2026-09-15):**
+```
+[P1] OK
+[P4] OK
+[P5] OK - no Spanish fields in entities
+[P5] Total methods (main + tests): 496 / OK: 0 Spanish method names (0%)
+[P6] Javadoc coverage: 226/226 (100%) / OK: Javadoc >= 90%
+[P7] OK - all figure/table captions in English
+[P10] Results: 283 OK, 0 FAILED, 0 MISSING out of 283 entries / OK
+[P11] OK
+[P9] OK
+ALL CHECKS PASSED (exit code 0)
 ```
 
 ---
 
 ## CONTRIBUCIONES.md (EV-4)
 
-Ver archivo `CONTRIBUCIONES.md` en la raíz del repositorio.
+Ver archivo `CONTRIBUCIONES.md` en la raíz del repositorio (firmado por los tres
+integrantes con su correo institucional).
 
 ---
 
@@ -270,5 +305,8 @@ Ver archivo `CONTRIBUCIONES.md` en la raíz del repositorio.
 
 ```bash
 git log -1 --format="%H %s (%cs)" v1.1.0
-# Salida esperada: c09f981 refactor: update security classes for P5 field renames (2026-09-xx)
 ```
+
+**Salida:** `b7a6731 docs(EV-4): apuntar tag v1.1.0 al commit final d2b88b7 en CONTRIBUCIONES.md (2026-09-15)`
+
+URL pública del sistema en la primera pantalla del README: `https://sgroas-backend.onrender.com`.

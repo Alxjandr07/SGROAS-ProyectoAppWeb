@@ -11,6 +11,8 @@
 > **Grupo D** — Universidad Técnica Estatal de Quevedo (UTEQ) — FCC — Carrera de Ingeniería de Software
 > Aplicaciones Web — Quinto Nivel — Periodo 2026-2027
 
+**Sistema en línea (despliegue público):** https://sgroas-backend.onrender.com
+
 ## Integrantes
 
 | Integrante | Rol |
