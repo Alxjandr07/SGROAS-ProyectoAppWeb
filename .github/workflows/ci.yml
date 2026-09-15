@@ -124,10 +124,10 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/alxjandr07/sgroas:${{ github.ref_name }}
-            ghcr.io/alxjandr07/sgroas:latest
+            ghcr.io/${{ github.repository_owner }}/sgroas:${{ github.ref_name }}
+            ghcr.io/${{ github.repository_owner }}/sgroas:latest
 
       - name: Print image digest
         run: |
-          echo "image pushed: ghcr.io/alxjandr07/sgroas:${{ github.ref_name }}"
+          echo "image pushed: ghcr.io/${{ github.repository_owner }}/sgroas:${{ github.ref_name }}"
           echo "digest: ${{ steps.build.outputs.digest }}"

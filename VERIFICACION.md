@@ -349,8 +349,9 @@ integrantes con su correo institucional).
 ## Tag v1.1.0 (EV-3)
 
 El tag `v1.1.0` se colocó sobre el ÚLTIMO commit de la cadena de cierre
-(contenido sustantivo en `51202f5`; el commit del tag cierra con la corrección
-del pipeline CI que define la variable de entorno `JWT_SECRET`). Se verifica:
+(contenido sustantivo en `51202f5`; el commit del tag cierra con las correcciones
+del pipeline CI: definir la variable de entorno `JWT_SECRET` y publicar la imagen
+en `ghcr.io/<owner>/sgroas` con el owner dinámico del workflow). Se verifica:
 
 ```bash
 git rev-parse v1.1.0
