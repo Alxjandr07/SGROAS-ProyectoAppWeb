@@ -5,3 +5,6 @@ Makefile text eol=lf
 dataset/MANIFEST.csv text eol=lf
 dataset/MANIFEST.sha256 text eol=lf
 dataset/jacoco/** text eol=lf
+dataset/** text eol=lf
+dataset/**/*.gif binary
+dataset/**/*.png binary
