@@ -161,7 +161,7 @@ python3 scripts/check-javadoc.py
 
 **Salida (2026-09-15):**
 ```
-Javadoc coverage: 226/226 (100%)
+Javadoc coverage: 226/226 (100.0%)
 OK: Javadoc >= 90%
 BUILD SUCCESS (mvn javadoc:javadoc sin errores)
 ```
@@ -328,10 +328,12 @@ make verify
 [P2] OK
 [P4] OK
 [P5] OK - no Spanish fields in entities
-[P5] Total methods (main + tests): 496
-[P5] OK: 0 Spanish method names (0%)
-[P6] Javadoc coverage: 226/226 (100%)
-[P6] OK: Javadoc >= 90%
+[P5] Checking Spanish method names in main...
+Total methods (main + tests): 496
+OK: 0 Spanish method names (0%)
+[P6] Checking Javadoc coverage on public methods...
+Javadoc coverage: 226/226 (100.0%)
+OK: Javadoc >= 90%
 [P7] OK - all figure/table captions in English
 [P10] Results: 283 OK, 0 FAILED, 0 MISSING out of 283 entries / OK
 [P11] OK
