@@ -4,3 +4,4 @@ Makefile text eol=lf
 *.sh text eol=lf
 dataset/MANIFEST.csv text eol=lf
 dataset/MANIFEST.sha256 text eol=lf
+dataset/jacoco/ text eol=lf
