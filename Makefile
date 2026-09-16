@@ -118,7 +118,7 @@ verify:
 	@echo "[P7] OK - all figure/table captions in English"
 	@echo ""
 	@echo "[P10] Verifying MANIFEST.sha256..."
-	@powershell -ExecutionPolicy Bypass -File scripts/verify-manifest.ps1
+	@tr -d '\r' < dataset/MANIFEST.sha256 | sha256sum -c -
 	@echo "[P10] OK"
 	@echo ""
 	@echo "[P11] Checking SUS instrument and consent..."
