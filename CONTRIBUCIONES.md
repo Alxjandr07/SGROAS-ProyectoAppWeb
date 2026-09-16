@@ -99,6 +99,10 @@ Integrantes: Luis Alejandro Tejada Bajaña, María del Rosario Escudero Plaza, K
 
 **Commit:** `92576cf` + `c09f981` — "P5: rename all entity fields from Spanish to English" + "refactor: update security classes for P5 field renames"
 
+**Verificación (portable a Linux, sin PowerShell):**
+- `scripts/check-spanish-methods.py` — 0 nombres de método en español (496 métodos, 0%)
+- `scripts/check-javadoc.py` — 226/226 métodos documentados (100%), ≥ 90%
+
 ---
 
 ## P7 — Captions de figuras/tablas en inglés (commit 33e25e5)
@@ -140,7 +144,7 @@ Integrantes: Luis Alejandro Tejada Bajaña, María del Rosario Escudero Plaza, K
 ## P10 — Manifest SHA-256 verificable (commit fc25cb8)
 
 **Archivos creados/modificados:**
-- `dataset/MANIFEST.sha256` — Regenerado con 280 entradas
+- `dataset/MANIFEST.sha256` — 283 entradas SHA-256 (LF), verificadas con `sha256sum -c`
 - `scripts/verify-manifest.ps1` — Script de verificación (equivalente a sha256sum -c)
 - `scripts/regenerate-manifest.ps1` — Script de regeneración
 
@@ -199,6 +203,6 @@ integrantes que firman, con los archivos y commits indicados en cada sección.
 
 | Integrante | Correo institucional | Firma |
 |---|---|---|
-| Luis Alejandro Tejada Bajaña | ltejadab@uteq.edu.ec | |
-| María del Rosario Escudero Plaza | mescuderop@uteq.edu.ec | |
-| Kevin Moisés Castro Espinoza | kcastroe2@uteq.edu.ec | |
+| Luis Alejandro Tejada Bajaña | ltejadab@uteq.edu.ec | Luis Alejandro Tejada Bajaña |
+| María del Rosario Escudero Plaza | mescuderop@uteq.edu.ec | María del Rosario Escudero Plaza |
+| Kevin Moisés Castro Espinoza | kcastroe2@uteq.edu.ec | Kevin Moisés Castro Espinoza |

@@ -31,6 +31,9 @@ cd SGROAS-ProyectoAppWeb
 # Copiar variables de entorno
 cp .env.example .env
 
+# Requisitos: GNU make, Python 3 y un shell POSIX (Git Bash en Windows);
+# no se requiere PowerShell para make verify.
+
 # Levantar todo
 make up
 

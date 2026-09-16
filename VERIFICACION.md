@@ -130,7 +130,7 @@ grep -n "\.secure(true)" src/main/java/ec/edu/uteq/sgroas/controller/AuthControl
 
 **Orden de verificación:**
 ```bash
-powershell -ExecutionPolicy Bypass -File scripts/check-spanish-methods.ps1
+python3 scripts/check-spanish-methods.py
 ```
 
 **Salida (2026-09-15):**
@@ -155,7 +155,7 @@ cognado inglés, no español) → 0,77% ≤ 5%.
 
 **Orden de verificación:**
 ```bash
-powershell -ExecutionPolicy Bypass -File scripts/check-javadoc.ps1
+python3 scripts/check-javadoc.py
 ./mvnw javadoc:javadoc
 ```
 
@@ -237,7 +237,7 @@ cat docs/mediciones/sec/live-session/asignaciones.json
 
 **Salida (2026-09-15):**
 ```
-11
+9
 "method": "DELETE"  "method": "GET"  "method": "POST"  "method": "PUT"
 (HTTP/1.1 200 — GET /api/asignaciones?page=0&size=10 con cookie: content con 8 elementos)
 ```
@@ -292,7 +292,7 @@ La verificación también se cubre con el script PowerShell (`scripts/verify-man
 
 **Orden de verificación:**
 ```bash
-grep -c "^[0-9]\." dataset/sus/SUS-INSTRUMENT.md
+grep -cE "^[0-9]+\. " dataset/sus/SUS-INSTRUMENT.md
 grep -c "| Yes" dataset/sus/CONSENT-REGISTRY.md
 ls dataset/sus/CONSENT-FORM.md
 ```
@@ -328,8 +328,10 @@ make verify
 [P2] OK
 [P4] OK
 [P5] OK - no Spanish fields in entities
-[P5] Total methods (main + tests): 496 / OK: 0 Spanish method names (0%)
-[P6] Javadoc coverage: 226/226 (100%) / OK: Javadoc >= 90%
+[P5] Total methods (main + tests): 496
+[P5] OK: 0 Spanish method names (0%)
+[P6] Javadoc coverage: 226/226 (100%)
+[P6] OK: Javadoc >= 90%
 [P7] OK - all figure/table captions in English
 [P10] Results: 283 OK, 0 FAILED, 0 MISSING out of 283 entries / OK
 [P11] OK
